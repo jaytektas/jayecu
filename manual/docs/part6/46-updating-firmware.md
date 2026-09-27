@@ -11,7 +11,7 @@
 :material-circle:{ .level-basic } Basic
 
 - The studio and the ECU firmware are updated **separately** (chapter 3 covers the studio).
-- Firmware comes as a **kit** for one board: the firmware image, its descriptor and its pages. Kits
+- Firmware comes as a **kit** for one board: the firmware image, its meta and its pages. Kits
   ship with the studio, and the studio can download newer ones.
 - The update runs over the ordinary **USB cable**. No programmer, no other program.
 - Your tune is **read, backed up, converted and put back** as part of the update.
@@ -23,10 +23,10 @@
 
 ### 1 · Where kits come from
 
-- **Shipped**: each studio release carries kits for the boards it supports.
+- **Shipped**: each studio release carries a kit for every board it supports.
 - **Downloaded**: with **Check for firmware updates at startup** on (Edit ▸ Preferences ▸ Updates), or
-  when you press **Check now**, the studio looks for newer firmware for every board it has met and
-  downloads it. Every file is checked against the release's published checksums before it is kept.
+  when you press **Check now**, the studio looks for newer firmware for every board it has met or has
+  a kit for, and downloads it. Every file is checked against the release's published checksums before it is kept.
   Nothing is put on an ECU by this: it only makes the kit available.
 - **Beta**: with **Include beta firmware** on (Preferences ▸ Updates), the check also looks at beta
   releases published between full ones, and downloads whichever is newest. A beta's version reads
@@ -60,7 +60,7 @@ connect asks again.
 ### 4 · The steps
 
 <figure markdown>
-  ![Eight steps: read the tune, show the changes, check it is safe, back up the tune, flash over the bootloader, reconnect and check, put the converted tune back and burn it, copy the descriptor and pages to the SD card, then connect normally](../img/diagrams/firmware-update-steps.svg)
+  ![Eight steps: read the tune, show the changes, check it is safe, back up the tune, flash over the bootloader, reconnect and check, put the converted tune back and burn it, copy the meta and pages to the SD card, then connect normally](../img/diagrams/firmware-update-steps.svg)
   <figcaption>Figure 46.1 — What happens after Update firmware.</figcaption>
 </figure>
 
@@ -80,9 +80,11 @@ connect asks again.
    convert or back up: the new firmware's default tune goes on instead, and the studio says so when it
    finishes.
    <!-- src: apps/studio-jf/src/app/FirmwareUpgrade.cpp (noTune_: defaults, no backup); FirmwareUpgrade.cpp (the finishing message) -->
-9. **SD card**: the new descriptor and pages are copied onto the ECU's card, so another studio that
-   has never seen this firmware can fetch them from the ECU (chapter 48). No card: skipped, and said
-   so.
+9. **SD card**: the studio asks whether to copy the new meta and pages onto the ECU's card, so
+   another studio that has never seen this firmware can fetch them from the ECU (chapter 48). It
+   takes about a minute. Tick **Remember my choice** and it stops asking; **Copy the meta and
+   dashboard to the ECU's SD card** (Preferences ▸ Updates) shows and
+   changes the answer. No card: skipped, and said so.
 10. The normal connect runs, with the studio and the ECU in step.
     <!-- src: apps/studio-jf/src/app/FirmwareUpgrade.h; apps/studio-jf/src/app/FirmwareUpgrade.cpp -->
 
@@ -121,7 +123,7 @@ connect asks again.
 | Flash failed part-way | USB unplugged or disturbed | The ECU waits in its bootloader: answer **Try again**, or press Connect later (chapter 47) |
 | Tune values missing after the update | They were in **Going out** | The backup: **File ▸ Open Tune…**, marked *(firmware backup)* (chapter 48) |
 | "It had no tune, so it now has the firmware's default tune" | The ECU had no usable tune before the update | Set the tune up, or open a saved one with **File ▸ Open Tune…** (chapter 47, section 2) |
-| Another studio shows no pages for this ECU | It has no copy of the new descriptor | It fetches it from the ECU's SD card (chapter 48) |
+| Another studio shows no pages for this ECU | It has no copy of the new meta | It fetches it from the ECU's SD card (chapter 48) |
 
 ## Related
 

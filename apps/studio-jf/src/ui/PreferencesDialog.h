@@ -779,7 +779,7 @@ private:
         // THE SD COPY after installing firmware (FirmwareUpgrade::copyToSd). Asked each time unless the
         // answer was remembered; this is that answer. Unset, the box shows the likely one, and changing it
         // counts as remembering.
-        f->add(std::make_unique<JLabel>(m_graph, "Copy the meta and dashboard to the ECU's SD card after installing firmware", 240.f));
+        f->add(std::make_unique<JLabel>(m_graph, "Copy the meta and dashboard to the ECU's SD card", 240.f));
         JCheckBox* fwSd = f->add(std::make_unique<JCheckBox>(m_graph, "", 30.f));
         fwSd->setChecked(JSettings::instance().get<bool>("updates.firmwareCopyToSd", true));
         fwSd->onStateChanged.connect([](bool on) { JSettings::instance().set("updates.firmwareCopyToSd", on); });

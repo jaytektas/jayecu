@@ -66,7 +66,7 @@ Inside the data folder:
 | Folder or file | What it holds |
 |---|---|
 | `ecus/` | One folder for each ECU the studio has met, named by the ECU's unique ID. It holds that ECU's saved tunes (`tunes/`), restore points (`restore/`), its page layout (`dashboard.gui`) and the tune backups made before a firmware update (`backups/`). |
-| `meta/` | ECU descriptors: the files that tell the studio what settings and channels a given firmware has. |
+| `meta/` | ECU metas: the files that tell the studio what settings and channels a given firmware has. |
 | `dashboards/` | Page layouts, one for each firmware layout (`<board> <layout hash>.gui`), from the shipped kit, an ECU's SD card or a firmware release. |
 | `firmware/` | ECU firmware kits the studio has downloaded. |
 | `datalogs/` | Logs you record in the studio, unless you choose another folder in **Edit ▸ Preferences ▸ Datalog**. |
@@ -91,7 +91,9 @@ looks at full releases. Drafts and pre-releases are never offered.
 <!-- src: apps/studio-jf/main.cpp (releases/latest of jaytektas/jayecu) (startup check) (Check now); JFramework include/j/update/JRelease.h -->
 
 When a newer version exists, the studio asks you first: *"jayecu Studio X is available. You have Y.
-Download and install it now (N MB)?"* If you answer **Yes**, it:
+Download and install it now (N MB)?"*, with **Update** and **Not now**. Tick **Don't ask about X
+again** before **Not now** and that version is not offered at startup again; the next version is, and
+**Check now** still finds it, because then you asked. If you answer **Update**, it:
 
 1. downloads the release's checksum file (`SHA256SUMS`), then the file for your system;
 2. checks that the file's SHA-256 checksum matches the published one. If it does not match, nothing
@@ -99,7 +101,7 @@ Download and install it now (N MB)?"* If you answer **Yes**, it:
 3. puts the new version ready to install (it **stages** it) and closes the studio in the usual way.
    If you have unsaved work, you are asked about it as you would be at any close;
 4. installs the new version once the studio has closed, and starts it.
-<!-- src: JFramework include/j/app/JAppUpdater.h (offer) (download sums, then asset, verify, stage, requestClose); apps/studio-jf/main.cpp (installStaged after the main loop) -->
+<!-- src: JFramework include/j/app/JAppUpdater.h (offer: Update / Not now, updates.skipVersion) (download sums, then asset, verify, stage, requestClose); apps/studio-jf/main.cpp (installStaged after the main loop) -->
 
 <figure markdown>
   ![Diagram of the update sequence: check, compare with the newest release, ask, download the checksums and the file, verify, stage, close, install, start the new version; and the three ways it stops or waits](../img/diagrams/installing-studio-update.svg)
@@ -130,9 +132,9 @@ installed the next time you close the studio.
     checksums, so it cannot be installed safely"). Neither is downloaded.
     <!-- src: JFramework include/j/update/JRelease.h; JFramework include/j/app/JAppUpdater.h -->
 
-**ECU firmware** is checked in the same place but released on its own. When the studio checks at
+**ECU firmware** comes in the same releases, with its own version number. When the studio checks at
 startup (or you press **Check now**), it also looks for newer firmware for every board it has
-connected to before, and downloads any it finds into the data folder's `firmware/` folder. Each file
+connected to before or has firmware for, and downloads any it finds into the data folder's `firmware/` folder. Each file
 is checked against the release's checksums first. Downloaded firmware is **kept, never flashed**: the
 studio only offers it when you connect to an ECU that runs older firmware, and asks before it changes
 anything (chapter 46).
@@ -328,22 +330,27 @@ or refused). Nothing was changed."
       starts. It only speaks up if there is one, so a laptop with no network is not told so every
       time.
     - **Check for firmware updates at startup** (on by default): look for newer ECU firmware for
-      the boards you have used, and download it. It is never put on an ECU from here.
+      the boards you have used and the boards the studio has firmware for, and download it. It is
+      never put on an ECU from here.
     - **Tell me when a connected ECU has older firmware** (on by default): when you connect, offer
       the newer firmware the studio already has. This needs no network, so it still works when the
       two checks above are off.
     - **Include beta firmware** (off by default): the firmware check also looks at beta releases, and
       the newest firmware wins, beta or not. Betas are published between releases for testing; leave
       this off on a car you depend on.
-    <!-- src: apps/studio-jf/src/ui/PreferencesDialog.h; main.cpp; JFramework include/j/app/JAppUpdater.h -->
+    - **Copy the meta and dashboard to the ECU's SD card**: after a
+      firmware update or recovery, put the ECU's meta and pages on its SD card, so another
+      studio can read the ECU with no internet. It takes about a minute. The studio asks each time
+      until you tick **Remember my choice**; this box shows the answer it remembered, and changes it.
+    <!-- src: apps/studio-jf/src/ui/PreferencesDialog.h; main.cpp; JFramework include/j/app/JAppUpdater.h; apps/studio-jf/src/app/FirmwareUpgrade.cpp (copyToSd, updates.firmwareCopyToSd) -->
 4. Press **Check now** to check both the studio and the firmware immediately. The answer appears in
    the status bar at the bottom of the main window. It might say "jayecu Studio is up to date
    (0.1.0)", "ECU firmware is up to date", or an offer to download.
    <!-- src: apps/studio-jf/main.cpp; JFramework include/j/app/JAppUpdater.h; main.cpp -->
 
 <figure markdown>
-  ![Edit, Preferences, Updates: This version 0.1.0, three ticked boxes for startup and connect checks, and the Check now button](../img/studio/installing-studio-updates.png)
-  <figcaption>Figure 3.5 — Edit ▸ Preferences ▸ Updates, as shipped: all three checks on. The
+  ![Edit, Preferences, Updates: This version 0.3.0; ticked boxes for the startup and connect checks, beta firmware off, the SD card copy of the meta and dashboard, and the Check now button](../img/studio/installing-studio-updates.png)
+  <figcaption>Figure 3.5 — Edit ▸ Preferences ▸ Updates, as shipped: the three checks on, beta firmware off. The
   text under Check now is the promise that firmware is never flashed without asking.</figcaption>
 </figure>
 

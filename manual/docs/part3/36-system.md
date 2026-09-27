@@ -77,7 +77,7 @@ The microSD card is optional, but several things need it:
 | `learn0.jlt` … `learn2.jlt` | learned values, so they survive a restart (chapter 23) |
 | `dtc.bin` | stored trouble codes, so they survive a restart (chapter 44) |
 | `LOG0001.MLG` … | on-board logs (chapter 42) |
-| the studio's descriptor and layout | so a studio that has never seen this ECU can show its pages (chapter 48) |
+| the studio's meta and layout | so a studio that has never seen this ECU can show its pages (chapter 48) |
 
 <!-- src: firmware (0:/ecucfg.bin, 0:/learn0..2.jlt, 0:/dtc.bin, 0:/LOG%04d.MLG); firmware/Comms/SdProtocol.cpp -->
 

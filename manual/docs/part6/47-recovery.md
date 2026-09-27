@@ -45,7 +45,7 @@ The ECU also ends up waiting in its bootloader on its own if a firmware update i
 <figure markdown>
   ![Case open and USB connected; hold SW5 BOOT; press and release SW4 RESET while holding BOOT; let go of BOOT; press Connect and the studio offers to install firmware](../img/diagrams/recovery-boot-reset.svg)
   <figcaption>Figure 47.1 — Starting the bootloader by hand. After an interrupted update the ECU is
-  already there: skip to step 5.</figcaption>
+  already there: skip to step 3.</figcaption>
 </figure>
 
 1. Open the case and connect USB. USB power is enough; the ignition can be off.
@@ -62,8 +62,9 @@ The ECU also ends up waiting in its bootloader on its own if a firmware update i
 5. From here it is a firmware update (chapter 46): the studio reads the tune the ECU started with. A
    tune that suits this firmware stays. A new board has none, so the firmware's default tune goes on,
    is read back and checked, burned, and the ECU restarts on it.
-6. It copies the meta and dashboard to the ECU's SD card, so another studio can read this ECU from its
-   own card. With no card it skips that step.
+6. It asks whether to copy the meta and pages to the ECU's SD card, as an update does, so
+   another studio can read this ECU from its own card (chapter 46, step 9); once you have ticked
+   **Remember my choice** it does what you chose without asking. With no card it skips that step.
 7. The studio connects, and the status line says what was installed. Only when it put the default
    tune on does it stop first, with **ECU firmware installed**: a default tune is only a starting
    point, so set it up for your engine before starting it. Press **OK** and it connects.
@@ -119,7 +120,7 @@ The engine ran before a change and not after:
 | The status line says what the studio found | It names an ECU it does not recognise, or a bootloader |
 
 An ECU running firmware this studio has never seen still connects if its SD card holds the
-descriptor: the studio fetches it from the card (chapter 48).
+meta: the studio fetches it from the card (chapter 48).
 
 ## Examples
 

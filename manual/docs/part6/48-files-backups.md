@@ -10,7 +10,7 @@
 :material-circle:{ .level-basic } Basic
 
 <figure markdown>
-  ![In the ECU: working memory, flash after Burn, and the SD card with its copies and the descriptor. In the studio's data folder, per ECU: tunes, restore points, backups before firmware updates, and the page layout](../img/diagrams/files-tune-copies.svg)
+  ![In the ECU: working memory, flash after Burn, and the SD card with its copies and the meta. In the studio's data folder, per ECU: tunes, restore points, backups before firmware updates, and the page layout](../img/diagrams/files-tune-copies.svg)
   <figcaption>Figure 48.1 — Where copies of a tune live.</figcaption>
 </figure>
 
@@ -21,7 +21,7 @@
 | Restore points | `ecus/<ECU id>/restore/` | the studio, at every connect |
 | Backups before a firmware update | `ecus/<ECU id>/backups/` | the firmware update (chapter 46) |
 | Page layout for this ECU | `ecus/<ECU id>/dashboard.gui` | **File ▸ Save Layout** (chapter 49) |
-| Descriptors (what a firmware has) | `meta/` | the studio; also on the ECU's SD card |
+| Metas (what a firmware has) | `meta/` | the studio; also on the ECU's SD card |
 
 The data folder's location on your system is in chapter 3.
 <!-- src: apps/studio-jf/src/model/Ecu.h; manual/docs/part1/03-installing-studio.md (data folder table) -->
@@ -72,9 +72,9 @@ flashed or wiped), it says so.
 ### 4 · The ECU's SD card
 
 The card holds its own copy of the tune and the learned values (chapter 36), and also the
-**descriptor** and **page layout** for the firmware it runs. A studio that has never seen that
+**meta** and **page layout** for the firmware it runs. A studio that has never seen that
 firmware fetches them from the card when it connects, so it can show the ECU's pages without being
-given any files. The firmware update puts them there (chapter 46).
+given any files. A firmware update or recovery puts them there when you let it (chapter 46, step 9).
 <!-- src: apps/studio-jf/main.cpp (meta fetched from the ECU's SD) (dashboard fetched from the SD) -->
 
 ## Procedure
@@ -123,7 +123,7 @@ it. Everything is found by that one path.
 | A restore point will not open | It was made on a different firmware layout | Use a named tune; they convert |
 | The ECU does not have my changes after power-off | Not burned | Burn |
 | No ECU listed in Open ECU | This studio has never connected to it | Connect it once |
-| An ECU with new firmware shows no pages | No descriptor in this studio and none on the card | Update the studio, or run the firmware update from a studio that has it |
+| An ECU with new firmware shows no pages | No meta in this studio and none on the card | Update the studio, or run the firmware update from a studio that has it |
 | Tunes missing after reinstalling | The data folder was not copied | Restore it from the backup |
 
 ## Related
