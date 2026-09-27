@@ -18,12 +18,17 @@
 // ECU, and closing a window you did not understand must not be the way that happens.
 //
 // Result is the index into the buttons passed in, or -1 for dismissal.
+//
+// An optional TICK BOX sits at the left of the button row, where dialogs put it ("[ ] Remember my choice"
+// ... [Cancel] [OK]): pass its label and take the result as (index, ticked). Dismissal reports it unticked
+// — closing a window is not a choice to remember.
 
 #include <j/core/JWidget.h>
 #include <j/core/JStyle.h>
 #include <j/core/JTextHelper.h>
 #include <j/core/JTitleBar.h>
 #include <j/core/JButton.h>
+#include <j/core/JCheckBox.h>
 #include <j/core/JDialogButtonBox.h>
 #include <j/core/FocusManager.h>
 #include <j/graphics/GpuHal.h>
@@ -106,6 +111,8 @@ public:
         const auto lines = wrapBody(body, static_cast<float>(kW) - 32.f);
         return static_cast<uint32_t>(hdrH() + 16.f + lines.size() * lineH() + 20.f + kBtnH() + 16.f);
     }
+    // The tick box's width on the button row: the box, a gap, its label.
+    static float checkW(const std::string& label) { return label.empty() ? 0.f : kBtnH() + 8.f + textW(label) + 4.f; }
 
 #if defined(_WIN32)
     using PlatformWinType     = jf::JWindowsPlatformWindow;
@@ -118,8 +125,17 @@ public:
     ChoiceDialog(std::string title, std::string body, std::vector<Choice> choices,
                  std::function<void(int)> onResult,
                  jf::JGpuHal& hal, int screenX, int screenY, NativeWinHandleType parent)
-        : m_title(std::move(title)), m_body(std::move(body)), m_onResult(std::move(onResult))
+        : ChoiceDialog(std::move(title), std::move(body), std::move(choices), std::string{},
+                       std::function<void(int, bool)>([onResult](int i, bool) { if (onResult) onResult(i); }),
+                       hal, screenX, screenY, parent) {}
+
+    // The same, with a tick box labelled `checkLabel` above the buttons; onResult(index, ticked).
+    ChoiceDialog(std::string title, std::string body, std::vector<Choice> choices, std::string checkLabel,
+                 std::function<void(int, bool)> onResult,
+                 jf::JGpuHal& hal, int screenX, int screenY, NativeWinHandleType parent)
+        : m_title(std::move(title)), m_body(std::move(body)), m_checkLabel(std::move(checkLabel))
         , m_lines(wrapBody(m_body, static_cast<float>(kW) - 32.f))
+        , m_onResult(std::move(onResult))
         , m_h(heightFor(m_body))
         , m_window(std::make_unique<PlatformWinType>(m_title, kW, m_h, screenX, screenY,
                                                      jf::JPlatformWindowStyle::Borderless, parent))
@@ -131,6 +147,8 @@ public:
         JLOGC("dialog", jf::JLogLevel::Debug) << "CTOR lines=" << m_lines.size()
             << " h=" << m_h << " lineH=" << lineH() << " atlas=" << int(jf::JTextHelper::hasAtlas())
             << " measure(Mmmm)=" << jf::JTextHelper::measureWidth("Mmmm");
+        if (!m_checkLabel.empty())
+            m_check = std::make_unique<jf::JCheckBox>(m_graph, m_checkLabel, checkW(m_checkLabel));
         m_box = std::make_unique<jf::JDialogButtonBox>(m_graph);
         for (int i = 0; i < static_cast<int>(choices.size()); ++i) {
             const float w = std::max(96.f, textW(choices[i].label) + 28.f);
@@ -180,12 +198,16 @@ public:
         m_graph.setHostWindow(m_window->screenX(), m_window->screenY(),
                               static_cast<std::uintptr_t>(m_window->rawWindowId()));
         const float pad = 16.f, by = H - kBtnH() - 12.f;
-        m_box->setBounds({ pad, by, W - 2 * pad, kBtnH() });
+        // The tick box takes the left of the row; the buttons keep the rest, placed by the box as ever.
+        const float cw = m_check ? checkW(m_checkLabel) + 12.f : 0.f;
+        if (m_check) m_check->setBounds({ pad, by + 3.f, cw - 12.f, kBtnH() - 6.f });
+        m_box->setBounds({ pad + cw, by, W - 2 * pad - cw, kBtnH() });
 
         _refreshFocusRoots();
         if (pressed) jf::jRouteMouse(mx, my, m_focus);
         if (!m_focusSeeded) { m_focusSeeded = true; m_focus.focusFirst(); }
         m_box->handleMouseMove(mx, my);
+        if (pressed && m_check) m_check->handleMousePress(mx, my);
         if (pressed)  m_box->handleMousePress(mx, my);
         if (released) m_box->handleMouseRelease(mx, my);
         if (m_done) return false;
@@ -211,6 +233,7 @@ public:
                 y += lineH();
             }
         }
+        if (m_check) m_check->populateRenderPrimitives(buf);
         m_box->populateRenderPrimitives(buf);
 
         auto frame = hal.beginFrame(m_surface);
@@ -223,21 +246,24 @@ private:
     void finish(int result) {
         if (m_done) return;
         m_done = true;
-        if (m_onResult) m_onResult(result);
+        if (m_onResult) m_onResult(result, result >= 0 && m_check && m_check->isChecked());
     }
     void _refreshFocusRoots() {
         std::vector<jf::JWidget*> roots;
+        if (m_check) roots.push_back(m_check.get());
         if (m_box) roots.push_back(m_box.get());
         m_focus.setFocusRoots(std::move(roots));
     }
 
     std::string m_title, m_body;
+    std::string m_checkLabel;           // empty = no tick box
     std::vector<std::string> m_lines;   // the question, wrapped once where the atlas is known good
-    std::function<void(int)> m_onResult;
+    std::function<void(int, bool)> m_onResult;
     uint32_t m_h;
     std::unique_ptr<PlatformWinType> m_window;
     jf::GpuSurfaceId m_surface{ 0 };
     jf::JSceneGraph  m_graph;
+    std::unique_ptr<jf::JCheckBox> m_check;
     std::unique_ptr<jf::JDialogButtonBox> m_box;
     jf::JFocusManager m_focus;
     bool m_focusSeeded{ false };

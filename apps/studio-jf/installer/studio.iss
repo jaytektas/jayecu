@@ -82,11 +82,12 @@ Source: "..\calibrations\*";   DestDir: "{app}\calibrations"; Flags: ignoreversi
 
 ; The user manual (make manual), beside the executable: Help ▸ User Manual opens {app}\manual\index.html.
 Source: "..\..\..\manual\site\*";   DestDir: "{app}\manual"; Flags: ignoreversion recursesubdirs createallsubdirs
-; The newest ECU firmware kit (make kit): what the studio offers as an update and installs for recovery,
-; with the descriptor and dashboard drawn for it. Older firmware's are fetched from their releases when
-; an ECU running one connects. Passed in by `make studio-installer` as /DKitDir and /DKitName.
-#ifdef KitDir
-Source: "{#KitDir}\*"; DestDir: "{app}\firmware\{#KitName}"; Flags: ignoreversion
+; The ECU firmware kits, one per board: what the studio offers as an update and installs for recovery,
+; each with the descriptor and dashboard drawn for it. Older firmware's are fetched from their releases
+; when an ECU running one connects. EVERY board's kit ships: recovery must be able to put firmware on a
+; virgin board of any type. Passed in by `make studio-installer` as /DKitsDir (the folder `make ship-kits` fills).
+#ifdef KitsDir
+Source: "{#KitsDir}\*"; DestDir: "{app}\firmware"; Flags: ignoreversion recursesubdirs createallsubdirs
 #endif
 ; The CAN device templates (shared/can_templates, made by codegen).
 Source: "..\..\..\shared\can_templates\*.json"; DestDir: "{app}\can_templates"; Flags: ignoreversion

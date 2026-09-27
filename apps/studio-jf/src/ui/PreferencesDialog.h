@@ -744,8 +744,8 @@ private:
         m_rows[6] = rows;
     }
 
-    // Updates — the studio's own updates, and ECU firmware (firmware + meta + dashboard, released on its
-    // own). Checking online and telling you about the ECU are separate switches: the second needs no
+    // Updates — the studio's own updates, and ECU firmware (firmware + meta + dashboard, in the same
+    // releases as the studio). Checking online and telling you about the ECU are separate switches: the second needs no
     // network, so it still works at a track with the first turned off.
     void buildUpdates() {
         using namespace jf;
@@ -776,6 +776,14 @@ private:
         fwBeta->setChecked(JSettings::instance().get<bool>("updates.firmwareBeta", false));
         fwBeta->onStateChanged.connect([](bool on) { JSettings::instance().set("updates.firmwareBeta", on); });
 
+        // THE SD COPY after installing firmware (FirmwareUpgrade::copyToSd). Asked each time unless the
+        // answer was remembered; this is that answer. Unset, the box shows the likely one, and changing it
+        // counts as remembering.
+        f->add(std::make_unique<JLabel>(m_graph, "Copy the meta and dashboard to the ECU's SD card after installing firmware", 240.f));
+        JCheckBox* fwSd = f->add(std::make_unique<JCheckBox>(m_graph, "", 30.f));
+        fwSd->setChecked(JSettings::instance().get<bool>("updates.firmwareCopyToSd", true));
+        fwSd->onStateChanged.connect([](bool on) { JSettings::instance().set("updates.firmwareCopyToSd", on); });
+
         // THE APPLICATIONS-MENU QUESTION (Linux AppImage; app/DesktopIntegration.h). Ticked when the user
         // declined it at startup, so they are not asked every launch; untick to be asked again next time.
         int menuRows = 0;
@@ -794,8 +802,9 @@ private:
         f->add(std::make_unique<JLabel>(m_graph, "", 240.f));
         addNote(f, 7, "Checks online for a newer studio and newer ECU firmware. Firmware is downloaded "
                       "and kept, but never put on an ECU without asking. Beta firmware is for testing: "
-                      "leave it off on a car you depend on.");
-        m_rows[7] = 8 + menuRows;
+                      "leave it off on a car you depend on. The SD card copy lets another studio read the "
+                      "ECU with no internet; the studio asks each time unless you tell it to remember.");
+        m_rows[7] = 9 + menuRows;
     }
 
     void buildEditor() {

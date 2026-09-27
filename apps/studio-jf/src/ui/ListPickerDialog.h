@@ -17,6 +17,8 @@
 #include <j/graphics/GpuHal.h>
 #include <j/graphics/RenderPrimitive.h>
 
+#include "WrapText.h"
+
 #if defined(_WIN32)
   #include <j/platforms/windows/WindowsPlatformWindow.h>
 #else
@@ -86,6 +88,18 @@ public:
         : ListPickerDialog(std::move(title), std::move(items), wantName, std::move(onAccept),
                            std::function<void()>{}, std::string{}, hal, sx, sy, parent) {}
 
+    // A QUESTION THAT NEEDS SAYING, not just a list: `message` is drawn above the list, wrapped to the
+    // dialog's width, with the list below it. For when the choice has consequences the rows alone do not
+    // state — which board is in the bootloader, and that the wrong one drives the wrong pins.
+    ListPickerDialog(std::string title, std::string message, std::vector<std::string> items,
+                     std::function<void(int, std::string)> onAccept, std::function<void()> onDismiss,
+                     std::string acceptLabel,
+                     jf::JGpuHal& hal, int sx, int sy, NativeWinHandleType parent)
+        : ListPickerDialog(std::move(title), std::move(items), false, std::move(onAccept), std::move(onDismiss),
+                           std::move(acceptLabel), hal, sx, sy, parent) {
+        m_message = std::move(message);
+    }
+
     // The same, plus onDismiss: called when the dialog closes WITHOUT a choice — Cancel, Escape, the
     // close [x], the window manager. A caller whose question has consequences either way (a connection
     // held open behind the prompt, say) needs to hear about the third answer too, and silence is not it.
@@ -145,6 +159,11 @@ public:
         }
 
         float y = kHeader() + kPad;
+        // Wrapped every frame against the live atlas (a first frame can measure 0 — WrapText.h), and the
+        // list starts below however many lines it took.
+        m_wrapped = wraptext::wrap(m_message, static_cast<float>(kW) - 2.f * kPad);
+        m_msgY = y;
+        if (m_wrapped.lines > 0) y += m_wrapped.height + kPad;
         if (m_name) { m_name->setBounds({ kPad, y, static_cast<float>(kW) - 2.f * kPad, kRowH }); y += kRowH + kPad; }
         // The list stops above the footer, which now sits at the bottom where a dialog's buttons belong.
         const float footerH = kBtnH() + 2.f * kPad;
@@ -210,6 +229,7 @@ private:
         if (m_box) m_box->populateRenderPrimitives(buf);   // the footer paints itself
         const JRect cr = _closeRect();
         JCloseButton::draw(buf, cr, _inRect(cr, mx, my));   // framework close control
+        if (m_wrapped.lines > 0) JTextHelper::pushText(buf, kPad, m_msgY, m_wrapped.text, Colors::TextSecondary);
         if (m_name) m_name->populateRenderPrimitives(buf);
         m_list->populateRenderPrimitives(buf);
     }
@@ -219,6 +239,9 @@ private:
     bool                                  m_focusSeeded{false};
     bool                                  m_done{false};       // set by the footer; ends pollAndRender
     std::string m_title, m_okLabel, m_acceptLabel;
+    std::string m_message;             // optional prose above the list
+    wraptext::Wrapped m_wrapped;       // m_message wrapped to the dialog's width
+    float m_msgY = 0.f;
     bool        m_wantName;
     std::function<void(int, std::string)> m_onAccept;
     std::function<void()> m_onDismiss;

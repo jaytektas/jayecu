@@ -7,6 +7,7 @@
 #include "../model/StudioPaths.h"
 #include "../surface/PanelLibrary.h"
 
+#include <j/config/Settings.h>
 #include <j/core/Log.h>
 #include <j/core/MainThreadDispatcher.h>
 #include <j/core/Timer.h>
@@ -76,13 +77,26 @@ FirmwareUpgrade::FirmwareUpgrade(EcuLink& link, Ui ui) : link_(link), ui_(std::m
 void FirmwareUpgrade::recover(const fwkits::Kit& kit) {
     kit_ = kit; identity_.clear(); port_.clear(); board_ = kit.board;
     recovering_ = true;
+    tuneDict_.clear(); noTune_ = false; pushed_.clear(); report_ = {}; backupPath_.clear(); sdNote_.clear();
+    fromVersion_ = "none"; fromHash_.clear(); uid_.clear();
     JLOGC("firmware", jf::JLogLevel::Info) << "recovery: flashing " << kit_.board << " " << kit_.version
                                            << " onto an ECU found waiting in its bootloader";
+    // RECOVERY IS AN UPDATE whose first half cannot happen: the board is in its bootloader, so there is no
+    // old firmware to read a tune from, check the ignition with, or back up. From the flash on it is the
+    // same sequence — check, then the tune (read off the new firmware: kept if it is valid for it, the
+    // firmware's default tune if not), SD card, and the same summary.
+    if (!newMeta_.loadFile(kit_.meta)) {
+        abandon(newMeta_.needsStudio().empty()
+                    ? "The firmware's meta could not be read (" + kit_.meta + "). Nothing was written."
+                    : "Firmware " + kit_.version + " needs jayecu Studio " + newMeta_.needsStudio() +
+                      ". Update the studio first. Nothing was written.");
+        return;
+    }
     // THE SAME ACCESS AN UPDATE NEEDS. A bootloader the studio may not open is found, offered, and
     // then fails at the first transfer — so the rule (Linux) or the driver (Windows) comes first here too.
     ensureUsbAccess([this] {
         step_ = Step::Flashing;
-        ui_.openProgress("Installing ECU firmware", "Writing firmware " + kit_.version + " \xE2\x80\x94 do not unplug the ECU");
+        ui_.openProgress(title(), "Writing firmware " + kit_.version + " \xE2\x80\x94 do not unplug the ECU");
         ui_.progress(0, "");
         runFlash();
     });
@@ -236,6 +250,7 @@ bool FirmwareUpgrade::onConfigProgress(int done, int total) {
 }
 
 bool FirmwareUpgrade::onConfigImage(const std::vector<uint8_t>& image) {
+    if (step_ == Step::Pulling && recovering_) { recoveredRead(image); return true; }
     if (step_ == Step::Pulling)   { pulled(image); return true; }
     if (step_ == Step::Verifying) { verify(image); return true; }
     return false;
@@ -286,6 +301,26 @@ void FirmwareUpgrade::pulled(const std::vector<uint8_t>& image) {
     });
 }
 
+// RECOVERY'S TUNE. The firmware rejects at boot any stored tune that is not for its layout, and then runs
+// with every setting zero — so the layout hash at the head of the image says whether it started on a real
+// one. A real one stays: it survived whatever broke the firmware, and it is this ECU's. Otherwise the
+// firmware's own default tune goes on, exactly as an update does for an ECU that had none.
+void FirmwareUpgrade::recoveredRead(const std::vector<uint8_t>& image) {
+    if (int(image.size()) != newMeta_.configSize()) { fail("The tune could not be read from the ECU.", true); return; }
+    const uint32_t stored = uint32_t(image[0]) | uint32_t(image[1]) << 8 | uint32_t(image[2]) << 16 |
+                            uint32_t(image[3]) << 24;
+    noTune_ = stored != uint32_t(std::strtoul(newMeta_.layoutHash().c_str(), nullptr, 16));
+    if (!noTune_) {
+        JLOGC("firmware", jf::JLogLevel::Info) << "recovery: the ECU kept a tune that suits this firmware";
+        pushed_ = image;
+        copyToSd();
+        return;
+    }
+    JLOGC("firmware", jf::JLogLevel::Info) << "recovery: the ECU has no tune: the firmware's default tune goes on";
+    tuneDict_ = TuneFile::serialise(newMeta_.defaultImage(), newMeta_);
+    pushTune();
+}
+
 void FirmwareUpgrade::declined() {
     // "Not now": nothing was written anywhere, not even a backup. The connect carries on.
     JLOGC("firmware", jf::JLogLevel::Info) << "firmware " << kit_.version << " offered, not taken";
@@ -310,7 +345,7 @@ void FirmwareUpgrade::backupThenFlash() {
 
 void FirmwareUpgrade::enterDfu() {
     step_ = Step::Flashing;
-    ui_.openProgress("Updating ECU firmware", "Restarting the ECU into its bootloader \xE2\x80\x94 do not unplug it");
+    ui_.openProgress(title(), "Restarting the ECU into its bootloader \xE2\x80\x94 do not unplug it");
     ui_.progress(0, "");
     link_.sendCli("dfu");
     // The command never answers — the ECU resets. Give it a moment to go out, then let the port go.
@@ -372,7 +407,7 @@ void FirmwareUpgrade::flashed(bool ok, const std::string& error) {
                 "Writing the firmware failed: " + error + ".\n\nThe ECU is waiting in its bootloader. Keep it "
                 "plugged in.\n\nTry again?",
                 [this] {
-                    ui_.openProgress("Updating ECU firmware", "Trying again \xE2\x80\x94 do not unplug the ECU");
+                    ui_.openProgress(title(), "Trying again \xE2\x80\x94 do not unplug the ECU");
                     runFlash();
                 },
                 // WHERE THE WAY BACK ACTUALLY IS. This named a Tools menu item that does not exist and a
@@ -398,16 +433,29 @@ void FirmwareUpgrade::waitForEcu(Step next) {
     waitTicks_ = 0;
     std::weak_ptr<std::atomic<bool>> alive = alive_;
     auto tick = std::make_shared<std::function<void()>>();
-    *tick = [this, alive, tick] {
+    *tick = [this, alive, tick, next] {
         if (!alive.lock()) return;
         const std::string port = findEcuPort(port_);
         if (!port.empty()) {
             // A just-appeared port can take a moment to be given to the user (the udev ACL).
             std::weak_ptr<std::atomic<bool>> a2 = alive_;
-            jf::JTimer::singleShot(std::chrono::milliseconds(800), [this, a2, port] {
+            jf::JTimer::singleShot(std::chrono::milliseconds(800), [this, a2, port, tick, next] {
                 if (!a2.lock()) return;
                 port_ = port;
                 link_.open(port);        // the identity handshake comes back through onIdentity
+                // AN OPEN PORT IS NOT A RETURNED ECU. After `reset` the firmware first lets the burn land
+                // (up to ~2 s), so the port found here can still be the OLD connection: it opens, the ECU
+                // then resets under it, the link drops, and nothing ever answered. This loop used to stop
+                // at the open, so that was a progress window waiting forever. Now the ECU has to IDENTIFY
+                // itself (onIdentity moves step_ on) within 3 s, or the port is let go and the search
+                // carries on — inside the same overall limit.
+                jf::JTimer::singleShot(std::chrono::milliseconds(3000), [this, a2, tick, next] {
+                    if (!a2.lock() || step_ != next) return;   // it answered: the sequence has moved on
+                    JLOGC("firmware", jf::JLogLevel::Info) << "no identity on " << port_ << " yet; looking again";
+                    link_.close();
+                    waitTicks_ += 15;                          // the 3.8 s just spent counts against the limit
+                    (*tick)();
+                });
             });
             return;
         }
@@ -433,17 +481,19 @@ bool FirmwareUpgrade::onIdentity(const std::string& sig) {
         std::string why = "The ECU came back running " + ver + " " + build + " (layout " + hash + "), not " +
                           kit_.version + " " + kit_.build + " (layout " + kit_.layoutHash + ").";
         if (step_ == Step::Rebooting && !backupPath_.empty())
-            why += " Your tune was not put back on it. It is backed up in " + backupPath_ + ".";
+            why += " Your tune was not put back on it." + backupNote();
         fail(why, true);
         return true;
     }
     if (step_ == Step::Rebooting && recovering_) {
-        recovering_ = false;
-        step_ = Step::Idle;
-        ui_.closeProgress();
-        JLOGC("firmware", jf::JLogLevel::Info) << "recovery complete: " << sig;
-        ui_.tell("ECU firmware installed", "The ECU is running firmware " + kit_.version + " again.");
-        ui_.handBack(identity_);
+        // There was no old firmware to read the tune from, so read the one this firmware booted with.
+        JLOGC("firmware", jf::JLogLevel::Info) << "recovery: firmware is running: " << sig;
+        uid_ = w.size() > 5 ? w[5] : "";
+        step_ = Step::Pulling;
+        ui_.openProgress(title(), "Reading the tune the ECU started with");
+        link_.setConfigSize(newMeta_.configSize());
+        link_.setBlockSize(newMeta_.blockSize());
+        link_.readConfigImage();
         return true;
     }
     if (step_ == Step::Rebooting) pushTune(); else copyToSd();
@@ -454,8 +504,8 @@ bool FirmwareUpgrade::onIdentity(const std::string& sig) {
 
 void FirmwareUpgrade::pushTune() {
     step_ = Step::Pushing;
-    ui_.openProgress("Updating ECU firmware", noTune_ ? "Putting the default tune on the new firmware"
-                                                      : "Putting your tune on the new firmware");
+    ui_.openProgress(title(), noTune_ ? "Putting the default tune on the new firmware"
+                                      : "Putting your tune on the new firmware");
     ui_.progress(0, "");
     report_ = {};
     pushed_ = TuneFile::deserialise(tuneDict_, newMeta_, report_);
@@ -471,7 +521,7 @@ void FirmwareUpgrade::pushTune() {
     *wait = [this, alive, wait] {
         if (!alive.lock() || step_ != Step::Pushing) return;
         if (link_.busy()) {
-            if (++waitTicks_ > 600) { fail("Writing the tune to the ECU did not finish. It is backed up in " + backupPath_ + ".", true); return; }
+            if (++waitTicks_ > 600) { fail("Writing the tune to the ECU did not finish." + backupNote(), true); return; }
             jf::JTimer::singleShot(std::chrono::milliseconds(50), *wait);
             return;
         }
@@ -483,14 +533,13 @@ void FirmwareUpgrade::pushTune() {
 
 void FirmwareUpgrade::onWriteFailed() {
     if (step_ == Step::Pushing || step_ == Step::Verifying)
-        fail("Writing the tune to the ECU failed. It is backed up in " + backupPath_ + ".", true);
+        fail("Writing the tune to the ECU failed." + backupNote(), true);
 }
 
 void FirmwareUpgrade::verify(const std::vector<uint8_t>& image) {
     // Compared by NAME, not by byte: padding and firmware-owned bytes need not round-trip.
     if (TuneFile::serialise(image, newMeta_) != TuneFile::serialise(pushed_, newMeta_)) {
-        fail("The tune read back from the ECU is not the tune that was written. It is backed up in " +
-             backupPath_ + ".", true);
+        fail("The tune read back from the ECU is not the tune that was written." + backupNote(), true);
         return;
     }
     ui_.progress(100, "Saving the tune on the ECU");
@@ -522,10 +571,39 @@ void FirmwareUpgrade::resetEcu() {
 
 // ---- 7. meta + dashboard onto the ECU's SD card -----------------------------------------------------
 
+// ASKED, UNLESS REMEMBERED. The copy is what lets ANOTHER studio, with no internet, read this ECU from its own
+// card — and it costs about a minute over USB serial, wasted on an ECU only ever connected to this computer.
+// Only the person knows which this is, so the studio asks; "Remember my choice" keeps the answer, and
+// Preferences ▸ Updates shows and changes it.
+static constexpr const char* kSdSetting = "updates.firmwareCopyToSd";
+
 void FirmwareUpgrade::copyToSd() {
     step_ = Step::SdCopy;
     sdFiles_.clear();
     sdNote_.clear();
+    auto& settings = jf::JSettings::instance();
+    if (!settings.has(kSdSetting) && !sdAnswered_) {
+        ui_.closeProgress();
+        std::weak_ptr<std::atomic<bool>> alive = alive_;
+        ui_.askRemember("Copy to the ECU's SD card?",
+            "Copy the firmware's meta and dashboard to the ECU's SD card? Another studio can then read this "
+            "ECU from its own card, with no internet. It takes about a minute.",
+            "Copy to SD card", "Skip",
+            [this, alive](bool yes, bool remember) {
+                if (!alive.lock()) return;
+                if (remember) jf::JSettings::instance().set(kSdSetting, yes);
+                sdAnswered_ = true; sdYes_ = yes;
+                copyToSd();
+            });
+        return;
+    }
+    const bool copy = settings.has(kSdSetting) ? settings.get<bool>(kSdSetting, true) : sdYes_;
+    sdAnswered_ = false;                                // this run's answer is used once
+    if (!copy) {                                        // No: the card is not touched at all
+        JLOGC("firmware", jf::JLogLevel::Info) << "SD copy skipped";
+        finish();
+        return;
+    }
     const std::string stem = board_ + " " + kit_.layoutHash;
     // The meta as the kit carries it — JSON plus its CRC32 footer, the form a studio fetching it checks.
     sdFiles_.push_back({ stem + ".meta", readAll(kit_.meta) });
@@ -536,7 +614,7 @@ void FirmwareUpgrade::copyToSd() {
         for (int i = 0; i < 4; ++i) gui.push_back(uint8_t(crc >> (8 * i)));
         sdFiles_.push_back({ stem + ".gui", std::move(gui) });
     }
-    ui_.openProgress("Updating ECU firmware", "Copying the meta and dashboard to the ECU's SD card");
+    ui_.openProgress(title(), "Copying the meta and dashboard to the ECU's SD card");
     ui_.progress(0, "");
     link_.sdMcu();                       // take the card; the reply says whether there is one
 }
@@ -605,6 +683,18 @@ void FirmwareUpgrade::finish() {
         const std::string name = e->lastActiveTune().empty() ? "current" : e->lastActiveTune();
         e->saveTune(name, TuneFile::serialise(pushed_, newMeta_));
     }
+    // A RECOVERY THAT KEPT THE ECU'S OWN TUNE has nothing to report: no tune carried over, no backup, nothing
+    // for the person to act on — so no dialog, which would only be a click in front of the connect. The
+    // status line says what happened. (A recovery that put the DEFAULT tune on does stop, below: that one
+    // carries a warning — set it up for your engine before starting it.)
+    if (recovering_ && !noTune_) {
+        recovering_ = false;
+        step_ = Step::Idle;
+        JLOGC("firmware", jf::JLogLevel::Info) << "recovery complete (tune kept). " << sdNote_;
+        ui_.status("ECU firmware " + kit_.version + " installed, with the tune it already had. " + sdNote_);
+        ui_.handBack(identity_);
+        return;
+    }
     // The report, in full, beside the backup.
     std::ostringstream r;
     r << "Firmware " << fromVersion_ << " (" << fromHash_ << ") -> " << kit_.version << " (" << kit_.layoutHash << ")\n"
@@ -619,11 +709,13 @@ void FirmwareUpgrade::finish() {
     JLOGC("firmware", jf::JLogLevel::Info) << "upgrade complete\n" << r.str();
     if (noTune_) {
         step_ = Step::Idle;
+        const bool recovered = recovering_;
+        recovering_ = false;
         std::string body = "The ECU is now running firmware " + kit_.version + ". It had no tune, so it now has "
                            "the firmware's default tune \xE2\x80\x94 set it up for your engine before starting it.";
         if (!sdNote_.empty()) body += "\n\n" + sdNote_;
-        ui_.tell("ECU firmware updated", body);
-        ui_.handBack(identity_);
+        ui_.tell(recovered ? "ECU firmware installed" : "ECU firmware updated", body,
+                 [this, id = identity_] { ui_.handBack(id); });
         return;
     }
 
@@ -635,8 +727,7 @@ void FirmwareUpgrade::finish() {
     if (!sdNote_.empty()) body += "\n\n" + sdNote_;
     body += "\n\nFull report: " + reportPath;
     step_ = Step::Idle;
-    ui_.tell("ECU firmware updated", body);
-    ui_.handBack(identity_);
+    ui_.tell("ECU firmware updated", body, [this, id = identity_] { ui_.handBack(id); });
 }
 
 void FirmwareUpgrade::abandon(const std::string& why) {
@@ -644,14 +735,21 @@ void FirmwareUpgrade::abandon(const std::string& why) {
     JLOGC("firmware", jf::JLogLevel::Warn) << "upgrade not started: " << why;
     step_ = Step::Idle;
     ui_.closeProgress();
-    ui_.tell("ECU firmware not updated", why);
-    ui_.handBack(identity_);
+    ui_.tell("ECU firmware not updated", why, [this, id = identity_] { ui_.handBack(id); });
 }
 
 void FirmwareUpgrade::fail(const std::string& why, bool ecuStillHasFirmware) {
     JLOGC("firmware", jf::JLogLevel::Error) << "upgrade failed: " << why;
     step_ = Step::Idle;
     ui_.closeProgress();
-    ui_.tell("ECU firmware update failed", why);
-    ui_.handBack(ecuStillHasFirmware && link_.isOpen() ? identity_ : std::string());
+    ui_.tell("ECU firmware update failed", why,
+             [this, id = ecuStillHasFirmware && link_.isOpen() ? identity_ : std::string()] { ui_.handBack(id); });
+}
+
+std::string FirmwareUpgrade::title() const {
+    return recovering_ ? "Installing ECU firmware" : "Updating ECU firmware";
+}
+
+std::string FirmwareUpgrade::backupNote() const {
+    return backupPath_.empty() ? std::string() : " It is backed up in " + backupPath_ + ".";
 }

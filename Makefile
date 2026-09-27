@@ -11,7 +11,8 @@
 #  make firmware         → codegen + build the ECU firmware (no flashing)
 #  make kit              → firmware + the kit the studio ships (image, meta, dashboard, kit.json)
 #  make flash            → build firmware and flash to hardware via ST-Link
-#  make dfu              → build firmware and flash over USB DFU (no ST-Link needed)
+#  make dfu              → build firmware and update the ECU over USB DFU (no ST-Link needed;
+#                          a virgin board is put into DFU by hand: hold BOOT, toggle RESET)
 #  make push             → push meta + studio layout to the ECU's SD card (no reflash)
 #  make dash             → install the board's authored dashboard into the local studio
 #  make tests            → build and run native unit tests
@@ -65,7 +66,7 @@ ST_PROG   ?= STM32_Programmer_CLI
 META_LIB  ?= $(HOME)/.local/share/jayecu/jayecu Studio/meta
 
 .DEFAULT_GOAL := codegen
-.PHONY: help all package release stim codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio manual
+.PHONY: help all package release ship-kits stim codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio manual
 
 # codegen.py emits shared/tuneit-meta.json (the TuneIt Data Dictionary) along with the C++
 # headers, ecu.ini and ecu.json — so a bare `make` already produces it, then installs it into
@@ -152,8 +153,12 @@ firmware: codegen
 # Writes code.bin (the application only), so the config banks are left alone — unlike
 # `make flash`, which mass-erases. A tune already burned to bank A or B survives a DFU
 # update, which is what you want for a firmware bump that does not move the layout_hash.
+# Update the ECU over USB (no ST-LINK). A board running jayecu is told to restart into its bootloader;
+# a virgin board is put there by hand (hold BOOT, press and release RESET, release BOOT) and this waits.
+# Writes the application only, so the tune survives; the SD card is `make push`, as for `make flash`.
+# PORT=/dev/ttyACMn picks the ECU when more than one is connected.
 dfu: firmware
-	$(PYTHON) tools/dfu_flash.py --board $(BOARD)
+	$(PYTHON) tools/dfu_flash.py --board $(BOARD) $(if $(PORT),--port $(PORT))
 
 # Show the authored dashboard in the LOCAL studio. The scripts in apps/studio-jf/tools/layout
 # author definition/boards/<board>.dashboard.gui — in the working tree, in git, where a shipped
@@ -223,23 +228,32 @@ studio-run: studio
 #   cmake --install ../JFramework/build-win --prefix $(JF_SDK_WIN)
 # The Linux release file. Only an AppImage can update itself (JFramework JSelfInstaller), so this is the form
 # the studio ships in and the form the bench runs. Needs appimagetool on PATH.
-studio-appimage: studio manual kit
-	apps/studio-jf/tools/make_appimage.sh $(STUDIO_BUILD)
+studio-appimage: studio manual ship-kits
+	KITS=$(SHIP_KITS) apps/studio-jf/tools/make_appimage.sh $(STUDIO_BUILD)
 
 # The firmware KIT the studio ships with: image, descriptor, stamped dashboard and kit.json, in
 # firmware/build/<board>/kits/<board>-<version>. Both studio packages carry the newest one.
 FW_VERSION = $(shell cat firmware/version.txt)
-KIT_NAME   = $(BOARD)-$(FW_VERSION)
 kit: firmware
 	$(PYTHON) tools/make_kit.py --board $(BOARD)
+
+# EVERY BOARD'S KIT GOES IN BOTH PACKAGES, not just $(BOARD)'s. Recovery installs from the kits the studio
+# has, and it only downloads kits for boards it has already met — so a studio shipped with one board's kit
+# had no way to put firmware on a virgin board of any other. This gathers the kit of THIS firmware version
+# for every board that has one built (`make release` builds them all) into one folder the packages copy.
+SHIP_KITS = firmware/build/ship-kits
+ship-kits: kit
+	@rm -rf $(SHIP_KITS) && mkdir -p $(SHIP_KITS)
+	@for d in firmware/build/*/kits/*-$(FW_VERSION); do \
+	    [ -f "$$d/kit.json" ] && cp -r "$$d" $(SHIP_KITS)/ && echo "  ships kit: $$(basename $$d)"; done; true
 
 # The Windows installer: studio.exe, the manual, the newest kit and the CAN templates, made with Inno
 # Setup (under wine here). The version is the studio's own, from its CMakeLists project().
 ISCC ?= wine C:/InnoSetup/ISCC.exe
 STUDIO_VERSION = $(shell sed -n 's/^project.[a-z_]* VERSION \([0-9.]*\).*/\1/p' apps/studio-jf/CMakeLists.txt)
-studio-installer: studio-win manual kit
+studio-installer: studio-win manual ship-kits
 	cd apps/studio-jf && WINEDEBUG=-all $(ISCC) /DAppVersion=$(STUDIO_VERSION) \
-	    '/DKitDir=..\..\..\firmware\build\$(BOARD)\kits\$(KIT_NAME)' /DKitName=$(KIT_NAME) installer/studio.iss
+	    '/DKitsDir=..\..\..\firmware\build\ship-kits' installer/studio.iss
 	@echo "  installer: apps/studio-jf/installer/Output/jayecu-studio-$(STUDIO_VERSION)-setup.exe"
 
 # The user manual: MkDocs + Material, pinned in manual/requirements.txt and installed into its own venv

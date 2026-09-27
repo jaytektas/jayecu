@@ -44,12 +44,16 @@ MANUAL="$HERE/../../manual/site"
 if [ -f "$MANUAL/index.html" ]; then cp -r "$MANUAL" "$APPDIR/usr/bin/manual"
 else echo "make_appimage: no built manual at $MANUAL -- run make manual; packaging without it" >&2; fi
 
-# The newest ECU firmware kit (make kit), beside the studio as firmware/<kit>: the update it offers and
-# the firmware recovery installs. KIT overrides; otherwise the newest kit the firmware tree has built.
-KIT="${KIT:-$(ls -td "$HERE"/../../firmware/build/*/kits/*/ 2>/dev/null | head -1)}"
-if [ -n "$KIT" ] && [ -f "$KIT/kit.json" ]; then
-    mkdir -p "$APPDIR/usr/bin/firmware"; cp -r "${KIT%/}" "$APPDIR/usr/bin/firmware/"
-else echo "make_appimage: no firmware kit -- run make kit; packaging without one" >&2; fi
+# The ECU firmware kits, one per board, beside the studio as firmware/<kit>: the update it offers and what
+# recovery installs on a board with no firmware — of ANY board, which is why every board's kit ships.
+# KITS is the folder `make ship-kits` gathers them into.
+KITS="${KITS:-$HERE/../../firmware/build/ship-kits}"
+n=0
+for k in "$KITS"/*/; do
+    [ -f "$k/kit.json" ] || continue
+    mkdir -p "$APPDIR/usr/bin/firmware"; cp -r "${k%/}" "$APPDIR/usr/bin/firmware/"; n=$((n+1))
+done
+[ "$n" -gt 0 ] || echo "make_appimage: no firmware kits in $KITS -- run make ship-kits; packaging without any" >&2
 
 # The CAN device templates, made by codegen.
 if compgen -G "$HERE/../../shared/can_templates/*.json" >/dev/null; then

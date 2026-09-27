@@ -51,25 +51,30 @@ The ECU also ends up waiting in its bootloader on its own if a firmware update i
 1. Open the case and connect USB. USB power is enough; the ignition can be off.
 2. Hold **SW5 BOOT**, press and release **SW4 RESET**, then let go of **BOOT** (chapter 7 shows where
    they are).
-3. In the studio press **Connect**. It finds an ECU waiting in its bootloader and offers to install
-   firmware:
-    - If it has met one board type, it names it: *"Install firmware … for jaytek_v1 now? Only say Yes
-      if this ECU is a jaytek_v1."*
-    - If it knows several, or has never connected to an ECU, it asks which board it is. Choose
-      carefully: firmware for another board drives the wrong pins.
-4. **Yes**. If the studio does not yet have USB access to the bootloader — the permission rule on
-   Linux, the USB driver on Windows — it asks for it first (chapter 3). Then the firmware is written
-   and checked, and the ECU restarts.
-5. It connects as normal. If the stored tune does not suit this firmware, the ECU starts with its
-   engine side off (section 2).
+3. In the studio press **Connect**. It finds an ECU waiting in its bootloader and opens **ECU waiting
+   in its bootloader**, which lists every board type it has firmware for, each with the firmware
+   version it would install (`jaytek_v1 — firmware 0.4.0`, `proteus_f7 — firmware 0.4.0`). These
+   are hardware types, not the ECUs it has connected to before.
+4. Choose the board this ECU is and press **Install**. Choose carefully: firmware for another board
+   drives the wrong pins. If the studio does not yet have USB access to the bootloader — the
+   permission rule on Linux, the USB driver on Windows — it asks for it first (chapter 3). Then the
+   firmware is written and checked, and the ECU restarts.
+5. From here it is a firmware update (chapter 46): the studio reads the tune the ECU started with. A
+   tune that suits this firmware stays. A new board has none, so the firmware's default tune goes on,
+   is read back and checked, burned, and the ECU restarts on it.
+6. It copies the meta and dashboard to the ECU's SD card, so another studio can read this ECU from its
+   own card. With no card it skips that step.
+7. The studio connects, and the status line says what was installed. Only when it put the default
+   tune on does it stop first, with **ECU firmware installed**: a default tune is only a starting
+   point, so set it up for your engine before starting it. Press **OK** and it connects.
    <!-- src: apps/studio-jf/main.cpp (s_offerRecovery) (Connect finds the bootloader); apps/studio-jf/src/app/FirmwareUpgrade.cpp -->
 
 To leave the bootloader without installing anything, press **RESET** alone.
 
 !!! warning "The studio needs firmware for your board"
-    It installs from the kits it has (chapter 46). If it has none for your board it says so: check for
-    updates (Edit ▸ Preferences ▸ Updates ▸ **Check now**) on a computer with internet, then connect
-    again.
+    It installs from the kits it has (chapter 46). Every board's firmware ships with the studio, so this
+    only happens with a board newer than your studio: it says so, and updating the studio (Edit ▸
+    Preferences ▸ Updates ▸ **Check now**, on a computer with internet) brings its firmware.
 
 ### 2 · No usable tune
 

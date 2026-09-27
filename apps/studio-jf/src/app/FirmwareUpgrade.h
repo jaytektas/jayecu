@@ -27,6 +27,11 @@
 //   8. HAND BACK    the migrated tune is saved as the ECU's active tune, and the normal connect runs —
 //                   which then finds the studio and the ECU in sync.
 //
+// RECOVERY (recover()) is the same sequence for an ECU found waiting in its bootloader — a new board, or
+// one whose firmware stopped running. Steps 1-3 and the backup need firmware that is running, so they
+// cannot happen; from 4 on it is an update. At 6 the tune is read off the NEW firmware: a tune it booted
+// with (one that suits it) stays, and an ECU with none gets the firmware's default tune, as above.
+//
 // The studio's side (dialogs, progress, the link's signals) is passed in, so this class is only the
 // sequence.
 
@@ -54,7 +59,9 @@ public:
         // A yes/no question. Exactly one of the two runs.
         std::function<void(const std::string& title, const std::string& body,
                            std::function<void()> yes, std::function<void()> no)> ask;
-        std::function<void(const std::string& title, const std::string& body)> tell;
+        // A message with OK. `then` runs when it is dismissed — the upgrade hands the ECU back from there,
+        // so the studio's connect (and whatever it asks) waits for the person to have read this.
+        std::function<void(const std::string& title, const std::string& body, std::function<void()> then)> tell;
         // What the update takes away and brings (FirmwareChangesDialog), before anything is erased.
         // `proceed` gets the answer: true = update, false = cancel.
         struct Changes {
@@ -69,6 +76,9 @@ public:
         // The upgrade is over — finished, refused or failed. `identity` is what the ECU last said it
         // is; the studio carries on its normal connect with it. Empty = the link is not up.
         std::function<void(const std::string& identity)> handBack;
+        // A question with two named answers and a "Remember my choice" box: answer(yes, remember).
+        std::function<void(const std::string& title, const std::string& body, const std::string& yesLabel,
+                           const std::string& noLabel, std::function<void(bool yes, bool remember)> answer)> askRemember;
     };
 
     FirmwareUpgrade(EcuLink& link, Ui ui);
@@ -106,6 +116,9 @@ private:
     void ensureUsbAccess(std::function<void()> then);   // udev rule (Linux) / WinUSB driver (Windows)
     void pull();
     void pulled(const std::vector<uint8_t>& image);
+    void recoveredRead(const std::vector<uint8_t>& image);   // recovery: the tune the new firmware booted with
+    std::string title() const;        // "Installing" for a recovery, "Updating" for an update
+    std::string backupNote() const;   // " It is backed up in …" — or nothing, when there is no backup
     void declined();
     void backupThenFlash();
     void enterDfu();
@@ -134,7 +147,8 @@ private:
     MigrationReport report_;
     std::string backupPath_;
     std::vector<std::pair<std::string, std::vector<uint8_t>>> sdFiles_;   // still to write to the card
-    std::string sdNote_;                                                  // what happened on the card
+    std::string sdNote_;
+    bool sdAnswered_ = false, sdYes_ = false;   // the SD question, answered this run without "remember"                                                  // what happened on the card
     std::vector<uint8_t> lastTelemetry_;
     int waitTicks_ = 0;
     std::shared_ptr<std::atomic<bool>> alive_ = std::make_shared<std::atomic<bool>>(true);

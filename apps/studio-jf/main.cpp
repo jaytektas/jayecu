@@ -1179,13 +1179,17 @@ int main(int argc, char** argv) {
     };
 
     // Check the firmware releases for kits newer than the ones on hand, for every board this studio has
-    // met. `manual` = the Check now button, which reports every outcome; at startup only a download is
-    // worth mentioning, and only in the status line — nothing is put on an ECU from here.
+    // met OR has firmware for — the shipped kits are what recovery installs on a virgin board, so they are
+    // kept current too. `manual` = the Check now button, which reports every outcome; at startup only a
+    // download is worth mentioning, and only in the status line — nothing is put on an ECU from here.
     static std::function<void(bool)> s_checkFirmware = [&win](bool manual) {
         std::vector<std::string> boards;
         for (const Ecu::Summary& e : Ecu::list())
             if (!e.board.empty() && std::find(boards.begin(), boards.end(), e.board) == boards.end())
                 boards.push_back(e.board);
+        for (const fwkits::Kit& k : allKits())
+            if (!k.board.empty() && std::find(boards.begin(), boards.end(), k.board) == boards.end())
+                boards.push_back(k.board);
         if (boards.empty()) {
             if (manual) win.showStatus("No ECU has been connected yet, so there is no firmware to look for", 6000);
             return;
@@ -1318,7 +1322,12 @@ int main(int argc, char** argv) {
     static FirmwareUpgrade s_upgrade(link, FirmwareUpgrade::Ui{
         [&win](const std::string& t) { win.showStatus(t, 8000); },
         [&win](const std::string& title, const std::string& what) {
-            if (auto* d = jf::JProgressDialog::active()) { d->setNote(what); return; }
+            // A NEW STEP IS A NEW HEADLINE. This used to reuse the open window and put the step in its NOTE,
+            // so "Writing firmware 0.4.0 — do not unplug the ECU" stayed as the headline through the tune
+            // push and the SD copy, and each of their progress bars read as the firmware being written
+            // again. The framework's progress window cannot change its headline, so the step gets a fresh
+            // window (dismiss() lets go of active() at once, so the next open is the new one).
+            if (auto* d = jf::JProgressDialog::active()) d->dismiss();
             win.openModal<jf::JProgressDialog>(title, what);
         },
         [](int pct, const std::string& note) {
@@ -1328,7 +1337,9 @@ int main(int argc, char** argv) {
         [](const std::string& title, const std::string& body, std::function<void()> yes, std::function<void()> no) {
             jf::JDialog::confirm(title, body, std::move(yes), std::move(no), kYesNo);
         },
-        [](const std::string& title, const std::string& body) { jf::JDialog::message(title, body); },
+        [](const std::string& title, const std::string& body, std::function<void()> then) {
+            jf::JDialog::message(title, body, std::move(then));
+        },
         [&win](FirmwareUpgrade::Ui::Changes c, std::function<void(bool)> proceed) {
             FirmwareChangesDialog::Side goes, comes;
             goes.heading   = "Going out: what your tune sets that firmware " + c.toVersion + " no longer has";
@@ -1356,51 +1367,61 @@ int main(int argc, char** argv) {
             if (!identity.empty() && link.isOpen()) s_onIdentity(identity);
             else win.setStatusText("Disconnected");
         },
+        [&win](const std::string& title, const std::string& body, const std::string& yesLabel,
+               const std::string& noLabel, std::function<void(bool, bool)> answer) {
+            win.openModal<ChoiceDialog>(title, body,
+                std::vector<ChoiceDialog::Choice>{ { noLabel,  jf::JDialogButtonBox::Role::Reject },
+                                                   { yesLabel, jf::JDialogButtonBox::Role::Accept } },
+                std::string("Remember my choice"),
+                std::function<void(int, bool)>([answer](int i, bool remember) { answer(i == 1, remember); }));
+        },
     });
     s_startUpgrade = [](const fwkits::Kit& kit, const std::string& identity) {
         s_upgrade.start(kit, identity, link.portName());
     };
     // RECOVERY. The bootloader does not say which board it is on, and firmware for the wrong board would
-    // drive the wrong pins — so the board is never guessed between two: one board known, it is named in
-    // the question; several, the person picks.
+    // drive the wrong pins — so the board is never guessed between two. The question is WHAT HARDWARE IT
+    // IS, and the answers are the board types the studio has firmware for: every kit names one. NOT the
+    // ECUs it has met. Those are not hardware types — an ECU met running rusEFI is filed under its rusEFI
+    // signature, an .ini import under "ts" — and a virgin board is by definition one it has never met, so
+    // listing them offered "rusEFI jaytek.2026.08.12…" as a board to install onto, and asked only about the
+    // boards already seen. Every board type is listed, in the one dialog that also installs.
     s_offerRecovery = [&win] {
-        std::vector<std::string> boards;
-        for (const Ecu::Summary& e : Ecu::list())
-            if (!e.board.empty() && std::find(boards.begin(), boards.end(), e.board) == boards.end())
-                boards.push_back(e.board);
-        auto offer = [](const std::string& board) {
-            fwkits::Kit kit;
-            if (!fwkits::newestFor(allKits(), board, STUDIO_VERSION, kit)) {
-                jf::JDialog::message("ECU waiting in its bootloader",
-                    "An ECU is waiting in its bootloader, but the studio has no firmware for " + board +
-                            ". Check for updates (Preferences > Updates), then connect again.");
-                return;
-            }
-            jf::JDialog::confirm("ECU waiting in its bootloader",
-                "An ECU is waiting in its bootloader \xE2\x80\x94 put there with its BOOT button, or by a firmware "
-                        "update that did not finish.\n\n"
-                        "Install firmware " + kit.version + " for " + board + " now?\n\n"
-                        "Only say Yes if this ECU is a " + board + ".",
-                [kit] { s_upgrade.recover(kit); }, {}, kYesNo);
-        };
-        // A STUDIO THAT HAS NEVER MET AN ECU still has kits, and every kit names its board. A new user whose
-        // first board is stuck in its bootloader is exactly who needs this, and "cannot tell" left them no
-        // way out but a developer's tools. The board is still never guessed: they pick it, and the
-        // question below still says "only say Yes if this ECU is a …".
-        if (boards.empty())
-            for (const fwkits::Kit& k : allKits())
-                if (!k.board.empty() && std::find(boards.begin(), boards.end(), k.board) == boards.end())
-                    boards.push_back(k.board);
-        if (boards.empty()) {
-            jf::JDialog::message("ECU waiting in its bootloader",
-                "An ECU is waiting in its bootloader, but this studio has no firmware for any board. Check for "
-                        "updates (Preferences > Updates), then connect again.");
-        } else if (boards.size() == 1) {
-            offer(boards.front());
-        } else {
-            win.openModal<ListPickerDialog>(std::string("Which ECU is waiting in its bootloader?"), boards, false,
-                [boards, offer](int i, std::string) { if (i >= 0 && i < int(boards.size())) offer(boards[size_t(i)]); });
+        // ONE DIALOG: what is happening, which board it is, and Install. It used to be a board picker and
+        // then a confirm about the board just picked — two questions for one decision.
+        std::vector<fwkits::Kit> installable;   // the newest kit per board type this studio can install
+        std::vector<std::string> tooNew;        // board types whose only kits need a newer studio
+        for (const fwkits::Kit& k : allKits()) {
+            if (k.board.empty()) continue;
+            const bool seen = std::any_of(installable.begin(), installable.end(),
+                                          [&](const fwkits::Kit& i) { return i.board == k.board; });
+            if (seen || std::find(tooNew.begin(), tooNew.end(), k.board) != tooNew.end()) continue;
+            fwkits::Kit best;
+            if (fwkits::newestFor(allKits(), k.board, STUDIO_VERSION, best)) installable.push_back(best);
+            else tooNew.push_back(k.board);
         }
+        if (installable.empty()) {
+            jf::JDialog::message("ECU waiting in its bootloader",
+                tooNew.empty()
+                    ? "An ECU is waiting in its bootloader, but this studio has no firmware for any board. Update "
+                      "the studio (Preferences > Updates), then connect again."
+                    : "An ECU is waiting in its bootloader, but the firmware this studio has needs a newer studio. "
+                      "Update the studio (Preferences > Updates), then connect again.");
+            return;
+        }
+        std::vector<std::string> rows;
+        for (const fwkits::Kit& k : installable) rows.push_back(k.board + "  \xE2\x80\x94  firmware " + k.version);
+        win.openModal<ListPickerDialog>(
+            std::string("ECU waiting in its bootloader"),
+            std::string("An ECU is waiting in its bootloader \xE2\x80\x94 put there with its BOOT button, or by a "
+                        "firmware update that did not finish. Choose the board it is, and Install puts that "
+                        "board's firmware on it.\n\nChoose carefully: firmware for another board drives the "
+                        "wrong pins."),
+            rows,
+            std::function<void(int, std::string)>([installable](int i, std::string) {
+                if (i >= 0 && i < int(installable.size())) s_upgrade.recover(installable[size_t(i)]);
+            }),
+            std::function<void()>{}, std::string("Install"));
     };
     link.configReadProgress.connect([](int done, int total) { s_upgrade.onConfigProgress(done, total); });
     // The port the last open() was given — recorded so the identity handler can file the ECU under
