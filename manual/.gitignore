@@ -1,3 +1,15 @@
 .venv/
 site/
 genesis.log
+
+# The generated reference pages (gen_settings.py, gen_reference.py — each says GENERATED at the top), rebuilt
+# by `make manual` from the meta. glossary.md and specifications.md in the same folder are written by hand
+# and ARE kept.
+docs/reference/settings/
+docs/reference/channels.md
+docs/reference/dtc.md
+docs/reference/lua-api.md
+docs/reference/output-templates.md
+docs/reference/proteus-f7.md
+docs/reference/sensor-types.md
+docs/reference/trigger-wheels.md

@@ -31,7 +31,7 @@ tools/Ardu-Stim/
 genesis.log
 
 # Downloaded third-party reference material (manuals, protocol specs) — not ours to track
-reference/
+/reference/
 
 # Codegen output — built from definition/ by every make target that needs it, never edited, never stored.
 # generated/ holds ONE board at a time, so a stored copy would silently be whichever board ran last.
