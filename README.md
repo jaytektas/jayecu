@@ -201,6 +201,8 @@ Every target takes `BOARD=<name>`, defaulting to `jaytek_v1`. Boards are
 | `make studio-win` | cross-build `studio.exe` for Windows |
 | `make all` | build the firmware, then the studio for Linux and Windows |
 | `make package` | both studio packages: the Linux AppImage and the Windows installer |
+| `make manual` | build the user manual (HTML) into `manual/site` |
+| `make manual-publish` | build it and publish it to [GitHub Pages](https://jaytektas.github.io/jayecu/) |
 | `make stim` | clone the bench stim firmware (our [Ardu-Stim fork](https://github.com/jaytektas/Ardu-Stim/tree/jaytek)) into `tools/Ardu-Stim` |
 | `make clean` | remove every build: tests, firmware, studio and the manual |
 | `make help` | list every target |

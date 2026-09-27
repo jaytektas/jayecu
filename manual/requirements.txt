@@ -1,1 +1,4 @@
+# Pinned, both of them. MkDocs 2.0 drops plugins and themes and is not yet licensed, and a fresh venv
+# resolving the theme's own range could one day pick it up; 1.6.1 is the version the manual is built with.
+mkdocs==1.6.1
 mkdocs-material==9.7.7

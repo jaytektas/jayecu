@@ -1,5 +1,9 @@
 site_name: jayecu User Manual
 site_description: The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.
+# Where the published copy lives (make manual-publish): canonical links and the sitemap need it.
+site_url: https://jaytektas.github.io/jayecu/
+repo_url: https://github.com/jaytektas/jayecu
+repo_name: jaytektas/jayecu
 docs_dir: docs
 site_dir: site
 strict: true

@@ -28,6 +28,7 @@
 #  make studio-installer → Windows package: jayecu-studio-<ver>-setup.exe (Inno Setup under wine)
 #  make bench-studio     → package it, put it on the bench (BENCH=<ssh host>) and check it starts there
 #  make manual           → build the user manual (HTML) into manual/site
+#  make manual-publish   → build it and publish it to GitHub Pages (jaytektas.github.io/jayecu)
 #
 #  Cleaning
 #  make clean            → remove EVERY build: tests, firmware (all boards, with their kits), studio
@@ -75,7 +76,7 @@ ST_PROG   ?= STM32_Programmer_CLI
 META_LIB  ?= $(HOME)/.local/share/jayecu/jayecu Studio/meta
 
 .DEFAULT_GOAL := codegen
-.PHONY: help all package release ship-kits stim sdk sdk-win jframework-src sdk-check sdk-win-check codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio manual
+.PHONY: help all package release manual-publish ship-kits stim sdk sdk-win jframework-src sdk-check sdk-win-check codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio manual
 
 # codegen.py emits shared/tuneit-meta.json (the TuneIt Data Dictionary) along with the C++
 # headers, ecu.ini and ecu.json — so a bare `make` already produces it, then installs it into
@@ -346,6 +347,18 @@ sdk-win-check:
 	@[ -f $(VULKAN_WIN_LIB) ] || { echo "no Windows Vulkan import library at $(VULKAN_WIN_LIB): make sdk-win" >&2; exit 1; }
 	@[ ! -f $(JF_SDK_WIN)/jframework.commit ] || [ "$$(cat $(JF_SDK_WIN)/jframework.commit)" = "$(JF_PIN)" ] || \
 	  echo "  warning: the SDK at $(JF_SDK_WIN) is JFramework $$(cat $(JF_SDK_WIN)/jframework.commit), the studio is pinned to $(JF_PIN) — make sdk-win"
+
+# THE MANUAL ON THE WEB is the same HTML the studio ships, so the two can never disagree. The built site
+# becomes the ONE commit of the gh-pages branch, pushed from a throwaway repository: the working tree is
+# never switched, and the branch carries no history of old builds.
+PAGES_REMOTE ?= $(shell git remote get-url origin)
+manual-publish: manual
+	@T=$$(mktemp -d) && cp -r manual/site/. $$T/ && touch $$T/.nojekyll && \
+	  git -C $$T init -q -b gh-pages && git -C $$T add -A && \
+	  git -C $$T -c user.name="$$(git config user.name)" -c user.email="$$(git config user.email)" \
+	      commit -q -m "manual from $$(git rev-parse --short HEAD)" && \
+	  git -C $$T push -q -f $(PAGES_REMOTE) gh-pages && rm -rf $$T && \
+	  echo "  manual published: https://jaytektas.github.io/jayecu/  (from $$(git rev-parse --short HEAD))"
 
 test_codegen: codegen
 	$(PYTHON) tests/test_codegen.py
