@@ -1,0 +1,12 @@
+// studio.rc — the Windows resources compiled into studio.exe.
+//
+// THE SAME ARTWORK THE LINUX BUILD USES: assets/studio.png, the jayECU gauge, converted to a
+// multi-resolution .ico (256 down to 16). Windows will not
+// scale one large image well on its own — the 16 and 32 px entries are what the taskbar and Explorer
+// list view actually draw, so they ship as their own frames rather than being resampled at runtime.
+//
+// ID 1 IS NOT ARBITRARY. Explorer shows the lowest-numbered icon in an executable, and
+// JWindowsPlatformWindow loads resource id 1 for the window class — so the file, the title bar, the
+// Alt-Tab switcher and the taskbar button all end up showing the same artwork. Renumber this and the
+// window silently falls back to the Windows default while Explorer still looks right.
+1 ICON "assets/studio.ico"

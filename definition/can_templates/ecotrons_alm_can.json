@@ -1,0 +1,29 @@
+{
+  "id": "ecotrons_alm_can",
+  "name": "Ecotrons ALM-CAN (J1939)",
+  "direction": "receive",
+  "bitrate": 250000,
+  "note": "Every lambda field arrives UNSET, which is the point: set a lambda sensor's interface to CAN and point its frame and start bit at the field, so the reading comes with that sensor's calibration, operating window and P-codes instead of as a bare number on the bus. J1939 at 250 kbit with 29-bit ids \u2014 a third bit rate again, so it wants a bus of its own. PGN 65280, channel 1 on 0x0CFF0001 and channel 2 of an ALM-CAN-II on 0x0CFF0002. 10 ms. Lambda is SPN 520193: 2 bytes at J1939 start position 3-4, resolution 0.000244 per bit, which is 1/4096. READ THE ENDIANNESS TWICE: this field is set little-endian because that is the J1939 convention and Ecotrons publish the frame as J1939, but their own document never says so in words \u2014 if lambda reads as nonsense, clear Little Endian and the start bit becomes 23. The frame also carries O2%, sensor temperature (0.023438 K/bit) and a split 12-bit heater duty.",
+  "frames": [
+    {
+      "id": 218038273,
+      "ext": true,
+      "dlc": 8,
+      "period_ms": 10,
+      "name": "Ecotrons ALM",
+      "fields": [
+        {
+          "sig": null,
+          "flags": 2,
+          "scale": 4096.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200,
+          "bit_off": 16,
+          "width": 16
+        }
+      ]
+    }
+  ],
+  "consumer": "lambda"
+}

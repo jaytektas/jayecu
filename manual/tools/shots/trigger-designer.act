@@ -1,0 +1,6 @@
+# xdotool steps for shoot.sh --act (1700x1100 window): open the Trigger Library dock, then double-click
+# "2JZ 36-2 + Rear Cam" — which loads the wheel AND opens the Trigger Designer tab.
+xdotool mousemove 283 250; sleep 0.3; xdotool mousemove 284 268; sleep 0.3
+xdotool mousedown 1; sleep 0.15; xdotool mouseup 1; sleep 1.5
+xdotool mousemove 60 840; sleep 0.3; xdotool mousemove 60 847; sleep 0.3
+xdotool mousedown 1; sleep 0.05; xdotool mouseup 1; sleep 0.08; xdotool mousedown 1; sleep 0.05; xdotool mouseup 1; sleep 2.5

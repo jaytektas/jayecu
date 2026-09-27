@@ -1,0 +1,8 @@
+# jayecu table 1
+# preset: Spartan 3 0-5V 0.68-1.36 lambda
+# note: 14Point7 Spartan 3 default linear output: 10-20 AFR petrol.
+# table: sensors.sensor[lambda_1].cal
+# x: Sensor Raw [ADC]
+# value: Reading [λ]
+,0,4095
+,0.68,1.36

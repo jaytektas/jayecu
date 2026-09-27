@@ -1,0 +1,56 @@
+# JayECU USB device permissions (Linux).
+#
+# Install (and remove the old 99- copy if you have one):
+#   sudo rm -f /etc/udev/rules.d/99-jayecu.rules
+#   sudo cp tools/udev/70-jayecu.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+#   # then unplug/replug the ECU
+#
+# WHY 70 AND NOT 99 — the number is load-bearing. `uaccess` is acted on by systemd's
+# 73-seat-late.rules, and only for a device that ALREADY carries the tag when that file runs.
+# Named 99, this file added the tag after the fact, so on a real plug-in (an `add` event) no
+# ACL was ever granted: the ECU's port came back root:dialout every time the board reset —
+# after every DFU flash, every `reset` — and a studio not in dialout could not reconnect.
+# A `change` trigger appeared to fix it only because tags stick from the previous event.
+# Anything below 73 works; 70 sits beside systemd's own 70-uaccess.rules.
+#
+# WHY THIS IS NEEDED, and it is not cosmetic: the firmware's DFU path exists so a board
+# with NO ST-LINK can be reflashed (the `dfu` CLI command reboots into the STM32 system
+# bootloader; dfu-util then writes it). On a stock Linux that path FAILS for everyone
+# except the person sitting at the screen.
+#
+# dfu-util's own packaged rule tags the bootloader device `uaccess`, which makes
+# systemd-logind grant an ACL to whoever owns the ACTIVE LOCAL SEAT SESSION. So:
+#   - a terminal inside your desktop session  -> works
+#   - over SSH                                -> LIBUSB_ERROR_ACCESS
+#   - from a script, CI, or an agent          -> LIBUSB_ERROR_ACCESS
+#   - with the seat sitting at a login greeter-> the ACL goes to gdm-greeter, not you
+# and the failure comes AFTER the board is already in the bootloader, where the only way
+# out is a successful write or a power cycle. Observed exactly that: the node came up
+# crw-rw-r-- root:root with `user:gdm-greeter:rw-` in its ACL, leaving everyone else on
+# other::r-- while libusb needs O_RDWR.
+#
+# Adding GROUP+MODE alongside the tag fixes it for any member of plugdev without taking
+# anything away from the desktop-session case.
+
+# STM32 system bootloader (DFU) — the ST-LINK-less reflash path.
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="df11", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# The ECU's USB CDC serial port — the raw usb node, and the tty that appears for it.
+#
+# BOTH carry `uaccess`, and on the tty it is NOT redundant with GROUP=dialout. A group is
+# granted at LOGIN, so someone just added to dialout keeps failing to open the port in every
+# process of the session they were already in — the studio started from the desktop launcher
+# included — until they log all the way out, while `id -nG $USER` reads the user database and
+# cheerfully tells them they are in the group. The ACL is granted per-device to whoever holds
+# the active seat, so it works the moment the rule is triggered. Belt and braces: the ACL
+# covers the desktop, the group covers SSH and scripts, which `uaccess` alone never reaches.
+#
+# A node that ALREADY EXISTS needs `udevadm trigger --action=change` to pick the ACL up; an
+# `add` trigger leaves it unset.
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="5740", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", TAG+="uaccess", GROUP="dialout", MODE="0660", SYMLINK+="jayecu"
+
+# NOTE: the ST-LINK/V2 (0483:3748) is deliberately NOT here — stlink-tools ships its own
+# rule and it already works for any user. Duplicating it would only create a second place
+# to disagree.

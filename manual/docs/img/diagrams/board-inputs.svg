@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 640" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>jaytek_v1 input front ends</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .pin  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2.5; }
+    .cpu  { fill: #f1f2f4; stroke: #1d1f23; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt, .pin { fill: #16283b; } .cpu { fill: #2a2d33; stroke: #e4e6ea; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- Row A: AV -->
+  <text x="20" y="28" class="muted head">A · Analog voltage input  AV1–AV11, AV13–AV16</text>
+  <rect x="20" y="40" width="130" height="62" rx="6" class="pin"/>
+  <text x="85" y="66" text-anchor="middle" class="fg head">CN3 pin</text>
+  <text x="85" y="87" text-anchor="middle" class="fg mono">AVn, 0–5 V</text>
+  <rect x="190" y="40" width="200" height="62" rx="6" class="box"/>
+  <text x="290" y="66" text-anchor="middle" class="fg">470 kΩ to ground</text>
+  <text x="290" y="87" text-anchor="middle" class="muted">10 kΩ + 100 nF, clamp</text>
+  <rect x="430" y="40" width="200" height="62" rx="6" class="tgt"/>
+  <text x="530" y="66" text-anchor="middle" class="fg">Buffer (MCP6004)</text>
+  <text x="530" y="87" text-anchor="middle" class="muted">runs from +5V</text>
+  <rect x="670" y="40" width="200" height="62" rx="6" class="box"/>
+  <text x="770" y="66" text-anchor="middle" class="fg">5.6 kΩ / 10 kΩ</text>
+  <text x="770" y="87" text-anchor="middle" class="muted">0–5 V → 0–3.3 V</text>
+  <rect x="910" y="40" width="190" height="62" rx="6" class="cpu"/>
+  <text x="1005" y="66" text-anchor="middle" class="fg">12-bit ADC</text>
+  <text x="1005" y="87" text-anchor="middle" class="muted">reported as 0–5 V</text>
+  <path d="M150,71 H188" class="line" marker-end="url(#a)"/>
+  <path d="M390,71 H428" class="line" marker-end="url(#a)"/>
+  <path d="M630,71 H668" class="line" marker-end="url(#a)"/>
+  <path d="M870,71 H908" class="line" marker-end="url(#a)"/>
+
+  <!-- Row B: AT -->
+  <text x="20" y="140" class="muted head">B · Analog temperature input  AT1–AT4</text>
+  <rect x="20" y="152" width="130" height="62" rx="6" class="pin"/>
+  <text x="85" y="178" text-anchor="middle" class="fg head">CN3 pin</text>
+  <text x="85" y="199" text-anchor="middle" class="fg mono">ATn</text>
+  <rect x="190" y="152" width="200" height="62" rx="6" class="box"/>
+  <text x="290" y="178" text-anchor="middle" class="fg">2.7 kΩ pull-up</text>
+  <text x="290" y="199" text-anchor="middle" class="fg mono">to 5V SENSOR 1</text>
+  <rect x="430" y="152" width="200" height="62" rx="6" class="box"/>
+  <text x="530" y="178" text-anchor="middle" class="fg">10 kΩ + 100 nF</text>
+  <text x="530" y="199" text-anchor="middle" class="muted">filter</text>
+  <rect x="670" y="152" width="200" height="62" rx="6" class="tgt"/>
+  <text x="770" y="178" text-anchor="middle" class="fg">Buffer + 5.6 / 10 kΩ</text>
+  <text x="770" y="199" text-anchor="middle" class="muted">as the AV path</text>
+  <rect x="910" y="152" width="190" height="62" rx="6" class="cpu"/>
+  <text x="1005" y="178" text-anchor="middle" class="fg">12-bit ADC</text>
+  <text x="1005" y="199" text-anchor="middle" class="muted">reported as 0–5 V</text>
+  <path d="M150,183 H188" class="line" marker-end="url(#a)"/>
+  <path d="M390,183 H428" class="line" marker-end="url(#a)"/>
+  <path d="M630,183 H668" class="line" marker-end="url(#a)"/>
+  <path d="M870,183 H908" class="line" marker-end="url(#a)"/>
+
+  <!-- Row C: DIG -->
+  <text x="20" y="252" class="muted head">C · Digital input  DIG1–DIG8</text>
+  <rect x="20" y="264" width="130" height="62" rx="6" class="pin"/>
+  <text x="85" y="290" text-anchor="middle" class="fg head">CN3 pin</text>
+  <text x="85" y="311" text-anchor="middle" class="fg mono">DIGn</text>
+  <rect x="190" y="264" width="200" height="62" rx="6" class="box"/>
+  <text x="290" y="290" text-anchor="middle" class="fg">2.7 kΩ pull-up</text>
+  <text x="290" y="311" text-anchor="middle" class="fg mono">to 5V SENSOR 1</text>
+  <rect x="430" y="264" width="200" height="62" rx="6" class="box"/>
+  <text x="530" y="290" text-anchor="middle" class="fg">2.7 kΩ + 1 nF</text>
+  <text x="530" y="311" text-anchor="middle" class="muted">RC filter</text>
+  <rect x="670" y="264" width="200" height="62" rx="6" class="tgt"/>
+  <text x="770" y="290" text-anchor="middle" class="fg">Schmitt buffer</text>
+  <text x="770" y="311" text-anchor="middle" class="muted">74HC2G17 at 5 V</text>
+  <rect x="910" y="264" width="190" height="62" rx="6" class="cpu"/>
+  <text x="1005" y="290" text-anchor="middle" class="fg">Edge capture</text>
+  <text x="1005" y="311" text-anchor="middle" class="muted">1 µs timebase</text>
+  <path d="M150,295 H188" class="line" marker-end="url(#a)"/>
+  <path d="M390,295 H428" class="line" marker-end="url(#a)"/>
+  <path d="M630,295 H668" class="line" marker-end="url(#a)"/>
+  <path d="M870,295 H908" class="line" marker-end="url(#a)"/>
+
+  <!-- Row D: VR -->
+  <text x="20" y="364" class="muted head">D · VR input  VR1, VR2 (two wires each)</text>
+  <rect x="20" y="376" width="130" height="62" rx="6" class="pin"/>
+  <text x="85" y="402" text-anchor="middle" class="fg head">CN3 pins</text>
+  <text x="85" y="423" text-anchor="middle" class="fg mono">VRn+ / VRn−</text>
+  <rect x="190" y="376" width="200" height="62" rx="6" class="box"/>
+  <text x="290" y="402" text-anchor="middle" class="fg">2 × 4.7 kΩ each leg</text>
+  <text x="290" y="423" text-anchor="middle" class="muted">1 nF across the pair</text>
+  <rect x="430" y="376" width="200" height="62" rx="6" class="tgt"/>
+  <text x="530" y="402" text-anchor="middle" class="fg">VR interface</text>
+  <text x="530" y="423" text-anchor="middle" class="muted">MAX9924</text>
+  <rect x="670" y="376" width="200" height="62" rx="6" class="box"/>
+  <text x="770" y="402" text-anchor="middle" class="fg">Clean digital edge</text>
+  <text x="770" y="423" text-anchor="middle" class="muted">rising = zero crossing</text>
+  <rect x="910" y="376" width="190" height="62" rx="6" class="cpu"/>
+  <text x="1005" y="402" text-anchor="middle" class="fg">Edge capture</text>
+  <text x="1005" y="423" text-anchor="middle" class="muted">1 µs timebase</text>
+  <path d="M150,407 H188" class="line" marker-end="url(#a)"/>
+  <path d="M390,407 H428" class="line" marker-end="url(#a)"/>
+  <path d="M630,407 H668" class="line" marker-end="url(#a)"/>
+  <path d="M870,407 H908" class="line" marker-end="url(#a)"/>
+
+  <!-- Row E: knock -->
+  <text x="20" y="476" class="muted head">E · Knock input  KNOCK1, KNOCK2</text>
+  <rect x="20" y="488" width="130" height="62" rx="6" class="pin"/>
+  <text x="85" y="514" text-anchor="middle" class="fg head">CN4 pin</text>
+  <text x="85" y="535" text-anchor="middle" class="fg mono">KNOCKn</text>
+  <rect x="190" y="488" width="200" height="62" rx="6" class="box"/>
+  <text x="290" y="514" text-anchor="middle" class="fg">3.3 nF in series</text>
+  <text x="290" y="535" text-anchor="middle" class="muted">jumper H1 / H2 shorts it</text>
+  <rect x="430" y="488" width="200" height="62" rx="6" class="tgt"/>
+  <text x="530" y="514" text-anchor="middle" class="fg">Amplifier ×4.7</text>
+  <text x="530" y="535" text-anchor="middle" class="muted">470 kΩ / 100 kΩ</text>
+  <rect x="670" y="488" width="200" height="62" rx="6" class="tgt"/>
+  <text x="770" y="514" text-anchor="middle" class="fg">Low-pass filter</text>
+  <text x="770" y="535" text-anchor="middle" class="muted">then to ADC3</text>
+  <rect x="910" y="488" width="190" height="62" rx="6" class="cpu"/>
+  <text x="1005" y="514" text-anchor="middle" class="fg">ADC burst</text>
+  <text x="1005" y="535" text-anchor="middle" class="muted">about 281 kHz</text>
+  <path d="M150,519 H188" class="line" marker-end="url(#a)"/>
+  <path d="M390,519 H428" class="line" marker-end="url(#a)"/>
+  <path d="M630,519 H668" class="line" marker-end="url(#a)"/>
+  <path d="M870,519 H908" class="line" marker-end="url(#a)"/>
+  <rect x="670" y="572" width="200" height="50" rx="6" class="box"/>
+  <text x="770" y="602" text-anchor="middle" class="fg">Buffer → jack CN1</text>
+  <path d="M770,550 V570" class="line" marker-end="url(#a)"/>
+</svg>

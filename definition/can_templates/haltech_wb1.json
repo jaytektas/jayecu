@@ -1,0 +1,29 @@
+{
+  "id": "haltech_wb1",
+  "name": "Haltech WB1 (single channel)",
+  "direction": "receive",
+  "bitrate": 1000000,
+  "note": "Every lambda field arrives UNSET, which is the point: set a lambda sensor's interface to CAN and point its frame and start bit at the field, so the reading comes with that sensor's calibration, operating window and P-codes instead of as a bare number on the bus. One sensor, 20 Hz. 32767 is the controller saying FREE AIR, carried here as the field's No Reading code so the channel expires rather than reading 32 lambda. The frame also carries the sense resistor (byte 4), a diagnostic nibble (6:3-6:0: 1 low battery, 2 high battery, 3 sensor short, 4 sensor open, 5 sensor cold) and battery volts (byte 7, y=x*20/255) \u2014 add a field by hand if you want them. Same frame for the LSU 4.9 and NTK kits.",
+  "frames": [
+    {
+      "id": 689,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "Haltech WB1",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "0-1",
+          "flags": 4,
+          "scale": 1024.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 300,
+          "sentinel": 32767
+        }
+      ]
+    }
+  ],
+  "consumer": "lambda"
+}

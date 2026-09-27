@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 600" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>jaytek_v1 power supply tree</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pin  { fill: #fbeaea; stroke: #c8412d; stroke-width: 2.5; }
+    .red  { stroke: #c8412d; stroke-width: 2.5; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe, .pin { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- ===== 12V RAW branch ===== -->
+  <text x="20" y="28" class="muted head">1 · The ECU's own supply</text>
+  <rect x="20" y="44" width="150" height="58" rx="6" class="pin"/>
+  <text x="95" y="68" text-anchor="middle" class="fg head">CN4-9</text>
+  <text x="95" y="89" text-anchor="middle" class="fg mono">12V RAW (R)</text>
+
+  <rect x="210" y="44" width="170" height="58" rx="6" class="safe"/>
+  <text x="295" y="68" text-anchor="middle" class="fg head">TVS clamp</text>
+  <text x="295" y="89" text-anchor="middle" class="muted">SMCJ30CA to ground</text>
+  <rect x="420" y="44" width="190" height="58" rx="6" class="safe"/>
+  <text x="515" y="68" text-anchor="middle" class="fg head">Series diode</text>
+  <text x="515" y="89" text-anchor="middle" class="muted">reverse-polarity block</text>
+  <path d="M170,73 H208" class="red" marker-end="url(#a)"/>
+  <path d="M380,73 H418" class="red" marker-end="url(#a)"/>
+  <text x="630" y="68" class="fg mono">12V_PROT (internal)</text>
+  <path d="M610,73 H640 V122" class="red"/>
+
+  <!-- fuse out -->
+  <rect x="660" y="130" width="160" height="58" rx="6" class="safe"/>
+  <text x="740" y="154" text-anchor="middle" class="fg head">Fuses F1 ∥ F2</text>
+  <text x="740" y="175" text-anchor="middle" class="muted">on the board</text>
+  <rect x="860" y="130" width="230" height="58" rx="6" class="pin"/>
+  <text x="975" y="154" text-anchor="middle" class="fg head">CN4-16  out</text>
+  <text x="975" y="175" text-anchor="middle" class="fg mono">12V PROT (R/Y)</text>
+  <path d="M640,122 V159 H658" class="red" marker-end="url(#a)"/>
+  <path d="M820,159 H858" class="red" marker-end="url(#a)"/>
+
+  <!-- buck -->
+  <rect x="200" y="210" width="190" height="58" rx="6" class="box"/>
+  <text x="295" y="234" text-anchor="middle" class="fg head">5 V buck regulator</text>
+  <text x="295" y="255" text-anchor="middle" class="muted">LMR14020</text>
+  <path d="M640,122 V195 H295 V208" class="red" marker-end="url(#a)"/>
+
+  <rect x="200" y="300" width="190" height="58" rx="6" class="box"/>
+  <text x="295" y="324" text-anchor="middle" class="fg head">3.3 V regulator</text>
+  <text x="295" y="345" text-anchor="middle" class="muted">AMS1117 → processor</text>
+  <rect x="420" y="300" width="190" height="58" rx="6" class="tgt"/>
+  <text x="515" y="324" text-anchor="middle" class="fg head">ADC reference</text>
+  <text x="515" y="345" text-anchor="middle" class="muted">REF3033</text>
+  <path d="M295,268 V298" class="line" marker-end="url(#a)"/>
+  <path d="M390,245 H515 V298" class="line" marker-end="url(#a)"/>
+  <text x="400" y="237" class="fg mono">+5V</text>
+
+  <!-- USB -->
+  <rect x="20" y="210" width="150" height="58" rx="6" class="pid"/>
+  <text x="95" y="234" text-anchor="middle" class="fg head">USB VBUS</text>
+  <text x="95" y="255" text-anchor="middle" class="muted">through a diode</text>
+  <path d="M170,239 H198" class="line" marker-end="url(#a)"/>
+  <text x="20" y="292" class="muted">USB also feeds +5V:</text>
+  <text x="20" y="310" class="muted">the processor runs</text>
+  <text x="20" y="328" class="muted">on USB alone.</text>
+
+  <!-- sensor supplies -->
+  <rect x="660" y="228" width="200" height="58" rx="6" class="tgt"/>
+  <text x="760" y="252" text-anchor="middle" class="fg head">Sensor supply 1</text>
+  <text x="760" y="273" text-anchor="middle" class="muted">TLS115D0, tracks +5V</text>
+  <rect x="660" y="298" width="200" height="58" rx="6" class="tgt"/>
+  <text x="760" y="322" text-anchor="middle" class="fg head">Sensor supply 2</text>
+  <text x="760" y="343" text-anchor="middle" class="muted">TLS115D0, tracks +5V</text>
+  <path d="M640,195 V327 H658" class="red" marker-end="url(#a)"/>
+  <path d="M640,257 H658" class="red" marker-end="url(#a)"/>
+  <rect x="890" y="214" width="200" height="86" rx="6" class="pin"/>
+  <text x="990" y="236" text-anchor="middle" class="fg head">CN4-14  out</text>
+  <text x="990" y="256" text-anchor="middle" class="fg mono">5V SENSOR 1 (O/W)</text>
+  <text x="990" y="276" text-anchor="middle" class="muted">also the pull-ups for</text>
+  <text x="990" y="293" text-anchor="middle" class="muted">AT1–4 and DIG1–8</text>
+  <rect x="890" y="312" width="200" height="58" rx="6" class="pin"/>
+  <text x="990" y="336" text-anchor="middle" class="fg head">CN4-15  out</text>
+  <text x="990" y="357" text-anchor="middle" class="fg mono">5V SENSOR 2 (O/W)</text>
+  <path d="M860,257 H888" class="line" marker-end="url(#a)"/>
+  <path d="M860,337 H888" class="line" marker-end="url(#a)"/>
+  <text x="660" y="384" class="muted">Each supply's power-good line goes to the processor:</text>
+  <text x="660" y="402" class="muted">low for 100 ms with the key on sets P0641 / P0651.</text>
+
+  <!-- battery sense -->
+  <rect x="20" y="120" width="150" height="58" rx="6" class="tgt"/>
+  <text x="95" y="144" text-anchor="middle" class="fg head">Battery sense</text>
+  <text x="95" y="165" text-anchor="middle" class="muted">divider → AV12</text>
+  <path d="M95,102 V118" class="line" marker-end="url(#a)"/>
+  <text x="200" y="400" class="muted">Battery sense reads CN4-9 before the diode.</text>
+  <text x="200" y="420" class="muted">Key on above 8.0 V, key off below 7.0 V.</text>
+
+  <!-- ===== 12V MR branch ===== -->
+  <text x="20" y="496" class="muted head">2 · The power stage's supply</text>
+  <rect x="20" y="512" width="150" height="58" rx="6" class="pin"/>
+  <text x="95" y="536" text-anchor="middle" class="fg head">CN4-13</text>
+  <text x="95" y="557" text-anchor="middle" class="fg mono">12V MR (R/W)</text>
+  <path d="M170,541 H198" class="red" marker-end="url(#a)"/>
+  <rect x="200" y="512" width="200" height="58" rx="6" class="ff"/>
+  <text x="300" y="536" text-anchor="middle" class="fg head">High-sides HS1–8</text>
+  <text x="300" y="557" text-anchor="middle" class="muted">VNQ7140 supply</text>
+  <rect x="420" y="512" width="200" height="58" rx="6" class="ff"/>
+  <text x="520" y="536" text-anchor="middle" class="fg head">H-bridges 1 and 2</text>
+  <text x="520" y="557" text-anchor="middle" class="muted">IFX9201 supply</text>
+  <rect x="640" y="512" width="230" height="58" rx="6" class="ff"/>
+  <text x="755" y="536" text-anchor="middle" class="fg head">Freewheel diodes</text>
+  <text x="755" y="557" text-anchor="middle" class="muted">from LS13–LS16</text>
+  <path d="M400,541 H418" class="red"/>
+  <path d="M620,541 H638" class="red"/>
+  <text x="890" y="536" class="muted">No 12 V here, and the</text>
+  <text x="890" y="556" class="muted">high-sides and bridges are dead.</text>
+</svg>

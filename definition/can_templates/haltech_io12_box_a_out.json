@@ -1,0 +1,92 @@
+{
+  "id": "haltech_io12_box_a_out",
+  "name": "Haltech IO Expander 12 (Box A) \u2014 outputs",
+  "direction": "transmit",
+  "bitrate": 1000000,
+  "note": "The four digital pulsed outputs the ECU commands on an I/O Expander 12, at 50 Hz: a duty cycle and a period each. Both fields arrive UNSET \u2014 choose what drives each output, because which channel belongs on a remote pin is a decision about this car and not something the protocol settles. 100 % is raw 1000, which is the 0xFA in byte 0 a box treats as hard on. If Absent is Send zero, so an output whose channel has nothing to say goes off rather than holding. Box A and Box B are the same protocol with every identifier one apart.",
+  "frames": [
+    {
+      "id": 720,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "IOA DPO 1-2",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "0:7-1:6",
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": null,
+          "bits": "1:0-3:0",
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": null,
+          "bits": "4:7-5:6",
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": null,
+          "bits": "5:0-7:0",
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 722,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "IOA DPO 3-4",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "0:7-1:6",
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": null,
+          "bits": "1:0-3:0",
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": null,
+          "bits": "4:7-5:6",
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": null,
+          "bits": "5:0-7:0",
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    }
+  ],
+  "consumer": ""
+}

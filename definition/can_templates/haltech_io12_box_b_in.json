@@ -1,0 +1,189 @@
+{
+  "id": "haltech_io12_box_b_in",
+  "name": "Haltech IO Expander 12 (Box B) \u2014 inputs",
+  "direction": "receive",
+  "bitrate": 1000000,
+  "note": "The I/O Expander 12 as the ECU hears it: four 0\u20135 V analogue inputs and four digital pulsed inputs, at 50 Hz. Every field arrives UNSET \u2014 point a sensor's CAN frame and start bit at one and that sensor publishes the channel with its own calibration, operating window and P-codes, rather than the field writing a bare number onto the bus. The box also sends a keep-alive; it carries no reading, and the frame is here so the list says the box is talking. The DPI level bit is not in the published table \u2014 it is what Haltech's own boxes and every emulator put at 1:5, and it is how a switch on a DPI reads as a switch. Box A and Box B are the same protocol with every identifier one apart.",
+  "frames": [
+    {
+      "id": 705,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "IOB AVI 1-4",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "0:3-1:0",
+          "flags": 0,
+          "scale": 819.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "2:3-3:0",
+          "flags": 0,
+          "scale": 819.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "4:3-5:0",
+          "flags": 0,
+          "scale": 819.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "6:3-7:0",
+          "flags": 0,
+          "scale": 819.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        }
+      ]
+    },
+    {
+      "id": 707,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "IOB DPI 1-2",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "0:7-1:6",
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "1:5",
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "1:0-3:0",
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "4:7-5:6",
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "5:5",
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "5:0-7:0",
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        }
+      ]
+    },
+    {
+      "id": 709,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "IOB DPI 3-4",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "0:7-1:6",
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "1:5",
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "1:0-3:0",
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "4:7-5:6",
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "5:5",
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        },
+        {
+          "sig": null,
+          "bits": "5:0-7:0",
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        }
+      ]
+    },
+    {
+      "id": 711,
+      "ext": false,
+      "dlc": 5,
+      "period_ms": 100,
+      "name": "IOB keep-alive",
+      "fields": []
+    }
+  ],
+  "consumer": ""
+}

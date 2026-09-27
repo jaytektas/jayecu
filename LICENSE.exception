@@ -1,0 +1,40 @@
+JayECU — Additional permission under GNU GPL version 3 section 7
+
+Copyright (C) 2026 Jason Roughley
+
+JayECU is licensed under the GNU General Public License version 3 or later; see
+the file LICENSE. The following is an ADDITIONAL PERMISSION. It grants you more
+than the GPL does. It takes nothing away, and it is not a further restriction.
+
+    As a special exception, the copyright holder of JayECU gives you permission
+    to combine JayECU with software licensed under STMicroelectronics' SLA0044 —
+    in particular the STM32 USB Device Library distributed with STM32CubeF7 —
+    and to convey the resulting work. You must still comply with the GNU General
+    Public License in all respects for all of JayECU used, as well as for the
+    other code concerned.
+
+
+WHY THIS EXISTS
+
+The firmware links ST's STM32 USB Device Library: usbd_core.c, usbd_ctlreq.c,
+usbd_ioreq.c, usbd_cdc.c and the composite builder. ST licenses that library
+under SLA0044, which permits use only on STMicroelectronics devices.
+
+GPL version 3 section 7 forbids conveying a covered work under terms that impose
+further restrictions on the rights it grants. A device restriction is such a
+restriction. So without an explicit permission from JayECU's copyright holder,
+conveying a firmware image that combines the two would be a conflict — not
+because anyone is doing anything wrong, but because the two licences cannot both
+be satisfied at once by a distributor who has not been given this permission.
+
+This file is that permission, and it can only come from the copyright holder,
+which is why it is a separate document and not a note in a source file.
+
+Nothing here alters ST's terms. Their files remain under SLA0044, and the device
+restriction still binds anyone using them. What this permission does is let the
+COMBINATION be distributed under the GPL — which is the only thing that was in
+doubt.
+
+The practical effect is none, because the firmware targets an STM32F767 and no
+other part will run it. The exception exists so that the licence describes what
+is actually happening, rather than leaving a conflict for someone else to find.

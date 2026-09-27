@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 300" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Two ways to put a control on a page</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .dict { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .pal  { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .ok   { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .dict { fill: #16283b; } .pal { fill: #33240f; } .ok { fill: #13291a; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="30" width="250" height="100" rx="6" class="dict"/>
+  <text x="145" y="58" text-anchor="middle" class="fg head">Dictionary dock</text>
+  <text x="145" y="82" text-anchor="middle" class="fg">a setting or a channel,</text>
+  <text x="145" y="104" text-anchor="middle" class="mono fg">boost.activation_kpa</text>
+
+  <rect x="20" y="170" width="250" height="100" rx="6" class="pal"/>
+  <text x="145" y="198" text-anchor="middle" class="fg head">Controls dock</text>
+  <text x="145" y="222" text-anchor="middle" class="fg">a kind of control:</text>
+  <text x="145" y="244" text-anchor="middle" class="fg">Dial Gauge, Table, Toggle …</text>
+
+  <path d="M270 80 H420" class="line" marker-end="url(#a)"/>
+  <text x="345" y="70" text-anchor="middle" class="muted">drag onto the page</text>
+  <path d="M270 220 H420" class="line" marker-end="url(#a)"/>
+  <text x="345" y="210" text-anchor="middle" class="muted">drag onto the page</text>
+
+  <rect x="422" y="30" width="300" height="100" rx="6" class="ok"/>
+  <text x="572" y="58" text-anchor="middle" class="fg head">A control, already connected</text>
+  <text x="572" y="82" text-anchor="middle" class="fg">the right kind for that setting,</text>
+  <text x="572" y="104" text-anchor="middle" class="fg">captioned with its name</text>
+
+  <rect x="422" y="170" width="300" height="100" rx="6" class="box"/>
+  <text x="572" y="198" text-anchor="middle" class="fg head">A control, not yet connected</text>
+  <text x="572" y="222" text-anchor="middle" class="fg">choose what it shows in</text>
+  <text x="572" y="244" text-anchor="middle" class="fg">the Properties dock</text>
+
+  <path d="M722 80 H790" class="line"/>
+  <path d="M722 220 H790 V92" class="line"/>
+  <path d="M790 80 H818" class="line" marker-end="url(#a)"/>
+  <rect x="820" y="30" width="260" height="240" rx="6" class="box"/>
+  <text x="950" y="58" text-anchor="middle" class="fg head">Then, in Properties</text>
+  <text x="950" y="86" text-anchor="middle" class="fg">size, colours, fonts, format</text>
+  <text x="950" y="114" text-anchor="middle" class="fg">right-click ▸ Edit:</text>
+  <text x="950" y="138" text-anchor="middle" class="fg">Visibility Condition…</text>
+  <text x="950" y="162" text-anchor="middle" class="fg">Enable Condition…</text>
+  <text x="950" y="196" text-anchor="middle" class="muted">A Dictionary item dropped on</text>
+  <text x="950" y="216" text-anchor="middle" class="muted">an existing control re-points</text>
+  <text x="950" y="236" text-anchor="middle" class="muted">that control at it.</text>
+</svg>

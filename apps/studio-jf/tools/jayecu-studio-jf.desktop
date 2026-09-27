@@ -1,0 +1,13 @@
+# Desktop-entry TEMPLATE for running the studio from a source checkout through tools/studio-launch.sh
+# (which keeps a session log and a backtrace on a crash). Replace @STUDIO_DIR@ with the absolute path
+# of this checkout, then copy the file to ~/.local/share/applications/. Packaged installs do not use it.
+[Desktop Entry]
+Name=jayECU Studio (JF)
+Comment=jayECU tuning studio — JFramework-native build
+Exec=@STUDIO_DIR@/tools/studio-launch.sh
+Path=@STUDIO_DIR@
+Icon=jayecu-studio
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupWMClass=studio

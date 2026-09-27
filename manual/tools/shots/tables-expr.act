@@ -1,0 +1,4 @@
+# xdotool steps for shoot.sh --act (1700x1000 window): press the "fx" strip of Launch Control's
+# Arm When box, which opens the Expression window.
+xdotool mousemove 700 350; sleep 0.3; xdotool mousemove 705 357; sleep 0.3
+xdotool mousedown 1; sleep 0.1; xdotool mouseup 1; sleep 2

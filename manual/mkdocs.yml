@@ -1,0 +1,148 @@
+site_name: jayecu User Manual
+site_description: The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.
+docs_dir: docs
+site_dir: site
+strict: true
+# Snippet files are pulled INTO chapters (--8<--) and are not pages of their own: built, they turned up
+# in search as a bare table with a file name for a title.
+exclude_docs: |
+  reference/settings/_*.table.md
+  part2/_pins-*.md
+
+theme:
+  name: material
+  logo: img/brand/studio.png
+  favicon: img/brand/studio.png
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - content.tabs.link
+    # ONE INDEX, not two: the page's own sections sit under the current chapter in the left-hand
+    # index, so the right-hand column is not spent on a second table of contents.
+    - toc.integrate
+  # Dark first, like the studio; the studio's own orange as the accent (studio.common.style).
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle: { icon: material/weather-sunny, name: Light }
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle: { icon: material/weather-night, name: Dark }
+
+plugins:
+  - search
+  - offline          # works from file:// — the copy shipped inside the studio opens with no server
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc: { permalink: true }
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed: { alternate_style: true }
+  - pymdownx.snippets: { base_path: [docs] }
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra_css:
+  - css/manual.css
+
+# ---------------------------------------------------------------------------------------------------
+# THE INDEX. Parts run from first contact to reference; within a part, chapters run basic to advanced.
+# Module chapters (template 5a in STANDARD.md) list the firmware modules they cover in their trailing comment;
+# everything else is a topic chapter (5b).
+# Every firmware module in definition/ecu.schema.yaml has exactly one home here.
+# ---------------------------------------------------------------------------------------------------
+nav:
+  - Home: index.md
+
+  - Part I — Getting started:
+      - part1/index.md
+      - 1 How to use this manual: part1/01-using-this-manual.md
+      - 2 The system at a glance: part1/02-system-overview.md          # ECU, studio, definitions, tunes, layouts, how they talk
+      - 3 Installing jayecu Studio: part1/03-installing-studio.md      # AppImage, Windows installer, USB rule/driver, updates
+      - 4 A tour of the studio: part1/04-studio-tour.md                # menus, navigation, pages, Locked/Editing, Burn, Verify
+      - 5 First connection: part1/05-first-connection.md
+      - 6 Quick start — box to first start: part1/06-quick-start.md    # the checklist, pointing into the rest
+
+  - Part II — Hardware and wiring:
+      - part2/index.md
+      - 7 The jaytek_v1 board: part2/07-board.md                        # connectors, pinout, I/O capability, specifications
+      - 8 Tools and materials: part2/08-tools.md                        # crimpers, wire, heatshrink, meters, scope, stim
+      - 9 Wiring practice: part2/09-wiring-practice.md                  # gauges, routing, shielding, splices, connectors
+      - 10 Power, grounds and protection: part2/10-power-grounds.md
+      - 11 Wiring sensors: part2/11-wiring-sensors.md                   # analog, temp, pressure, knock, wideband, VR/Hall, SENT, digital
+      - 12 Wiring outputs: part2/12-wiring-outputs.md                   # injectors, coils, relays, PWM valves, H-bridge, stepper
+      - 13 CAN bus: part2/13-can-bus.md                                 # topology, termination, devices, templates
+      - 14 Vehicle integration: part2/14-vehicle-integration.md         # tacho, fuel pump, fans, A/C, cluster, VSS, OBD
+
+  - Part III — Configuring the engine:
+      - part3/index.md
+      - 15 Engine and vehicle basics: part3/15-engine-vehicle.md    # Engine, Vehicle
+      - 16 The trigger system: part3/16-trigger.md                  # Trigger — theory, sync, cam, examples, Trigger Designer, library
+      - 17 Sensors and calibration: part3/17-sensors.md             # Sensors, sensor types, calibration curves
+      - 18 Outputs and the pin system: part3/18-outputs.md          # Outputs, output templates, pin registry, output test
+      - 19 Fuel: part3/19-fuel.md                                   # FuelCalculator, TransientThrottle
+      - 20 Ignition: part3/20-ignition.md                           # Ignition
+      - 21 Idle: part3/21-idle.md                                   # Idle, Stepper
+      - 22 Electronic throttle: part3/22-electronic-throttle.md     # App, ElectronicThrottle, HBridge
+      - 23 Closed-loop lambda: part3/23-lambda.md                   # Lambda
+      - 24 Boost: part3/24-boost.md                                 # Boost
+      - 25 Cam and valve control: part3/25-vvt-vvl.md               # VvtControl, VVL
+      - 26 Launch, shift and traction: part3/26-launch-shift-traction.md   # Launch, FlatShift, TractionControl
+      - 27 Speed limiting: part3/27-speed-limiting.md               # RevLimiter, PitLimiter, CruiseControl
+      - 28 Power adders: part3/28-power-adders.md                   # Nitrous, Wmi, AntiLag
+      - 29 Engine protection: part3/29-protection.md                # EngineProtection, LambdaProtect, EgtProtect, Dfco
+      - 30 Knock: part3/30-knock.md                                 # Knock (configuration; tuning is chapter 38)
+      - 31 Misfire detection: part3/31-misfire.md                   # Misfire
+      - 32 Vehicle functions: part3/32-vehicle-functions.md         # VehicleSpeed, GearDetect, Alternator, TorqueModel
+      - 33 CAN configuration: part3/33-can-config.md                # Can, generic CAN frames, templates
+      - 34 Generic tables and expressions: part3/34-tables-expressions.md   # GenericTables, the expression language
+      - 35 Lua scripting: part3/35-lua.md                           # Lua, the API, examples
+      - 36 System settings: part3/36-system.md                      # System
+
+  - Part IV — Tuning:
+      - part4/index.md
+      - 37 Tuning principles: part4/37-principles.md                    # VE, lambda, MBT, knock, safety — from first principles
+      - 38 Tuning fuel: part4/38-tuning-fuel.md                         # VE, targets, cranking, warm-up, transient
+      - 39 Tuning ignition: part4/39-tuning-ignition.md
+      - 40 Auto tune: part4/40-auto-tune.md                             # the VE autotuner, filters, trims
+      - 41 Knock tuning: part4/41-knock-tuning.md                       # Knock Scope, thresholds, retard strategy
+      - 42 Datalogging and analysis: part4/42-datalogging.md            # Datalog module, studio recording, onboard logging, card logs, MegaLogViewer
+
+  - Part V — Testing and troubleshooting:
+      - part5/index.md
+      - 43 Bench testing: part5/43-bench-testing.md                     # stimulator, output test, trigger log, engine cycle
+      - 44 Diagnostics and trouble codes: part5/44-diagnostics.md   # Diagnostics, the DTC system, the studio's DTC and Diagnostics docks
+      - 45 Troubleshooting guide: part5/45-troubleshooting.md           # symptom → cause → check trees
+
+  - Part VI — Firmware and maintenance:
+      - part6/index.md
+      - 46 Updating firmware: part6/46-updating-firmware.md             # studio kits, DFU, ST-Link
+      - 47 Recovering an ECU: part6/47-recovery.md                      # bricked ECU, bootloader, bad tune
+      - 48 Tunes, layouts and backups: part6/48-files-backups.md        # files, restore points, SD card
+      - 49 Customising the studio: part6/49-customising-studio.md       # layouts, surfaces, widgets, editing mode
+
+  - Part VII — Reference:
+      - part7/index.md
+      - Every setting, by module: reference/settings/index.md           # generated from ecu.schema.yaml
+      - Output channels: reference/channels.md                          # generated: every telemetry channel
+      - Trouble codes: reference/dtc.md                                 # generated: every DTC
+      - Trigger wheel library: reference/trigger-wheels.md              # generated: the 42 wheels, each with a diagram
+      - Sensor types: reference/sensor-types.md                         # generated
+      - Output templates: reference/output-templates.md                 # generated
+      - Lua API: reference/lua-api.md                                   # generated
+      - Specifications: reference/specifications.md
+      - Glossary: reference/glossary.md
+      - Appendix — Proteus F7 board: reference/proteus-f7.md

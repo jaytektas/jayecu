@@ -1,0 +1,28 @@
+{
+  "id": "aem_x_series",
+  "name": "AEM X-Series Wideband (AEMnet)",
+  "direction": "receive",
+  "bitrate": 500000,
+  "note": "Every lambda field arrives UNSET, which is the point: set a lambda sensor's interface to CAN and point its frame and start bit at the field, so the reading comes with that sensor's calibration, operating window and P-codes instead of as a bare number on the bus. THE ODD ONE OUT: 29-bit identifiers at 500 kbit, where every other wideband here is 11-bit at 1 Mbit \u2014 it cannot share a bus with them. 100 Hz. The gauge menu's ID 1..ID 16 are 0x180..0x18F, so a second controller is this template with the id stepped. There is no free-air code; byte 6 bit 7 is LAMBDA DATA VALID and byte 7 bit 6 is SENSOR FAULT, and a reading is only worth having while that valid bit is set. Covers 30-0300, 30-0310, 30-0333/0334 and 30-0350.",
+  "frames": [
+    {
+      "id": 384,
+      "ext": true,
+      "dlc": 8,
+      "period_ms": 10,
+      "name": "AEM X-Series",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "0-1",
+          "flags": 0,
+          "scale": 10000.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 200
+        }
+      ]
+    }
+  ],
+  "consumer": "lambda"
+}

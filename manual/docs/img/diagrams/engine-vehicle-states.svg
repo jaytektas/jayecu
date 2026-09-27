@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 400" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The engine run state: STOPPED, CRANKING and RUNNING, and what moves the engine between them</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .ff { fill: #33240f; } .pid { fill: #13291a; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- states -->
+  <rect x="40"  y="150" width="220" height="90" rx="8" class="box"/>
+  <text x="150" y="182" text-anchor="middle" class="fg head">STOPPED</text>
+  <text x="150" y="204" text-anchor="middle" class="mono muted">engine_state = 0</text>
+  <text x="150" y="224" text-anchor="middle" class="muted">no position, RPM 0</text>
+
+  <rect x="420" y="150" width="220" height="90" rx="8" class="ff"/>
+  <text x="530" y="182" text-anchor="middle" class="fg head">CRANKING</text>
+  <text x="530" y="204" text-anchor="middle" class="mono muted">engine_state = 1</text>
+  <text x="530" y="224" text-anchor="middle" class="muted">turning, not caught</text>
+
+  <rect x="820" y="150" width="220" height="90" rx="8" class="pid"/>
+  <text x="930" y="182" text-anchor="middle" class="fg head">RUNNING</text>
+  <text x="930" y="204" text-anchor="middle" class="mono muted">engine_state = 2</text>
+  <text x="930" y="224" text-anchor="middle" class="muted">caught and running</text>
+
+  <!-- STOPPED -> CRANKING -->
+  <path d="M260 180 H418" class="line" marker-end="url(#a)"/>
+  <text x="340" y="170" text-anchor="middle" class="fg">RPM above 0</text>
+  <!-- CRANKING -> STOPPED -->
+  <path d="M420 212 H262" class="line" marker-end="url(#a)"/>
+  <text x="340" y="232" text-anchor="middle" class="fg">RPM 0</text>
+
+  <!-- CRANKING -> RUNNING -->
+  <path d="M640 195 H818" class="line" marker-end="url(#a)"/>
+  <text x="730" y="172" text-anchor="middle" class="fg">RPM at or above</text>
+  <text x="730" y="188" text-anchor="middle" class="fg head">Cranking Threshold</text>
+
+  <!-- STOPPED -> RUNNING direct (rare) -->
+  <path d="M150 150 V70 H930 V148" class="line" marker-end="url(#a)"/>
+  <text x="530" y="60" text-anchor="middle" class="muted">straight to RUNNING if the first RPM is already at or above the threshold (rare)</text>
+
+  <!-- RUNNING -> STOPPED -->
+  <path d="M930 240 V320 H150 V242" class="line" marker-end="url(#a)"/>
+  <text x="530" y="312" text-anchor="middle" class="fg">RPM 0: the trigger lost position, or teeth stopped arriving</text>
+  <text x="530" y="346" text-anchor="middle" class="muted">RUNNING never drops back to CRANKING: it holds through any dip in RPM until the engine really stops.</text>
+  <text x="530" y="370" text-anchor="middle" class="muted">RPM is reported as 0 until the trigger has sync, so “above 0” means “the ECU knows where the engine is”.</text>
+</svg>

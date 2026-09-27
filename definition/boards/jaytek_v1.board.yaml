@@ -1,0 +1,364 @@
+---
+# Jaytek V1 Board Definition
+# Source: the EasyEDA Pro schematic's netlist export (2026-05-22, not shipped)
+#
+# This file is the authoritative hardware capability + layout description for the
+# Jaytek V1 ECU board. It drives scripts/board_codegen.py (firmware C++ pin map +
+# constants); the studio reads it directly for pin dropdowns. Single source.
+#
+# Structure:
+#   - Clock / ADC reference constants
+#   - pins:        per-pin truth (control-relevant pins only — AV/AT/IGN/LS/HS/VR/
+#                  DIG/CAN/UART/HBRIDGE/knock/status). Each pin carries `caps:` — the
+#                  SET of functional roles it can be routed to. The user routes a
+#                  function to any pin whose caps include the needed role; a pin
+#                  appears under every role it supports. Passive pins (power/clock/
+#                  VCAP/NC/boot/debug/SPI/I2C/USB) live in jaytek_v1_hardware.md.
+#   - resources:   only what is NOT derivable from caps — timebase + compound
+#                  multi-pin devices (CAN bus, HBRIDGE channel). Role pools and all
+#                  capability counts DERIVE from pin caps (board_codegen.py).
+#   - connectors:  outside-world terminal map (structured, drives the per-vehicle
+#                  wiring diagram = f(connectors, tune) + the studio "wire-to" hint).
+#
+# See docs/modular-platform-architecture.md for the full design.
+
+board:       jaytek_v1
+mcu:         STM32F767ZIT6
+package:     LQFP-144
+ref_designator: U43
+description: "Jaytek V1 ECU — LQFP-144 STM32F767ZIT6"
+source:      "EasyEDA Pro schematic, netlist export 2026-05-22"
+
+# ---------------------------------------------------------------------------
+# Clock sources
+# ---------------------------------------------------------------------------
+hse_hz:  8000000    # 8 MHz crystal X1 on PH0/PH1 (C105/C106 20 pF)
+lse_hz:  32768      # 32.768 kHz crystal X2 on PC14/PC15 (RTC)
+
+# ---------------------------------------------------------------------------
+# ADC voltage reference
+# REF3033AIDBZR (U40) — 3.3 V precision reference on VREF+
+# ---------------------------------------------------------------------------
+adc_vref_mv: 3300
+
+# Analog front-end: every AV/AT channel passes through an MCP6004 buffer that
+# level-shifts the 0–5 V input range to 0–3.3 V at the 12-bit ADC. By design the
+# full ADC count range (0–4095) therefore corresponds to 0–5 V at the connector,
+# so we report the connector voltage directly with a 5000 mV full-scale — counts
+# × 5000 / 4095. (Knock PF4/PF5 use a separate high-speed path, NOT this one.)
+# NB: this is the clean design-intent gain (3.3/5 = 0.66). The resistor-nominal
+# ratio works out ~0.628 (a ~5% difference that the per-sensor min_mv/max_mv
+# calibration absorbs); the battery fixed-input below keeps its own empirically
+# validated divider rather than this model.
+analog_av_fullscale_mv: 5000   # AV1-16: full scale 4095 counts = 5.000 V
+analog_at_fullscale_mv: 5000   # AT1-4:  full scale 4095 counts = 5.000 V
+
+# ===========================================================================
+# Capability counts and fixed inputs are DERIVED, not declared (board_codegen.py):
+#   counts   <- len(resources.<pool>)
+#   battery  <- the analog pool entry carrying a `divider` (AV12 in pins: below)
+#   knock / VR / LEDs / power-good  <- pins[] + resources.{knock,leds,power_good}
+#
+# Battery (AV12 = PB1, ADC1_IN9) divider = TOTAL attenuation to the ADC, two
+# stages in series:
+#   1. resistor divider R143 39k / R144 8.2k       = 8.2/(39+8.2)   = 0.17373
+#   2. MCP6004 front-end (all AV/AT go through it):
+#        input 10k/470k = 0.97917, buffer ×1, output 5.6k/10k = 0.64103 → 0.62768
+#   total = 0.17373 × 0.62768 ≈ 0.1091  (front-end maps 0–5 V → 0–3.3 V;
+#   full-scale ≈ 3.3/0.1091 ≈ 30 V). Lives on the AV12 pin's `divider` field.
+# ===========================================================================
+
+# ===========================================================================
+# pins — per-pin truth (control-relevant pins only).
+#
+# fields: pin (LQFP physical), gpio (port+bit), signal (net/silkscreen name),
+#         caps  = SET of functional roles the pin can be routed to. Vocabulary:
+#                 inputs : TRIGGER_INPUT DIGITAL_INPUT FREQUENCY_INPUT SENT_INPUT
+#                          ANALOG_VOLTAGE ANALOG_TEMP KNOCK_INPUT POWER_GOOD
+#                 outputs: IGNITION_OUT LOWSIDE_OUT HIGHSIDE_OUT PWM_OUT STATUS_LED
+#                 device : HBRIDGE_PWM HBRIDGE_DIR HBRIDGE_ENABLE CAN_RX CAN_TX UART_TX UART_RX
+#                 (VR pins do edge roles — TRIGGER_INPUT, FREQUENCY_INPUT — but no
+#                  clean static level, so NOT DIGITAL_INPUT; DIG pins add
+#                  DIGITAL_INPUT and SENT_INPUT via the EXTI HAL.)
+#         mode  = analog | input | output | alternate
+#         one peripheral binding as applicable:
+#           adc:   {unit, channel}     (analog input)
+#           exti:  {line}              (EXTI capture/digital pin)
+#           timer: {unit, channel, af} (pwm / timer compare)
+#           af:    {num, signal}       (comms alternate-function)
+#         optional: active_low, assignable, driver, polarity, divider, note
+# ===========================================================================
+pins:
+
+  # ---- Analog voltage inputs (AV) — ADC1 ----
+  - { pin: 34, gpio: PA0, signal: AV1,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 0} }
+  - { pin: 35, gpio: PA1, signal: AV2,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 1} }
+  - { pin: 36, gpio: PA2, signal: AV3,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 2} }
+  - { pin: 37, gpio: PA3, signal: AV4,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 3} }
+  - { pin: 40, gpio: PA4, signal: AV5,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 4} }
+  - { pin: 41, gpio: PA5, signal: AV6,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 5} }
+  - { pin: 42, gpio: PA6, signal: AV7,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 6} }
+  - { pin: 43, gpio: PA7, signal: AV8,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 7} }
+  - { pin: 44, gpio: PC4, signal: AV9,  caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 14} }
+  - { pin: 45, gpio: PC5, signal: AV10, caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 15} }
+  - { pin: 46, gpio: PB0, signal: AV11, caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 8} }
+  - { pin: 47, gpio: PB1, signal: AV12, caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC1, channel: 9},
+      net: 12V_DIVIDED, divider: 0.1091, assignable: false, note: "battery voltage sense (fixed input)" }
+  # ---- Analog voltage inputs (AV) — ADC3 ----
+  - { pin: 18, gpio: PF6, signal: AV13, caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC3, channel: 4} }
+  - { pin: 19, gpio: PF7, signal: AV14, caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC3, channel: 5} }
+  - { pin: 20, gpio: PF8, signal: AV15, caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC3, channel: 6} }
+  - { pin: 21, gpio: PF9, signal: AV16, caps: [ANALOG_VOLTAGE], mode: analog, adc: {unit: ADC3, channel: 7} }
+  # ---- Analog temperature inputs (AT) — ADC1 ----
+  - { pin: 26, gpio: PC0, signal: AT1, caps: [ANALOG_TEMP], mode: analog, adc: {unit: ADC1, channel: 10} }
+  - { pin: 27, gpio: PC1, signal: AT2, caps: [ANALOG_TEMP], mode: analog, adc: {unit: ADC1, channel: 11} }
+  - { pin: 28, gpio: PC2, signal: AT3, caps: [ANALOG_TEMP], mode: analog, adc: {unit: ADC1, channel: 12} }
+  - { pin: 29, gpio: PC3, signal: AT4, caps: [ANALOG_TEMP], mode: analog, adc: {unit: ADC1, channel: 13} }
+  # ---- Knock inputs — ADC3, board-routed (not user-assignable) ----
+  - { pin: 14, gpio: PF4, signal: KNOCK1, caps: [KNOCK_INPUT], mode: analog, adc: {unit: ADC3, channel: 14}, assignable: false }
+  - { pin: 15, gpio: PF5, signal: KNOCK2, caps: [KNOCK_INPUT], mode: analog, adc: {unit: ADC3, channel: 15}, assignable: false }
+
+  # ---- Capture inputs (EXTI) ----
+  - { pin: 141, gpio: PE0,  signal: VR1,  caps: [TRIGGER_INPUT, FREQUENCY_INPUT], mode: input, exti: {line: 0},  driver: MAX9924UAUB+, note: "crank trigger" }
+  - { pin: 142, gpio: PE1,  signal: VR2,  caps: [TRIGGER_INPUT, FREQUENCY_INPUT], mode: input, exti: {line: 1},  driver: MAX9924UAUB+, note: "secondary VR" }
+  - { pin: 77,  gpio: PD8,  signal: DIG1, caps: [TRIGGER_INPUT, DIGITAL_INPUT, FREQUENCY_INPUT, SENT_INPUT], mode: input, exti: {line: 8},  driver: 74HC2G17GW }
+  - { pin: 78,  gpio: PD9,  signal: DIG2, caps: [TRIGGER_INPUT, DIGITAL_INPUT, FREQUENCY_INPUT, SENT_INPUT], mode: input, exti: {line: 9},  driver: 74HC2G17GW }
+  - { pin: 79,  gpio: PD10, signal: DIG3, caps: [TRIGGER_INPUT, DIGITAL_INPUT, FREQUENCY_INPUT, SENT_INPUT], mode: input, exti: {line: 10}, driver: 74HC2G17GW }
+  - { pin: 80,  gpio: PD11, signal: DIG4, caps: [TRIGGER_INPUT, DIGITAL_INPUT, FREQUENCY_INPUT, SENT_INPUT], mode: input, exti: {line: 11}, driver: 74HC2G17GW }
+  - { pin: 81,  gpio: PD12, signal: DIG5, caps: [TRIGGER_INPUT, DIGITAL_INPUT, FREQUENCY_INPUT, SENT_INPUT], mode: input, exti: {line: 12}, driver: 74HC2G17GW }
+  - { pin: 82,  gpio: PD13, signal: DIG6, caps: [TRIGGER_INPUT, DIGITAL_INPUT, FREQUENCY_INPUT, SENT_INPUT], mode: input, exti: {line: 13}, driver: 74HC2G17GW }
+  - { pin: 85,  gpio: PD14, signal: DIG7, caps: [TRIGGER_INPUT, DIGITAL_INPUT, FREQUENCY_INPUT, SENT_INPUT], mode: input, exti: {line: 14}, driver: 74HC2G17GW }
+  - { pin: 86,  gpio: PD15, signal: DIG8, caps: [TRIGGER_INPUT, DIGITAL_INPUT, FREQUENCY_INPUT, SENT_INPUT], mode: input, exti: {line: 15}, driver: 74HC2G17GW }
+
+  # ---- Ignition outputs (IX4427NTR non-inverting; HIGH = dwell) ----
+  # Pin map per user-confirmed hardware truth (2026-06-02): IGN6=PC12, IGN8=PC10.
+  # Firmware sources this map from the schema (generated jaytek_v1_pins.h), so the
+  # old hand-coded IGN6/IGN8 swap is gone — no override in board_hal/profile.
+  - { pin: 1,   gpio: PE2,  signal: IGN1,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 2,   gpio: PE3,  signal: IGN2,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 3,   gpio: PE4,  signal: IGN3,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 4,   gpio: PE5,  signal: IGN4,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 5,   gpio: PE6,  signal: IGN5,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 113, gpio: PC12, signal: IGN6,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 112, gpio: PC11, signal: IGN7,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 111, gpio: PC10, signal: IGN8,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 10,  gpio: PF0,  signal: IGN9,  caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 11,  gpio: PF1,  signal: IGN10, caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 12,  gpio: PF2,  signal: IGN11, caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+  - { pin: 13,  gpio: PF3,  signal: IGN12, caps: [IGNITION_OUT, TACH_OUTPUT], mode: output, driver: IX4427NTR, polarity: "HIGH=dwell" }
+
+  # ---- Low-side outputs (VNLD5090TR-E; HIGH = ON) ----
+  - { pin: 49,  gpio: PF11, signal: LS1,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 50,  gpio: PF12, signal: LS2,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 53,  gpio: PF13, signal: LS3,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 54,  gpio: PF14, signal: LS4,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 55,  gpio: PF15, signal: LS5,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 56,  gpio: PG0,  signal: LS6,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 57,  gpio: PG1,  signal: LS7,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 58,  gpio: PE7,  signal: LS8,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 59,  gpio: PE8,  signal: LS9,  caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 60,  gpio: PE9,  signal: LS10, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 63,  gpio: PE10, signal: LS11, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 64,  gpio: PE11, signal: LS12, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 65,  gpio: PE12, signal: LS13, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 66,  gpio: PE13, signal: LS14, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 67,  gpio: PE14, signal: LS15, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 68,  gpio: PE15, signal: LS16, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 125, gpio: PG10, signal: LS17, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 126, gpio: PG11, signal: LS18, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 127, gpio: PG12, signal: LS19, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 128, gpio: PG13, signal: LS20, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 129, gpio: PG14, signal: LS21, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+  - { pin: 132, gpio: PG15, signal: LS22, caps: [LOWSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNLD5090TR-E, polarity: "HIGH=on" }
+
+  # ---- High-side outputs (VNQ7140AJTR; HIGH = ON) ----
+  - { pin: 87, gpio: PG2, signal: HS1, caps: [HIGHSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNQ7140AJTR, polarity: "HIGH=on" }
+  - { pin: 88, gpio: PG3, signal: HS2, caps: [HIGHSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNQ7140AJTR, polarity: "HIGH=on" }
+  - { pin: 89, gpio: PG4, signal: HS3, caps: [HIGHSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNQ7140AJTR, polarity: "HIGH=on" }
+  - { pin: 90, gpio: PG5, signal: HS4, caps: [HIGHSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNQ7140AJTR, polarity: "HIGH=on" }
+  - { pin: 91, gpio: PG6, signal: HS5, caps: [HIGHSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNQ7140AJTR, polarity: "HIGH=on" }
+  - { pin: 92, gpio: PG7, signal: HS6, caps: [HIGHSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNQ7140AJTR, polarity: "HIGH=on" }
+  - { pin: 93, gpio: PG8, signal: HS7, caps: [HIGHSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNQ7140AJTR, polarity: "HIGH=on" }
+  - { pin: 96, gpio: PC6, signal: HS8, caps: [HIGHSIDE_OUT, PWM_OUT, TACH_OUTPUT], mode: output, driver: VNQ7140AJTR, polarity: "HIGH=on" }
+
+  # ---- Generic H-bridge drivers (IFX9201SGAUMA1; DIS LOW = enabled) — usable as ETB servo /
+  #      stepper / BAC idle valve / DC-PWM. NOTE: PD6/PD3 have NO timer-channel AF on the F767
+  #      (TIM2_CH4=PA3, TIM2_CH2=PA1/PB3) — the PWM is software-generated (SoftPwm on the GPIO),
+  #      which the IFX9201 PWM input accepts fine. So these are plain GPIO outputs. ----
+  - { pin: 122, gpio: PD6, signal: HBRIDGE1_PWM, caps: [HBRIDGE_PWM], mode: output }
+  - { pin: 119, gpio: PD5, signal: HBRIDGE1_DIS, caps: [HBRIDGE_ENABLE], mode: output, polarity: "LOW=enabled" }
+  - { pin: 123, gpio: PD7, signal: HBRIDGE1_DIR, caps: [HBRIDGE_DIR], mode: output }
+  - { pin: 117, gpio: PD3, signal: HBRIDGE2_PWM, caps: [HBRIDGE_PWM], mode: output }
+  - { pin: 116, gpio: PD2, signal: HBRIDGE2_DIS, caps: [HBRIDGE_ENABLE], mode: output, polarity: "LOW=enabled" }
+  - { pin: 118, gpio: PD4, signal: HBRIDGE2_DIR, caps: [HBRIDGE_DIR], mode: output }
+
+  # ---- CAN ----
+  - { pin: 114, gpio: PD0,  signal: CAN1_RX, caps: [CAN_RX], mode: alternate, af: {num: 9, signal: CAN1_RX} }
+  - { pin: 115, gpio: PD1,  signal: CAN1_TX, caps: [CAN_TX], mode: alternate, af: {num: 9, signal: CAN1_TX} }
+  - { pin: 73,  gpio: PB12, signal: CAN2_RX, caps: [CAN_RX], mode: alternate, af: {num: 9, signal: CAN2_RX} }
+  - { pin: 74,  gpio: PB13, signal: CAN2_TX, caps: [CAN_TX], mode: alternate, af: {num: 9, signal: CAN2_TX} }
+
+  # ---- UART (USART1, external client header H6) ----
+  - { pin: 101, gpio: PA9,  signal: UART_TX, caps: [UART_TX], mode: alternate, af: {num: 7, signal: USART1_TX} }
+  - { pin: 102, gpio: PA10, signal: UART_RX, caps: [UART_RX], mode: alternate, af: {num: 7, signal: USART1_RX} }
+
+  # ---- Status LEDs (active LOW: VDD → 1 kΩ → LED → GPIO) ----
+  - { pin: 100, gpio: PA8, signal: RUNNING, caps: [STATUS_LED], mode: output, active_low: false, assignable: false, note: "status LED, active HIGH" }
+  - { pin: 97,  gpio: PC7, signal: WARNING, caps: [STATUS_LED], mode: output, active_low: false, assignable: false, note: "status LED, active HIGH" }
+  - { pin: 98,  gpio: PC8, signal: ERROR,   caps: [STATUS_LED], mode: output, active_low: false, assignable: false, note: "status LED, active HIGH" }
+  - { pin: 99,  gpio: PC9, signal: COMMS,   caps: [STATUS_LED], mode: output, active_low: false, assignable: false, note: "status LED, active HIGH" }
+
+  # ---- 5 V sensor-supply power-good monitors (TLS115D0LD open-drain; HIGH = OK) ----
+  - { pin: 140, gpio: PB9, signal: 5V_SENSOR1_PG, caps: [POWER_GOOD], mode: input, assignable: false, note: "power-good monitor" }
+  - { pin: 139, gpio: PB8, signal: 5V_SENSOR2_PG, caps: [POWER_GOOD], mode: input, assignable: false, note: "power-good monitor" }
+
+# ===========================================================================
+# resources — only what is NOT derivable from pin caps.
+#
+# Every role pool (trigger/capture, ignition, low-side, high-side, analog-V,
+# analog-T, knock, LEDs, power-good) is DERIVED: "the pins whose `caps` include
+# that role, in pins[] declaration order". A pin appears under EVERY role it can
+# do (e.g. DIG1 is both a trigger input and a digital input) — that's the whole
+# point. The firmware index for a role = position in that derived, ordered list
+# (e.g. trigger capture pool = TRIGGER_INPUT pins = VR1,VR2,DIG1..8; compare pool
+# = IGNITION_OUT pins then LOWSIDE_OUT pins, split at the ignition count).
+#
+# Only declared here: the timebase, and the compound multi-pin DEVICES (CAN bus =
+# rx+tx, HBRIDGE channel = pwm+dir+dis) that bundle several pins into one logical unit.
+# ===========================================================================
+resources:
+  timebase: { timer: TIM5, ticks_per_second: 1000000 }
+
+  can: [ {name: CAN1, rx: CAN1_RX, tx: CAN1_TX},
+         {name: CAN2, rx: CAN2_RX, tx: CAN2_TX} ]
+
+  hbridge: [ {name: HBRIDGE1, pwm: HBRIDGE1_PWM, dir: HBRIDGE1_DIR, dis: HBRIDGE1_DIS},
+         {name: HBRIDGE2, pwm: HBRIDGE2_PWM, dir: HBRIDGE2_DIR, dis: HBRIDGE2_DIS} ]
+
+# ===========================================================================
+# connectors — outside-world terminal map (structured; drives the per-vehicle
+# wiring diagram = f(connectors, tune) + studio "wire-to" hint).
+# Each terminal links to a control `signal` (-> pins[].signal) OR carries a
+# passive `role` (ground | power | sensor_supply). Differential / multi-line
+# signals (VR±, CAN H/L, HBRIDGE±) carry a `line` discriminator.
+# ===========================================================================
+connectors:
+
+  # CN2 (776231-1 white, 35-pin) — ignitions + low-sides.
+  # Netlist-verified (EasyEDA Pro export, 2026-05-22): pins 1-22 = LS1-22
+  # (INTERLEAVED — see exact mapping below), pin 23 = GND, pins 24-35 = IGN1-12.
+  - id: CN2
+    part: "776231-2"      # 35-way vertical sealed header, NATURAL — TE's name for white
+    mate: "776164-2"      # harness-side receptacle housing, same colour key
+    color: white
+    desc: "Ignitions + low-sides"
+    terminals:
+      - { pin: 1,  net: CON_LS1,  signal: LS1, color: Br/B }
+      - { pin: 2,  net: CON_LS17, signal: LS17, color: Br/G }
+      - { pin: 3,  net: CON_LS3,  signal: LS3, color: Br/R }
+      - { pin: 4,  net: CON_LS19, signal: LS19, color: Br }
+      - { pin: 5,  net: CON_LS5,  signal: LS5, color: Br/G }
+      - { pin: 6,  net: CON_LS21, signal: LS21, color: Br/V }
+      - { pin: 7,  net: CON_LS7,  signal: LS7, color: Br }
+      - { pin: 8,  net: CON_LS13, signal: LS13, color: Br/B }
+      - { pin: 9,  net: CON_LS9,  signal: LS9, color: Br/V }
+      - { pin: 10, net: CON_LS15, signal: LS15, color: Br/R }
+      - { pin: 11, net: CON_LS11, signal: LS11, color: Br/Pk }
+      - { pin: 12, net: CON_LS12, signal: LS12, color: Br }
+      - { pin: 13, net: CON_LS2,  signal: LS2, color: Br/W }
+      - { pin: 14, net: CON_LS18, signal: LS18, color: Br/Bu }
+      - { pin: 15, net: CON_LS4,  signal: LS4, color: Br/Y }
+      - { pin: 16, net: CON_LS20, signal: LS20, color: Br/O }
+      - { pin: 17, net: CON_LS6,  signal: LS6, color: Br/Bu }
+      - { pin: 18, net: CON_LS22, signal: LS22, color: Br/Gy }
+      - { pin: 19, net: CON_LS8,  signal: LS8, color: Br/O }
+      - { pin: 20, net: CON_LS14, signal: LS14, color: Br/W }
+      - { pin: 21, net: CON_LS10, signal: LS10, color: Br/Gy }
+      - { pin: 22, net: CON_LS16, signal: LS16, color: Br/Y }
+      - { pin: 23, net: GND, role: ground, color: B }
+      - { pin: 24, net: CON_IGN1,  signal: IGN1, color: W/B }
+      - { pin: 25, net: CON_IGN2,  signal: IGN2, color: W }
+      - { pin: 26, net: CON_IGN3,  signal: IGN3, color: W/R }
+      - { pin: 27, net: CON_IGN4,  signal: IGN4, color: W/Y }
+      - { pin: 28, net: CON_IGN5,  signal: IGN5, color: W/G }
+      - { pin: 29, net: CON_IGN6,  signal: IGN6, color: W/Bu }
+      - { pin: 30, net: CON_IGN7,  signal: IGN7, color: W/Br }
+      - { pin: 31, net: CON_IGN8,  signal: IGN8, color: W/O }
+      - { pin: 32, net: CON_IGN9,  signal: IGN9, color: W/V }
+      - { pin: 33, net: CON_IGN10, signal: IGN10, color: W/Gy }
+      - { pin: 34, net: CON_IGN11, signal: IGN11, color: W/Pk }
+      - { pin: 35, net: CON_IGN12, signal: IGN12, color: W }
+
+  # CN3 (776231-1 blue, 35-pin) — sensors, analog, VR, digital.
+  - id: CN3
+    part: "776231-5"      # 35-way vertical sealed header, BLUE
+    mate: "776164-5"      # harness-side receptacle housing, same colour key
+    color: blue
+    desc: "Sensors, analog, VR, digital"
+    terminals:
+      - { pin: 1,  net: CON_AT4,  signal: AT4, color: Gy/Y }
+      - { pin: 2,  net: CON_AT2,  signal: AT2, color: Gy/W }
+      - { pin: 3,  net: CON_AV16, signal: AV16, color: G/Y }
+      - { pin: 4,  net: CON_AV14, signal: AV14, color: G/W }
+      - { pin: 5,  net: CON_AV13, signal: AV13, color: G/B }
+      - { pin: 6,  net: CON_VR1+, signal: VR1, line: "+", color: Bu }
+      - { pin: 7,  net: CON_VR1-, signal: VR1, line: "-", color: Bu/B }
+      - { pin: 8,  net: CON_VR2+, signal: VR2, line: "+", color: Bu }
+      - { pin: 9,  net: CON_VR2-, signal: VR2, line: "-", color: Bu/B }
+      - { pin: 10, net: GND, role: ground, color: B }
+      - { pin: 11, net: GND, role: ground, color: B }
+      - { pin: 12, net: GND, role: ground, color: B }
+      - { pin: 13, net: CON_AT3,  signal: AT3, color: Gy/R }
+      - { pin: 14, net: CON_AT1,  signal: AT1, color: Gy/B }
+      - { pin: 15, net: CON_AV15, signal: AV15, color: G/R }
+      - { pin: 16, net: CON_DIG8, signal: DIG8, color: O }
+      - { pin: 17, net: CON_DIG7, signal: DIG7, color: O/Br }
+      - { pin: 18, net: CON_DIG6, signal: DIG6, color: O/Bu }
+      - { pin: 19, net: CON_DIG5, signal: DIG5, color: O/G }
+      - { pin: 20, net: CON_DIG4, signal: DIG4, color: O/Y }
+      - { pin: 21, net: CON_DIG3, signal: DIG3, color: O/R }
+      - { pin: 22, net: CON_DIG2, signal: DIG2, color: O/W }
+      - { pin: 23, net: CON_DIG1, signal: DIG1, color: O/B }
+      - { pin: 24, net: CON_AV4,  signal: AV4, color: G/Y }
+      - { pin: 25, net: CON_AV3,  signal: AV3, color: G/R }
+      - { pin: 26, net: CON_AV2,  signal: AV2, color: G/W }
+      - { pin: 27, net: CON_AV1,  signal: AV1, color: G/B }
+      - { pin: 28, net: CON_AV11, signal: AV11, color: G/Pk }
+      - { pin: 29, net: CON_AV10, signal: AV10, color: G/Gy }
+      - { pin: 30, net: CON_AV9,  signal: AV9, color: G/V }
+      - { pin: 31, net: CON_AV8,  signal: AV8, color: G/O }
+      - { pin: 32, net: CON_AV7,  signal: AV7, color: G/Br }
+      - { pin: 33, net: CON_AV6,  signal: AV6, color: G/Bu }
+      - { pin: 34, net: CON_AV5,  signal: AV5, color: G }
+      - { pin: 35, net: GND, role: ground, color: B }
+
+  # CN4 (776228-1 black, 23-pin) — power, HS, HBRIDGE, knock, CAN1.
+  - id: CN4
+    part: "776228-1"      # 23-way vertical sealed header, BLACK
+    mate: "770680-1"      # harness-side receptacle housing, same colour key
+    color: black
+    desc: "Power, high-sides, HBRIDGE, knock, CAN1"
+    terminals:
+      - { pin: 1,  net: CON_HS5, signal: HS5, color: Y/G }
+      - { pin: 2,  net: CON_HS6, signal: HS6, color: Y/Bu }
+      - { pin: 3,  net: CON_HS8, signal: HS8, color: Y/O }
+      - { pin: 4,  net: CON_HS7, signal: HS7, color: Y/Br }
+      - { pin: 5,  net: CON_HS3, signal: HS3, color: Y/R }
+      - { pin: 6,  net: CON_HS4, signal: HS4, color: Y }
+      - { pin: 7,  net: CON_HS1, signal: HS1, color: Y/B }
+      - { pin: 8,  net: CON_HS2, signal: HS2, color: Y/W }
+      - { pin: 9,  net: CON_12V_RAW,    role: power, voltage: 12, color: R }
+      - { pin: 10, net: CON_CAN1_H,     signal: CAN1, line: H, color: Lg }
+      - { pin: 11, net: GND, role: ground, color: B }
+      - { pin: 12, net: GND, role: ground, color: B }
+      - { pin: 13, net: CON_12V_MR,     role: power, voltage: 12, note: "main relay feed", color: R/W }
+      - { pin: 14, net: CON_5V_SENSOR1, role: sensor_supply, voltage: 5, color: O/W }
+      - { pin: 15, net: CON_5V_SENSOR2, role: sensor_supply, voltage: 5, color: O/W }
+      - { pin: 16, net: CON_12V_PROT,   role: power, voltage: 12, note: "protected 12V", color: R/Y }
+      - { pin: 17, net: CON_CAN1_L,     signal: CAN1, line: L, color: Lg/B }
+      - { pin: 18, net: CON_HBRIDGE2-,      signal: HBRIDGE2, line: "-", color: V/B }
+      - { pin: 19, net: CON_HBRIDGE2+,      signal: HBRIDGE2, line: "+", color: V }
+      - { pin: 20, net: CON_HBRIDGE1+,      signal: HBRIDGE1, line: "+", color: V }
+      - { pin: 21, net: CON_HBRIDGE1-,      signal: HBRIDGE1, line: "-", color: V/B }
+      - { pin: 22, net: CON_KNOCK2,     signal: KNOCK2, color: Pk/W }
+      - { pin: 23, net: CON_KNOCK1,     signal: KNOCK1, color: Pk/B }

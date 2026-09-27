@@ -1,0 +1,8 @@
+# jayecu table 1
+# preset: AEM X-Series 0-5V 0.58-1.23 lambda
+# note: AEM X-Series 30-0300 / 30-0310 default analogue out: 8.5-18.0 AFR petrol.
+# table: sensors.sensor[lambda_1].cal
+# x: Sensor Raw [ADC]
+# value: Reading [λ]
+,0,4095
+,0.58,1.23

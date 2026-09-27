@@ -1,0 +1,44 @@
+.stm32_cache/
+tests/build/
+tests/_check_gen.cpp
+firmware/build/
+firmware/*/build/
+*.o
+*.d
+*.elf
+*.bin
+*.map
+
+# Python bytecode
+__pycache__/
+*.pyc
+.venv/
+studio/__pycache__/
+
+# studio/bench transient state
+schema/backups/
+.vscode/
+.claude/
+tools/Ardu-Stim/
+
+
+# Out-of-source build + CTest artifacts (top-level cmake runs drop these in the repo root)
+/build/
+/CMakeFiles/
+/Testing/
+
+# Genesis run log (regenerated each run — not source)
+genesis.log
+
+# Downloaded third-party reference material (manuals, protocol specs) — not ours to track
+reference/
+
+# Codegen output — built from definition/ by every make target that needs it, never edited, never stored.
+# generated/ holds ONE board at a time, so a stored copy would silently be whichever board ran last.
+generated/
+shared/tuneit-meta.json
+shared/can_templates/
+firmware/version.h
+
+# make release output — uploaded to GitHub, never committed
+release/

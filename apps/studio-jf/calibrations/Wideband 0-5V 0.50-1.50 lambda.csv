@@ -1,0 +1,8 @@
+# jayecu table 1
+# preset: Wideband 0-5V 0.50-1.50 lambda
+# note: The common linear mapping; also the shipped default.
+# table: sensors.sensor[lambda_1].cal
+# x: Sensor Raw [ADC]
+# value: Reading [λ]
+,0,4095
+,0.50,1.50

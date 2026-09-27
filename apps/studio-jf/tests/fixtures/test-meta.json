@@ -1,0 +1,234 @@
+{
+ "meta": {
+  "product": "studio-jf test fixture",
+  "board": "fixture",
+  "fw_version": "0.0.0",
+  "fw_build": "fixture",
+  "layout_hash": "f1x7ure0",
+  "config_size": 256,
+  "telemetry_size": 8
+ },
+ "segments": [
+  {
+   "id": "config",
+   "base": 0,
+   "size": 256,
+   "kind": "tune",
+   "writable": true
+  },
+  {
+   "id": "learned",
+   "base": 1073741824,
+   "size": 128,
+   "kind": "nvram",
+   "writable": true
+  }
+ ],
+ "config": {
+  "fixture": {
+   "tune_table": {
+    "type": "table",
+    "datatype": "F32",
+    "offset": 64,
+    "size": 128,
+    "label": "Tune Table",
+    "units": "%",
+    "help": "",
+    "scale": 1.0,
+    "digits": 2,
+    "translate": 0.0,
+    "min": -100,
+    "max": 100,
+    "cols": 8,
+    "cols_max": 8,
+    "rows": 4,
+    "rows_max": 4,
+    "depth": 1,
+    "depth_max": 1
+   },
+   "enabled": {
+    "type": "scalar",
+    "datatype": "U08",
+    "offset": 0,
+    "size": 1,
+    "label": "Enabled",
+    "units": "",
+    "help": "",
+    "scale": 1.0,
+    "translate": 0.0,
+    "min": 0,
+    "max": 1,
+    "digits": 0,
+    "default": 0
+   },
+   "gain": {
+    "type": "scalar",
+    "datatype": "F32",
+    "offset": 4,
+    "size": 4,
+    "label": "Gain",
+    "units": "",
+    "help": "",
+    "scale": 1.0,
+    "translate": 0.0,
+    "min": 0,
+    "max": 10,
+    "digits": 2,
+    "default": 1.0
+   },
+   "flag_a": {
+    "type": "scalar",
+    "datatype": "U32",
+    "offset": 8,
+    "size": 4,
+    "bit_lo": 3,
+    "bit_hi": 3,
+    "label": "Flag A",
+    "units": "",
+    "help": "",
+    "scale": 1.0,
+    "translate": 0.0,
+    "min": 0,
+    "max": 1,
+    "digits": 0,
+    "default": 0
+   },
+   "flag_b": {
+    "type": "scalar",
+    "datatype": "U32",
+    "offset": 8,
+    "size": 4,
+    "bit_lo": 4,
+    "bit_hi": 4,
+    "label": "Flag B",
+    "units": "",
+    "help": "",
+    "scale": 1.0,
+    "translate": 0.0,
+    "min": 0,
+    "max": 1,
+    "digits": 0,
+    "default": 0
+   },
+   "learned_table": {
+    "type": "table",
+    "datatype": "F32",
+    "offset": 1073741824,
+    "size": 128,
+    "label": "Learned Table",
+    "units": "%",
+    "help": "",
+    "scale": 1.0,
+    "digits": 2,
+    "translate": 0.0,
+    "min": -100,
+    "max": 100,
+    "cols": 8,
+    "cols_max": 8,
+    "rows": 4,
+    "rows_max": 4,
+    "depth": 1,
+    "depth_max": 1,
+    "segment": "learned"
+   },
+   "strip": {
+    "type": "struct_array",
+    "base_offset": 4096,
+    "count": 3,
+    "stride": 40,
+    "label": "Strip Element",
+    "fields": {
+     "n": {
+      "rel_offset": 0,
+      "datatype": "U08",
+      "size": 1,
+      "label": "Live Count",
+      "units": "",
+      "help": "how many cells are live",
+      "scale": 1.0,
+      "min": 0,
+      "max": 8
+     }
+    },
+    "arrays": {
+     "cell": {
+      "count": 8,
+      "rel_offset": 4,
+      "stride": 4,
+      "fields": {
+       "v": {
+        "rel_offset": 0,
+        "datatype": "S16",
+        "size": 2,
+        "label": "Cell",
+        "units": "",
+        "help": "one cell of this element's run",
+        "scale": 1.0,
+        "min": -1000,
+        "max": 1000
+       },
+       "tag": {
+        "rel_offset": 2,
+        "datatype": "S16",
+        "size": 2,
+        "label": "Tag",
+        "units": "",
+        "help": "",
+        "scale": 1.0,
+        "min": 0,
+        "max": 0
+       }
+      }
+     }
+    }
+   },
+   "bins": {
+    "type": "table",
+    "datatype": "S16",
+    "offset": 200,
+    "size": 24,
+    "label": "Bins",
+    "units": "RPM",
+    "help": "",
+    "scale": 1.0,
+    "digits": 0,
+    "translate": 0.0,
+    "min": 0,
+    "max": 8000,
+    "cols": 12
+   }
+  }
+ },
+ "telemetry": {
+  "rpm": {
+   "offset": 0,
+   "size": 4,
+   "datatype": "F32",
+   "scale": 1.0,
+   "units": "rpm",
+   "label": "RPM",
+   "module": "fixture"
+  },
+  "coolant": {
+   "offset": 4,
+   "size": 4,
+   "datatype": "F32",
+   "scale": 1.0,
+   "units": "C",
+   "label": "Coolant",
+   "module": "fixture"
+  }
+ },
+ "navigation_tree": [
+  {
+   "name": "Configuration",
+   "children": [
+    {
+     "name": "Fixture",
+     "target_path": "config.fixture"
+    }
+   ]
+  }
+ ],
+ "default_tune": "AAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+}öÿ\

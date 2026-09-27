@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 560" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>How a CAN frame becomes a channel, and a channel becomes a frame</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <!-- ===== RECEIVE ===== -->
+  <text x="20" y="28" class="muted head">Receive · a frame arrives on the wire</text>
+  <rect x="20" y="44" width="170" height="80" rx="6" class="box"/>
+  <text x="105" y="70" text-anchor="middle" class="fg head">Controller</text>
+  <text x="105" y="92" text-anchor="middle" class="muted">accepts every id,</text>
+  <text x="105" y="110" text-anchor="middle" class="muted">11-bit and 29-bit</text>
+
+  <rect x="220" y="44" width="200" height="80" rx="6" class="tgt"/>
+  <text x="320" y="70" text-anchor="middle" class="fg head">Is it one of ours?</text>
+  <text x="320" y="92" text-anchor="middle" class="muted">bus + id matched against</text>
+  <text x="320" y="110" text-anchor="middle" class="muted">your Receive frames</text>
+
+  <rect x="450" y="44" width="300" height="80" rx="6" class="tgt"/>
+  <text x="600" y="70" text-anchor="middle" class="fg head">Decode each field, once</text>
+  <text x="600" y="92" text-anchor="middle" class="mono muted">raw = bits [Start Bit, Bit Length]</text>
+  <text x="600" y="110" text-anchor="middle" class="mono muted">value = (raw − Offset) ÷ Multiplier</text>
+
+  <rect x="780" y="44" width="260" height="80" rx="6" class="safe"/>
+  <text x="910" y="70" text-anchor="middle" class="fg head">No Reading code?</text>
+  <text x="910" y="92" text-anchor="middle" class="muted">skip the field: it is not</text>
+  <text x="910" y="110" text-anchor="middle" class="muted">refreshed, and goes stale</text>
+
+  <path d="M190 84 H218" class="line" marker-end="url(#a)"/>
+  <path d="M420 84 H448" class="line" marker-end="url(#a)"/>
+  <path d="M750 84 H778" class="safeline" marker-end="url(#r)"/>
+  <path d="M320 124 V150" class="line"/>
+  <text x="330" y="146" class="muted">not ours: ignored</text>
+
+  <!-- two sinks -->
+  <path d="M600 124 V170 H300 V196" class="line" marker-end="url(#a)"/>
+  <path d="M600 170 H790 V196" class="line" marker-end="url(#a)"/>
+
+  <rect x="140" y="198" width="320" height="104" rx="6" class="tgt"/>
+  <text x="300" y="222" text-anchor="middle" class="fg head">Field's Signal is set</text>
+  <text x="300" y="244" text-anchor="middle" class="muted">the value is written to that channel</text>
+  <text x="300" y="264" text-anchor="middle" class="muted">with the field's Priority, and stays</text>
+  <text x="300" y="284" text-anchor="middle" class="muted">valid for the field's Valid For time</text>
+
+  <rect x="600" y="198" width="380" height="104" rx="6" class="pid"/>
+  <text x="790" y="222" text-anchor="middle" class="fg head">Field's Signal is left unset</text>
+  <text x="790" y="244" text-anchor="middle" class="muted">a sensor set to Interface: CAN Bus reads it,</text>
+  <text x="790" y="264" text-anchor="middle" class="muted">adds its diagnostics and DTCs,</text>
+  <text x="790" y="284" text-anchor="middle" class="muted">and publishes the channel itself</text>
+
+  <path d="M300 302 V326 H540 V340" class="line" marker-end="url(#a)"/>
+  <path d="M790 302 V326 H540" class="line"/>
+  <rect x="380" y="342" width="320" height="50" rx="6" class="box"/>
+  <text x="540" y="372" text-anchor="middle" class="fg">A channel, like any sensor's</text>
+
+  <!-- ===== TRANSMIT ===== -->
+  <text x="20" y="432" class="muted head">Transmit · on each frame's own period</text>
+  <rect x="20" y="448" width="200" height="90" rx="6" class="box"/>
+  <text x="120" y="474" text-anchor="middle" class="fg head">Channels</text>
+  <text x="120" y="496" text-anchor="middle" class="muted">whatever the ECU</text>
+  <text x="120" y="514" text-anchor="middle" class="muted">already publishes</text>
+
+  <rect x="250" y="448" width="190" height="90" rx="6" class="ff"/>
+  <text x="345" y="474" text-anchor="middle" class="fg head">Frame due?</text>
+  <text x="345" y="496" text-anchor="middle" class="muted">every Transmit Period;</text>
+  <text x="345" y="514" text-anchor="middle" class="muted">start times spread out</text>
+
+  <rect x="470" y="448" width="330" height="90" rx="6" class="ff"/>
+  <text x="635" y="474" text-anchor="middle" class="fg head">Encode each field</text>
+  <text x="635" y="496" text-anchor="middle" class="mono muted">raw = value × Multiplier + Offset</text>
+  <text x="635" y="516" text-anchor="middle" class="muted">no value? If Absent: send zero / hold / skip</text>
+
+  <rect x="830" y="448" width="210" height="90" rx="6" class="box"/>
+  <text x="935" y="474" text-anchor="middle" class="fg head">Controller</text>
+  <text x="935" y="496" text-anchor="middle" class="muted">refused (mailboxes full)</text>
+  <text x="935" y="514" text-anchor="middle" class="muted">counts as TX Refused</text>
+
+  <path d="M220 493 H248" class="line" marker-end="url(#a)"/>
+  <path d="M440 493 H468" class="line" marker-end="url(#a)"/>
+  <path d="M800 493 H828" class="line" marker-end="url(#a)"/>
+</svg>

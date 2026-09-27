@@ -1,0 +1,43 @@
+# studio.common.style — the app's PROPORTIONS, and its accent. Applied in BOTH themes.
+#
+# These are the numbers the pages are authored against: a 22px control, a 14px label, a 24px dock
+# tab, a 3px radius. The light theme used to skip the app's stylesheet entirely and take the
+# framework defaults for all of them — which is why its dock tabs filled the bar instead of sitting
+# compact at the left (tabFill defaults to Fill; this sheet says left), and why every control in it
+# was a different size from the same control in dark.
+# JFramework Studio stylesheet
+# Edit a value, then View ▸ Reload Stylesheet to apply it live.
+# Colours are "r g b a" (a optional); anything omitted keeps the dark() default.
+
+# --- palette ---
+accent:        255 140 40       # warm orange — proves the sheet loaded (was iOS blue)
+accentHover:   255 165 80
+accentPress:   220 110 20
+
+# --- dimensions ---
+cornerRadius:  3       # matches the original studio's 3px border-radius
+titleBarHeight: 24
+
+# --- per-type control heights ---
+# Calibrated to the ORIGINAL Qt studio's rendered sizes (11px Ubuntu Sans + its QSS), measured with a
+# Qt6 sizeHint probe: combo/lineedit 22, button 22, checkbox 15, label 14, slider 15, tree/menu row 20.
+# The framework sizes every widget of that type from the scheme — an app never passes a size unless it
+# locally overrides one, so setting these makes the whole app match the original at a stroke.
+controlHeight: 22      # combo / spin / line-edit / text-area / colour+font button (orig combo/lineedit = 22)
+buttonHeight:  22      # push + toggle buttons (orig PushButton = 22)
+labelHeight:   14      # text labels (orig QLabel = 14)
+checkHeight:   15      # checkbox / radio (orig = 15)
+sliderHeight:  15      # slider (orig = 15)
+menuItemHeight: 20     # menu rows, list/tree rows (orig QTreeView::item min-height = 20)
+itemPadding:   6       # inner control padding
+spacing:       6       # gap between stacked controls
+borderWidth:   1
+focusRingWidth: 2
+tabBarSize:    24      # dock tab height (orig QTabBar::tab ~ 24)
+controlInsetY: 1       # air above and below a field's drawn box, so a column of them does not run together
+
+# --- dock tabs (global default; hosts can override) ---
+tabEdge:  top
+tabFill:  left
+tabClose:     pertab   # shared = one close button per leaf; pertab = a close on every tab
+tabCloseSide: right    # left | right — which side of the tab the per-tab close sits (right = after text)

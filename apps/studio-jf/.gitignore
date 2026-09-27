@@ -1,0 +1,17 @@
+build/
+genesis.log
+.cache/
+build-win/
+tools/fonttest
+build-asan/
+
+# Python bytecode from the layout tooling — build output, not source.
+__pycache__/
+*.pyc
+tools/textwidth
+
+# Local editor/session files — never part of the source.
+.vscode/
+*.code-workspace
+genesis.log*
+installer/Output/

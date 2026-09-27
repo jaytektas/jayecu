@@ -1,0 +1,39 @@
+{
+  "id": "haltech_wb2",
+  "name": "Haltech WB2 (dual channel)",
+  "direction": "receive",
+  "bitrate": 1000000,
+  "note": "Every lambda field arrives UNSET, which is the point: set a lambda sensor's interface to CAN and point its frame and start bit at the field, so the reading comes with that sensor's calibration, operating window and P-codes instead of as a bare number on the bus. Two sensors in ONE frame, 20 Hz \u2014 WBI1 in bytes 0-1 and WBI2 in bytes 2-3, both with 32767 = free air. This template is the WB2A address; a second, third and fourth box go on 0x2B4, 0x2B6 and 0x2B8, so load this and change the id. Diagnostics are a nibble each in byte 6 (1 low battery, 2 high battery, 3 sensor short, 4 sensor open, 5 sensor cold).",
+  "frames": [
+    {
+      "id": 688,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "Haltech WB2A",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "0-1",
+          "flags": 4,
+          "scale": 1024.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 300,
+          "sentinel": 32767
+        },
+        {
+          "sig": null,
+          "bits": "2-3",
+          "flags": 4,
+          "scale": 1024.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 300,
+          "sentinel": 32767
+        }
+      ]
+    }
+  ],
+  "consumer": "lambda"
+}

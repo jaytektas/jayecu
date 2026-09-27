@@ -1,0 +1,1008 @@
+{
+  "id": "haltech_v2",
+  "name": "Haltech CAN Broadcast V2",
+  "direction": "transmit",
+  "bitrate": 1000000,
+  "note": "Transcribed from the published specification. Loading this fills the tune's generic CAN pool; every frame and field stays editable afterwards.",
+  "frames": [
+    {
+      "id": 864,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "",
+      "fields": [
+        {
+          "sig": "rpm",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "map",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "tps",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "coolant_pressure",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 1013.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 865,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "",
+      "fields": [
+        {
+          "sig": "fuel_pressure",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 1013.0,
+          "policy": 0
+        },
+        {
+          "sig": "oil_pressure",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 1013.0,
+          "policy": 0
+        },
+        {
+          "sig": "throttle_demand",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "wastegate_pressure",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 1013.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 866,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "",
+      "fields": [
+        {
+          "sig": "inj_duty",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "inj_duty_2",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "advance",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 992,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 200,
+      "name": "",
+      "fields": [
+        {
+          "sig": "clt",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "iat",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "fuel_temp",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "oil_temp",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 872,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "lambda_1",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_2",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_3",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_4",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 873,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "trigger_teeth",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "sync_level",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 874,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "knock_1",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "knock_2",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 100.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 875,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "brake_pressure_f",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 101.3,
+          "policy": 0
+        },
+        {
+          "sig": "turbo_speed_1",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 6.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 876,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "wheel_fl",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "wheel_fr",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "wheel_rl",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "wheel_rr",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 879,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "wastegate_duty",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 880,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "vehicle_spd",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 1001,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "lambda_target",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 1006,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "lambda_5",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_6",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_7",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_8",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 1007,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "lambda_9",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_10",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_11",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_12",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 1136,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "lambda_overall",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_bank_1",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "lambda_bank_2",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "gear",
+          "bit_off": 63,
+          "width": 8,
+          "flags": 1,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 1138,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 50,
+      "name": "",
+      "fields": [
+        {
+          "sig": "cruise_target",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "cruise_error_kph",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 881,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 100,
+      "name": "",
+      "fields": [
+        {
+          "sig": "fuel_flow_vol",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 882,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 100,
+      "name": "",
+      "fields": [
+        {
+          "sig": "battery",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "boost_target",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "baro_kpa",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 883,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 100,
+      "name": "",
+      "fields": [
+        {
+          "sig": "egt_1",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_2",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_3",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_4",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 884,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 100,
+      "name": "",
+      "fields": [
+        {
+          "sig": "egt_5",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_6",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_7",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_8",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 885,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 100,
+      "name": "",
+      "fields": [
+        {
+          "sig": "egt_9",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_10",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_11",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "egt_12",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 886,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 100,
+      "name": "",
+      "fields": [
+        {
+          "sig": "ambient_air_temp",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "humidity",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 1002,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "",
+      "fields": [
+        {
+          "sig": "inj_duty_3",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "inj_duty_4",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 997,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "",
+      "fields": [
+        {
+          "sig": "steering_angle",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "driveshaft_rpm",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 1137,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 20,
+      "name": "",
+      "fields": [
+        {
+          "sig": "inj_press_diff",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "app_1",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 993,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 200,
+      "name": "",
+      "fields": [
+        {
+          "sig": "trans_oil_temp",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "diff_oil_temp",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 2731.5,
+          "policy": 0
+        },
+        {
+          "sig": "ethanol",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 994,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 200,
+      "name": "",
+      "fields": [
+        {
+          "sig": "fuel_level_l",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 995,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 200,
+      "name": "",
+      "fields": [
+        {
+          "sig": "stft_bank_1_pct",
+          "bit_off": 7,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "stft_bank_2_pct",
+          "bit_off": 23,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "ltft_bank_1_pct",
+          "bit_off": 39,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "ltft_bank_2_pct",
+          "bit_off": 55,
+          "width": 16,
+          "flags": 1,
+          "scale": 10.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    },
+    {
+      "id": 996,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 200,
+      "name": "",
+      "fields": [
+        {
+          "sig": "neutral_sw",
+          "bit_off": 15,
+          "width": 1,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "reverse_sw",
+          "bit_off": 14,
+          "width": 1,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "brake_sw",
+          "bit_off": 10,
+          "width": 1,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        },
+        {
+          "sig": "clutch_sw",
+          "bit_off": 9,
+          "width": 1,
+          "flags": 0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "policy": 0
+        }
+      ]
+    }
+  ]
+}

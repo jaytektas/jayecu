@@ -1,0 +1,29 @@
+{
+  "id": "generic_wideband",
+  "name": "Generic Wideband (lambda x1000)",
+  "direction": "receive",
+  "bitrate": 0,
+  "note": "Lambda x1000, big-endian, in the first two bytes \u2014 the shape most controllers settle on, and the one to try first against a box whose protocol you do not have. It is also exactly a 14Point7 Spartan 3 in its factory format: CAN id 1024 (0x400) at 500 kbit, DLC 4, 50 Hz, with sensor temperature in byte 2 (x10 deg C) and a state in byte 3 (1 waiting, 2 heating, 3 running). The field arrives UNSET for a lambda sensor to consume. NOTE the Spartan 3 manual calls its format little-endian and then prints a big-endian formula; the formula is the truth.",
+  "frames": [
+    {
+      "id": 1024,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 0,
+      "name": "Generic Wideband (l",
+      "fields": [
+        {
+          "sig": null,
+          "bit_off": 7,
+          "width": 16,
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": -0.0,
+          "policy": 0,
+          "ttl_ms": 300
+        }
+      ]
+    }
+  ],
+  "consumer": "lambda"
+}

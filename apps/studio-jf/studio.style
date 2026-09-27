@@ -1,0 +1,14 @@
+# studio.style — the app's DARK PALETTE.
+#
+# Split from the proportions (studio.common.style) so the light theme can have the studio's own
+# control heights, tab behaviour and radii without also inheriting its dark surfaces. This file is
+# applied for the Dark theme only; Light starts from the framework's light palette instead.
+# The brand accent is NOT here — it belongs to the app in either theme, so it lives in the common
+# sheet and an orange studio stays an orange studio with the lights on.
+surface0:      18 18 20
+surface1:      28 28 30
+surface2:      40 40 42
+surface3:      56 56 58
+border:        72 72 76
+textPrimary:   240 240 245
+textSecondary: 160 160 168

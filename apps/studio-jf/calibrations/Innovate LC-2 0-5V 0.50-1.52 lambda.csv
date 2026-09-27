@@ -1,0 +1,8 @@
+# jayecu table 1
+# preset: Innovate LC-2 0-5V 0.50-1.52 lambda
+# note: LC-2 factory default analogue 1: 0 V = 7.35 AFR, 5 V = 22.39 AFR petrol.
+# table: sensors.sensor[lambda_1].cal
+# x: Sensor Raw [ADC]
+# value: Reading [λ]
+,0,4095
+,0.500,1.523

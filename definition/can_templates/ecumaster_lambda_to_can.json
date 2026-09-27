@@ -1,0 +1,28 @@
+{
+  "id": "ecumaster_lambda_to_can",
+  "name": "ECUMaster Lambda to CAN",
+  "direction": "receive",
+  "bitrate": 1000000,
+  "note": "Every lambda field arrives UNSET, which is the point: set a lambda sensor's interface to CAN and point its frame and start bit at the field, so the reading comes with that sensor's calibration, operating window and P-codes instead of as a bare number on the bus. Lambda sits in bytes 4-5, not at the front: bytes 0-1 are supply voltage, 2 is heater power and 3 is sensor temperature. Bytes 6-7 are a fault word \u2014 0x01..0x20 the sensor pin shorts, 0x40 low supply, 0x80/0x100/0x200 heater faults, 0x1C00 calibration state, 0xE000 sensor type (0 LSU 4.2, 1 LSU 4.9, 2 LSU ADV). A second frame on 0x665 carries pump current, oxygen concentration and Ri. The device can also be switched to emulate a Haltech, MoTeC or Link controller, in which case load THAT template instead of this one. ECUMaster do not publish a transmit rate for this frame, so the template states none \u2014 it is a receive frame and the ECU ignores the period anyway; Valid For is what decides when a reading has gone stale.",
+  "frames": [
+    {
+      "id": 1636,
+      "ext": false,
+      "dlc": 8,
+      "period_ms": 0,
+      "name": "ECUMaster Lambda",
+      "fields": [
+        {
+          "sig": null,
+          "bits": "4-5",
+          "flags": 0,
+          "scale": 1000.0,
+          "offset": 0.0,
+          "policy": 0,
+          "ttl_ms": 300
+        }
+      ]
+    }
+  ],
+  "consumer": "lambda"
+}
