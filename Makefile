@@ -19,6 +19,8 @@
 #  make stim             → clone the bench stim (our Ardu-Stim fork, branch jaytek) into tools/Ardu-Stim
 #
 #  Studio
+#  make sdk              → build + install JFramework (the studio's SDK) at the pinned commit, Linux
+#  make sdk-win          → the same for the Windows build (needs mingw-w64)
 #  make studio           → build the desktop tuning studio (apps/studio-jf, on JFramework)
 #  make studio-run       → build the studio and launch it
 #  make studio-win       → cross-build studio.exe for Windows (MinGW-w64)
@@ -47,15 +49,22 @@ FW_BUILD   = firmware/build/$(BOARD)
 STUDIO_BUILD = apps/studio-jf/build
 STUDIO_WIN_BUILD = apps/studio-jf/build-win
 # The studio consumes JFramework as an INSTALLED SDK, never as a source subdirectory — nothing
-# from the studio leaks back into the framework. Build + install the framework first:
-#   cmake -S ../JFramework -B ../JFramework/build && cmake --install ../JFramework/build --prefix $(JF_SDK)
+# from the studio leaks back into the framework. `make sdk` (Linux) and `make sdk-win` (Windows) build and
+# install it, at the JFramework commit the studio is pinned to (JF_PIN).
 JF_SDK     ?= $(HOME)/jframework-sdk
 JF_SDK_WIN ?= $(HOME)/jframework-sdk-win
-JF_MINGW_TOOLCHAIN ?= $(HOME)/workspace/JFramework/cmake/mingw-w64.cmake
-# The Windows SDK's config needs a WINDOWS Vulkan (headers + libvulkan-1.a import library), which a
-# mingw cross-build cannot find on its own. These are the paths that SDK was itself built against.
-VULKAN_WIN_INC ?= $(HOME)/workspace/JFramework/include
-VULKAN_WIN_LIB ?= $(HOME)/workspace/hantek1008/third_party/vulkan-win/lib/libvulkan-1.a
+# The Windows build's toolchain and Vulkan come from the Windows SDK: `make sdk-win` puts them there — the
+# toolchain file and Vulkan headers copied out of JFramework, and the import library generated from them.
+JF_MINGW_TOOLCHAIN ?= $(JF_SDK_WIN)/mingw-w64.cmake
+VULKAN_WIN_INC ?= $(JF_SDK_WIN)/include
+VULKAN_WIN_LIB ?= $(JF_SDK_WIN)/lib/libvulkan-1.a
+# THE JFRAMEWORK THIS STUDIO IS BUILT AGAINST. The SDK is a separate repository, so nothing else ties a
+# jayecu commit to the framework it needs: a fresh clone of the framework's newest could be ahead of the
+# studio or behind it. Move the pin in the same commit as a studio change that needs a newer framework.
+JF_REPO ?= https://github.com/jaytektas/JFramework.git
+JF_PIN  := $(shell cat apps/studio-jf/jframework.commit 2>/dev/null)
+# make's own clone: checked out at the pin, so it never moves a JFramework checkout you are working in.
+JF_SRC  ?= $(CURDIR)/.jframework
 # STM32CubeProgrammer's CLI. Found on PATH by default; point it elsewhere with  make ST_PROG=/path/to/STM32_Programmer_CLI
 ST_PROG   ?= STM32_Programmer_CLI
 # Studio meta library. MUST match the org/app names the studio uses ("jayecu" / "jayecu Studio")
@@ -66,7 +75,7 @@ ST_PROG   ?= STM32_Programmer_CLI
 META_LIB  ?= $(HOME)/.local/share/jayecu/jayecu Studio/meta
 
 .DEFAULT_GOAL := codegen
-.PHONY: help all package release ship-kits stim codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio manual
+.PHONY: help all package release ship-kits stim sdk sdk-win jframework-src sdk-check sdk-win-check codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio manual
 
 # codegen.py emits shared/tuneit-meta.json (the TuneIt Data Dictionary) along with the C++
 # headers, ecu.ini and ecu.json — so a bare `make` already produces it, then installs it into
@@ -215,17 +224,15 @@ flash: firmware
 # Build the desktop tuning studio (apps/studio-jf, on JFramework). No source-list sync step — its
 # CMakeLists globs with CONFIGURE_DEPENDS, so a new file is picked up on the next build.
 # The studio's runtime meta library is installed separately by `make codegen` / studio-meta.
-studio:
+studio: sdk-check
 	cmake -S apps/studio-jf -B $(STUDIO_BUILD) -DCMAKE_PREFIX_PATH=$(JF_SDK)
 	cmake --build $(STUDIO_BUILD) --target studio --parallel
 
 studio-run: studio
 	$(STUDIO_BUILD)/studio
 
-# Cross-build studio.exe for Windows. Needs the MinGW-w64 toolchain and a WINDOWS build of the
-# framework installed at $(JF_SDK_WIN) — a Linux SDK cannot satisfy a mingw link:
-#   cmake -S ../JFramework -B ../JFramework/build-win -DCMAKE_TOOLCHAIN_FILE=$(JF_MINGW_TOOLCHAIN)
-#   cmake --install ../JFramework/build-win --prefix $(JF_SDK_WIN)
+# Cross-build studio.exe for Windows (the target is further down). Needs the MinGW-w64 toolchain and a
+# WINDOWS build of the framework at $(JF_SDK_WIN) — a Linux SDK cannot satisfy a mingw link: make sdk-win.
 # The Linux release file. Only an AppImage can update itself (JFramework JSelfInstaller), so this is the form
 # the studio ships in and the form the bench runs. Needs appimagetool on PATH.
 studio-appimage: studio manual ship-kits
@@ -276,7 +283,7 @@ bench-studio: studio-appimage
 	apps/studio-jf/tools/bench_deploy.sh \
 	    "$$(ls -t $(STUDIO_BUILD)/jayecu-studio-*-x86_64.AppImage | head -1)" $(BENCH)
 
-studio-win:
+studio-win: sdk-win-check
 	cmake -S apps/studio-jf -B $(STUDIO_WIN_BUILD) \
 	      -DCMAKE_TOOLCHAIN_FILE=$(JF_MINGW_TOOLCHAIN) \
 	      -DJFramework_DIR=$(JF_SDK_WIN)/lib/cmake/JFramework \
@@ -291,6 +298,54 @@ STIM_REPO ?= https://github.com/jaytektas/Ardu-Stim.git
 stim:
 	@if [ -d tools/Ardu-Stim/.git ]; then echo "  stim: tools/Ardu-Stim is already a clone"; \
 	else git clone -b jaytek $(STIM_REPO) tools/Ardu-Stim; fi
+
+# ---- The studio's SDK ------------------------------------------------------------------------------------
+jframework-src:
+	@[ -n "$(JF_PIN)" ] || { echo "no pin: apps/studio-jf/jframework.commit is missing" >&2; exit 1; }
+	@[ -d "$(JF_SRC)/.git" ] || git clone -q $(JF_REPO) "$(JF_SRC)"
+	@git -C "$(JF_SRC)" cat-file -e "$(JF_PIN)^{commit}" 2>/dev/null || git -C "$(JF_SRC)" fetch -q origin
+	git -C "$(JF_SRC)" checkout -q --detach $(JF_PIN)
+
+sdk: jframework-src
+	cmake -S "$(JF_SRC)" -B "$(JF_SRC)/build" -DCMAKE_BUILD_TYPE=Release
+	cmake --build "$(JF_SRC)/build" --target j_platform --parallel
+	cmake --install "$(JF_SRC)/build" --prefix $(JF_SDK)
+	@echo $(JF_PIN) > $(JF_SDK)/jframework.commit
+	@echo "  sdk: $(JF_SDK)  (JFramework $(JF_PIN))"
+
+# Windows has no libvulkan to link: an application links an IMPORT library naming each entry point in
+# vulkan-1.dll, which the graphics driver installs. The cross toolchain has none, so it is generated from
+# the framework's own Vulkan headers — every VKAPI_CALL entry point, vulkan_win32.h included, because the
+# swapchain is created through vkCreateWin32SurfaceKHR and leaving it out fails only at the link.
+VK_HDR = $(JF_SRC)/include/vulkan
+sdk-win: jframework-src
+	@command -v x86_64-w64-mingw32-dlltool >/dev/null || { echo "sdk-win needs mingw-w64: sudo apt install mingw-w64" >&2; exit 1; }
+	mkdir -p $(JF_SDK_WIN)/lib $(JF_SDK_WIN)/include
+	{ echo "LIBRARY vulkan-1.dll"; echo "EXPORTS"; \
+	  grep -ohE "VKAPI_CALL (vk[A-Za-z0-9]+)" $(VK_HDR)/vulkan_core.h $(VK_HDR)/vulkan_win32.h | awk '{print $$2}' | sort -u; \
+	} > $(JF_SDK_WIN)/lib/vulkan-1.def
+	x86_64-w64-mingw32-dlltool -d $(JF_SDK_WIN)/lib/vulkan-1.def -l $(JF_SDK_WIN)/lib/libvulkan-1.a -D vulkan-1.dll
+	cp -r "$(JF_SRC)/include/vulkan" "$(JF_SRC)/include/vk_video" $(JF_SDK_WIN)/include/
+	cp "$(JF_SRC)/cmake/mingw-w64.cmake" $(JF_SDK_WIN)/mingw-w64.cmake
+	cmake -S "$(JF_SRC)" -B "$(JF_SRC)/build-win" -DCMAKE_BUILD_TYPE=Release \
+	      -DCMAKE_TOOLCHAIN_FILE="$(JF_SRC)/cmake/mingw-w64.cmake" \
+	      -DVulkan_INCLUDE_DIR=$(JF_SDK_WIN)/include -DVulkan_LIBRARY=$(JF_SDK_WIN)/lib/libvulkan-1.a
+	cmake --build "$(JF_SRC)/build-win" --target j_platform --parallel
+	cmake --install "$(JF_SRC)/build-win" --prefix $(JF_SDK_WIN)
+	@echo $(JF_PIN) > $(JF_SDK_WIN)/jframework.commit
+	@echo "  sdk-win: $(JF_SDK_WIN)  (JFramework $(JF_PIN))"
+
+# A studio built against another framework than its pin still builds, which is how it goes unnoticed — so
+# say so. An SDK installed by hand (no record of its commit) is taken as the developer's own.
+sdk-check:
+	@[ -d $(JF_SDK)/lib/cmake/JFramework ] || { echo "no JFramework SDK at $(JF_SDK): make sdk" >&2; exit 1; }
+	@[ ! -f $(JF_SDK)/jframework.commit ] || [ "$$(cat $(JF_SDK)/jframework.commit)" = "$(JF_PIN)" ] || \
+	  echo "  warning: the SDK at $(JF_SDK) is JFramework $$(cat $(JF_SDK)/jframework.commit), the studio is pinned to $(JF_PIN) — make sdk"
+sdk-win-check:
+	@[ -d $(JF_SDK_WIN)/lib/cmake/JFramework ] || { echo "no Windows JFramework SDK at $(JF_SDK_WIN): make sdk-win" >&2; exit 1; }
+	@[ -f $(VULKAN_WIN_LIB) ] || { echo "no Windows Vulkan import library at $(VULKAN_WIN_LIB): make sdk-win" >&2; exit 1; }
+	@[ ! -f $(JF_SDK_WIN)/jframework.commit ] || [ "$$(cat $(JF_SDK_WIN)/jframework.commit)" = "$(JF_PIN)" ] || \
+	  echo "  warning: the SDK at $(JF_SDK_WIN) is JFramework $$(cat $(JF_SDK_WIN)/jframework.commit), the studio is pinned to $(JF_PIN) — make sdk-win"
 
 test_codegen: codegen
 	$(PYTHON) tests/test_codegen.py

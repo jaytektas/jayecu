@@ -42,3 +42,6 @@ firmware/version.h
 
 # make release output — uploaded to GitHub, never committed
 release/
+
+# make sdk's own JFramework checkout (at the pinned commit)
+.jframework/
