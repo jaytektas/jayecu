@@ -245,10 +245,13 @@ private:
         const int i = m_list->selectedIndex();
         return i >= 0 && i < static_cast<int>(m_schemas.size()) && !m_name->text().empty();
     }
+    // Accepting ENDS the dialog, whichever way it came (the Create button, or Return through the box):
+    // the box's onAccept only called this, so a created tune left the dialog open behind it.
     void _accept() {
         const int i = m_list->selectedIndex();
         if (i >= 0 && i < static_cast<int>(m_schemas.size()) && m_onAccept)
             m_onAccept(m_name->text(), m_schemas[i].path);
+        m_done = true;
     }
     // The list rows: every decoded schema, then the "Browse…" affordance as the last row.
     std::vector<std::string> _rows() const {
@@ -332,7 +335,7 @@ private:
     bool                                  m_focusSeeded{false};
     std::unique_ptr<jf::JDialogButtonBox> m_box;        // the standard footer (roles, order, Return/Escape)
     jf::JButton*                          m_create{nullptr};
-    bool m_done{false};                                 // set by the footer's Reject; ends pollAndRender
+    bool m_done{false};                                 // set by Cancel or Create; ends pollAndRender
     bool m_browseOpen{false};   // a "Browse…" file picker is currently open (don't re-trigger each frame)
     bool m_drag{false};
     float m_ax{0}, m_ay{0};
