@@ -128,7 +128,8 @@ sensor off, or read the field through the sensor instead.
 
 - The bus wired, terminated and switched on at the right bit rate (chapter 13).
 - The other device's frame layout: ids, byte order, which bytes carry what, and the scaling. Its
-  documentation or a DBC file has these.
+  documentation or a DBC file has these. The studio does not import DBC files: you type the values
+  in, either into the editor or into a template file of your own (below).
 
 ## Setting it up
 
@@ -161,6 +162,129 @@ Open **Configuration ▸ CAN Bus ▸ CAN1 ▸ Receive**.
 **Remove** takes out every selected frame (shift or ctrl to select several). **Remove Template…**
 takes out the frames a template added, as a set.
 
+### A value with no channel of its own
+
+A field always carries a channel the ECU already has. You cannot make a new channel. For a value the
+ECU has no name for, such as a button on a keypad or a pressure from a module you built, use one of
+the spare channels:
+
+| Spare channels | For |
+|---|---|
+| **Auxiliary Input 1–6** (`aux_1` … `aux_6`) | a number |
+| **Generic Switch 1–4** (`switch_1` … `switch_4`) | on or off |
+
+There are two ways to fill one:
+
+- **Directly**: pick it as the field's **Signal**. Keep the matching sensor switched off, or the ECU
+  sets **P1656**.
+- **Through the sensor**: leave the Signal empty, switch the sensor on, and set its **Interface** to
+  **CAN Bus** with its **CAN Field** on this field. The sensor adds its own checks and trouble codes,
+  and an Auxiliary Input also lets you choose its **Sensor Type** (chapter 17).
+
+The channel then works like any other. You can show it on a gauge, log it, use it in a generic
+output's conditions (chapter 18) or read it in a script with `signalRead("aux_1")` (chapter 35).
+<!-- src: definition/ecu.schema.yaml (sensor catalog: aux_1 … aux_6 and switch_1 … switch_4 with interface can_device; gc_field.sig options_from signals); firmware/Can/GenericCan.cpp (P1656) -->
+
+### Your own templates
+
+If you set up the same device on more than one car, save its frames as a template. A template is a
+JSON file. Put your own in the `can_templates` folder of the studio's data folder (chapter 3), then
+restart the studio: it reads the templates once, when it starts. It lists yours in **Load Template…**
+beside the ones it ships with. A file with the same name as a shipped template replaces it.
+
+This file sets up the dash frame from Example 1 below:
+
+```json
+{
+  "id": "my_dash",
+  "name": "My dash (0x600)",
+  "direction": "transmit",
+  "bitrate": 500000,
+  "note": "RPM, coolant, MAP and throttle for the dash, 20 Hz.",
+  "frames": [
+    {
+      "id": 1536, "ext": false, "dlc": 8, "period_ms": 50, "name": "Dash gauges",
+      "fields": [
+        { "sig": "rpm", "bit_off": 7,  "width": 16, "flags": 0, "scale": 1,  "offset": 0 },
+        { "sig": "clt", "bit_off": 23, "width": 16, "flags": 1, "scale": 10, "offset": 0 },
+        { "sig": "map", "bit_off": 39, "width": 16, "flags": 0, "scale": 10, "offset": 0 },
+        { "sig": "tps", "bit_off": 55, "width": 8,  "flags": 0, "scale": 2,  "offset": 0 }
+      ]
+    }
+  ]
+}
+```
+
+The template:
+
+| Key | Meaning |
+|---|---|
+| `id` | a short name for the file. If it is left out, the file name is used |
+| `name` | what **Load Template…** shows |
+| `direction` | `"receive"` for receive frames. Anything else makes transmit frames |
+| `bitrate` | the bus rate the device needs: 125000, 250000, 500000 or 1000000. 0 or left out means any rate |
+| `note` | the text **Load Template…** shows under the list |
+| `frames` | the frames, below |
+
+Each frame:
+
+| Key | Meaning |
+|---|---|
+| `id` | the CAN id, **in decimal**: JSON has no hex, so 0x600 is written 1536 |
+| `ext` | `true` for a 29-bit id |
+| `dlc` | the payload length, 0–8. **Always give it**: a frame without it has no bytes |
+| `period_ms` | transmit period in ms. Left out, 50 (20 Hz) |
+| `name` | the frame's **Name** |
+| `fields` | the fields, below |
+
+Each field:
+
+| Key | Meaning |
+|---|---|
+| `sig` | the channel's name, such as `"rpm"`. `null` leaves it empty, for a sensor to read |
+| `bit_off`, `width` | **Start** and **Bits**, numbered as in the grid (big endian: Start is the top bit) |
+| `flags` | add together: 1 signed, 2 little endian, 4 the No Reading code is in use |
+| `scale`, `offset` | **Multiplier** and **Offset**. Left out, 1 and 0 |
+| `policy` | transmit **If Absent**: 0 send zero, 1 hold last, 2 skip frame |
+| `ttl_ms` | receive **Valid (ms)**. Left out, 500 |
+| `sentinel` | receive **No Reading** code (with flag 4) |
+
+The rate works as it does for a shipped template. A template that names a rate can go on an empty bus,
+and sets the bus to that rate. Once frames are on the bus, only templates at the bus's rate can be
+added.
+
+!!! warning "The studio does not check your file"
+    A channel name the studio does not know loads as an empty field (the ✕), and a mistake in a
+    number loads as it is. After loading a template of your own, check every frame in the grid and
+    every field's Signal before you burn. A file that is not valid JSON, or has no frames, is left
+    out of the list.
+
+**Remove Template…** finds a template's frames by their ids. It takes your template's frames off the
+bus as a set, the same as it does for a shipped one.
+<!-- src: apps/studio-jf/src/ui/CanTemplates.h (load: the keys read and their defaults; dir and shippedDir; loaded once); apps/studio-jf/src/ui/GenericCanPanel.h (loadTemplate, _sigIdFor, dropTemplate); apps/studio-jf/main.cpp (onLoadTemplate: bit rate rules) -->
+
+The templates shipped with the studio are in `definition/can_templates/` in the source. The build
+checks each one against the ECU's channels and frame sizes. It stops if a template names a channel the
+ECU does not have, or has a field that runs past the end of its frame. Those files may also give a
+field's place as `"bits"` in the form a data sheet prints it (`"0-1"` for bytes 0 and 1, `"2:5"` for
+byte 2 bit 5), which the build turns into `bit_off` and `width`. A file in the data folder must use
+`bit_off` and `width`.
+<!-- src: codegen/codegen.py (install_can_templates, _parse_can_bits) -->
+
+### When a frame needs logic: a script
+
+The frame editor sends fixed fields on a fixed period, and reads fixed fields. Some devices want more:
+
+- a **rolling counter**, a number that goes up by one in every frame
+- a **checksum** worked out from the other bytes
+- a frame sent **once**, when something happens
+- one value spread over **several frames**, or a frame whose layout depends on a byte in it
+
+A Lua script (chapter 35) does these. `canSend` sends a frame you build byte by byte. `canSubscribe`
+and `onCanRx` hand the script the frames it asks for. Example 4 below sends a frame with a counter and
+a checksum.
+<!-- src: firmware/Scripting/ScriptEngine.cpp (l_canSend, canSubscribe, onCanRx) -->
+
 ## Worked examples
 
 :material-circle:{ .level-intermediate } Intermediate
@@ -186,6 +310,26 @@ takes out the frames a template added, as a set.
     A device documents "oil pressure: bytes 2–3, little endian, 0.1 kPa per bit". Start is the lowest
     bit, byte 2 bit 0 = **16**; Bits 16; Format Little Endian; Multiplier 10; Signal `oil_pressure`.
     The **Oil Pressure** sensor stays switched off, so only the CAN field writes that channel.
+
+!!! example "Example 4 — a counter and a checksum, from a script"
+    A device wants frame 0x5F0 at 50 Hz: RPM in bytes 0–1, a counter 0–15 in byte 6, and in byte 7
+    the sum of bytes 0–6 (the low 8 bits). The frame editor cannot count or add up, so a script sends
+    it (chapter 35):
+    ```lua
+    setTickRate(50)
+    local count = 0
+    function onTick()
+      local r = math.floor(rpm())
+      local b = { r // 256, r % 256, 0, 0, 0, 0, count, 0 }
+      local sum = 0
+      for i = 1, 7 do sum = sum + b[i] end
+      b[8] = sum % 256
+      canSend(0, 0x5F0, b)
+      count = (count + 1) % 16
+    end
+    ```
+    Bytes must be whole numbers, which is why `rpm()` goes through `math.floor`. If the script stops,
+    the frame stops. A device that checks the counter will notice, which is what the counter is for.
 
 ## Tuning it
 
@@ -237,4 +381,6 @@ settings:
 - [Chapter 13 — CAN bus](../part2/13-can-bus.md) (wiring, bit rates, templates)
 - [Chapter 14 — Vehicle integration](../part2/14-vehicle-integration.md) (OBD-II)
 - [Chapter 17 — Sensors and calibration](17-sensors.md) (CAN sensors)
+- [Chapter 18 — Outputs and the pin system](18-outputs.md) (using a received value in a generic output)
+- [Chapter 35 — Lua scripting](35-lua.md) (frames that need a counter, a checksum or logic)
 - [Chapter 32 — Vehicle functions](32-vehicle-functions.md) (gear)
