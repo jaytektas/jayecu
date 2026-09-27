@@ -87,12 +87,8 @@ public:
         indexTree(sigilRoot);                                // build the known / writable token sets
         m_search = std::make_unique<JLineEdit>(m_graph, "filter fields\xE2\x80\xA6");
         m_search->setClearButtonEnabled(true);
-        // …and Enter in the FILTER inserts the field the tree has landed on (type, arrow down, Enter),
-        // which the routing below also intended and also never reached.
-        m_search->onReturnPressed.connect([this] {
-            if (!m_tree) return;
-            if (JTreeViewNode* s = m_tree->selectedNode(); s && !s->userData.empty()) insertToken(s->userData);
-        });
+        // Enter in the FILTER inserts the field the tree has landed on (type, arrow down, Enter). The key
+        // routing below does it: a line edit lets Return go on after it commits.
         m_search->onTextChanged.connect([this](const std::string& q) { if (m_tree) m_tree->setFilter(q); });
         m_tree = std::make_unique<JTreeView>(m_graph);
         m_tree->setRootNode(std::move(sigilRoot));
@@ -100,12 +96,7 @@ public:
         m_edit = std::make_unique<JLineEdit>(m_graph, "expression \xE2\x80\x94 double-click a field to insert");
         m_edit->setClearButtonEnabled(true);
         m_edit->setText(initial);
-        // ENTER IN THE EXPRESSION BOX IS OK. The key routing below has said so for as long as it has
-        // existed, and it never ran: jRouteKey delivers the key to the focused control first, and a
-        // JLineEdit CONSUMES Return (it commits its validator and emits this), so the dialog-level branch
-        // was unreachable whenever the box had focus — which is always, since focus starts there. The field
-        // that took the key is the one that says what it was for.
-        m_edit->onReturnPressed.connect([this] { applyAndClose(); });
+        // ENTER IN THE EXPRESSION BOX IS OK: the key routing below, which a line edit lets Return reach.
         m_btnCancel = std::make_unique<JButton>(m_graph, "Cancel", kBtnW);
         m_btnOk     = std::make_unique<JButton>(m_graph, "OK", kBtnW);
         m_btnCancel->onClicked.connect([this] { m_done = true; });
@@ -170,8 +161,7 @@ public:
                 m_search->handleKeyEvent(ke);
                 continue;
             }
-            // Enter with NOTHING focused (the focus ring is on neither field) still means OK. When a field
-            // has it, that field's own onReturnPressed has already run — see the constructor.
+            // Enter in the expression box, or with nothing focused, means OK.
             if (ke.key == K::Return) { applyAndClose(); return false; }
             m_edit->handleKeyEvent(ke);
         }

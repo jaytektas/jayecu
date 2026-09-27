@@ -136,8 +136,6 @@ public:
         , m_surface(hal.createSurface(m_window->nativeHandle(), kW, kH)) {
         using namespace jf;
         m_name = std::make_unique<JLineEdit>(m_graph, "e.g. my nice supra, honda shitbox tune");
-        // Return in the name field is the dialog's default button, as in any dialog: create the tune.
-        m_name->onReturnPressed.connect([this] { if (_canCreate()) _accept(); });
         m_list = std::make_unique<JListView>(m_graph, _rows());
         if (!m_schemas.empty()) m_list->setSelectedIndex(0);   // a real schema is selected; the last row is "Browse…"
     }
@@ -213,10 +211,7 @@ public:
         if (m_create) { const bool can = _canCreate(); if (m_create->isEnabled() != can) m_create->setEnabled(can); }
         _refreshFocusRoots();
         if (pressed) jf::jRouteMouse(mx, my, m_focus);          // clicking a control focuses it
-        // The keyboard starts in the NAME field, so typing a name and pressing Return creates the tune.
-        // Not focusFirst(): on the first frame the footer has not laid its buttons out yet, they sit at
-        // (0,0), and reading order put Cancel first — so Return cancelled.
-        if (!m_focusSeeded) { m_focusSeeded = true; m_focus.syncOrder(); m_focus.setFocus(m_name.get()); }
+        if (!m_focusSeeded) { m_focusSeeded = true; m_focus.focusFirst(); }   // the name field: the footer never takes first focus
         m_box->handleMouseMove(mx, my);
         if (pressed)  m_box->handleMousePress(mx, my);
         if (released) m_box->handleMouseRelease(mx, my);
