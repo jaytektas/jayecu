@@ -1,0 +1,666 @@
+{
+ "meta": {
+  "proto": 1,
+  "product": "j8hp",
+  "board": "j8hp_v1",
+  "fw_version": "0.1.0",
+  "fw_build": "fd4e419",
+  "min_studio": "0.1.0",
+  "layout_hash": "3cbece25",
+  "config_size": 32,
+  "telemetry_size": 43,
+  "meta_format": 1,
+  "byteOrder": "little",
+  "floatBus": false,
+  "device_class": "tcu"
+ },
+ "protocol": {
+  "framing": {
+   "sync": [
+    170,
+    85
+   ],
+   "header_bytes": 16,
+   "length": {
+    "bytes": 2,
+    "endian": "little",
+    "counts": "total"
+   },
+   "crc": {
+    "algo": "crc16-ccitt",
+    "poly": 4129,
+    "init": 65535,
+    "bytes": 2,
+    "endian": "little"
+   },
+   "request": "typeId header + payload",
+   "response": "typeId header + payload",
+   "field_endian": "little",
+   "block_size": 1024
+  }
+ },
+ "segments": [
+  {
+   "id": "config",
+   "base": 0,
+   "size": 32,
+   "kind": "tune",
+   "writable": true
+  }
+ ],
+ "navigation_tree": [
+  {
+   "name": "Configuration",
+   "children": [
+    {
+     "name": "Solenoid",
+     "target_path": "config.solenoid",
+     "children": [
+      {
+       "name": "Pwm Frequency Hz",
+       "target_path": "config.solenoid.pwm_frequency_hz"
+      },
+      {
+       "name": "Current Control Hz",
+       "target_path": "config.solenoid.current_control_hz"
+      },
+      {
+       "name": "Stagger Enabled",
+       "target_path": "config.solenoid.stagger_enabled"
+      },
+      {
+       "name": "Ipropi Filter Tau Ms",
+       "target_path": "config.solenoid.ipropi_filter_tau_ms"
+      }
+     ]
+    },
+    {
+     "name": "Torque",
+     "target_path": "config.torque",
+     "children": [
+      {
+       "name": "Base Torque Rpm",
+       "target_path": "config.torque.base_torque_rpm"
+      },
+      {
+       "name": "Map Kpa Default",
+       "target_path": "config.torque.map_kpa_default"
+      },
+      {
+       "name": "Atf Temp Nominal C",
+       "target_path": "config.torque.atf_temp_nominal_c"
+      }
+     ]
+    },
+    {
+     "name": "Adaptation",
+     "target_path": "config.adaptation",
+     "children": [
+      {
+       "name": "Enabled",
+       "target_path": "config.adaptation.enabled"
+      },
+      {
+       "name": "Atf Temp Min C",
+       "target_path": "config.adaptation.atf_temp_min_c"
+      },
+      {
+       "name": "Atf Temp Max C",
+       "target_path": "config.adaptation.atf_temp_max_c"
+      },
+      {
+       "name": "Torque Window Min Nm",
+       "target_path": "config.adaptation.torque_window_min_nm"
+      },
+      {
+       "name": "Torque Window Max Nm",
+       "target_path": "config.adaptation.torque_window_max_nm"
+      }
+     ]
+    },
+    {
+     "name": "Fault",
+     "target_path": "config.fault",
+     "children": [
+      {
+       "name": "Limp Home Gear",
+       "target_path": "config.fault.limp_home_gear"
+      },
+      {
+       "name": "Overtemp Shutdown C",
+       "target_path": "config.fault.overtemp_shutdown_c"
+      },
+      {
+       "name": "Nfault Timeout Ms",
+       "target_path": "config.fault.nfault_timeout_ms"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "config": {
+  "solenoid": {
+   "pwm_frequency_hz": {
+    "type": "scalar",
+    "datatype": "U16",
+    "offset": 4,
+    "size": 2,
+    "label": "Pwm Frequency Hz",
+    "units": "",
+    "help": "PWM frequency for solenoid drivers",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 200,
+    "min": 0,
+    "max": 65535
+   },
+   "current_control_hz": {
+    "type": "scalar",
+    "datatype": "U16",
+    "offset": 6,
+    "size": 2,
+    "label": "Current Control Hz",
+    "units": "",
+    "help": "PID current control loop frequency",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 100,
+    "min": 0,
+    "max": 65535
+   },
+   "stagger_enabled": {
+    "type": "scalar",
+    "datatype": "U08",
+    "offset": 8,
+    "size": 1,
+    "label": "Stagger Enabled",
+    "units": "",
+    "help": "Enable staggered PWM across channels",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 1,
+    "kind": "bool",
+    "options": [
+     "Off",
+     "On"
+    ],
+    "min": 0,
+    "max": 1
+   },
+   "ipropi_filter_tau_ms": {
+    "type": "scalar",
+    "datatype": "U16",
+    "offset": 9,
+    "size": 2,
+    "label": "Ipropi Filter Tau Ms",
+    "units": "",
+    "help": "IPROPI current feedback filter time constant (ms)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 5,
+    "min": 0,
+    "max": 65535
+   }
+  },
+  "torque": {
+   "base_torque_rpm": {
+    "type": "scalar",
+    "datatype": "U16",
+    "offset": 11,
+    "size": 2,
+    "label": "Base Torque Rpm",
+    "units": "",
+    "help": "Base engine RPM for torque estimation",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 2000,
+    "min": 0,
+    "max": 65535
+   },
+   "map_kpa_default": {
+    "type": "scalar",
+    "datatype": "U16",
+    "offset": 13,
+    "size": 2,
+    "label": "Map Kpa Default",
+    "units": "",
+    "help": "Default MAP pressure (kPa)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 101,
+    "min": 0,
+    "max": 65535
+   },
+   "atf_temp_nominal_c": {
+    "type": "scalar",
+    "datatype": "S16",
+    "offset": 15,
+    "size": 2,
+    "label": "Atf Temp Nominal C",
+    "units": "",
+    "help": "Nominal ATF temperature (\u00b0C)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 80,
+    "min": -32768,
+    "max": 32767
+   }
+  },
+  "adaptation": {
+   "enabled": {
+    "type": "scalar",
+    "datatype": "U08",
+    "offset": 17,
+    "size": 1,
+    "label": "Enabled",
+    "units": "",
+    "help": "Enable adaptation learning",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 1,
+    "kind": "bool",
+    "options": [
+     "Off",
+     "On"
+    ],
+    "min": 0,
+    "max": 1
+   },
+   "atf_temp_min_c": {
+    "type": "scalar",
+    "datatype": "S16",
+    "offset": 18,
+    "size": 2,
+    "label": "Atf Temp Min C",
+    "units": "",
+    "help": "Min ATF temp for adaptation (\u00b0C)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 55,
+    "min": -32768,
+    "max": 32767
+   },
+   "atf_temp_max_c": {
+    "type": "scalar",
+    "datatype": "S16",
+    "offset": 20,
+    "size": 2,
+    "label": "Atf Temp Max C",
+    "units": "",
+    "help": "Max ATF temp for adaptation (\u00b0C)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 80,
+    "min": -32768,
+    "max": 32767
+   },
+   "torque_window_min_nm": {
+    "type": "scalar",
+    "datatype": "S16",
+    "offset": 22,
+    "size": 2,
+    "label": "Torque Window Min Nm",
+    "units": "",
+    "help": "Min torque window for adaptation (Nm)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 80,
+    "min": -32768,
+    "max": 32767
+   },
+   "torque_window_max_nm": {
+    "type": "scalar",
+    "datatype": "S16",
+    "offset": 24,
+    "size": 2,
+    "label": "Torque Window Max Nm",
+    "units": "",
+    "help": "Max torque window for adaptation (Nm)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 140,
+    "min": -32768,
+    "max": 32767
+   }
+  },
+  "fault": {
+   "limp_home_gear": {
+    "type": "scalar",
+    "datatype": "U08",
+    "offset": 26,
+    "size": 1,
+    "label": "Limp Home Gear",
+    "units": "",
+    "help": "Limp-home gear (6th)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 6,
+    "min": 0,
+    "max": 255
+   },
+   "overtemp_shutdown_c": {
+    "type": "scalar",
+    "datatype": "S16",
+    "offset": 27,
+    "size": 2,
+    "label": "Overtemp Shutdown C",
+    "units": "",
+    "help": "ATF overtemp shutdown (\u00b0C)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 130,
+    "min": -32768,
+    "max": 32767
+   },
+   "nfault_timeout_ms": {
+    "type": "scalar",
+    "datatype": "U16",
+    "offset": 29,
+    "size": 2,
+    "label": "Nfault Timeout Ms",
+    "units": "",
+    "help": "nFAULT debounce timeout (ms)",
+    "scale": 1.0,
+    "translate": 0.0,
+    "digits": 0,
+    "default": 50,
+    "min": 0,
+    "max": 65535
+   }
+  }
+ },
+ "telemetry": {
+  "gear_position": {
+   "datatype": "S08",
+   "offset": 0,
+   "size": 1,
+   "label": "Gear Position",
+   "units": "",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "program_mode": {
+   "datatype": "S08",
+   "offset": 1,
+   "size": 1,
+   "label": "Program Mode",
+   "units": "",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "atf_temp_c": {
+   "datatype": "S16",
+   "offset": 2,
+   "size": 2,
+   "label": "Atf Temp C",
+   "units": "\u00b0C",
+   "scale": 0.1,
+   "digits": 1,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "input_speed_hz": {
+   "datatype": "U16",
+   "offset": 4,
+   "size": 2,
+   "label": "Input Speed Hz",
+   "units": "Hz",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "output_speed_hz": {
+   "datatype": "U16",
+   "offset": 6,
+   "size": 2,
+   "label": "Output Speed Hz",
+   "units": "Hz",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_1": {
+   "datatype": "U16",
+   "offset": 8,
+   "size": 2,
+   "label": "Sol Ipropi 1",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_2": {
+   "datatype": "U16",
+   "offset": 10,
+   "size": 2,
+   "label": "Sol Ipropi 2",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_3": {
+   "datatype": "U16",
+   "offset": 12,
+   "size": 2,
+   "label": "Sol Ipropi 3",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_4": {
+   "datatype": "U16",
+   "offset": 14,
+   "size": 2,
+   "label": "Sol Ipropi 4",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_5": {
+   "datatype": "U16",
+   "offset": 16,
+   "size": 2,
+   "label": "Sol Ipropi 5",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_6": {
+   "datatype": "U16",
+   "offset": 18,
+   "size": 2,
+   "label": "Sol Ipropi 6",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_7": {
+   "datatype": "U16",
+   "offset": 20,
+   "size": 2,
+   "label": "Sol Ipropi 7",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_8": {
+   "datatype": "U16",
+   "offset": 22,
+   "size": 2,
+   "label": "Sol Ipropi 8",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_9": {
+   "datatype": "U16",
+   "offset": 24,
+   "size": 2,
+   "label": "Sol Ipropi 9",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_10": {
+   "datatype": "U16",
+   "offset": 26,
+   "size": 2,
+   "label": "Sol Ipropi 10",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_11": {
+   "datatype": "U16",
+   "offset": 28,
+   "size": 2,
+   "label": "Sol Ipropi 11",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "sol_ipropi_12": {
+   "datatype": "U16",
+   "offset": 30,
+   "size": 2,
+   "label": "Sol Ipropi 12",
+   "units": "counts",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "driver_faults": {
+   "datatype": "U08",
+   "offset": 32,
+   "size": 1,
+   "label": "Driver Faults",
+   "units": "",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "adaptation_active": {
+   "datatype": "U08",
+   "offset": 33,
+   "size": 1,
+   "label": "Adaptation Active",
+   "units": "",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "lockup_slip_rpm": {
+   "datatype": "S16",
+   "offset": 34,
+   "size": 2,
+   "label": "Lockup Slip Rpm",
+   "units": "RPM",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "line_pressure_ma": {
+   "datatype": "U16",
+   "offset": 36,
+   "size": 2,
+   "label": "Line Pressure Ma",
+   "units": "mA",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "config_dirty": {
+   "datatype": "U08",
+   "offset": 38,
+   "size": 1,
+   "label": "Config Dirty",
+   "units": "",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  },
+  "config_gen": {
+   "datatype": "U32",
+   "offset": 39,
+   "size": 4,
+   "label": "Config Gen",
+   "units": "",
+   "scale": 1.0,
+   "digits": 0,
+   "module": "Transmission",
+   "bus_type": "int",
+   "datalog": true
+  }
+ },
+ "default_tune": "Jc6+PMgAZAABBQDQB2UAUAABNwBQAFAAjAAGggAyAAA="
+}ü@²¨

@@ -3038,6 +3038,7 @@ int main(int argc, char** argv) {
         if (lastLuaErrs != -1 && luaErrs != lastLuaErrs) link.requestDebugLog();
         lastLuaErrs = luaErrs;
         std::string lua;
+        if (meta.hasTelemetry("lua_state"))                      // a TCU has no Lua: say nothing, not "Lua OK"
         switch (static_cast<int>(c.value("lua_state"))) {
             case 0: lua = "  \xC2\xB7  Lua OK"; break;
             case 1: lua = "  \xC2\xB7  Lua Disabled"; break;
@@ -3047,11 +3048,14 @@ int main(int argc, char** argv) {
                           std::to_string(static_cast<int>(c.value("lua_error_line"))) + ")"; break;
             default: break;
         }
+        // Engine readouts only when the definition has them (a TCU's frame has no rpm / clt).
+        std::string eng;
+        if (meta.hasTelemetry("rpm")) { char e[40]; std::snprintf(e, sizeof e, "  \xC2\xB7  rpm %.0f", c.value("rpm")); eng += e; }
+        if (meta.hasTelemetry("clt")) { char e[40]; std::snprintf(e, sizeof e, "  \xC2\xB7  clt %.1f", c.value("clt")); eng += e; }
         char buf[224];
-        std::snprintf(buf, sizeof(buf),
-                      "%s%s%s  \xC2\xB7  rpm %.0f  \xC2\xB7  clt %.1f%s",
+        std::snprintf(buf, sizeof(buf), "%s%s%s%s%s",
                       live.c_str(), live.empty() ? "" : "  \xC2\xB7  ",
-                      meta.layoutHash().c_str(), c.value("rpm"), c.value("clt"), lua.c_str());
+                      meta.layoutHash().c_str(), eng.c_str(), lua.c_str());
         return buf;
     }, 250);
 
@@ -5533,6 +5537,7 @@ int main(int argc, char** argv) {
         auto project  = [] { return ecu != nullptr; };
         auto native   = [] { return meta.isValid() && meta.tsSignature().empty(); };
         auto imported = [] { return meta.isValid() && !meta.tsSignature().empty(); };
+        auto engine   = [] { return !meta.isValid() || meta.deviceClass() == "ecu"; };   // not a TCU
         auto nativeUp = [&connectBtn] { return link.isOpen() && connectBtn.connState() == ConnectButton::State::Connected; };
         auto tsUp     = [] { return tsLink.isOpen(); };
         auto busy     = [&connectBtn] { return link.isOpen() || tsLink.isOpen()
@@ -5570,24 +5575,24 @@ int main(int argc, char** argv) {
         gate.item(libraryMenu, "Import TunerStudio .ini…", [busy] { return Gate{ true, !busy() }; });
 
         // TOOLS — each is offered for the ECU kinds it works with, and enabled when its link is up.
-        gate.item(toolsMenu, "Trigger Designer", [imported] { return Gate{ !imported(), true }; });
-        gate.item(toolsMenu, "Engine Cycle",     [imported, nativeUp, tsUp] {
-            return Gate{ true, imported() ? tsUp() : nativeUp() }; });
-        gate.item(toolsMenu, "Trigger Log",      [imported, nativeUp] { return Gate{ !imported(), nativeUp() }; });
-        gate.item(toolsMenu, "Knock Scope",      [imported, nativeUp] { return Gate{ !imported(), nativeUp() }; });
+        gate.item(toolsMenu, "Trigger Designer", [imported, engine] { return Gate{ !imported() && engine(), true }; });
+        gate.item(toolsMenu, "Engine Cycle",     [imported, nativeUp, tsUp, engine] {
+            return Gate{ engine(), imported() ? tsUp() : nativeUp() }; });
+        gate.item(toolsMenu, "Trigger Log",      [imported, nativeUp, engine] { return Gate{ !imported() && engine(), nativeUp() }; });
+        gate.item(toolsMenu, "Knock Scope",      [imported, nativeUp, engine] { return Gate{ !imported() && engine(), nativeUp() }; });
         gate.item(toolsMenu, "Auto Tune",        [nativeUp, tsUp] {
             return Gate{ meta.isValid() && meta.autotune().valid(), nativeUp() || tsUp() }; });
         gate.item(toolsMenu, "Update Navigation from Definition\xE2\x80\xA6", [project] {
             return Gate{ meta.isValid() && !meta.navigationTree().arr().empty(), project() }; });
-        gate.item(toolsMenu, "Reset ECU",        [imported, nativeUp] { return Gate{ !imported(), nativeUp() }; });
+        gate.item(toolsMenu, "Reset ECU",        [imported, nativeUp, engine] { return Gate{ !imported() && engine(), nativeUp() }; });
 
         // LOGGING — the PC-side recording needs a definition with telemetry; the card is a jayecu thing.
         for (const char* l : { "Start Recording", "Stop Recording" })
             gate.item(logMenu, l, [] { return Gate{ true, DatalogRecorder::instance().recording()
                                                           || (meta.isValid() && (link.isOpen() || tsLink.isOpen())) }; });
         gate.item(logMenu, "Recording Channels\xE2\x80\xA6", [] { return Gate{ true, meta.isValid() }; });
-        gate.item(logMenu, "Onboard Logging\xE2\x80\xA6", [imported, project] { return Gate{ !imported(), project() }; });
-        gate.item(logMenu, "Logs on Card\xE2\x80\xA6",    [imported] { return Gate{ !imported(), true }; });
+        gate.item(logMenu, "Onboard Logging\xE2\x80\xA6", [imported, project, engine] { return Gate{ !imported() && engine(), project() }; });
+        gate.item(logMenu, "Logs on Card\xE2\x80\xA6",    [imported, engine] { return Gate{ !imported() && engine(), true }; });
 
         // HELP — the Lua reference is built from the definition; offered when it declares one.
         gate.item(helpMenu, "Lua API Reference", [] {

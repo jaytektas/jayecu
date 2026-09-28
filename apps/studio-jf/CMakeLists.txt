@@ -754,6 +754,16 @@ target_compile_definitions(card_input_test PRIVATE
 add_test(NAME card_input COMMAND card_input_test)
 add_dependencies(studio_tests card_input_test)
 
+# A J8HP (transmission controller) definition loads, is a TCU, and resolves; the product tokens the link accepts.
+add_executable(j8hp_meta_test EXCLUDE_FROM_ALL tests/test_j8hp_meta.cpp)
+target_link_libraries(j8hp_meta_test PRIVATE studio_model JFramework::platform ${STUDIO_TLS_LIBS})
+target_include_directories(j8hp_meta_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_compile_definitions(j8hp_meta_test PRIVATE
+    J8HP_META="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/j8hp_v1.meta"
+    REAL_META="${CMAKE_CURRENT_SOURCE_DIR}/../../shared/tuneit-meta.json")
+add_test(NAME j8hp_meta COMMAND j8hp_meta_test)
+add_dependencies(studio_tests j8hp_meta_test)
+
 add_executable(dict_dump EXCLUDE_FROM_ALL
     tests/dict_dump.cpp src/ui/DictionaryTree.cpp
     )

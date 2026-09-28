@@ -1,3 +1,4 @@
+#include "Products.h"
 #include "EcuLink.h"
 #include <j/core/FrameTimer.h>   // the trigger log fills on a wall clock, not on a cycle boundary
 
@@ -973,7 +974,7 @@ void EcuLink::onResponse(uint16_t seq, uint8_t flag, const std::vector<uint8_t> 
 
     switch (cmd.kind) {
     case Kind::Identity:
-        if (flag == PACKET_IDENTITY && startsWith(data, "jayecu")) {   // solicited OR unsolicited broadcast
+        if (flag == PACKET_IDENTITY && isKnownProduct(data)) {   // solicited OR unsolicited broadcast
             JLOGC("comms", jf::JLogLevel::Info) << "identity: " << std::string(data.begin(), data.end());
             identityReceived.emit(std::string(data.begin(), data.end()));
             // No control claim: the ECU accepts writes/burns from any valid frame, so the studio just writes.

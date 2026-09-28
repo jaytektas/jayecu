@@ -398,6 +398,10 @@ public:
     std::string tsSignature() const { return tsSignature_; }
     std::string fwVersion() const { return meta_["fw_version"].str(); }
     std::string layoutHash() const{ return meta_["layout_hash"].str(); }
+    // What kind of controller this definition describes: "ecu" (absent = an engine ECU) or "tcu" (J8HP).
+    // Engine-only instruments and status (trigger, knock, cycle, rpm/clt) are offered for an ECU only.
+    std::string deviceClass() const { const std::string c = meta_["device_class"].str(); return c.empty() ? "ecu" : c; }
+    bool hasTelemetry(const std::string &ch) const { return telem_.count(ch) != 0; }
     std::string minStudio() const { return meta_["min_studio"].str(); }
     int configSize() const    { return meta_["config_size"].number<int>(); }
     int telemetrySize() const { return meta_["telemetry_size"].number<int>(); }

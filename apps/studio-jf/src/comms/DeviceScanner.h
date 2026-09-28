@@ -9,6 +9,7 @@
 // Frame: [AA 55][type][rsv][len:u16 LE][ts:u64][seq:u16][payload][crc16:2 LE]; identity = type 0x07.
 // Caller passes only jayecu-VID/PID ports, so 'Q' is never written to a foreign serial device.
 
+#include "Products.h"
 #include <j/io/SerialPort.h>
 
 #include <chrono>
@@ -271,7 +272,7 @@ private:
             if (crc16ccitt(fr, total - 2) == want && fr[2] == 0x07) {      // valid IDENTITY frame
                 const int paylen = total - 18;
                 std::string sig(reinterpret_cast<const char*>(fr + 16), reinterpret_cast<const char*>(fr + 16) + (paylen > 0 ? paylen : 0));
-                if (sig.rfind("jayecu", 0) == 0) {
+                if (isKnownProduct(sig)) {
                     dev.signature = sig;
                     std::vector<std::string> parts; size_t p = 0;
                     while (p <= sig.size()) {
