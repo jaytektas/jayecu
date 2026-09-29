@@ -40,7 +40,7 @@ int main() {
     ck(m.projectPcVars().size() == 1 && m.projectPcVars()[0].name == "my_sel",
        "the project keeps only its own variable");
     ck(m.config().count("pc.my_sel") != 0, "the project's variable resolves");
-    ck(find(m, "test_count") && find(m, "test_count")->maxV == 200.0, "the definition's declaration wins");
+    ck(find(m, "test_count") && find(m, "test_count")->maxV == 100000.0, "the definition's declaration wins");
     ck(m.pcVars().size() == 7, "the live set is definition + project");
 
     // Removing everything the project had leaves the definition's in place.

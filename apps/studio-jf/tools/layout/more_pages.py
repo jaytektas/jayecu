@@ -474,9 +474,9 @@ def page_output_setup(count=42):
     test_h = 12 + 3 * A.ROW + 8 + 30 + 6 + A.Page.wrapped_h(TEST_NOTE, TEST_NOTE_W) + A.PANEL_TITLE + 8
     test = p.panel(860, y0 + h_shape + 6 + h_shape_note + 92 + 8, 410, test_h, 'Bench Test')
     ty = 12
-    ty = p.field(test, 10, ty, 'Count',    'pc.test_count',  'configedit', 90)
-    ty = p.field(test, 10, ty, 'On Time',  'pc.test_on_ms',  'configedit', 90)
-    ty = p.field(test, 10, ty, 'Off Time', 'pc.test_off_ms', 'configedit', 90)
+    ty = p.field(test, 10, ty, 'Count',    'pc.test_count',  'configedit', 118)
+    ty = p.field(test, 10, ty, 'On Time',  'pc.test_on_ms',  'configedit', 90, unit='ms')
+    ty = p.field(test, 10, ty, 'Off Time', 'pc.test_off_ms', 'configedit', 90, unit='ms')
     # The three are HOST variables shared by every output's page: set the shape of the test once and it
     # applies to whichever pin you press next.
     p.add(p._new('command', 10, ty + 8, 120, 30,
@@ -487,9 +487,9 @@ def page_output_setup(count=42):
                  {'labelText': 'Stop', 'command': 'test %ROW% 0 0 0'}), into=test)
     p.add(p._new('command', 236, ty + 8, 110, 30,
                  {'labelText': 'Stop All', 'command': 'test 255 0 0 0'}), into=test)
-    # WHAT THE ECU WILL ACTUALLY DO, said here rather than discovered. The numbers above are a request:
-    # an ignition output is not a switch, and a coil held on saturates and takes its driver with it, so
-    # the firmware clamps the on-time per function and the console reply says when it did.
+    # WHAT THE ECU WILL ACTUALLY DO, said here rather than discovered. The numbers above are used as
+    # given — an ignition output is not a switch, and a coil held on saturates and takes its driver
+    # with it, so the note says to mind the dwell.
     p.wrapped(10, ty + 44, TEST_NOTE_W, TEST_NOTE, into=test, colour=C_DIM)
 
     return p

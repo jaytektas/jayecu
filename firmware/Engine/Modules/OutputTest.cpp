@@ -82,8 +82,10 @@ bool OutputTest::start(uint8_t row, uint32_t count, uint32_t on_ms, uint32_t off
     s.driving   = true;
     s.next_ms   = now_ms + on_ms;
     // The whole-test deadline, independent of the count: it is what survives a host that stops asking.
-    const uint32_t span = (on_ms + off_ms) * count + 1000u;
-    s.expiry_ms = now_ms + (span > MAX_TOTAL_MS ? MAX_TOTAL_MS : span);
+    // 64-bit: 100000 pulses of a long on/off overflows 32 bits and would wrap to a deadline that ends
+    // the test early.
+    const uint64_t span = (static_cast<uint64_t>(on_ms) + off_ms) * count + 1000u;
+    s.expiry_ms = now_ms + static_cast<uint32_t>(span > MAX_TOTAL_MS ? MAX_TOTAL_MS : span);
     if (s.expiry_ms == 0) s.expiry_ms = 1u;                      // 0 is never a deadline
     if (!was_active) ++active_n_;
     set_pin(row, true);

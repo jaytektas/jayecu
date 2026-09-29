@@ -7172,7 +7172,7 @@ well_known_signals:
 # ---------------------------------------------------------------------------
 pc_vars:
 - {"name": "diag_view", "label": "Diagnostics View", "units": "", "min": 0.0, "max": 9.0, "kind": "enum", "options": ["Engine & Trigger", "Fuel & Spark", "Air & Throttle", "Outputs & Bridges", "Sensors — Raw", "Sensors — Engine", "Vehicle & Traction", "Sensors — Vehicle", "Protection & Faults", "CAN Bus"]}
-- {"name": "test_count", "label": "Test Count", "units": "", "min": 1.0, "max": 200.0, "default": 3.0}
+- {"name": "test_count", "label": "Test Count", "units": "", "min": 1.0, "max": 100000.0, "default": 3.0}
 - {"name": "test_on_ms", "label": "Test On Time", "units": "ms", "min": 1.0, "max": 10000.0, "default": 4.0}
 - {"name": "test_off_ms", "label": "Test Off Time", "units": "ms", "min": 0.0, "max": 60000.0, "default": 500.0}
 - {"name": "knock_noise_cyl", "label": "Noise Floor Cylinder", "units": "", "min": 0.0, "max": 11.0, "kind": "enum", "options": ["Cyl 1", "Cyl 2", "Cyl 3", "Cyl 4", "Cyl 5", "Cyl 6", "Cyl 7", "Cyl 8", "Cyl 9", "Cyl 10", "Cyl 11", "Cyl 12"]}

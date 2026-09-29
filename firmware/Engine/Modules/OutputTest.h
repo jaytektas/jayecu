@@ -43,10 +43,11 @@ public:
     static constexpr uint32_t DEF_INJ_ON_MS   = 4;
     static constexpr uint32_t DEF_LEVEL_ON_MS = 2000;
     static constexpr uint32_t DEF_OFF_MS      = 500;
-    // The one bound that remains, and it is not a limit on what may be asked for: it is what ends a
-    // test when the host that asked for it goes away. Generous enough that a real test finishes
-    // (200 injector pulses a second apart is 200 s); short enough that nothing is left driving for ever.
-    static constexpr uint32_t MAX_TOTAL_MS    = 600000;  // 10 minutes
+    // The deadline is the request's own length plus a second, so it never cuts a test short — 100000
+    // injector pulses half a second apart is fourteen hours, and that is what was asked for. It only
+    // saturates here, where the wrapping tick compare in step() stops being able to tell the future
+    // from the past (~24.8 days).
+    static constexpr uint32_t MAX_TOTAL_MS    = 0x7FFFFFFFu;
 
     void bind(PinArbiter* arb, const OutputsConfig* cfg) noexcept { arb_ = arb; cfg_ = cfg; }
 
@@ -77,9 +78,8 @@ public:
     enum class Mode : uint8_t { Level = 0, Spark, Inject };
     [[nodiscard]] Mode mode_of(uint8_t row) const noexcept;
 
-    // WHAT WAS ACTUALLY APPLIED, after clamping — so a host that asked for a 200 ms dwell is told it
-    // is getting 8 rather than believing it got what it asked for. A clamp nobody can see is
-    // indistinguishable from a clamp that is not there.
+    // WHAT WAS ACTUALLY APPLIED, defaults filled in — so the reply shows the on/off times the test is
+    // really running with, including the ones a bare CLI call left out.
     void applied(uint8_t row, uint32_t& on_ms, uint32_t& off_ms) const noexcept {
         if (row >= MAX_ROWS) { on_ms = off_ms = 0; return; }
         on_ms = slot_[row].on_ms; off_ms = slot_[row].off_ms;
