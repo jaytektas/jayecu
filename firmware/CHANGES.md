@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.2
 - Diagnostics shows every reading in the units you chose in Preferences (psi, °F, a raw pin in volts,
   millivolts or counts), at that unit's precision. A raw analog pin read "3" beside "ADC"; it now reads
   "3.214 V".
