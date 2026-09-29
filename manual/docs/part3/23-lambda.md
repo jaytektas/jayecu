@@ -84,7 +84,13 @@ The trim is **held** — kept at its value, not driven and not reset — while:
   1000 ms) afterwards, while the exhaust refills;
 - the engine has been running less than **Closed Loop After Start** (default 3 s);
 - the coolant is below **Closed Loop Min Coolant** (default −40 °C, meaning never);
-- the wideband reads outside its valid range.
+- the wideband reads outside its valid range;
+- MAP prediction is active: the throttle is moving and the fuel is being worked out from the Predicted
+  MAP table rather than the sensor (chapter 19, section 6).
+
+**Closed-Loop Hold** `lambda_cl_hold` says which of these is holding it: None, Fuel Cut, After Cut,
+Settling, Cold, Off Range or Transient. While held, the trim shows its integral part only; the
+proportional part drops out until the loop runs again.
 
 If the sensor stops reading altogether, or you switch closed loop off, the trim goes back to zero.
 <!-- src: firmware/Engine/Modules/Lambda.cpp -->

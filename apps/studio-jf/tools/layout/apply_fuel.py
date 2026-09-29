@@ -146,7 +146,8 @@ def build():
                           [('Throttle Rate', 'tps_rate', '%.0f'), ('Throttle', 'tps', '%.1f'),
                            ('MAP Source', 'map_source', '%s'), ('MAP (est)', 'map_est', '%.1f')],
                           'The throttle RATE at which the full predicted MAP is used, per operating point. '
-                          'Below it, rate / cell of the way from measured to predicted. Watch Throttle '
+                          'Below it, rate / cell of the way from measured to predicted (half the rate, half '
+                          'way); under a tenth of the cell is noise and ignored. Watch Throttle '
                           'Rate with your foot still — whatever it wanders by is noise, and this wants to be '
                           'about ten times that, or the noise triggers prediction at constant throttle.'),
             cond=PRED),
@@ -281,8 +282,9 @@ def PREDICTED_MAP_PAGE():
                          [('MAP', 'map', '%.1f'), ('Throttle', 'tps', '%.1f'), ('Engine RPM', 'rpm', '%.0f')],
                          'What the manifold WOULD read at this RPM and throttle, for MAP prediction: while the '
                          'throttle moves fast the averaged MAP reading lags the plenum, and fuelling takes the '
-                         'higher of this and the measured value until the intake settles. Used only during a '
-                         'transient, with MAP Prediction switched on.')
+                         'higher of this and the measured value until the intake settles (the lower on a fast '
+                         'lift, with Predict Tip-Out). Used only during a transient. Auto Tune learns it from '
+                         'steady running (Tune: Predicted MAP).')
 
 
 def main():

@@ -87,6 +87,30 @@ lower **Minimum TPS** below your idle throttle reading if the idle is steady and
 - Changing a filter or limit mid-run re-works the whole proposal from the readings already collected.
   <!-- src: apps/studio-jf/src/model/Autotune.h; apps/studio-jf/src/model/Autotune.cpp; apps/studio-jf/src/ui/AutotunePanel.cpp -->
 
+### 5 · Predicted MAP: a measured value, not a ratio
+
+**Tune** at the left of the top row chooses what Auto Tune works on: the **VE Table** (everything
+above) or **Predicted MAP**, the table MAP prediction uses during a throttle transient (chapter 19,
+section 6). Predicted MAP is what the manifold **settles to** at each speed and throttle opening, so
+the engine can measure it directly: hold a throttle and a speed, and the MAP it settles to is the cell.
+No wideband is involved.
+
+- A reading counts only once **speed** (within 150 rpm), **throttle** (within 1 %) and **MAP** (within
+  3 kPa) have all held steady for **500 ms**. A reading taken while the manifold is still filling is the
+  transient, which is exactly what this table must not learn from. The status line says which one is
+  still moving ("not settled: tps").
+- It reads measured `map`, never `map_est`, which is the table itself while prediction is active.
+- The filters reject readings below **Minimum RPM**, while **Predicting** (prediction active, or the MAP
+  sensor failed), and **Above Atmosphere** (MAP over 102 kPa). Under boost the pressure depends on spool,
+  gear and boost control, not only speed and throttle, so boost is left out unless you raise that
+  threshold.
+- The proposal is each cell's **new value in kPa**, not a percentage. The same evidence rule applies (a
+  quarter of the weight moves a quarter of the way), and **Max change %** and **Max change** (kPa here)
+  limit it. They default to 100 % and 100 kPa for this table, because an untuned Predicted MAP table is
+  often half the real pressure. Each table remembers its own filter and limit settings.
+- **Apply** writes the proposed values into the Predicted MAP table in one step, as for VE.
+  <!-- src: apps/studio-jf/src/model/Autotune.cpp (value mode); apps/studio-jf/src/ui/AutotunePanel.cpp; definition/ecu.schema.yaml (value_autotune) -->
+
 ## Procedure
 
 :material-circle:{ .level-intermediate } Intermediate
@@ -112,6 +136,10 @@ Open **Tools ▸ Auto Tune** with the ECU connected.
    (Edit ▸ Undo takes it back) and the collected readings are cleared: they were measured against the
    old table.
 7. Drive again to check, repeat, then **Burn**.
+
+For **Predicted MAP**, choose it in **Tune** first, then press Start and hold a series of steady
+points: a throttle opening held at a steady speed for a second or two each, across the speeds and
+openings you drive at. There is no need to leave closed loop.
 
 **Apply continuously** applies the proposal every 2 seconds while recording, so the table converges
 as you drive. It changes the tune as you go: use it only once you trust the setup. **Reset** throws

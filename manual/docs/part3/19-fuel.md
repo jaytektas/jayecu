@@ -37,7 +37,7 @@ does and how to set the system up.
 :material-circle:{ .level-intermediate } Intermediate
 
 <figure markdown>
-  ![The fuel calculation: the air model, air mass, divide by stoichiometric ratio times lambda, divide by fuel density, divide by injector flow to give the base fuel pulse; the corrections multiplied in; wall film; split per squirt; staging; dead time and short-pulse adder; bank and cylinder trims; the injector opens](../img/diagrams/fuel-signal-flow.svg)
+  ![The fuel calculation: the air model, air mass, divide by stoichiometric ratio times lambda, divide by fuel density, divide by injector flow to give the base fuel pulse; the corrections multiplied in; split per squirt; staging; the fuel film per stage; dead time and short-pulse adder; bank and cylinder trims; the injector opens](../img/diagrams/fuel-signal-flow.svg)
   <figcaption>Figure 19.1 — The whole calculation, once per engine cycle. Blue is what you describe,
   orange is the corrections, green is closed loop and trims, red is protection.</figcaption>
 </figure>
@@ -56,7 +56,7 @@ vertical axis:
 | **Speed-Density** (default) | manifold pressure (kPa) | manifold pressure | MAP, CLT, IAT |
 | **Alpha-N** | throttle position (%) | barometric pressure | TPS, CLT, IAT |
 | **MAF** | manifold pressure (kPa) | (the MAF measures the air directly) | MAF, MAP, CLT, IAT |
-| **Blend** | "effective MAP" (see below) | effective MAP | MAP, TPS, CLT, IAT |
+| **Blend** | manifold pressure (kPa) | throttle below the crossover, MAP above (see below) | MAP, TPS, CLT, IAT |
 
 <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
@@ -65,13 +65,16 @@ vertical axis:
   throttle bodies with an aggressive cam. It assumes the air in the port is at atmospheric pressure.
 - **MAF** divides the measured airflow (g/s) by the number of intake strokes per second. The VE table
   is not used for air mass in this mode. If the MAF signal fails, the ECU falls back to
-  Speed-Density, sets **P1704**, and shows **MAF Failed - Speed-Density Fallback** `maf_failover`.
+  Speed-Density, sets **P1704**, and shows **MAF Failed - Using MAP** `maf_failover`.
   <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
-- **Blend** is for individual throttle bodies that also have a usable MAP signal. Below **Blend
-  Crossover Start RPM** (default 2000) it uses the **Predicted MAP** table, a table of what the
-  manifold would read at each speed and throttle opening, so it behaves like Alpha-N. Above **Blend
-  Crossover End RPM** (default 4000) it uses measured MAP, like Speed-Density. In between it fades
-  from one to the other. One VE table serves the whole range.
+- **Blend** is for individual throttle bodies that also have a usable MAP signal. It uses **two
+  maps**. Below **Blend Start RPM** (default 2000) the **Alpha-N VE Table** (speed × throttle, its air
+  at atmospheric pressure) carries the charge, like Alpha-N. Above **Blend End RPM** (default 4000)
+  the VE table on measured MAP carries it, like Speed-Density. In between, the ECU fades from one to
+  the other by mixing the **air masses** the two maps give, never their VE numbers. Each range has
+  its own cells, so tuning the low range never moves the cells the upper range uses. **Alpha-N VE
+  (Blend)** `ve_alpha` shows the low map's VE, and **Blend: Alpha-N Share** `blend_alpha_share` shows
+  how much of the charge it is still carrying (0 % above the crossover).
   <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
 For every model except MAF, the air mass trapped in one cylinder is:
@@ -90,16 +93,21 @@ in milligrams.
 whole swept volume. The table can have a third axis for ethanol content on a flex-fuel engine.
 <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
+**Charge Load** `charge_load` is the air in the cylinder as a percentage of a full charge: 100 % VE at
+barometric pressure and the charge temperature. Every air model publishes it in the same terms, and
+it is smooth through Blend's crossover, so it is the load to put Target Lambda and the ignition map on
+for Blend and MAF. When you change **Air Model**, the studio offers to point those two maps at the load
+that model suits, converting their load breakpoints (kPa to % of a full charge, and back). Their cells
+are kept, so check them afterwards. **Keep as they are** changes nothing.
+<!-- src: firmware/Engine/Modules/FuelCalculator.cpp; apps/studio-jf/src/model/AirModelLoad.cpp -->
+
 ### 2 · From air to fuel
 
 - **Target Lambda** comes from its own table, on the same speed × Fuel Load axes as the VE table. The
   ECU limits it to 0.5–1.5. The result is `lambda_target`.
-- **Stoich AFR** (default 14.7) is the air–fuel ratio at which this fuel burns completely. On a
-  flex-fuel engine the ECU blends it towards **Stoich AFR (Ethanol)** (default 9.0) by the ethanol
-  content.
+- **Stoich AFR** (default 14.7) is the air–fuel ratio at which a fuel burns completely.
 - **fuel mass = air mass ÷ (stoich × target lambda)**.
-- **Fuel Specific Gravity** (default 0.740, one cell) turns fuel mass into fuel volume. The table can
-  be expanded to fuel temperature × ethanol content.
+- **Fuel Specific Gravity** turns fuel mass into fuel volume.
 - **Injector flow** turns volume into time. The **Flow Rate** table (cc/min) is read against the
   pressure across the injector and battery voltage.
   <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
@@ -107,14 +115,30 @@ whole swept volume. The table can have a third axis for ethanol content on a fle
 The result is the base fuel pulse: the time the injector must flow, before any correction and before
 the time it takes to open.
 
-**Ethanol content** comes from **Ethanol Source** while that sensor reads. If it drops out, the ECU
-keeps the last good reading. If it has never read since power-up, it uses **Flex Fallback Ethanol**
-(default 0 %). The value used is **Ethanol Content (used for fuelling)** `flex_ethanol`.
+**The fuel is per injection stage.** A second stage is often a second fuel as well as a second set of
+injectors (port petrol with a secondary on E85 or methanol), so each stage has its own page,
+**Fuel Tuning ▸ Stage N ▸ Fuel**, with:
+
+- **Flex Fuel** and **Ethanol Source**: the stage's ethanol content is fixed (**Ethanol %**, 0 for
+  petrol, 85 for E85) or measured by a flex sensor. Several stages that share one fuel system point at
+  the same sensor. With Flex Fuel on, the ECU uses the sensor while it reads, the last good reading if
+  it drops out, and **Ethanol %** until it has read once since power-up. The stage's value is
+  **Ethanol Content (Stage N)** `stageN_ethanol`.
+- **Stoich AFR** and **Stoich AFR (Ethanol)** (default 14.7 and 9.0): the stage's stoich, blended
+  between the two by its ethanol content. Methanol is its Stoich AFR at 0 %.
+- **Specific Gravity** (default 0.740, one cell), which can be expanded to fuel temperature × ethanol.
+  **Fuel Temp Source** says where this stage's fuel temperature comes from.
+- **Fuel Comp Correction** (ethanol × load): a trim on this stage's fuel while Flex Fuel is on.
+
+When stages share the fuel, the split between them works in **air**: each stage's share is sized by
+its flow × density × stoich ÷ its trim, so stages on different fuels together burn exactly the air the
+charge needs. With one stage this is the ordinary calculation. **Charge Ethanol** `flex_ethanol` is the
+blend the cylinders actually get, weighted by the fuel mass each stage delivered on the last cycle.
 <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
 **Barometric pressure** comes from **Barometric Source** while it reads, or **Assumed Barometric
 Pressure** (default 101.3 kPa) when there is no sensor. A missing MAP reading is treated as
-atmospheric pressure, never as zero.
+atmospheric pressure, never as zero (see **A failed MAP**, section 6).
 <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
 ### 3 · The pressure across the injector
@@ -157,7 +181,6 @@ own **Enabled** switch. A switched-off correction is not calculated at all and r
 | **Post Start** | `fuel_corr_poststart` | only after the engine catches: adds the **Post-Start** table's % (coolant × run time) | 0.2–5 |
 | **Air Temp** | `fuel_corr_iat` | adds the **Air Temp Correction** % (air temperature, optionally × MAP) | 0.2–5 |
 | **Barometric** | `fuel_corr_baro` | adds the **Barometric Correction** % | 0.2–5 |
-| **Fuel Composition** | `fuel_corr_fuelcomp` | adds the **Fuel Comp Correction** % (ethanol × load) | 0.2–5 |
 | **Gear** | `fuel_corr_gear` | adds the **Fuel Gear Correction** % | 0.2–5 |
 | **RPM Limiter** | `fuel_corr_revlimit` | adds the % from the table of speed below the cut × MAP | 0.2–5 |
 | **Generic 1–4** | `fuel_corr_generic1` … `4` | four tables whose axes you choose | 0.2–5 |
@@ -165,12 +188,16 @@ own **Enabled** switch. A switched-off correction is not calculated at all and r
 
 <!-- src: firmware/Engine/Modules/FuelCalculator.cpp; firmware/Engine/Modules/FuelTrim.cpp -->
 
+The fuel composition correction is not in this list: it is per stage, on each stage's share of the
+fuel (**Stage N ▸ Fuel**, section 2), and **Fuel Corr: Fuel Comp** `fuel_corr_fuelcomp` shows stage 1's.
+The Corrections page links to it.
+
 Other modules add their own corrections to the same product: transient fuel (`fuel_corr_accel`,
 below), closed-loop lambda (`fuel_corr_stft`, `fuel_corr_ltft`, chapter 23), engine protection
 (`fuel_corr_protection`, chapter 29), exhaust-temperature protection (`fuel_corr_egt`, enrich only)
 and launch control (`fuel_corr_launch`, chapter 26). The whole product is limited to 0.1–10.
 
-The warm-up, air temperature, barometric, fuel composition, gear and generic corrections change
+The warm-up, air temperature, barometric, gear, generic and per-stage fuel composition corrections change
 slowly, so the ECU refreshes them in turn, one table per millisecond, rather than every cycle.
 <!-- src: firmware/Engine/Modules/FuelTrim.cpp -->
 
@@ -248,30 +275,67 @@ There are two ways to do it. Use **one**, not both.
 The enrichment is limited to −100 % … +300 %.
 <!-- src: firmware/Engine/Modules/TransientThrottle.cpp -->
 
-**MAP Prediction with wall film** is the model-based method, on the **MAP Prediction** page:
+**MAP Prediction & Fuel Film** is the model-based method. It models what happens instead of adding
+fuel by feel: prediction fixes the **measurement** (MAP read late), and the film fixes the **fuel**
+(fuel stuck to the port walls). It has its own page, **Fuel Tuning ▸ MAP Prediction & Fuel Film**, and
+one button there, **Use MAP Prediction + Fuel Film**, switches both halves on and Transient Throttle
+off. The two halves can still be switched separately: an Alpha-N or ITB engine may want only the film,
+a direct-injected one only prediction. Transient Throttle has the matching **Use Classic Transient
+Fuel** button, and both pages warn while both methods are on.
+<!-- src: apps/studio-jf/tools/layout/fuel_pages.py; apps/studio-jf/tools/layout/feature_pages.py -->
 
-- **MAP Prediction** `map_predict_enabled`: MAP is measured as an average, so it is always a little
-  late. While the throttle is moving fast, the ECU uses the **Predicted MAP** table instead of
-  measured MAP, or rather the **higher** of the two, so it can only add fuel. How much it uses depends
-  on the throttle rate against the **Transient TPS Scaling** table: at or above the table's rate it
-  uses the full predicted value; below it, the rate as a fraction of the table's decides how far it
-  moves from measured towards predicted (half the rate, half way). Under a tenth of the table's
-  rate counts as noise and is ignored. After a movement,
-  prediction holds for **Predicted MAP Time** (default 200 ms). **Manifold Pressure (est)**
-  `map_est` is the value used, and **MAP Source** `map_source` says where it came from (0 measured,
-  1 predicted, 2 failover).
-  <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
-- **Wall film** `wallfilm_enabled`: a fraction of each squirt (**Film Pooling**, default 20 %) lands
-  on the port wall, and the film evaporates into the cylinder with a time constant (**Evaporation
-  Time**, default 250 ms). The ECU injects extra fuel to build the film when the load rises, and less
-  when it falls. At steady load it changes nothing. It runs only once the engine is running, and
-  during a fuel cut the film only evaporates. **Fuel Corr: Wall Film** `fuel_corr_film` shows its
-  effect.
+**MAP Prediction** `map_predict_enabled`. A MAP reading is averaged over at least one cylinder period,
+because the manifold pulses with every intake stroke, so it is always a little late. Snap the throttle
+open and the plenum fills in milliseconds while the reading still says vacuum. While the throttle is
+moving fast, the ECU uses the **Predicted MAP** table (speed × throttle: what the manifold settles to
+at that point) instead:
+
+- **How fast counts** is set by the **Transient TPS Scaling** table, a throttle rate in %/s against
+  speed (optionally × throttle). The throttle rate is **Throttle Rate** `tps_rate`: the change in
+  the **Throttle Source** channel over the time since the last calculation, lightly smoothed.
+- **At or above** the table's rate, the estimate is the full predicted value. **Below** it, the rate as
+  a fraction of the table's rate decides how far the estimate moves from measured towards predicted:
+  half the rate, half way. **Under a tenth** of the table's rate counts as noise and is ignored.
+- The default rises with speed, from 150 %/s at 500 rpm through 300 at 2000 to 700 at 6000, because
+  the sensor lags less at speed: one cylinder period is about 30 ms at 1000 rpm on a four and 5 ms at
+  6000. Set it about ten times the rate the throttle channel wanders at with your foot still.
+- It takes the **higher** of measured and predicted, so it can only add fuel. With **Predict Tip-Out**
+  on (off by default) a fast **lift** is predicted too, and then the estimate moves **down** towards the
+  table, the lower of the two. Turn that on only once the table is right at part throttle: an
+  untuned table predicting down makes a lean spike on every lift.
+- After a movement, prediction holds for **Predicted MAP Time** (default 200 ms). A stronger movement
+  during the hold restarts it.
+- **Manifold Pressure (est)** `map_est` is the value used, and **MAP Source** `map_source` says where
+  it came from: Measured, Predicted (transient), or Failed (baro).
+- **Closed-loop lambda holds its trim** while prediction is active: the short-term trim is frozen, not
+  reset, and **Closed-Loop Hold** `lambda_cl_hold` reads **Transient**. The same channel names every
+  other reason the trim is held: fuel cut, after a cut, settling, cold, off range.
+  <!-- src: firmware/Engine/Modules/FuelCalculator.cpp; firmware/Engine/Modules/Lambda.cpp -->
+
+**Fuel Film** `wallfilm_enabled` (port wetting). Part of every squirt lands on the port wall and reaches
+the cylinder over the following cycles. The ECU tracks the film all the time and corrects each squirt
+for it: at a steady load the film gives back what it takes and the correction is ×1.000; when the load
+rises it injects more to build the film, and when it falls, less, because the film gives fuel back.
+During a fuel cut the film only evaporates.
+
+- **Film Pooling Percentage** (coolant × MAP, 0–90 %): how much of each squirt stays on the wall.
+  About 5–10 % warm with a well-matched injector and port, 25–30 % for sharp inlet turns, around 50 %
+  cold.
+- **Film Evaporation Time Constant** (speed × coolant, 1–1000 ms): how fast the film comes off. About
+  98 % of it has gone in four times this value. Around 200 ms warm and at speed, up to 400 ms cold or at
+  low speed.
+- The film is worked out **per injection stage**, after the fuel is split between stages. Each stage
+  has a **Port Film** switch on its Fuel page: turn it off for a direct-injected stage, which has no
+  port wall to wet.
+- **Fuel Corr: Fuel Film** `fuel_corr_film` shows the effect: the fuel injected over the fuel wanted.
+- Set the injection timing first. A lean spike caused by squirting against a closed valve is not a
+  pooling problem.
   <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
-**MAP failover.** If the MAP sensor fails on a model that needs it, the ECU uses the Predicted MAP
-table instead, whether or not prediction is switched on. That table cannot know how much boost there
-is, so this is a limp-home mode, not something to tune on. It sets **P1700**.
+**A failed MAP.** If the MAP sensor stops reading on a model that needs it, the ECU reads
+**atmospheric pressure** in its place, sets **P1700**, and **MAP Source** reads **Failed (baro)**. That
+is rich at idle, which is the safe side. It does **not** fall back to the Predicted MAP table: that
+table is for transients only, used only with prediction on.
 <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
 ### 7 · From fuel to injector pulses
@@ -337,22 +401,21 @@ sequential, with a vacuum-referenced 300 kPa regulator on a return-style rail.
 Open **Configuration ▸ Engine Configuration ▸ Fuel System ▸ Fuel Setup**.
 
 <figure markdown>
-  ![Fuel Setup: Air Model with the Blend RPMs and Charge Temp IAT Weight; the signal sources; Stoich AFR, Stoich AFR (Ethanol), Overall Fuel Trim and Tank Capacity; the Wall Film settings](../img/studio/fuel-setup.png)
+  ![Fuel Setup: Air Model with the Blend RPMs and Charge Temp IAT Weight; the signal sources; Overall Fuel Trim and Tank Capacity, with a note that stoich, ethanol and density are per stage; the Fuel Film switch and a link to its tables](../img/studio/fuel-setup.png)
   <figcaption>Figure 19.6 — Fuel Setup.</figcaption>
 </figure>
 
 1. **Air Model**: Speed-Density for the example. The two **Blend** speeds are used only by Blend.
 2. **Charge Temp IAT Weight**: leave at 100 % to start.
 3. **Signal Sources**: the channel each input comes from. The defaults are the usual sensors. Change
-   one only if yours reads on a different channel. **Ethanol If No Reading** is Flex Fallback
-   Ethanol. **Assumed Baro** is used when there is no barometric sensor: set it to your local
-   pressure if you live high up.
-4. **Fuel Properties**: **Stoich AFR** 14.7 for petrol. For E85 without a flex sensor, set the petrol
-   figure to the blend's stoichiometric ratio. **Overall Fuel Trim** is the Overall correction.
-   **Tank Capacity** (litres) only turns the fuel-level sender's percentage into litres. 0 means
-   unknown.
+   one only if yours reads on a different channel. **Assumed Baro** is used when there is no
+   barometric sensor: set it to your local pressure if you live high up.
+4. **Fuel Properties**: **Overall Fuel Trim** is the Overall correction. **Tank Capacity** (litres)
+   only turns the fuel-level sender's percentage into litres. 0 means unknown. Stoich, ethanol and
+   density are set per stage (Step 3).
    <!-- src: definition/ecu.schema.yaml -->
-5. **Wall Film**: leave off unless you use MAP Prediction (section 6).
+5. **Fuel Film**: leave off unless you use MAP Prediction & Fuel Film (section 6). **Film tables ▸**
+   opens that page.
 
 ### Step 2 — Injector stage 1
 
@@ -380,15 +443,26 @@ Open **Fuel Tuning ▸ Stage 1 ▸ Setup**.
   <figcaption>Figure 19.8 — Short Pulse Width Adder.</figcaption>
 </figure>
 
-### Step 3 — Fuel density
+### Step 3 — The fuel
 
-**Fuel Tuning ▸ Specific Gravity** holds one number by default, 0.740. Change it for your fuel, or
-expand the table to fuel temperature × ethanol for a flex-fuel engine.
+Open **Fuel Tuning ▸ Stage 1 ▸ Fuel**. Each stage has one.
 
 <figure markdown>
-  ![Specific Gravity: one cell of 0.740](../img/studio/fuel-specific-gravity.png)
-  <figcaption>Figure 19.9 — Specific Gravity.</figcaption>
+  ![Stage 1 Fuel: Flex Fuel, Ethanol Source, Ethanol %, Stoich AFR, Stoich AFR (Ethanol), Fuel Temp Source and Port Film; how the ethanol reading is used; the Specific Gravity table; and the Fuel Comp Correction table against ethanol](../img/studio/fuel-stage-fuel.png)
+  <figcaption>Figure 19.9 — Stage 1 Fuel: what this stage burns.</figcaption>
 </figure>
+
+1. **Flex Fuel**: off for a fixed fuel. Then **Ethanol %** is the blend: 0 for petrol, 85 for E85.
+   On, pick the flex sensor in **Ethanol Source**, and Ethanol % is used only until the sensor has
+   read once since power-up.
+2. **Stoich AFR** 14.7 for petrol. **Stoich AFR (Ethanol)** 9.0 is pure ethanol's; the ECU blends
+   between the two by the ethanol content, so an E85 stage needs no other change. Methanol is its
+   Stoich AFR (about 6.4) at 0 % ethanol.
+3. **Specific Gravity**: one number by default, 0.740. Change it for your fuel, or expand it to fuel
+   temperature × ethanol for a flex-fuel stage.
+4. **Fuel Comp Correction**: a trim against ethanol × load, used only while Flex Fuel is on. Leave it
+   at 0 to start.
+5. **Port Film** matters only with the fuel film on (section 6): off for a direct-injected stage.
 
 ### Step 4 — VE and Target Lambda
 
@@ -451,7 +525,8 @@ Open **Fuel Tuning ▸ Start & Warmup**. The page lays out everything between ke
 </figure>
 
 Each correction's own page appears in the navigation under **Corrections** only while it is switched
-on. Leave them all on with their default tables to start. The warm-up, cranking and post-start tables
+on. The fuel composition correction is per stage, and the page links to it (**Fuel Composition
+(Stage 1 ▸ Fuel)**). Leave them all on with their default tables to start. The warm-up, cranking and post-start tables
 matter from the first start, and the rest can wait until the engine runs.
 
 ### Step 7 — Transient fuel
@@ -459,7 +534,7 @@ matter from the first start, and the rest can wait until the engine runs.
 Open **Fuel Tuning ▸ Transient Throttle**.
 
 <figure markdown>
-  ![Transient Throttle: Load Signal, Enrichment dead bands, Disenrichment, Decay and Async, Overall, and the list of tables](../img/studio/fuel-transient.png)
+  ![Transient Throttle: Load Signal, Enrichment dead bands, Disenrichment, Decay and Async, Overall, the Strategy button Use Classic Transient Fuel, and the list of tables](../img/studio/fuel-transient.png)
   <figcaption>Figure 19.16 — Transient Throttle.</figcaption>
 </figure>
 
@@ -473,20 +548,41 @@ Open **Fuel Tuning ▸ Transient Throttle**.
   <figcaption>Figure 19.17 — Enrich Rate. More fuel for faster movements from lighter loads.</figcaption>
 </figure>
 
-If you prefer the model-based method, switch Transient Throttle **off** and use MAP Prediction with
-wall film instead:
+If you prefer the model-based method, open **Fuel Tuning ▸ MAP Prediction & Fuel Film** and press
+**Use MAP Prediction + Fuel Film**. That switches both halves on and Transient Throttle off.
 
 <figure markdown>
-  ![The MAP Prediction page: Prediction with Predicted MAP Time and Throttle Source, Fuel Film with Film Pooling and Evaporation Time, and live readouts](../img/studio/fuel-map-prediction.png)
-  <figcaption>Figure 19.18 — MAP Prediction with wall film. The page itself says to use this or
-  Transient Throttle, not both.</figcaption>
+  ![MAP Prediction & Fuel Film: the Strategy button with the MAP Prediction and Fuel Film switches and a warning that both strategies are on; Prediction with Predicted MAP Time, Throttle Source and Predict Tip-Out; Right Now readouts; a Fuel Film note; and links to the four tables](../img/studio/fuel-map-prediction.png)
+  <figcaption>Figure 19.18 — MAP Prediction & Fuel Film. The amber line appears only while Transient
+  Throttle is on as well.</figcaption>
 </figure>
 
-<figure markdown>
-  ![Transient TPS Scaling: the throttle rate at which prediction is fully applied, by RPM](../img/studio/fuel-tps-scaling.png)
-  <figcaption>Figure 19.19 — Transient TPS Scaling. It should be about ten times the throttle rate
-  you see with your foot held still, or noise will trigger prediction.</figcaption>
-</figure>
+1. **Predicted MAP**: what the manifold settles to at each speed and throttle. Log `map` at steady
+   points and fill it in, or let **Auto Tune** learn it (chapter 40): choose **Tune ▸ Predicted MAP**,
+   press Start, and hold steady throttle and speed points. It learns only from settled readings, with
+   speed, throttle and MAP all steady, never from the transient itself.
+
+    <figure markdown>
+      ![The Predicted MAP table: throttle against RPM, in kPa](../img/studio/fuel-predicted-map.png)
+      <figcaption>Figure 19.19 — Predicted MAP.</figcaption>
+    </figure>
+
+2. **Transient TPS Scaling**: leave the default curve to start. If prediction switches on with your
+   foot still, raise it; watch **Throttle Rate** at a steady pedal.
+
+    <figure markdown>
+      ![Transient TPS Scaling: the throttle rate at which prediction is fully applied, rising with RPM from 150 to 700 %/s](../img/studio/fuel-tps-scaling.png)
+      <figcaption>Figure 19.20 — Transient TPS Scaling. About ten times the throttle rate you see with
+      your foot held still.</figcaption>
+    </figure>
+
+3. **Film Pooling Percentage** and **Film Evaporation Time Constant**: the defaults suit a typical
+   port-injected engine. Get the injection timing right before you change them.
+
+    <figure markdown>
+      ![Film Pooling Percentage: coolant against MAP, 50 % cold falling to 20 % warm](../img/studio/fuel-film-pool.png){ width="870" }
+      <figcaption>Figure 19.21 — Film Pooling Percentage.</figcaption>
+    </figure>
 
 ### Step 8 — Check with Fuel Breakdown
 
@@ -496,15 +592,15 @@ something you do not expect.
 
 <figure markdown>
   ![Fuel Breakdown: The Charge, Corrections, Closed Loop, Then In Time, and Commanded](../img/studio/fuel-breakdown.png){ width="870" }
-  <figcaption>Figure 19.20 — Fuel Breakdown. Read it top to bottom.</figcaption>
+  <figcaption>Figure 19.22 — Fuel Breakdown. Read it top to bottom.</figcaption>
 </figure>
 
-The **Fuel Tuning** page itself (Figure 19.21) is a summary: which fuel functions are switched on,
+The **Fuel Tuning** page itself (Figure 19.23) is a summary: which fuel functions are switched on,
 and the whole correction chain live.
 
 <figure markdown>
   ![The Fuel Tuning overview: Fuel Functions switches and the live correction chain](../img/studio/fuel-overview.png)
-  <figcaption>Figure 19.21 — The Fuel Tuning page.</figcaption>
+  <figcaption>Figure 19.23 — The Fuel Tuning page.</figcaption>
 </figure>
 
 ## Worked examples
@@ -544,12 +640,17 @@ and the whole correction chain live.
     | Setting | Value | Why |
     |---|---|---|
     | Air Model | **Blend** | throttle-based at low speed, MAP-based at high speed |
-    | Blend Crossover Start / End RPM | 2500 / 4500 | the range where MAP becomes trustworthy on this engine |
-    | Predicted MAP table | what MAP reads at each speed and throttle | only appears in the navigation with Blend selected |
+    | Blend Start / End RPM | 2500 / 4500 | the range where MAP becomes trustworthy on this engine |
+    | Alpha-N VE Table | VE against speed × throttle | the low-speed map; only appears in the navigation with Blend selected |
+    | Target Lambda and ignition load | **Charge Load** | continuous through the crossover; the studio offers it when you choose Blend |
+
+    Tune the Alpha-N VE Table below the crossover and the VE table above it. Between the two, watch
+    **Blend: Alpha-N Share**: the VE autotune leaves the VE table alone wherever the Alpha-N map carries
+    any of the charge.
 
     <figure markdown>
-      ![The Predicted MAP table: throttle against RPM, in kPa](../img/studio/fuel-predicted-map.png)
-      <figcaption>Figure 19.22 — Predicted MAP. Fill it from logged MAP at steady speed and throttle.</figcaption>
+      ![The Alpha-N VE Table: throttle against RPM](../img/studio/fuel-alpha-ve.png)
+      <figcaption>Figure 19.24 — The Alpha-N VE Table, Blend's low-speed map.</figcaption>
     </figure>
 
 !!! example "Example 4 — two injector stages"
@@ -559,7 +660,7 @@ and the whole correction chain live.
 
     <figure markdown>
       ![Stage 2 Staging Duty: one cell of 50 %](../img/studio/fuel-staging-duty.png)
-      <figcaption>Figure 19.23 — Staging Duty. Stage 1 carries the fuel alone up to this duty.</figcaption>
+      <figcaption>Figure 19.25 — Staging Duty. Stage 1 carries the fuel alone up to this duty.</figcaption>
     </figure>
 
     With Stage 1 Staging Duty at 70 %, stage 1 carries everything up to 70 % duty. Stage 2 then takes
@@ -579,14 +680,17 @@ Chapter 38 is the full procedure. The short version:
    `lambda`, `lambda_target`, `ve`, `fuel_load` and `rpm`. The Auto Tune tool (chapter 40) does this
    from logged data.
 3. **Tune starting** next: cranking and prime on a cold engine, post-start, then warm-up as it warms.
-4. **Transient fuel** last, with the steady state right. Watch `lambda` on quick throttle movements:
-   a lean spike on tip-in wants more **Enrich Rate**; a rich one wants less.
+4. **Transient fuel** last, with the steady state right. Watch `lambda` on quick throttle movements.
+   With Transient Throttle, a lean spike on tip-in wants more **Enrich Rate**; a rich one wants less.
+   With MAP Prediction & Fuel Film, get **Predicted MAP** right first (Auto Tune can learn it), then
+   raise **Film Pooling** where a tip-in still goes lean and lower it where it goes rich.
 5. **Do not correct a VE error with a correction table.** The corrections are for real effects
    (temperature, pressure, gear). A table used to hide a VE error will be wrong somewhere else.
 
 **Channels worth logging:** `base_pw`, `inj_pw`, `inj_duty`, `ve`, `air_mass`, `fuel_load`,
 `lambda_target`, `charge_temp`, `inj_press_diff`, `pw_add_deadtime`, the `fuel_corr_*` family,
-`transient_enrich_pct`, `tt_load_rate`, `map_est`, `map_source`.
+`transient_enrich_pct`, `tt_load_rate`, `map_est`, `map_source`, `tps_rate`, `fuel_corr_film`,
+`lambda_cl_hold`, `charge_load`, `blend_alpha_share`.
 
 !!! warning "Injector duty"
     **Injector Duty Cycle** `inj_duty` is the commanded pulse, dead time included, over the time one
@@ -600,7 +704,7 @@ Chapter 38 is the full procedure. The short version:
 
 | Code | Meaning | What sets it | What to check |
 |---|---|---|---|
-| **P1700** | Fuel: MAP signal missing | Speed-Density, MAF or Blend with no valid MAP. Severity 2. Fuelling falls back to the Predicted MAP table. | MAP sensor and its source (chapter 17) |
+| **P1700** | Fuel: MAP signal missing | Speed-Density, MAF or Blend with no valid MAP. Severity 2. Fuelling reads atmospheric pressure in its place; MAP Source reads Failed (baro). | MAP sensor and its source (chapter 17) |
 | **P1701** | Fuel: TPS signal missing | Alpha-N or Blend with no valid TPS. Severity 2. | TPS (chapter 17) |
 | **P1702** | Fuel: coolant-temp signal missing | Severity 2. | Coolant sensor |
 | **P1703** | Fuel: intake-air-temp signal missing | Severity 1. | Air temperature sensor |
@@ -621,15 +725,17 @@ the severity above, and only with the key on.
 | Symptom | Likely causes | Check |
 |---|---|---|
 | No injection at all | No sync; injector outputs not assigned; a fuel cut active; stages not set up | Sync level (chapter 16); injection stage outputs (chapter 15); `base_pw` is not 0 but the injector is silent means a cut is active |
-| Rich or lean everywhere by the same proportion | Stoich AFR, specific gravity, displacement or injector flow wrong | Fuel Setup, Specific Gravity, chapter 15, Flow Rate |
+| Rich or lean everywhere by the same proportion | Stoich AFR, specific gravity, displacement or injector flow wrong | Stage N ▸ Fuel, chapter 15, Flow Rate |
 | Right at load, wrong at idle | Dead time wrong | Dead Time table; the effect changes with battery voltage |
 | Lean under boost only | Fixed Regulator selected on a referenced rail, or the reverse; flow table missing low pressure-difference cells | Stage 1 Fuel Pressure mode; `inj_press_diff` under boost |
 | Floods on a cold start | Too much cranking enrichment or prime | Cranking table; Prime table; clear with flood clear |
 | Starts, then dies after a few seconds | Post-start enrichment too little or too much | Post-Start table; log `lambda` and `run_time` |
 | Lean stumble on tip-in | Transient enrichment too small, or the detect dead band too high | Enrich Rate; Enr Load Rate Dead Band; `transient_enrich_pct` |
 | Rich bog on tip-in | Transient enrichment too big | Enrich Rate; Enrich Decay |
-| Fuelling jumps with no throttle movement | Transient Throttle and MAP Prediction both on; noise on TPS | Use one method; Transient TPS Scaling; `tps_rate` at a steady pedal |
-| A flex-fuel engine runs lean as petrol | Ethanol sensor never read, fallback 0 % | `flex_ethanol`; Flex Fallback Ethanol |
+| Fuelling jumps with no throttle movement | Transient Throttle and MAP Prediction both on; noise on TPS | Use one method (the pages warn); Transient TPS Scaling; `tps_rate` at a steady pedal |
+| Lean spike on every throttle lift | Predict Tip-Out on with an untuned Predicted MAP table | Turn Predict Tip-Out off, or tune Predicted MAP (Auto Tune) |
+| A flex-fuel engine runs lean as petrol | Ethanol sensor never read, so the stage uses its Ethanol % | `stage1_ethanol`, `flex_ethanol`; the stage's Ethanol % |
+| Closed-loop trim does nothing for a while after throttle movements | It holds during MAP prediction, by design | `lambda_cl_hold` reads Transient; a long Predicted MAP Time holds it longer |
 | `inj_duty` near 100 % | Injectors too small | Bigger injectors, higher pressure, or a second stage |
 
 ## Settings reference
