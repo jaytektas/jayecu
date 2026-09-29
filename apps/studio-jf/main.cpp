@@ -5699,11 +5699,11 @@ int main(int argc, char** argv) {
         if (g_termRequest) { g_termRequest = 0; win.requestClose(); }
         if (g_trackDockHomes) g_trackDockHomes();   // keep each panel's last-known placement current
         if (g_syncViewToggles) g_syncViewToggles(); // and the View menu honest about what's on screen
-        std::string t = "jayecu Studio";
+        std::string t = "jayECU Studio (JF)";   // the launcher's name, as the window was created with
         if (ecu && !activeTuneName.empty()) t = activeTuneName + (g_docDirty ? " *" : "") + " \xE2\x80\x94 studio";
         if (!s_connTitle.empty()) t += " \xE2\x80\x94 " + s_connTitle;
         static std::string lastTitle;
-        if (t != lastTitle) { lastTitle = t; win.window().setTitle(t); }
+        if (t != lastTitle) { lastTitle = t; win.setTitle(t); }   // the drawn title bar, not just the taskbar
     });
     houseTimer.start(std::chrono::milliseconds(250), jf::JTimer::JMode::Repeating);
 
