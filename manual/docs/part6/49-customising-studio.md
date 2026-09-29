@@ -85,12 +85,21 @@ Undo).
 
 ### 5 · A new firmware's pages
 
+Each ECU has its own copy of its pages, taken from the ones shipped with its firmware the first time
+you open it. When a studio or firmware update brings re-drawn pages for that ECU's firmware:
+
+- **You never changed yours** — they are replaced, and the status line says so.
+- **You changed them** (saved a layout edit), or they were installed before the studio kept track —
+  you are asked. **Use the new pages** keeps yours beside them in the ECU's folder as
+  `dashboard-<date>-<time>.gui`, which **File ▸ Open Layout…** can bring back. **Keep mine** is
+  remembered: that update is not offered again. Closing the question asks again next time.
+
 After a firmware update adds features, **Help ▸ Add Missing Navigation Entries…** (Editing mode) shows, on the
 left, everything the firmware's own tree has that yours does not, and on the right your tree as it is.
 Select what you want and import it. It only ever **adds** — nothing you have is removed, renamed or
 moved — and it is one undo step. A page you deleted on purpose simply shows up on the left each time:
 leave it there.
-<!-- src: apps/studio-jf/src/ui/ReseedDialog.h -->
+<!-- src: apps/studio-jf/src/ui/ReseedDialog.h; apps/studio-jf/src/app/DashboardOrigin.h; apps/studio-jf/main.cpp -->
 
 ## Procedure
 
