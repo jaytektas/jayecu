@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 # THE STUDIO'S VERSION — the one place it is set. It is baked into StudioVersion.h (below), shown in
 # Help > About, and compared against the newest GitHub release tag by the update check. A release
 # tagged vX.Y.Z must be built with X.Y.Z here.
-project(jframework_studio VERSION 0.3.6 LANGUAGES CXX)
+project(jframework_studio VERSION 0.3.7 LANGUAGES CXX)
 
 
 # THE TEST SUITE IS A SUITE. Thirty add_test() registrations sat here doing nothing because
