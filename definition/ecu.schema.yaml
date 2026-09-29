@@ -272,6 +272,7 @@ learned:
     # allocation went unrecorded and the studio read the whole grid as one row.
     row_axis: {external: true, min: 0, max: 4}
     apply_to: [config.vvt_control.intake_base_duty_1, config.vvt_control.exhaust_base_duty_1]
+    apply_mode: add          # duty offset: VvtControl adds it to the base duty
   # THE FUEL TRIM, and there is one of it. It lives under fuel_calculator rather than lambda because
   # it BORROWS ve_table's axes — the same arrays, the same signal ids, the same allocation — and an
   # axis reference resolves inside one module's config. That is the whole point: LTFT cell (i,j,k) IS
@@ -298,6 +299,7 @@ learned:
     row_axis:   {path: config.fuel_calculator.ve_table_y_axis, channel: fuel_load}
     depth_axis: {path: config.fuel_calculator.ve_table_z_axis, channel: flex_ethanol, en: ve_table_z_en}
     apply_to: [config.fuel_calculator.ve_table]   # Apply to Base Table, then reset (operator-confirmed)
+    apply_mode: multiply     # a percentage of the VE cell: base x (1 + trim/100)
   # BANK DIFFERENCE IS TWO NUMBERS, NOT A SECOND TABLE. What separates one bank from the other is
   # dominated by injector flow variance and manifold bias — close to a constant offset, not a surface
   # that varies across the whole operating range. Two learned scalars carry it for four bytes; a
@@ -334,6 +336,8 @@ learned:
     col_axis: {path: config.boost.base_targ_axis, channel: boost_target}
     row_axis: {path: config.boost.base_rpm_axis, channel: rpm, en: base_boost_duty_table_y_en}
     apply_to: [config.boost.base_boost_duty_table]
+    # A DUTY OFFSET the firmware ADDS to the base (Boost.cpp: base + ltt), so it is folded in by adding.
+    apply_mode: add
   - id: idle_ltt
     module: idle
     label: "Idle Long-Term Trim"
@@ -440,6 +444,30 @@ autotune:
   # (lambda.ltft_delay_table) for its own learning; the studio reads THAT when it is connected to an
   # ECU that has one, and falls back to this only for an ECU that states nothing.
   delay: {table: lambda.ltft_delay_table}
+
+# TABLES THE STUDIO LEARNS FROM A CHANNEL THAT MEASURES THE ANSWER, rather than from a wideband ratio.
+# Each is a second target in the Auto Tune tool. A record counts once every `steady` channel has held within
+# its span for `settle_ms` — the value an engine SETTLES to is the answer; what it reads on the way there is
+# the transient. The proposal is the cell's new value (as the VE target's is a percentage), applied only
+# when the user presses Apply.
+value_autotune:
+# PREDICTED MAP is steady-state manifold pressure against RPM x throttle: hold a throttle and a speed, and
+# the MAP it settles to IS the cell. It is USED during a throttle transient (MAP prediction) and LEARNED
+# outside one. `map`, not `map_est`: during prediction map_est is the table's own value.
+- name: Predicted MAP
+  table: fuel_calculator.predicted_map_table
+  value_channel: map
+  settle_ms: 500
+  steady:
+  - {channel: rpm, span: 150}
+  - {channel: tps, span: 1.0}
+  - {channel: map, span: 3.0}
+  filters:
+  - {name: "Minimum RPM",   channel: rpm,        op: '<', value: 500}
+  - {name: "Predicting",    channel: map_source, op: '>', value: 0.5}   # prediction active, or MAP failed
+  # Under boost the pressure depends on spool, gear and boost control, not only RPM and throttle. The
+  # threshold is the user's: raise it to learn boost too.
+  - {name: "Above Atmosphere", channel: map,     op: '>', value: 102}
 
 sensor_types:
 - {id: temperature, units: C, decimals: 1, raw: volts, stages: [calibration, filter, diagnostics], diagnostics: [raw_min, raw_max, operating_min, operating_max], min: -40.0, max: 300.0, update_hz: 5}
@@ -932,8 +960,8 @@ signals:
 # (a tank's content does not change mid-drive), the configured fallback if it has never read. A dead
 # sensor read as 0 % used to fuel an E85 engine as petrol: about a third lean, everywhere, silently.
 # The MAF air model is running on speed-density because the MAF signal is missing or invalid.
-- {id: maf_failover, label: "MAF Failed - Speed-Density Fallback", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 1.0, category: "Fuel", bus_type: float, datalog: true, enum: bool_active, owner: firmware}
-- {id: flex_ethanol, label: "Ethanol Content (charge, used for fuelling)", units: '%', scale: 1.0, telem_type: uint8, min: 0.0, max: 100.0, category: "Fuel", bus_type: float, datalog: true, owner: firmware}
+- {id: maf_failover, label: "MAF Failed - Using MAP", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 1.0, category: "Fuel", bus_type: float, datalog: true, enum: bool_active, owner: firmware}
+- {id: flex_ethanol, label: "Charge Ethanol", units: '%', scale: 1.0, telem_type: uint8, min: 0.0, max: 100.0, category: "Fuel", bus_type: float, datalog: true, owner: firmware}
 # EACH STAGE'S OWN ETHANOL — its sensor, its last good reading, or its Ethanol % — while flex_ethanol above
 # is the CHARGE: the stages' fuels mixed by the mass each delivered (one stage = that stage's).
 - {id: stage1_ethanol, label: "Ethanol Content (Stage 1)", units: '%', scale: 1.0, telem_type: uint8, min: 0.0, max: 100.0, category: "Fuel", bus_type: float, datalog: true, owner: firmware}
@@ -971,7 +999,6 @@ signals:
 - {id: fuel_corr_generic4, label: "Fuel Corr: Generic 4", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 - {id: fuel_corr_iat, label: "Fuel Corr: Air Temp", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 - {id: fuel_corr_ltft, label: "Fuel Corr: LTFT", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "Lambda", bus_type: float, datalog: true, owner: firmware}
-- {id: fuel_corr_map, label: "Fuel Corr: MAP", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 - {id: fuel_corr_overall, label: "Fuel Corr: Overall", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 - {id: fuel_corr_poststart, label: "Fuel Corr: Post-Start", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 - {id: fuel_corr_protection, label: "Fuel Corr: Protection", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
@@ -1040,7 +1067,7 @@ signals:
 - {id: tps_rate, label: "Throttle Rate", units: '%/s', scale: 0.1, telem_type: int16, min: -3000.0, max: 3000.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 # The film model's own correction, in the same units as every other fuel correction: 1.000 = it is
 # asking for exactly the steady-state pulse, 1.100 = a tenth more to fill the film.
-- {id: fuel_corr_film, label: "Fuel Corr: Wall Film", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
+- {id: fuel_corr_film, label: "Fuel Corr: Fuel Film", units: 'x', scale: 0.001, telem_type: uint16, min: 0.0, max: 5.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 # WHAT EACH OUTPUT SLOT IS DOING, one channel per slot. An output whose state is invisible cannot be
 # tuned, cannot be tested on a bench and cannot be believed: the Outputs pages have shown a live figure
 # per slot since they were written, bound to channels that did not exist, so every one of them read 0
@@ -1323,6 +1350,9 @@ signals:
 # Under boost on a narrowband car that is the normal, correct state rather than a fault, which is why
 # it is said out loud here; P1753 is what separates "nothing is reading" from "cannot see this target".
 - {id: lambda_cl_state, label: "Closed-Loop State", units: '', scale: 1.0, telem_type: uint8, min: 0, max: 3, category: "Lambda", bus_type: float, datalog: true, owner: firmware, options: ["Off", "Wideband", "Narrowband", "Open loop"]}
+# WHY CLOSED LOOP IS HELD (frozen, not reset) — a state that said only "open loop" could not say whether
+# that was a fuel cut, a cold engine or a throttle transient, which are three different things to fix.
+- {id: lambda_cl_hold, label: "Closed-Loop Hold", units: '', scale: 1.0, telem_type: uint8, min: 0, max: 6, category: "Lambda", bus_type: float, datalog: true, owner: firmware, options: ["None", "Fuel Cut", "After Cut", "Settling", "Cold", "Off Range", "Transient"]}
 - {id: sync_level, label: "Sync Level", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 2.0, category: "Trigger", bus_type: float, enum: sync_level, owner: firmware}
 - {id: synchronized, label: "Crank Synchronized", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 1.0, category: "Trigger", bus_type: float, datalog: true, enum: bool_active, owner: firmware}
 - {id: torque_conv_pressure, label: "Torque Converter Pressure", category: "Sensors - Transmission", bus_type: float}
@@ -4232,21 +4262,25 @@ modules:
       - {name: stage1_ethanol_pct, type: uint8, label: Stage 1 Ethanol %, units: '%', scale: 1.0, min: 0, max: 100, default: 0, help: 'Flex Fuel OFF: the ethanol content of stage 1''s fuel, used all the time (0 petrol, 85 E85). Flex Fuel ON: what to fuel for until the sensor has given one good reading since power-up — after that a dropout holds the LAST GOOD reading, because the tank does not change mid-drive. Set it to what the car normally runs: a dead sensor read as 0 % fuels an ethanol engine as petrol, about a third lean.'}
       - {name: stage1_stoich_x10, type: uint16, label: Stage 1 Stoich AFR, units: '', scale: 0.1, min: 10, max: 300, digits: 1, default: 147, help: 'The stoichiometric ratio of stage 1''s BASE fuel — the fuel at 0 % ethanol. 14.7 for petrol; 6.4 for methanol, which is set here with Ethanol % at 0.'}
       - {name: stage1_stoich_ethanol_x10, type: uint16, label: Stage 1 Stoich AFR (Ethanol), units: '', scale: 0.1, min: 10, max: 300, digits: 1, default: 90, help: 'The stoichiometric ratio of pure ethanol, around 9.0. Stage 1''s working ratio is blended between its base fuel and this by its ethanol content.'}
+      - {name: stage1_film_enabled, type: uint8, label: Stage 1 Port Film, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'Stage 1''s fuel wets the intake port, so the fuel film model tracks a film for it (when Fuel Film is on). Turn it off for a DIRECT-injected stage: its fuel goes straight into the cylinder and never touches a port wall.'}
       - {name: stage2_flex_enabled, type: uint8, label: Stage 2 Flex Fuel, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Stage 2''s ethanol content is MEASURED by a flex sensor (its Ethanol Source). Off, the stage runs a fixed blend: its Ethanol % is used as-is, and its fuel-composition correction is not applied. Stages sharing one fuel system can point at the same sensor.'}
       - {name: stage2_ethanol_src, type: uint8, label: Stage 2 Ethanol Source, units: '', scale: 1.0, min: 0, max: 254, default: ethanol, help: 'Which signal reports stage 2''s ethanol content, when Flex Fuel is on. Several stages may use the same sensor.'}
       - {name: stage2_ethanol_pct, type: uint8, label: Stage 2 Ethanol %, units: '%', scale: 1.0, min: 0, max: 100, default: 0, help: 'Flex Fuel OFF: the ethanol content of stage 2''s fuel, used all the time (0 petrol, 85 E85). Flex Fuel ON: what to fuel for until the sensor has given one good reading since power-up — after that a dropout holds the LAST GOOD reading, because the tank does not change mid-drive. Set it to what the car normally runs: a dead sensor read as 0 % fuels an ethanol engine as petrol, about a third lean.'}
       - {name: stage2_stoich_x10, type: uint16, label: Stage 2 Stoich AFR, units: '', scale: 0.1, min: 10, max: 300, digits: 1, default: 147, help: 'The stoichiometric ratio of stage 2''s BASE fuel — the fuel at 0 % ethanol. 14.7 for petrol; 6.4 for methanol, which is set here with Ethanol % at 0.'}
       - {name: stage2_stoich_ethanol_x10, type: uint16, label: Stage 2 Stoich AFR (Ethanol), units: '', scale: 0.1, min: 10, max: 300, digits: 1, default: 90, help: 'The stoichiometric ratio of pure ethanol, around 9.0. Stage 2''s working ratio is blended between its base fuel and this by its ethanol content.'}
+      - {name: stage2_film_enabled, type: uint8, label: Stage 2 Port Film, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'Stage 2''s fuel wets the intake port, so the fuel film model tracks a film for it (when Fuel Film is on). Turn it off for a DIRECT-injected stage: its fuel goes straight into the cylinder and never touches a port wall.'}
       - {name: stage3_flex_enabled, type: uint8, label: Stage 3 Flex Fuel, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Stage 3''s ethanol content is MEASURED by a flex sensor (its Ethanol Source). Off, the stage runs a fixed blend: its Ethanol % is used as-is, and its fuel-composition correction is not applied. Stages sharing one fuel system can point at the same sensor.'}
       - {name: stage3_ethanol_src, type: uint8, label: Stage 3 Ethanol Source, units: '', scale: 1.0, min: 0, max: 254, default: ethanol, help: 'Which signal reports stage 3''s ethanol content, when Flex Fuel is on. Several stages may use the same sensor.'}
       - {name: stage3_ethanol_pct, type: uint8, label: Stage 3 Ethanol %, units: '%', scale: 1.0, min: 0, max: 100, default: 0, help: 'Flex Fuel OFF: the ethanol content of stage 3''s fuel, used all the time (0 petrol, 85 E85). Flex Fuel ON: what to fuel for until the sensor has given one good reading since power-up — after that a dropout holds the LAST GOOD reading, because the tank does not change mid-drive. Set it to what the car normally runs: a dead sensor read as 0 % fuels an ethanol engine as petrol, about a third lean.'}
       - {name: stage3_stoich_x10, type: uint16, label: Stage 3 Stoich AFR, units: '', scale: 0.1, min: 10, max: 300, digits: 1, default: 147, help: 'The stoichiometric ratio of stage 3''s BASE fuel — the fuel at 0 % ethanol. 14.7 for petrol; 6.4 for methanol, which is set here with Ethanol % at 0.'}
       - {name: stage3_stoich_ethanol_x10, type: uint16, label: Stage 3 Stoich AFR (Ethanol), units: '', scale: 0.1, min: 10, max: 300, digits: 1, default: 90, help: 'The stoichiometric ratio of pure ethanol, around 9.0. Stage 3''s working ratio is blended between its base fuel and this by its ethanol content.'}
+      - {name: stage3_film_enabled, type: uint8, label: Stage 3 Port Film, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'Stage 3''s fuel wets the intake port, so the fuel film model tracks a film for it (when Fuel Film is on). Turn it off for a DIRECT-injected stage: its fuel goes straight into the cylinder and never touches a port wall.'}
       - {name: stage4_flex_enabled, type: uint8, label: Stage 4 Flex Fuel, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Stage 4''s ethanol content is MEASURED by a flex sensor (its Ethanol Source). Off, the stage runs a fixed blend: its Ethanol % is used as-is, and its fuel-composition correction is not applied. Stages sharing one fuel system can point at the same sensor.'}
       - {name: stage4_ethanol_src, type: uint8, label: Stage 4 Ethanol Source, units: '', scale: 1.0, min: 0, max: 254, default: ethanol, help: 'Which signal reports stage 4''s ethanol content, when Flex Fuel is on. Several stages may use the same sensor.'}
       - {name: stage4_ethanol_pct, type: uint8, label: Stage 4 Ethanol %, units: '%', scale: 1.0, min: 0, max: 100, default: 0, help: 'Flex Fuel OFF: the ethanol content of stage 4''s fuel, used all the time (0 petrol, 85 E85). Flex Fuel ON: what to fuel for until the sensor has given one good reading since power-up — after that a dropout holds the LAST GOOD reading, because the tank does not change mid-drive. Set it to what the car normally runs: a dead sensor read as 0 % fuels an ethanol engine as petrol, about a third lean.'}
       - {name: stage4_stoich_x10, type: uint16, label: Stage 4 Stoich AFR, units: '', scale: 0.1, min: 10, max: 300, digits: 1, default: 147, help: 'The stoichiometric ratio of stage 4''s BASE fuel — the fuel at 0 % ethanol. 14.7 for petrol; 6.4 for methanol, which is set here with Ethanol % at 0.'}
       - {name: stage4_stoich_ethanol_x10, type: uint16, label: Stage 4 Stoich AFR (Ethanol), units: '', scale: 0.1, min: 10, max: 300, digits: 1, default: 90, help: 'The stoichiometric ratio of pure ethanol, around 9.0. Stage 4''s working ratio is blended between its base fuel and this by its ethanol content.'}
+      - {name: stage4_film_enabled, type: uint8, label: Stage 4 Port Film, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'Stage 4''s fuel wets the intake port, so the fuel film model tracks a film for it (when Fuel Film is on). Turn it off for a DIRECT-injected stage: its fuel goes straight into the cylinder and never touches a port wall.'}
       # ATMOSPHERE, WHICH MAY OR MAY NOT BE MEASURED. Alpha-N has no manifold reading to take charge
       # density from and used a hardcoded 101.3 kPa; the barometric correction table indexes on baro and
       # read nothing at all when no sensor published it. Both want the same number, and it has one home
@@ -4289,9 +4323,8 @@ modules:
       # fill the film on tip-in and less on tip-out (the film gives it back). Disabled by default.
       - {name: map_predict_enabled, type: uint8, label: MAP Prediction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'While the throttle is moving fast, take manifold pressure from the predicted table rather than the sensor, which is necessarily averaged over a cylinder period and therefore late. Meant to be used WITH the wall-film model and INSTEAD of transient throttle: this one fixes the measurement, the film model fixes the fuel.'}
       - {name: map_predict_hold_ms, type: uint16, label: Predicted MAP Time, units: ms, scale: 1.0, min: 0, max: 2000, default: 200, help: 'How long prediction stays in effect after the throttle movement that triggered it. Too short and it lets go before the real sensor has caught up, which is the lean hole it exists to fill; a long or shared MAP hose wants more. 200 ms suits a typical install.'}
-      - {name: wallfilm_enabled, type: uint8, label: Wall-Film Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Model the fuel film on the port walls explicitly, rather than correcting for it with transient tables. A fraction of every injection wets the wall and evaporates later, so the fuel delivered and the fuel that arrives are different during any change — this computes the difference from first principles and injects what is actually needed. At steady state it corrects nothing; on a tip-in it over-injects to fill the film, on a tip-out it under-injects because the film gives fuel back. It is only modelled while RUNNING: during cranking the port is dominated by priming rather than these dynamics.'}
-      - {name: wallfilm_x_pct, type: uint16, label: Wall-Film Deposit X (%), units: '%', scale: 0.1, min: 0, max: 900, default: 200, help: 'What fraction of each injection lands on the port wall instead of going straight in. It is the size of the effect — a cold port with a wide-open valve wets far more than a hot one. Clamped below 90%, because at 100% no fuel would ever reach the cylinder and the correction diverges.'}
-      - {name: wallfilm_tau_ms, type: uint16, label: Wall-Film Evap Tau, units: ms, scale: 1.0, min: 1, max: 5000, default: 250, help: 'How quickly the wall film evaporates into the cylinder, as a time constant. Short means the film clears fast and the correction is brief; long means fuel keeps arriving for a while after injection and the correction has a long tail. Together with the deposit fraction it defines the whole model.'}
+      - {name: map_predict_tipout, type: uint8, label: Predict Tip-Out, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Also predict when the throttle CLOSES quickly: the estimate moves down towards Predicted MAP, taking the LOWER of the two, the same way a tip-in takes the higher. Off, a lift is left to the sensor. Opt in once the Predicted MAP table is tuned at part throttle — an untuned table predicting down makes a lean spike on every lift.'}
+      - {name: wallfilm_enabled, type: uint8, label: Fuel Film Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Model the fuel film on the port walls explicitly, rather than correcting for it with transient tables. A fraction of every injection wets the wall and evaporates later, so the fuel delivered and the fuel that arrives are different during any change — this computes the difference from first principles and injects what is actually needed. At steady state it corrects nothing; on a tip-in it over-injects to fill the film, on a tip-out it under-injects because the film gives fuel back. It is only modelled while RUNNING: during cranking the port is dominated by priming rather than these dynamics.'}
       # Prime pulse: a ONE-SHOT simultaneous injector squirt fired once on the first crank/sync after power-up
       # (the STOPPED->CRANKING edge). prime_mode picks how the prime_fuel_table cell is read.
       # FLOOD CLEAR. Hold the throttle wide open while cranking and the ECU stops injecting, so the
@@ -4334,7 +4367,6 @@ modules:
       - {name: enable_cranking, type: uint8, label: Cranking Correction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'The cranking enrichment table is evaluated while the engine is cranking. Off, cranking gets the base fuel calculation with no enrichment at all, which almost no engine starts on — this is here to be turned off deliberately while chasing a flooding problem, not as a tuning step.'}
       - {name: enable_poststart, type: uint8, label: Post-Start Correction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'The post-start enrichment table (coolant x run time) is applied for the seconds after the engine catches. Off, fuelling steps straight from cranking to the running calculation.'}
       - {name: enable_iat, type: uint8, label: Air Temp Correction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'The intake-air-temperature correction table is evaluated and applied. Note this is a TRIM on top of the charge-temperature model, which already accounts for air density — turning it off does not make the ECU ignore air temperature.'}
-      - {name: enable_map, type: uint8, label: MAP Correction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'The load-and-speed trim table on top of the VE table is evaluated and applied.'}
       - {name: enable_revlimit, type: uint8, label: Rev Limiter Correction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'The enrichment that comes in as the rev limiter is approached is evaluated and applied. It softens the cut and cools the chambers; off, the limiter cuts against the plain fuel calculation.'}
       - {name: enable_baro, type: uint8, label: Barometric Correction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'The barometric correction table is evaluated and applied. Only meaningful with a baro source assigned.'}
       - {name: enable_gear, type: uint8, label: Gear Correction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'The per-gear fuelling table is evaluated and applied. Only meaningful with gear detection running.'}
@@ -4451,7 +4483,11 @@ modules:
         units: '%/s'
         type: uint16
         scale: 1.0           # cell stores %/s directly
-        default: 100         # the throttle rate at which prediction is fully in
+        default: 300         # the throttle rate at which prediction is fully in
+        # RISING WITH RPM: a MAP reading is averaged over a cylinder period, so its lag is ~30 ms at
+        # 1000 rpm (4 cyl) and ~5 ms at 6000 — at speed the sensor keeps up with all but a faster stab.
+        # 300 %/s at 2000 rpm; every throttle row the same until the optional TPS axis is used.
+        default_values: [150, 200, 250, 300, 400, 500, 600, 700, 150, 200, 250, 300, 400, 500, 600, 700, 150, 200, 250, 300, 400, 500, 600, 700, 150, 200, 250, 300, 400, 500, 600, 700]
         rows: 4              # Y = TPS bins (optional; off by default -> one curve over RPM)
         cols: 8              # X = RPM bins
         x_axis: mps_rpm_axis
@@ -4459,9 +4495,9 @@ modules:
         y_optional: true
         x_channel: rpm
         y_channel: tps
-        help: 'The throttle rate (percent per second) at which prediction is FULLY applied. Below a quarter of it nothing happens; between the two it scales in, so a gentle squeeze is barely predicted and a stab is entirely. Set it about ten times the rate the throttle channel wanders at while your foot is still — otherwise noise triggers it at constant throttle.'
+        help: 'The throttle rate (percent per second) at which the full predicted MAP is used. Below it, the throttle rate as a fraction of this value decides how far the estimate moves from measured MAP towards predicted: half this rate, half way. Under a tenth of it is treated as noise and ignored. A gentle squeeze is barely predicted and a stab is entirely. Set it about ten times the rate the throttle channel wanders at while your foot is still — otherwise noise triggers it at constant throttle.'
       - {name: mps_rpm_axis, label: TPS Scaling RPM Axis, units: RPM, type: float, size: 8, max_size: 16, default_values: [500, 1000, 1500, 2000, 3000, 4000, 5000, 6000], help: 'RPM breakpoints for the throttle-rate threshold. A fast idle transient and a fast 6000 rpm transient are not the same event.'}
-      - {name: mps_tps_axis, label: TPS Scaling TPS Axis, units: '%', type: float, size: 4, max_size: 4, default_values: [0, 20, 50, 100], help: 'Optional throttle-position breakpoints for the rate threshold, off by default. The first few degrees off the stop move the manifold far more than the last few do.'}
+      - {name: mps_tps_axis, label: TPS Scaling TPS Axis, units: '%', type: float, size: 4, max_size: 16, default_values: [0, 20, 50, 100], help: 'Optional throttle-position breakpoints for the rate threshold, off by default. The first few degrees off the stop move the manifold far more than the last few do.'}
       - name: predicted_map_table
         min: 0
         max: 10000
@@ -4494,6 +4530,33 @@ modules:
         x_axis: {signal: rpm,   max: 32, values: [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000]}
         y_axis: {signal: tps, max: 32, units: '%', values: [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 95, 98, 100]}
         help: 'What the manifold WOULD read at a given RPM and throttle, for MAP prediction: while the throttle is moving fast the averaged MAP reading lags the plenum, and fuelling takes the higher of this and the measured value until the intake settles. Read only during a transient with MAP Prediction switched on.'
+      # THE FUEL FILM, as tables. Part of every port injection wets the port wall and reaches the cylinder
+      # over the following cycles; the model keeps that film and corrects each injection for it (steady
+      # state x1.000; a load rise builds the film, a fall gives it back). How much sticks depends on how
+      # warm the port is and on load, and how fast it evaporates on port temperature and on airflow — one
+      # number for each could only be right in one condition. Row-major x-fastest.
+      - name: film_pool_table
+        min: 0
+        max: 900
+        label: Film Pooling Percentage
+        units: '%'
+        type: uint16
+        scale: 0.1
+        default_values: [500, 500, 500, 300, 200, 200, 200, 500, 500, 500, 300, 200, 200, 200, 500, 500, 500, 300, 200, 200, 200, 500, 500, 500, 300, 200, 200, 200, 500, 500, 500, 300, 200, 200, 200, 500, 500, 500, 300, 200, 200, 200]
+        x_axis: {signal: clt, max: 16, units: °C, values: [-10, 0, 25, 50, 75, 100, 120]}
+        y_axis: {signal: map, max: 16, units: kPa, values: [20, 40, 60, 80, 100, 150]}
+        help: 'The percentage of each injection that stays on the port wall instead of entering the cylinder, against coolant temperature and manifold pressure. As low as 5-10 % for a warm engine with a well-matched injector and port; 25-30 % for sharp inlet turns or a spray that hits the port divider; around 50 % or more cold, when less evaporates. Use as little as gives a clean transient: pooling is not a fix for late injection timing.'
+      - name: film_evap_table
+        min: 1
+        max: 1000
+        label: Film Evaporation Time Constant
+        units: ms
+        type: uint16
+        scale: 1.0
+        default_values: [400, 400, 400, 332, 226, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 400, 400, 400, 332, 226, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 400, 400, 400, 332, 226, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 400, 400, 400, 332, 226, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 400, 400, 400, 332, 226, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 400, 400, 400, 332, 226, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 400, 400, 400, 332, 226, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+        x_axis: {signal: rpm, max: 16, values: [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 8000]}
+        y_axis: {signal: clt, max: 16, units: °C, values: [0, 20, 40, 60, 80, 100, 120]}
+        help: 'How quickly the port film evaporates into the cylinder, as a time constant: about 98 % of what has pooled has gone in four times this. Around 200 ms warm and at speed, as high as 400 ms cold or at low RPM. It sets how long the extra fuel of a tip-in keeps being added.'
       # Injector dead time — 2D table (injector pressure differential × battery voltage) → µs. Replaces
       # the old base+linear-voltage formula. Default grid = a typical injector (typical values).
       - {name: stage1_dead_time_table, min: 0, max: 20000, label: Stage1 Injector Dead Time, units: us, type: uint16, scale: 1.0, rows: 5, cols: 4, x_axis: dead_time_dp_axis, y_axis: dead_time_volt_axis, x_channel: inj_press_diff, y_channel: battery, default_values: [1400, 1630, 1810, 1980, 980, 1130, 1280, 1450, 640, 740, 850, 1050, 370, 430, 580, 810, 190, 260, 440, 640], help: 'How long an injector takes to open and close before it flows anything, against supply voltage and pressure differential. It is added to every pulse and it dominates at small pulse widths — an idle pulse can be mostly dead time — so an error here shows up as an idle that will not lean out no matter what the VE table says.'}
@@ -4790,23 +4853,6 @@ modules:
         max_size: 8
         default_values: [20, 50, 90, 140, 200, 250]
         help: 'Load breakpoints for the rev-limit fuel correction. Only meaningful under load — a limiter reached on a trailing throttle needs no enrichment at all.'
-      # MAP correction: a MAP×RPM %-trim (default 0). Same recipe as every other correction.
-      - name: map_corr_table
-        label: MAP Correction
-        units: '%'
-        type: int16
-        scale: 0.1
-        default: 0
-        rows: 8              # Y = RPM (optional)
-        cols: 8              # X = MAP
-        x_axis: map_corr_map_axis
-        y_axis: map_corr_rpm_axis
-        y_optional: true
-        x_channel: map
-        y_channel: rpm
-        help: 'A fuel correction against MAP and RPM — a direct trim on the main fuel surface. It is the right place for a correction that follows load and speed but does not belong in the VE table, since the VE table should stay a physical statement about the engine''s breathing.'
-      - {name: map_corr_map_axis, label: MAP Corr MAP Axis (kPa), units: kPa, type: float, size: 8, max_size: 16, default_values: [20, 40, 60, 80, 120, 160, 210, 250], help: 'MAP breakpoints for the MAP fuel correction.'}
-      - {name: map_corr_rpm_axis, label: MAP Corr RPM Axis, units: RPM, type: float, size: 8, max_size: 16, default_values: [500, 1500, 2500, 3500, 4500, 5500, 6500, 8000], help: 'RPM breakpoints for the MAP fuel correction.'}
       # Generic 1-4: empty user-definable correction tables (any X/Y channel via the auto _src selectors,
       # default rpm×map). Default 0 = neutral. The pattern's showcase — add one = this 5-line recipe.
       - {name: generic1_corr_table, min: -100, max: 500, label: Generic 1 Correction, units: '%', type: int16, scale: 0.1, default: 0, rows: 8, cols: 8, x_axis: gen1_x_axis, y_axis: gen1_y_axis, y_optional: true, x_channel: rpm, y_channel: map, help: 'General-purpose fuel correction 1, on axes of your choosing. Any pair of bus signals can be its axes, so a correction the fixed tables do not cover — fuel against oil temperature, a gear, a switch, anything published — can be built without new firmware. All four generic tables are multiplied into the total, so they compose rather than override.'}
@@ -4821,21 +4867,21 @@ modules:
       - {name: generic4_corr_table, min: -100, max: 500, label: Generic 4 Correction, units: '%', type: int16, scale: 0.1, default: 0, rows: 8, cols: 8, x_axis: gen4_x_axis, y_axis: gen4_y_axis, y_optional: true, x_channel: rpm, y_channel: map, help: 'General-purpose fuel correction 4 — see correction 1.'}
       - {name: gen4_x_axis, label: Generic 4 X Axis, type: float, size: 8, max_size: 16, default_values: [500, 1500, 2500, 3500, 4500, 5500, 6500, 8000], help: 'X-axis channel and breakpoints for generic fuel correction 4.'}
       - {name: gen4_y_axis, label: Generic 4 Y Axis, type: float, size: 8, max_size: 16, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Y-axis channel and breakpoints for generic fuel correction 4.'}
-      # FUEL COMPOSITION CORRECTION, PER STAGE: that stage's ethanol x optional load, a %-trim on the fuel
+      # FUEL COMPOSITION CORRECTION, PER STAGE (load axis up to 8: RAM is full, and an ethanol trim needs no finer load): that stage's ethanol x optional load, a %-trim on the fuel
       # THAT STAGE delivers (fuel_corr_fuelcomp = stage 1, _2.._4 the others). Applied while the stage's
       # Flex Fuel is on. The stoich blend already carries the bulk of an ethanol change; this is the rest.
       - {name: stage1_fuel_comp_corr_table, min: -100, max: 500, label: Stage 1 Fuel Comp Correction, units: '%', type: int16, scale: 0.1, default: 0, rows: 8, cols: 8, x_axis: stage1_fuel_comp_axis, y_axis: stage1_fuel_comp_load_axis, y_optional: true, x_channel: stage1_ethanol, y_channel: map, help: 'Fuel correction for stage 1''s ethanol content, against load — a trim on the fuel stage 1 delivers. The stoichiometric blend already handles the bulk of the change; this is for what the ratio alone does not (cold-start behaviour, a sensor that reads off). Applied while stage 1''s Flex Fuel is on.'}
       - {name: stage1_fuel_comp_axis, label: Stage 1 Fuel Comp Axis (%), units: '%', type: float, size: 8, max_size: 16, default_values: [0, 10, 20, 30, 40, 55, 70, 85], help: 'Ethanol content breakpoints for stage 1''s fuel composition correction.'}
-      - {name: stage1_fuel_comp_load_axis, label: Stage 1 Fuel Comp Load Axis (kPa), units: kPa, type: float, size: 8, max_size: 16, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Load breakpoints for stage 1''s fuel composition correction.'}
+      - {name: stage1_fuel_comp_load_axis, label: Stage 1 Fuel Comp Load Axis (kPa), units: kPa, type: float, size: 8, max_size: 8, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Load breakpoints for stage 1''s fuel composition correction.'}
       - {name: stage2_fuel_comp_corr_table, min: -100, max: 500, label: Stage 2 Fuel Comp Correction, units: '%', type: int16, scale: 0.1, default: 0, rows: 8, cols: 8, x_axis: stage2_fuel_comp_axis, y_axis: stage2_fuel_comp_load_axis, y_optional: true, x_channel: stage2_ethanol, y_channel: map, help: 'Fuel correction for stage 2''s ethanol content, against load — a trim on the fuel stage 2 delivers. The stoichiometric blend already handles the bulk of the change; this is for what the ratio alone does not (cold-start behaviour, a sensor that reads off). Applied while stage 2''s Flex Fuel is on.'}
       - {name: stage2_fuel_comp_axis, label: Stage 2 Fuel Comp Axis (%), units: '%', type: float, size: 8, max_size: 16, default_values: [0, 10, 20, 30, 40, 55, 70, 85], help: 'Ethanol content breakpoints for stage 2''s fuel composition correction.'}
-      - {name: stage2_fuel_comp_load_axis, label: Stage 2 Fuel Comp Load Axis (kPa), units: kPa, type: float, size: 8, max_size: 16, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Load breakpoints for stage 2''s fuel composition correction.'}
+      - {name: stage2_fuel_comp_load_axis, label: Stage 2 Fuel Comp Load Axis (kPa), units: kPa, type: float, size: 8, max_size: 8, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Load breakpoints for stage 2''s fuel composition correction.'}
       - {name: stage3_fuel_comp_corr_table, min: -100, max: 500, label: Stage 3 Fuel Comp Correction, units: '%', type: int16, scale: 0.1, default: 0, rows: 8, cols: 8, x_axis: stage3_fuel_comp_axis, y_axis: stage3_fuel_comp_load_axis, y_optional: true, x_channel: stage3_ethanol, y_channel: map, help: 'Fuel correction for stage 3''s ethanol content, against load — a trim on the fuel stage 3 delivers. The stoichiometric blend already handles the bulk of the change; this is for what the ratio alone does not (cold-start behaviour, a sensor that reads off). Applied while stage 3''s Flex Fuel is on.'}
       - {name: stage3_fuel_comp_axis, label: Stage 3 Fuel Comp Axis (%), units: '%', type: float, size: 8, max_size: 16, default_values: [0, 10, 20, 30, 40, 55, 70, 85], help: 'Ethanol content breakpoints for stage 3''s fuel composition correction.'}
-      - {name: stage3_fuel_comp_load_axis, label: Stage 3 Fuel Comp Load Axis (kPa), units: kPa, type: float, size: 8, max_size: 16, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Load breakpoints for stage 3''s fuel composition correction.'}
+      - {name: stage3_fuel_comp_load_axis, label: Stage 3 Fuel Comp Load Axis (kPa), units: kPa, type: float, size: 8, max_size: 8, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Load breakpoints for stage 3''s fuel composition correction.'}
       - {name: stage4_fuel_comp_corr_table, min: -100, max: 500, label: Stage 4 Fuel Comp Correction, units: '%', type: int16, scale: 0.1, default: 0, rows: 8, cols: 8, x_axis: stage4_fuel_comp_axis, y_axis: stage4_fuel_comp_load_axis, y_optional: true, x_channel: stage4_ethanol, y_channel: map, help: 'Fuel correction for stage 4''s ethanol content, against load — a trim on the fuel stage 4 delivers. The stoichiometric blend already handles the bulk of the change; this is for what the ratio alone does not (cold-start behaviour, a sensor that reads off). Applied while stage 4''s Flex Fuel is on.'}
       - {name: stage4_fuel_comp_axis, label: Stage 4 Fuel Comp Axis (%), units: '%', type: float, size: 8, max_size: 16, default_values: [0, 10, 20, 30, 40, 55, 70, 85], help: 'Ethanol content breakpoints for stage 4''s fuel composition correction.'}
-      - {name: stage4_fuel_comp_load_axis, label: Stage 4 Fuel Comp Load Axis (kPa), units: kPa, type: float, size: 8, max_size: 16, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Load breakpoints for stage 4''s fuel composition correction.'}
+      - {name: stage4_fuel_comp_load_axis, label: Stage 4 Fuel Comp Load Axis (kPa), units: kPa, type: float, size: 8, max_size: 8, default_values: [20, 50, 80, 110, 140, 180, 220, 250], help: 'Load breakpoints for stage 4''s fuel composition correction.'}
       # Barometric correction: baro × optional-RPM %-trim (altitude comp) → fuel_corr_baro.
       - {name: baro_corr_table, min: -100, max: 500, label: Barometric Correction, units: '%', type: int16, scale: 0.1, default: 0, rows: 8, cols: 8, x_axis: baro_corr_axis, y_axis: baro_corr_rpm_axis, y_optional: true, x_channel: baro_kpa, y_channel: rpm, help: 'Fuel correction for barometric pressure, against RPM. Speed-density already accounts for altitude through MAP, so this is for what it does not: a naturally-aspirated engine at altitude has a different exhaust backpressure and residual fraction, not just less air.'}
       - {name: baro_corr_axis, label: Baro Corr Axis (kPa), units: kPa, type: float, size: 8, max_size: 16, default_values: [50, 65, 80, 90, 95, 100, 101, 105], help: 'Barometric pressure breakpoints for the altitude correction.'}
@@ -7121,7 +7167,6 @@ well_known_signals:
   fuel_corr_generic4: fuel_corr_generic4
   fuel_corr_iat: fuel_corr_iat
   fuel_corr_ltft: fuel_corr_ltft
-  fuel_corr_map: fuel_corr_map
   fuel_corr_overall: fuel_corr_overall
   fuel_corr_poststart: fuel_corr_poststart
   fuel_corr_protection: fuel_corr_protection
@@ -7315,7 +7360,7 @@ datalog_templates:
     # is a question, not an answer.
     # THE WHOLE MULTIPLY CHAIN, not a selection of it: fuel_corr_overall says the mixture was moved
     # and only the terms say by what. One unlogged term is one correction you cannot rule out.
-    fuel_corr_overall, fuel_corr_warmup, fuel_corr_iat, fuel_corr_map, fuel_corr_baro,
+    fuel_corr_overall, fuel_corr_warmup, fuel_corr_iat, fuel_corr_baro,
     fuel_corr_accel, fuel_corr_film, fuel_corr_poststart, fuel_corr_cranking, fuel_corr_fuelcomp,
     fuel_corr_gear, fuel_corr_egt, fuel_corr_protection, fuel_corr_revlimit,
     fuel_corr_generic1, fuel_corr_generic2, fuel_corr_generic3, fuel_corr_generic4,

@@ -156,7 +156,6 @@ own **Enabled** switch. A switched-off correction is not calculated at all and r
 | **Cranking** | `fuel_corr_cranking` | only while cranking: the **Cranking Enrichment** table as an **absolute** % (100 % = no change) | 0–6 |
 | **Post Start** | `fuel_corr_poststart` | only after the engine catches: adds the **Post-Start** table's % (coolant × run time) | 0.2–5 |
 | **Air Temp** | `fuel_corr_iat` | adds the **Air Temp Correction** % (air temperature, optionally × MAP) | 0.2–5 |
-| **MAP** | `fuel_corr_map` | adds the **MAP Correction** % (MAP × speed) | 0.2–5 |
 | **Barometric** | `fuel_corr_baro` | adds the **Barometric Correction** % | 0.2–5 |
 | **Fuel Composition** | `fuel_corr_fuelcomp` | adds the **Fuel Comp Correction** % (ethanol × load) | 0.2–5 |
 | **Gear** | `fuel_corr_gear` | adds the **Fuel Gear Correction** % | 0.2–5 |
@@ -254,8 +253,10 @@ The enrichment is limited to −100 % … +300 %.
 - **MAP Prediction** `map_predict_enabled`: MAP is measured as an average, so it is always a little
   late. While the throttle is moving fast, the ECU uses the **Predicted MAP** table instead of
   measured MAP, or rather the **higher** of the two, so it can only add fuel. How much it uses depends
-  on the throttle rate against the **Transient TPS Scaling** table. Below a quarter of that rate
-  nothing happens. It then scales in, reaching full at the table's rate. After a movement,
+  on the throttle rate against the **Transient TPS Scaling** table: at or above the table's rate it
+  uses the full predicted value; below it, the rate as a fraction of the table's decides how far it
+  moves from measured towards predicted (half the rate, half way). Under a tenth of the table's
+  rate counts as noise and is ignored. After a movement,
   prediction holds for **Predicted MAP Time** (default 200 ms). **Manifold Pressure (est)**
   `map_est` is the value used, and **MAP Source** `map_source` says where it came from (0 measured,
   1 predicted, 2 failover).

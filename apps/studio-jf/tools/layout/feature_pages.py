@@ -952,7 +952,20 @@ EXTRA_PANELS['vvt_control'] = branch_tables_panel('vvt_control',
                                                   'Configuration/Engine Functions/Cam Control')
 
 
-EXTRA_PANELS['transient_throttle'] = branch_tables_panel(
-    'transient_throttle', 'Configuration/Fuel Tuning/Transient Throttle')
+def transient_strategy_panel(p, x, y, on):
+    """THE OTHER TRANSIENT STRATEGY, chosen from here: classic on, MAP prediction and the fuel film off —
+    a settings button, so it writes the offs. And the warning while both are on (they add enrichment for
+    the same event). Beside Overall, in the column Disenrichment leaves free."""
+    import fuel_pages as F
+    st = p.panel(830, 218, 400, 160, 'Strategy')
+    p.action(st, 10, 12, 380, 'Use Classic Transient Fuel',
+             [('transient_throttle.enabled', '1'), ('fuel_calculator.map_predict_enabled', '0'),
+              ('fuel_calculator.wallfilm_enabled', '0')], h=30, write_zeros=True)
+    F._both_warning(p, st, 10, 52, 380)
+
+
+EXTRA_PANELS['transient_throttle'] = both(
+    branch_tables_panel('transient_throttle', 'Configuration/Fuel Tuning/Transient Throttle'),
+    transient_strategy_panel)
 EXTRA_PANELS['torque_model'] = branch_tables_panel(
     'torque_model', 'Configuration/Engine Functions/Torque Model')

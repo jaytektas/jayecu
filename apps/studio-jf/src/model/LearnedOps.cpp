@@ -64,6 +64,11 @@ Plan planApplyToBase(const std::string& tablePath) {
     if (p.cells == 0)
         std::snprintf(d, sizeof d, "%s is all zero - there is nothing learned to apply to %s.",
                       p.trimName.c_str(), p.baseName.c_str());
+    else if (trim.applyAdd)
+        std::snprintf(d, sizeof d,
+                      "Add %s to %d cell(s) of %s (largest %+.2f), then reset those cells to zero.\n\nThe "
+                      "engine must not be learning while you do this, and %s still has to be burned afterwards.",
+                      p.trimName.c_str(), p.cells, p.baseName.c_str(), p.worst, p.baseName.c_str());
     else
         std::snprintf(d, sizeof d,
                       "Multiply %d cell(s) of %s by their %s (largest %+.2f%%), then reset those cells "
@@ -124,7 +129,9 @@ void applyToBase(const std::string& tablePath) {
             for (int cc = 0; cc < nx; ++cc) {
                 const double pct = c.tiCell(trim, cc, r, z);
                 if (pct == 0.0) continue;                       // neutral cell: leave the base alone
-                c.tiSetCell(base, cc, r, z, c.tiCell(base, cc, r, z) * (1.0 + pct / 100.0));
+                // A duty offset adds; a percentage multiplies. The schema says which (apply_mode).
+                const double b = c.tiCell(base, cc, r, z);
+                c.tiSetCell(base, cc, r, z, trim.applyAdd ? b + pct : b * (1.0 + pct / 100.0));
                 c.tiSetCell(trim, cc, r, z, 0.0);               // consumed - the trim is neutral again
             }
     c.endEdit("Apply to Base Table");

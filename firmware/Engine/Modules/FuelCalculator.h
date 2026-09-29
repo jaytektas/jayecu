@@ -46,7 +46,7 @@ private:
     DtcManager*                 dtc_ = nullptr;
 
     // Wall-film (X-τ) state: the film mass held in fuel-PW units, and the last update tick for dt.
-    float    film_pw_    = 0.0f;
+    float    film_pw_[kStages] = {};   // each port-injected stage's film, in its own per-cycle PW units
     uint32_t wf_last_ms_ = 0;
     // MAP prediction: the throttle-rate estimate it triggers on, and when the hold expires. Kept here
     // rather than recomputed from the bus because the rate is a DERIVATIVE — it only exists if
@@ -56,6 +56,7 @@ private:
     uint32_t tps_last_ms_ = 0;
     uint32_t predict_until_ms_ = 0;
     float    predict_wt_  = 0.0f;      // how much of the predicted value the trigger asked for (0..1)
+    bool     predict_down_ = false;    // the movement was a lift (tip-out prediction, opt-in)
 
     // Engine run-time for post-start enrichment: tick captured at the cranking->running edge by
     // on_engine_start() (the engine caught). wk::run_time = now - run_start_ms_; the post-start

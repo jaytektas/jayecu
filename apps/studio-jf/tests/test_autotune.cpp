@@ -227,6 +227,79 @@ int main(int argc, char** argv) {
     }
 
     // ---- THE CONTRACT THE PANEL READS -------------------------------------------------------------
+    // VALUE MODE: a table learned from a channel that measures its answer (Predicted MAP). Records are
+    // taken only once the engine has SETTLED, and the proposal is the cell's value, not a percentage.
+    const auto vs = [](uint32_t ms, double rpm, double tps, double map) {
+        Sample s;
+        s.ms = ms; s.x = rpm; s.y = tps; s.ok = true;
+        s.value  = map;
+        s.steady = { rpm, tps, map };
+        return s;
+    };
+    const auto valueEngine = [] {
+        Engine e;
+        e.setGrid({ 1000.0, 2000.0, 3000.0 }, { 0.0, 10.0, 20.0 });   // rpm x throttle
+        e.setBase({ 30.0, 30.0, 30.0,  50.0, 50.0, 50.0,  70.0, 70.0, 70.0 });
+        e.setValueMode(500.0, { { "rpm", 150.0 }, { "tps", 1.0 }, { "map", 3.0 } });
+        e.setSettings({ Resistance::Easy, 100.0, 100.0 });
+        return e;
+    };
+
+    std::printf("\n=== value mode: a settled reading becomes the cell's value ===\n");
+    {
+        Engine e = valueEngine();
+        // 2000 rpm, 10 % throttle, MAP settled at 62 kPa, held for well over the settle time.
+        for (uint32_t t = 0; t <= 1000; t += 20) e.add(vs(1000 + t, 2000.0, 10.0, 62.0));
+        near(e.proposed(1, 1), 62.0, 0.01, "the cell proposes the pressure it settled to (was 50)");
+        near(e.changePct(1, 1), 24.0, 0.01, "…which is +24 % of the cell, for the Change view");
+        near(e.proposed(0, 0), 30.0, 0.01, "a cell nothing was measured in stays as it was");
+        check(e.hasProposal(), "…and there is a proposal to apply");
+    }
+
+    std::printf("\n=== value mode: the transient is not learned ===\n");
+    {
+        Engine e = valueEngine();
+        // A tip-in: throttle 0 -> 10 % and MAP climbing 30 -> 62 over 300 ms, then held.
+        uint32_t t = 1000;
+        for (int k = 0; k < 30; ++k, t += 20) e.add(vs(t, 2000.0, 0.0, 30.0));       // settled at 0 %
+        const long usedBefore = e.stats().used;
+        for (int k = 0; k <= 15; ++k, t += 20) e.add(vs(t, 2000.0, 10.0, 30.0 + 32.0 * k / 15.0));
+        check(e.stats().used == usedBefore, "nothing is credited while throttle and MAP are moving",
+              "used " + std::to_string(e.stats().used - usedBefore));
+        check(e.stats().activeFilter.rfind("not settled", 0) == 0, "…and the reason says so",
+              e.stats().activeFilter);
+        for (int k = 0; k < 40; ++k, t += 20) e.add(vs(t, 2000.0, 10.0, 62.0));        // held 800 ms
+        check(e.stats().used > usedBefore, "once held for the settle time, it learns");
+        near(e.proposed(1, 1), 62.0, 0.01, "…the settled value, not a value from the climb");
+    }
+
+    std::printf("\n=== value mode: evidence and authority ===\n");
+    {
+        Engine e = valueEngine();
+        e.setSettings({ Resistance::Normal, 100.0, 100.0 });                        // 4 records for full weight
+        // Exactly one record's worth of settled history on the breakpoint.
+        for (uint32_t t = 0; t <= 500; t += 500) e.add(vs(1000 + t, 2000.0, 10.0, 62.0));
+        near(e.weight(1, 1), 1.0, 0.001, "one settled record");
+        near(e.proposed(1, 1), 53.0, 0.01, "a quarter of the evidence moves a quarter of the way (50 -> 53)");
+        e.setSettings({ Resistance::Easy, 100.0, 5.0 });
+        near(e.proposed(1, 1), 55.0, 0.01, "Max Change in kPa caps the move (+5)");
+        e.setSettings({ Resistance::Easy, 10.0, 100.0 });
+        near(e.proposed(1, 1), 55.0, 0.01, "Max Change % caps it too (10 % of 50)");
+    }
+
+    std::printf("\n=== value mode: a filter rejects the record as it stands ===\n");
+    {
+        Engine e = valueEngine();
+        e.setFilters({ { "Predicting", "map_source", Filter::Op::Above, 0.5, true } });
+        for (uint32_t t = 0; t <= 1000; t += 20) {
+            Sample s = vs(1000 + t, 2000.0, 10.0, 62.0);
+            s.filt = { 1.0 };                                    // MAP prediction active throughout
+            e.add(s);
+        }
+        check(e.stats().used == 0 && e.stats().activeFilter == "Predicting",
+              "no record is taken while MAP prediction is active", e.stats().activeFilter);
+    }
+
     // Everything above is arithmetic; none of it runs unless the loaded definition says which channel
     // is the mixture, which is the target and which report the correction already being applied. Both
     // kinds of definition have to produce that, in one shape, or the panel has a special case in it.
@@ -251,7 +324,19 @@ int main(int argc, char** argv) {
     {
         MetaModel m;
         if (!m.loadFile(REAL_META)) check(false, "the shipped meta loads", REAL_META);
-        else                        checkContract(m, "native");
+        else {
+            checkContract(m, "native");
+            // …and the Predicted MAP value target, resolved end to end.
+            const MetaModel::ValueAutotune* pm = nullptr;
+            for (const auto& v : m.valueAutotunes()) if (v.name == "Predicted MAP") pm = &v;
+            check(pm != nullptr, "native: states a Predicted MAP value target");
+            if (pm) {
+                check(m.resolveTable(pm->table).valid, "…naming a table that resolves", pm->table);
+                check(pm->valueChannel == "map", "…learned from measured MAP, not map_est", pm->valueChannel);
+                check(pm->steady.size() == 3 && pm->settleMs > 0.0, "…settled on rpm, throttle and MAP");
+                check(!pm->filters.empty(), "…with filters (prediction active, boost)");
+            }
+        }
     }
     if (argc > 1) {
         std::printf("\n=== …and so does a TunerStudio ini ===\n");

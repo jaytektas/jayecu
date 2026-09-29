@@ -49,7 +49,7 @@ static FuelCalculatorConfig make_cfg() {
     // Every correction now carries its own enable, and the schema defaults them ON — a zeroed struct
     // is not the shipped configuration, so the fixture states what the defaults are rather than
     // testing an ECU with every correction switched off.
-    c.enable_warmup = c.enable_cranking = c.enable_poststart = c.enable_iat = c.enable_map =
+    c.enable_warmup = c.enable_cranking = c.enable_poststart = c.enable_iat =
         c.enable_revlimit = c.enable_baro = c.enable_gear =
         c.enable_generic1 = c.enable_generic2 = c.enable_generic3 = c.enable_generic4 =
         c.enable_overall = 1;
@@ -109,6 +109,22 @@ static SignalBus make_bus(float map_kpa = 100.0f, float clt_c = 80.0f) {
     bus.set(SIG_MAP, map_kpa);
     bus.set(SIG_CLT,   clt_c);
     return bus;
+}
+
+// The fuel film's two tables, uniform: pooling in 0.1 % (250 = 25 %), evaporation in ms. Both collapsed
+// to a 2x2 on their own channels, so every operating point reads the one value.
+static void film(FuelCalculatorConfig& c, uint16_t pool_x10, uint16_t tau_ms) {
+    c.film_pool_table_x_src = SIG_CLT; c.film_pool_table_y_src = SIG_MAP;
+    c.film_evap_table_x_src = SIG_RPM; c.film_evap_table_y_src = SIG_CLT;
+    c.film_pool_table_x_axis_n = c.film_pool_table_y_axis_n = 2;
+    c.film_evap_table_x_axis_n = c.film_evap_table_y_axis_n = 2;
+    c.film_pool_table_x_axis[0] = -40; c.film_pool_table_x_axis[1] = 150;
+    c.film_pool_table_y_axis[0] = 0;   c.film_pool_table_y_axis[1] = 400;
+    c.film_evap_table_x_axis[0] = 0;   c.film_evap_table_x_axis[1] = 10000;
+    c.film_evap_table_y_axis[0] = -40; c.film_evap_table_y_axis[1] = 150;
+    for (auto& v : c.film_pool_table) v = pool_x10;
+    for (auto& v : c.film_evap_table) v = tau_ms;
+    c.stage1_film_enabled = c.stage2_film_enabled = c.stage3_film_enabled = c.stage4_film_enabled = 1;
 }
 
 int main() {
@@ -703,7 +719,7 @@ int main() {
     SECTION("wall-film (X-τ): tip-in over-injects to fill the film, settles to steady");
     {
         auto cfg = make_cfg(); cfg.charge_temp_iat_pct = 1000;
-        cfg.wallfilm_enabled = 1; cfg.wallfilm_x_pct = 250; cfg.wallfilm_tau_ms = 200;
+        cfg.wallfilm_enabled = 1; film(cfg, 250, 200);
         FuelCalculator fc; fc.init(cfg);
         EngineFrame f{};
         auto run = [&](float map, uint32_t ms){ g_test_ms = ms; SignalBus b = make_bus(map, 80.0f);
@@ -726,7 +742,7 @@ int main() {
         // During a cut nothing is injected; the film only evaporates. It used to go on depositing as if
         // fuel were flowing, so on resume the model thought the walls were wet and added nothing.
         auto cfg = make_cfg(); cfg.charge_temp_iat_pct = 1000;
-        cfg.wallfilm_enabled = 1; cfg.wallfilm_x_pct = 250; cfg.wallfilm_tau_ms = 200;
+        cfg.wallfilm_enabled = 1; film(cfg, 250, 200);
         FuelCalculator fc; fc.init(cfg);
         EngineFrame f{};
         auto run = [&](uint32_t ms, bool cut){ g_test_ms = ms; SignalBus b = make_bus(100.0f, 80.0f);
@@ -739,6 +755,31 @@ int main() {
         const float resume = run(3020, false);
         fprintf(stdout, "    steady=%.0f  first pulse after the cut=%.0f\n", (double)steady, (double)resume);
         CHECK(resume > steady * 1.10f);                  // re-wetting the walls, not assuming them wet
+    }
+
+    SECTION("fuel film tables: more pooling, bigger tip-in; Port Film off (DI) has no film");
+    {
+        struct Tip { float ratio, corr; };
+        auto tipin = [&](uint16_t pool_x10, bool port) -> Tip {
+            auto cfg = make_cfg(); cfg.charge_temp_iat_pct = 1000;
+            cfg.wallfilm_enabled = 1; film(cfg, pool_x10, 200); cfg.stage1_film_enabled = port ? 1 : 0;
+            FuelCalculator fc; fc.init(cfg);
+            EngineFrame f{};
+            auto run = [&](float map, uint32_t ms){ g_test_ms = ms; SignalBus b = make_bus(map, 80.0f);
+                b.set(SIG_IAT, 20.0f); b.set(SIG_ENGINE_STATE, static_cast<float>(EngineRunState::RUNNING));
+                fc.update(make_pos(3000.0f), b, f); return std::make_pair(f.base_fuel_pw_us, b.get(SIG_FUEL_CORR_FILM, -1.0f)); };
+            float steady = 0; for (uint32_t t = 20; t <= 1500; t += 20) steady = run(100.0f, t).first;
+            const auto spike = run(150.0f, 1520);
+            float after = 0; for (uint32_t t = 1540; t <= 3000; t += 20) after = run(150.0f, t).first;
+            (void)steady;
+            return Tip{ spike.first / after, spike.second };
+        };
+        const auto small = tipin(100, true), big = tipin(400, true), di = tipin(400, false);
+        fprintf(stdout, "    tip-in / steady: pooling 10%% %.3f, 40%% %.3f, Port Film off %.3f (film corr %.3f)\n",
+                (double)small.ratio, (double)big.ratio, (double)di.ratio, (double)di.corr);
+        CHECK(big.ratio > small.ratio + 0.05f);                          // the table's pooling drives the size
+        CHECK_NEAR(di.ratio, 1.0, 0.01);                                 // DI: no film, no over-injection
+        CHECK_NEAR(di.corr, 1.0, 0.001);
     }
 
     SECTION("post-start enrichment only once the engine has caught, not while cranking");
@@ -988,18 +1029,18 @@ int main() {
         // SIGNAL too, so a page reading 1.000 means the correction is out of the calculation rather
         // than merely neutral today.
         auto cfg = make_cfg();
-        for (unsigned i = 0; i < FUEL_CALCULATOR_MAP_CORR_TABLE_ALLOC; i++) cfg.map_corr_table[i] = 500;  // +50%
+        for (unsigned i = 0; i < FUEL_CALCULATOR_REV_LIMIT_FUEL_CORR_TABLE_ALLOC; i++) cfg.rev_limit_fuel_corr_table[i] = 500;  // +50%
         EngineFrame f{};
         auto corr = [&](uint8_t on) {
-            auto c = cfg; c.enable_map = on;
+            auto c = cfg; c.enable_revlimit = on;
             FuelCalculator fc; fc.init(c);
             SignalBus b = make_bus(100.0f, 80.0f);
             fc.update(make_pos(2000.0f), b, f);
-            return std::pair<float, float>{ b.get(SIG_FUEL_CORR_MAP, -1.0f), f.base_fuel_pw_us };
+            return std::pair<float, float>{ b.get(SIG_FUEL_CORR_REVLIMIT, -1.0f), f.base_fuel_pw_us };
         };
         auto [on_mult, on_pw]   = corr(1);
         auto [off_mult, off_pw] = corr(0);
-        fprintf(stdout, "    map corr on=%.3f off=%.3f  pw %.1f -> %.1f\n",
+        fprintf(stdout, "    rev-limit corr on=%.3f off=%.3f  pw %.1f -> %.1f\n",
                 (double)on_mult, (double)off_mult, (double)on_pw, (double)off_pw);
         CHECK_NEAR(on_mult,  1.5, 1e-4);
         CHECK_NEAR(off_mult, 1.0, 1e-4);
@@ -1095,6 +1136,59 @@ int main() {
                 (double)after.get(SIG_MAP_SOURCE, -1.0f));
         CHECK(after.get(SIG_MAP_SOURCE, -1.0f) == 0.0f);         // the sensor again
         CHECK_NEAR(after.get(SIG_MAP_EST, 0.0f), 40.0f, 0.5f);
+    }
+
+    SECTION("tip-out prediction is opt-in: a fast lift predicts DOWN only when asked");
+    {
+        for (int opt = 0; opt <= 1; ++opt) {
+            auto cfg = make_cfg();
+            cfg.fuel_model = 0; cfg.map_predict_enabled = 1; cfg.map_predict_hold_ms = 200;
+            cfg.map_predict_tipout = static_cast<uint8_t>(opt);
+            cfg.map_predict_scale_table_x_src = SIG_RPM; cfg.map_predict_scale_table_y_en = 0;
+            for (unsigned i = 0; i < FUEL_CALCULATOR_MAP_PREDICT_SCALE_TABLE_ALLOC; i++) cfg.map_predict_scale_table[i] = 100;
+            for (unsigned k = 0; k < FUEL_CALCULATOR_PREDICTED_MAP_TABLE_ALLOC; k++) cfg.predicted_map_table[k] = 300;  // 30 kPa
+            FuelCalculator fc; fc.init(cfg); EngineFrame frame{};
+            uint32_t t = 1000; SignalBus last{};
+            auto step = [&](float tps, uint32_t ms) {
+                for (uint32_t k = 0; k < ms; k += 5) {
+                    t += 5; SignalBus b = make_bus(90.0f, 80.0f); b.set(SIG_TPS, tps);
+                    g_test_ms = t; fc.update(make_pos(1000.0f), b, frame); last = b;
+                }
+                return last;
+            };
+            step(60.0f, 200);                                     // held open, 90 kPa measured
+            SignalBus lift = step(5.0f, 5);                       // snapped shut
+            fprintf(stdout, "    tip-out %s: map_est=%.1f source=%.0f\n", opt ? "on " : "off",
+                    (double)lift.get(SIG_MAP_EST, 0.0f), (double)lift.get(SIG_MAP_SOURCE, -1.0f));
+            if (opt) { CHECK_NEAR(lift.get(SIG_MAP_EST, 0.0f), 30.0f, 0.5f); CHECK(lift.get(SIG_MAP_SOURCE, -1.0f) == 1.0f); }
+            else     { CHECK_NEAR(lift.get(SIG_MAP_EST, 0.0f), 90.0f, 0.5f); CHECK(lift.get(SIG_MAP_SOURCE, -1.0f) == 0.0f); }
+        }
+    }
+
+    SECTION("MAP prediction scales with the throttle rate: half the table's rate, half way; a tenth is noise");
+    {
+        auto cfg = make_cfg();
+        cfg.fuel_model = 0; cfg.map_predict_enabled = 1; cfg.map_predict_hold_ms = 200;
+        cfg.map_predict_scale_table_x_src = SIG_RPM; cfg.map_predict_scale_table_y_en = 0;
+        for (unsigned i = 0; i < FUEL_CALCULATOR_MAP_PREDICT_SCALE_TABLE_ALLOC; i++) cfg.map_predict_scale_table[i] = 100;
+        for (unsigned k = 0; k < FUEL_CALCULATOR_PREDICTED_MAP_TABLE_ALLOC; k++) cfg.predicted_map_table[k] = 1000;
+        auto ramp = [&](float pct_per_s) {                       // a steady ramp, 400 ms of it
+            FuelCalculator fc; fc.init(cfg); EngineFrame frame{};
+            uint32_t t = 1000; float tps = 5.0f; SignalBus last{};
+            for (int k = 0; k < 80; ++k) {
+                t += 5; tps += pct_per_s * 0.005f;
+                SignalBus b = make_bus(40.0f, 80.0f); b.set(SIG_TPS, tps);
+                g_test_ms = t; fc.update(make_pos(1000.0f), b, frame); last = b;
+            }
+            return last;
+        };
+        SignalBus half = ramp(50.0f), slow = ramp(8.0f);
+        fprintf(stdout, "    50 %%/s: map_est=%.1f source=%.0f   8 %%/s: map_est=%.1f source=%.0f\n",
+                (double)half.get(SIG_MAP_EST, 0.0f), (double)half.get(SIG_MAP_SOURCE, -1.0f),
+                (double)slow.get(SIG_MAP_EST, 0.0f), (double)slow.get(SIG_MAP_SOURCE, -1.0f));
+        CHECK_NEAR(half.get(SIG_MAP_EST, 0.0f), 70.0f, 0.5f);    // 40 + 0.5 x (100 - 40)
+        CHECK(slow.get(SIG_MAP_SOURCE, -1.0f) == 0.0f);          // under a tenth: measured
+        CHECK_NEAR(slow.get(SIG_MAP_EST, 0.0f), 40.0f, 0.5f);
     }
 
     SECTION("MAP prediction never predicts DOWNWARD, and is inert when disabled");

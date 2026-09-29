@@ -20,6 +20,14 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 - Diagnostics: the Fuel & Spark view is two views, Fuel and Spark, and every channel now has a place (charge ethanol and MAF failover had none).
 - Every tick box's name sits level with its box (1,835 rows across the pages, text was 1-4 px high).
 - Fuel Setup: Ethanol If No Reading is a number you can enter again; it was an empty drop-down.
+- The fuel film (port wall wetting) uses two tables instead of two single numbers: Film Pooling Percentage (coolant × MAP) and Film Evaporation Time Constant (RPM × coolant). It runs per injection stage, and each stage has a Port Film switch so a direct-injected stage has no film. The old Deposit Fraction and Evaporation Tau are retired — fill in the tables after updating.
+- MAP prediction's Transient TPS Scaling table can have up to 16 throttle rows. Below the table's rate, prediction now scales straight with the throttle rate (half the rate, half way to predicted MAP); it used to ignore anything under a quarter of the rate (now under a tenth, as noise).
+- Transient TPS Scaling's default rises with RPM, from 150 %/s at 500 rpm through 300 at 2000 to 700 at 6000 (was 100 everywhere): at speed the MAP sensor lags less, so it takes a faster stab to need prediction.
+- MAP prediction can also predict a fast throttle LIFT (Predict Tip-Out, off by default): the estimate moves down towards Predicted MAP, as a tip-in moves it up.
+- Closed-loop O2 holds its trim while MAP prediction is active; the new Closed-Loop Hold channel says why the trim is held (fuel cut, after cut, settling, cold, off range or transient).
+- Fuel Tuning ▸ MAP Prediction & Fuel Film holds the transient strategy's switches and all four of its tables. One button chooses it (and turns Classic Transient Fuel off); Transient Throttle has the matching button, and both pages warn while the two strategies are on together.
+- The MAP fuel correction table (Fuel Tuning ▸ Corrections ▸ MAP) is removed. It was a MAP × RPM trim on top of the VE table, indexed on measured MAP rather than the fuel model's load; put anything it held into the VE table or a Generic correction.
+- Each stage's fuel-composition correction has up to 8 load rows (was 16), to make room for the film tables.
 
 ## 0.4.3
 - Diagnostics ▸ Sensors — Raw: a pin that is not on a connector says so on one line instead of being cut off.

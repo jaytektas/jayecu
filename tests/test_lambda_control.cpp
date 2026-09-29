@@ -271,6 +271,39 @@ int main() {
         CHECK(std::fabs(fast) < 0.005f);
     }
 
+    SECTION("a throttle transient (MAP prediction active) HOLDS the trim, and says why");
+    {
+        reset_region(); clear_widebands(); clear_assignments(); enable_wb(SIG_LAMBDA_1);
+        assign_wb(SIG_LAMBDA_1, WB_OVERALL);
+        LambdaConfig cfg = make_cfg(); cfg.ltft_enabled = 0;
+        Lambda lc; lc.init(cfg); lc.on_engine_start(); EngineFrame f{}; float wound = 1.0f;
+        for (int i = 0; i <= 30; i++) { g_ms = 70000 + i * 30;
+            SignalBus b = make_bus({{SIG_LAMBDA_1, 1.05f}});
+            lc.update(pos(), b, f); wound = b.get(SIG_FUEL_CORR_STFT, 1.0f); }
+        CHECK(wound > 1.0f);
+        // Predicted MAP standing in (Map Source 1): the wideband reads the transient's lean spike. The trim
+        // must not chase it — frozen, not reset, with the reason published.
+        // Held means the INTEGRAL is kept and nothing is added to it; the proportional part (which reacts
+        // to the reading) drops out, as it does for every hold. So: constant through the transient.
+        float held = 0.0f, first_held = -1.0f, reason = -1.0f;
+        for (int i = 1; i <= 10; i++) { g_ms = 71000 + i * 30;
+            SignalBus b = make_bus({{SIG_LAMBDA_1, 1.20f}, {SIG_MAP_SOURCE, 1.0f}});
+            lc.update(pos(), b, f); held = b.get(SIG_FUEL_CORR_STFT, 1.0f); reason = b.get(SIG_LAMBDA_CL_HOLD, -1.0f);
+            if (first_held < 0.0f) first_held = held; }
+        fprintf(stdout, "    trim running %.4f; held through the transient %.4f -> %.4f; hold reason %.0f\n",
+                (double)wound, (double)first_held, (double)held, (double)reason);
+        CHECK_NEAR(held, first_held, 0.0001);          // frozen: the lean spike added nothing
+        CHECK(held > 1.0f);                            // and kept, not reset
+        CHECK_NEAR(reason, 6.0, 0.01);                 // "Transient"
+        // …and once the transient is over it corrects again.
+        float after = 0.0f;
+        for (int i = 1; i <= 10; i++) { g_ms = 72000 + i * 30;
+            SignalBus b = make_bus({{SIG_LAMBDA_1, 1.20f}, {SIG_MAP_SOURCE, 0.0f}});
+            lc.update(pos(), b, f); after = b.get(SIG_FUEL_CORR_STFT, 1.0f); reason = b.get(SIG_LAMBDA_CL_HOLD, -1.0f); }
+        CHECK(after > held + 0.001f);
+        CHECK_NEAR(reason, 0.0, 0.01);
+    }
+
     SECTION("disabling a trim zeroes it rather than freezing it");
     {
         reset_region(); clear_widebands(); clear_assignments(); enable_wb(SIG_LAMBDA_1);

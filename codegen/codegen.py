@@ -2538,6 +2538,13 @@ def learned_blocks_as_tables(schema: dict, modules: dict) -> None:
                 t[key] = b[key]
         if b.get("apply_to"):
             t["apply_to"] = b["apply_to"]
+            # HOW it folds in: a percentage multiplies the base (the fuel trim), a duty offset adds to it
+            # (boost, VVT). The studio did every trim as a multiply, which folded a +5-point duty trim
+            # on a 40 % cell into 42 % instead of 45 %.
+            mode = b.get("apply_mode", "multiply")
+            if mode not in ("multiply", "add"):
+                raise SystemExit(f"learned.{b.get('id')}.apply_mode: '{mode}' is not multiply or add")
+            t["apply_mode"] = mode
         for src, ax, n in (("col_axis", "x", cols), ("row_axis", "y", rows),
                            ("depth_axis", "z", int(b.get("depth", 1)))):
             spec = b.get(src)
@@ -3185,6 +3192,45 @@ def _autotune_meta(schema: dict) -> dict:
     delay = (at.get("delay") or {}).get("table")
     if delay:
         out["delay_table"] = need_table(delay, "delay.table")
+    return out
+
+
+def _value_autotune_meta(schema: dict) -> list:
+    """The studio's VALUE-learned tables (schema `value_autotune`), validated like the VE contract: every
+    name is looked up at runtime, so one that does not resolve is a build error here rather than a target
+    that silently never learns."""
+    targets = schema.get("value_autotune") or []
+    if not targets:
+        return []
+    chans = {s.get("id") for s in (schema.get("signals") or [])}
+    tables = set()
+    for mod_name, mod in (schema.get("modules") or {}).items():
+        ms = module_snake(mod_name)
+        for t in (mod.get("tables") or []):
+            if t.get("name"):
+                tables.add(f"{ms}.{t['name']}")
+    out = []
+    for i, t in enumerate(targets):
+        where = f"value_autotune[{i}]"
+        def need_chan(v, what):
+            if not v or v not in chans:
+                raise SystemExit(f"{where}.{what}: '{v}' is not a signal id")
+            return v
+        if t.get("table") not in tables:
+            raise SystemExit(f"{where}.table: '{t.get('table')}' is not a module table")
+        out.append({
+            "name":          t.get("name") or t["table"],
+            "table":         t["table"],
+            "value_channel": need_chan(t.get("value_channel"), "value_channel"),
+            "settle_ms":     float(t.get("settle_ms", 500)),
+            "steady":  [{"channel": need_chan(x.get("channel"), "steady"), "span": float(x.get("span", 0.0))}
+                        for x in (t.get("steady") or [])],
+            "filters": [{"name":    f.get("name", f.get("channel", "?")),
+                         "channel": need_chan(f.get("channel"), "filters"),
+                         "op":      ">" if str(f.get("op", "<")).strip() == ">" else "<",
+                         "value":   float(f.get("value", 0.0))}
+                        for f in (t.get("filters") or [])],
+        })
     return out
 
 
@@ -4710,6 +4756,7 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
         # the schema specifies — apply, then reset — could not be offered generically.
         if t.get("apply_to"):
             entry["apply_to"] = list(t["apply_to"])
+            entry["apply_mode"] = t.get("apply_mode", "multiply")
         if t.get("_is_axis") or t.get("_synth_axis"):
             entry["axis"] = True                           # a table's breakpoint array, not a bindable map
             if t.get("_axis_owned_by"):
@@ -5223,6 +5270,8 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
         # The studio's VE autotuner: which map it tunes, which channels it measures and which
         # conditions disqualify a reading. Host-side feature, ECU-specific facts — see the schema.
         "autotune": _autotune_meta(schema),
+        # …and the tables it learns from a channel that measures the answer (Predicted MAP).
+        "value_autotune": _value_autotune_meta(schema),
         "dtc_descriptions": _dtc_descriptions(schema),
         "dtc_categories": [
             {"lo": f"P{lo:04X}", "hi": f"P{hi:04X}", "label": label}

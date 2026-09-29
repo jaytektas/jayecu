@@ -176,8 +176,6 @@ CORRECTIONS = [
      'Decays out over run time. Tune AFTER warmup, or its fuel ends up baked into that table.', [], FC + 'enable_poststart'),
     ('Air Temp',         FC + 'iat_corr_table',
      [('Air Temp Corr', 'fuel_corr_iat', '%.3f'), ('Air Temp', 'iat', '%.0f'), ('MAP', 'map', '%.0f')], '', [], FC + 'enable_iat'),
-    ('MAP',              FC + 'map_corr_table',
-     [('MAP Corr', 'fuel_corr_map', '%.3f')] + LIVE_RPM_LOAD, '', [], FC + 'enable_map'),
     ('Barometric',       FC + 'baro_corr_table',
      [('Baro Corr', 'fuel_corr_baro', '%.3f'), ('Barometric', 'baro_kpa', '%.0f'), ('MAP', 'map', '%.0f')], '', [], FC + 'enable_baro'),
     ('Gear',             FC + 'fuel_gear_table',

@@ -126,8 +126,8 @@ FUEL_ROWS = [
     ('Corrections',        '',                                   f'{CFG}/Fuel Tuning/Corrections/Air Temp'),
     ('Cylinder Trims',     '',                                   f'{CFG}/Fuel Tuning/Corrections/Cylinder 1'),
     ('Injector Stage 1',   '',                                   f'{CFG}/Fuel Tuning/Stage 1/Setup'),
-    ('MAP Prediction',     'fuel_calculator.map_predict_enabled', f'{CFG}/Fuel Tuning/MAP Prediction'),
-    ('Wall Film',          'fuel_calculator.wallfilm_enabled',    f'{CFG}/Fuel Tuning/MAP Prediction'),
+    ('MAP Prediction',     'fuel_calculator.map_predict_enabled', f'{CFG}/Fuel Tuning/MAP Prediction & Fuel Film'),
+    ('Fuel Film',          'fuel_calculator.wallfilm_enabled',    f'{CFG}/Fuel Tuning/MAP Prediction & Fuel Film'),
     ('Transient Fuel',     'transient_throttle.enabled',          f'{CFG}/Fuel Tuning/Transient Throttle'),
     # A ROW IS A NAME, and the indent already says it belongs to the one above. These read as lowercase
     # sentence fragments — "…decay" — in a column where every other row is a proper noun you can go to,
@@ -177,7 +177,7 @@ def page_fuel_top():
                  {'labelText': 'Fuel correction chain  (x1.00 = doing nothing)', 'align': 'Left',
                   'fontName': A.FONT_SMALL, 'fgColor': C_DIM}), into=live)
     chain = [('Warmup', 'fuel_corr_warmup'), ('Post-Start', 'fuel_corr_poststart'), ('Cranking', 'fuel_corr_cranking'),
-             ('Air Temp', 'fuel_corr_iat'), ('MAP', 'fuel_corr_map'), ('Baro', 'fuel_corr_baro'),
+             ('Air Temp', 'fuel_corr_iat'), ('Baro', 'fuel_corr_baro'),
              ('Fuel Comp', 'fuel_corr_fuelcomp'), ('Accel', 'fuel_corr_accel'), ('Gear', 'fuel_corr_gear'),
              ('STFT', 'fuel_corr_stft'), ('LTFT', 'fuel_corr_ltft'), ('Rev Limit', 'fuel_corr_revlimit'),
              ('EGT', 'fuel_corr_egt'), ('Protection', 'fuel_corr_protection'), ('Overall', 'fuel_corr_overall')]
@@ -633,7 +633,6 @@ def page_fuel_breakdown():
         ('Barometric',    'fuel_corr_baro'),
         ('Fuel Comp',     'fuel_corr_fuelcomp'),
         ('Gear',          'fuel_corr_gear'),
-        ('MAP',           'fuel_corr_map'),
         ('Cranking',      'fuel_corr_cranking'),
         ('Post-Start',    'fuel_corr_poststart'),
         ('Accel Enrich',  'fuel_corr_accel'),

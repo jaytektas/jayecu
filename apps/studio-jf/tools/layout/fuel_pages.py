@@ -38,7 +38,7 @@ def _live_strip(p, y=498, h=202, title='Live'):
         p.readout(panel, 12 + i * 112, 14, lbl, ch, fmt)
     # The correction CHAIN, in the order the firmware applies it — the answer to "why is it rich here?"
     # is usually one of these being somewhere you did not expect, and they are otherwise invisible.
-    chain = [('Warmup', 'fuel_corr_warmup'), ('Air Temp', 'fuel_corr_iat'), ('MAP', 'fuel_corr_map'),
+    chain = [('Warmup', 'fuel_corr_warmup'), ('Air Temp', 'fuel_corr_iat'),
              ('Baro', 'fuel_corr_baro'), ('Fuel Comp', 'fuel_corr_fuelcomp'), ('Accel', 'fuel_corr_accel'),
              ('STFT', 'fuel_corr_stft'), ('LTFT', 'fuel_corr_ltft'), ('Rev Limit', 'fuel_corr_revlimit'),
              ('Protection', 'fuel_corr_protection'), ('Overall', 'fuel_corr_overall')]
@@ -96,12 +96,11 @@ def page_setup():
     # channel unpublished rather than reading zero on a full tank.
     p.field(fuel, 10, y, 'Tank Capacity', FC + 'tank_capacity_l', 'configedit', 110, 'L')
 
-    ww = p.panel(630, A.TOP + 240, 300, 190, 'Wall Film')
-    y = p.check(ww, 10, 16, 'Wall-film model enabled', FC + 'wallfilm_enabled')
-    on = '[#fuel_calculator.wallfilm_enabled] == 1'
-    y = p.field(ww, 10, y + 6, 'Deposit Fraction', FC + 'wallfilm_x_pct', 'configedit', 110, '%',
-                enable=f'{on} and [#fuel_calculator.wallfilm_tau_ms] > 0')
-    p.field(ww, 10, y, 'Evaporation Tau', FC + 'wallfilm_tau_ms', 'configedit', 110, 'ms', enable=on)
+    ww = p.panel(630, A.TOP + 240, 300, 190, 'Fuel Film')
+    y = p.check(ww, 10, 16, 'Fuel Film enabled', FC + 'wallfilm_enabled')
+    # Pooling and evaporation are TABLES now (coolant x MAP, RPM x coolant), on the transient strategy's
+    # own page with the prediction they work with.
+    p.switch(ww, 10, y + 10, 'Film tables \u25b8', '', link=MPF, w=270)
 
     eng = p.panel(940, A.TOP, 330, 430, 'Engine')
     y = 10
@@ -359,8 +358,11 @@ def page_stage_fuel(n):
     # WHERE THIS STAGE'S FUEL TEMPERATURE COMES FROM is the density table's temperature axis — a flex
     # sensor reports its own line's, and a stage sharing that line can point at the same one. Only read
     # when the table has a temperature axis, which it does not as it ships (a single density).
-    p.field(fuel, 10, y, 'Fuel Temp Source', f'{FC}stage{n}_specific_gravity_table_x_src', 'enum', 190,
+    y = p.field(fuel, 10, y, 'Fuel Temp Source', f'{FC}stage{n}_specific_gravity_table_x_src', 'enum', 190,
             enable=f'[#fuel_calculator.stage{n}_specific_gravity_table_x_en] == 1')
+    # A DIRECT-INJECTED STAGE HAS NO PORT WALL to wet: it opts out of the fuel film.
+    p.field(fuel, 10, y, 'Port Film', f'{FC}stage{n}_film_enabled', 'checkbox',
+            enable='[#fuel_calculator.wallfilm_enabled] == 1')
 
     NOTE = ('Flex Fuel off: Ethanol % is this stage\'s fixed blend (0 petrol, 85 E85; methanol is its Stoich '
             'AFR at 0 %). On: the sensor while it reads, the last good reading if it drops out, and Ethanol % '
@@ -392,11 +394,6 @@ CORRECTIONS = [
       ('X bins', FC + 'iat_axis_n'), ('Y bins', FC + 'iat_map_axis_n')],
      [('Air Temp Corr', 'fuel_corr_iat', '%.3f'), ('Air Temp', 'iat', '%.0f'), ('MAP', 'map', '%.0f')],
      'Denser air needs more fuel. This is the correction for it.'),
-    ('MAP', FC + 'map_corr_table',
-     [('X Channel', FC + 'map_corr_table_x_src'), ('Y Channel', FC + 'map_corr_table_y_src'),
-      ('X bins', FC + 'map_corr_map_axis_n'), ('Y bins', FC + 'map_corr_rpm_axis_n')],
-     [('MAP Corr', 'fuel_corr_map', '%.3f'), ('MAP', 'map', '%.0f'), ('Engine RPM', 'rpm', '%.0f')],
-     'A load-and-speed trim on top of the VE table.'),
     ('Barometric', FC + 'baro_corr_table',
      [('X Channel', FC + 'baro_corr_table_x_src'), ('Y Channel', FC + 'baro_corr_table_y_src'),
       ('X bins', FC + 'baro_corr_axis_n'), ('Y bins', FC + 'baro_corr_rpm_axis_n')],
@@ -461,7 +458,13 @@ def page_transient():
     y = p.check(cfg, 10, y + 6, 'Async pulses enabled', TT + 'enable_async', enable=ON)
     ASYNC = ON + ' && [#transient_throttle.enable_async] == 1'
     y = p.field(cfg, 10, y + 6, 'Max Async Pulses', TT + 'max_async_pulses', 'configedit', 100, '', enable=ASYNC)
-    p.field(cfg, 10, y, 'Async Holdoff', TT + 'async_holdoff_ms', 'configedit', 100, 'ms', enable=ASYNC)
+    y = p.field(cfg, 10, y, 'Async Holdoff', TT + 'async_holdoff_ms', 'configedit', 100, 'ms', enable=ASYNC)
+    # THE OTHER STRATEGY, chosen from here: classic on, prediction and film off. A settings button, so it
+    # writes the offs (write_zeros).
+    p.action(cfg, 10, y + 10, 300, 'Use Classic Transient Fuel',
+             [('transient_throttle.enabled', '1'), ('fuel_calculator.map_predict_enabled', '0'),
+              ('fuel_calculator.wallfilm_enabled', '0')], h=30, write_zeros=True)
+    _both_warning(p, cfg, 10, y + 46, 300)
 
     rate = p.panel(340, A.TOP, 460, 450, 'Enrichment Rate  (load rate x start load)', enable=ON)
     p.table(10, 12, 440, 400, TT + 'tt_enrich_rate_table', into=rate)
@@ -521,76 +524,89 @@ def page_transient_decay():
     return p
 
 
+MPF = 'Configuration/Fuel Tuning/MAP Prediction & Fuel Film'
+# BOTH TRANSIENT STRATEGIES ON AT ONCE: each adds its own enrichment for the same event, so the engine gets it
+# twice. Shown on both strategies' pages, only while it is true.
+BOTH_TRANSIENTS = ('[#transient_throttle.enabled] == 1 && ([#fuel_calculator.map_predict_enabled] == 1 || '
+                   '[#fuel_calculator.wallfilm_enabled] == 1)')
+BOTH_NOTE = ('Classic Transient Fuel and MAP Prediction / Fuel Film are both on: the engine gets the '
+             'enrichment twice. Use one or the other.')
+
+
+def _both_warning(p, panel, x, y, w):
+    h = A.Page.wrapped_h(BOTH_NOTE, w) + 4
+    p.add(p._new('label', x, y, w, h, {'labelText': BOTH_NOTE, 'align': 'Left', 'fontName': A.FONT_SMALL,
+                                        'fgColor': C_AMBER, 'wrap': '1', 'condition': BOTH_TRANSIENTS}), into=panel)
+    return y + h
+
+
 def page_map_prediction():
-    """MAP prediction + the wall-film model — the pair that replaces classic transient throttle.
+    """MAP prediction + the fuel film — the transient strategy that replaces classic transient throttle.
 
-    Two functions on one page because they are two halves of one answer: prediction fixes the
-    MEASUREMENT (a MAP signal averaged over a cylinder period is late, and a throttle stab fills the
-    plenum long before it says so), the film model fixes the FUEL (a port-injected engine wets its
-    walls, and the film has to be built up or given back on every change). Rate-table transient
-    enrichment corrects both at once by feel, which is why it wants retuning whenever anything else
-    moves.
+    Two halves of one answer: prediction fixes the MEASUREMENT (a MAP signal averaged over a cylinder period
+    is late, and a throttle stab fills the plenum long before it says so), the film fixes the FUEL (a port-
+    injected engine wets its walls, and the film is built up or given back on every change). The film runs
+    all the time — the correction at a snap depends on how big the film already is — and reads x1.000 in the
+    steady state. One button chooses this strategy (and switches classic transient fuel off); the two halves
+    stay separately switchable for the engines that want only one (Alpha-N or ITB: film only; direct
+    injection: prediction only).
     """
-    p = A.Page(title='MAP Prediction')
-    y0 = p.head('While the throttle is MOVING, take manifold pressure from the predicted table instead '
-                'of the sensor, and model the fuel film explicitly. Together these replace transient '
-                'throttle — use one approach or the other, not both.', enable=FC + 'map_predict_enabled',
-                enable_label='Prediction')
+    p = A.Page(title='MAP Prediction & Fuel Film')
+    y0 = p.head('The transient strategy that models what happens instead of adding fuel by feel: MAP '
+                'prediction while the throttle moves and the sensor lags, and a fuel film on the port walls. '
+                'Use this or Classic Transient Fuel, not both.')
+
+    st = p.panel(10, y0, 400, 196, 'Strategy')
+    p.action(st, 10, 12, 380, 'Use MAP Prediction + Fuel Film',
+             [('fuel_calculator.map_predict_enabled', '1'), ('fuel_calculator.wallfilm_enabled', '1'),
+              ('transient_throttle.enabled', '0')], h=30, write_zeros=True)
+    y = p.check(st, 10, 52, 'MAP Prediction', FC + 'map_predict_enabled')
+    y = p.check(st, 10, y + 4, 'Fuel Film  (port wetting)', FC + 'wallfilm_enabled')
+    _both_warning(p, st, 10, y + 6, 380)
+
     on = '[#fuel_calculator.map_predict_enabled] == 1'
-
-    cfg = p.panel(10, y0, 420, A.panel_h(2, A.ROW, top=12, bottom=6), 'Prediction')
+    cfg = p.panel(10, y0 + 206, 400, A.panel_h(3, A.ROW, top=12, bottom=6), 'Prediction', enable=on)
     y = 12
-    y = p.field(cfg, 10, y, 'Predicted MAP Time', FC + 'map_predict_hold_ms', 'configedit', 110, 'ms',
-                enable=on, lbl_w=170)
-    p.field(cfg, 10, y, 'Throttle Source', FC + 'tps_src', 'enum', 200, enable=on, lbl_w=170)
-    p.note(10, y0 + A.panel_h(2, A.ROW, top=12, bottom=6) + 6,
-           'The hold is how long prediction lasts after the movement that triggered it. Too short and '
-           'it lets go before the sensor has caught up, which is the lean hole it exists to fill; a '
-           'long or shared MAP hose wants more. Around 200 ms suits a typical install.', w=410)
+    y = p.field(cfg, 10, y, 'Predicted MAP Time', FC + 'map_predict_hold_ms', 'configedit', 110, 'ms', lbl_w=170)
+    y = p.field(cfg, 10, y, 'Throttle Source', FC + 'tps_src', 'enum', 200, lbl_w=170)
+    p.field(cfg, 10, y, 'Predict Tip-Out', FC + 'map_predict_tipout', 'checkbox', lbl_w=170)
+    PRED_NOTE = ('How long prediction lasts after the movement that triggered it — too short lets go before '
+                 'the sensor has caught up; a long or shared MAP hose wants more. Around 200 ms suits most '
+                 'installs. Closed-loop O2 holds while prediction is active (Closed-Loop Hold: Transient).')
+    ny = y0 + 206 + A.panel_h(3, A.ROW, top=12, bottom=6) + 6
+    p.note(10, ny, PRED_NOTE, w=390)
 
-    ww = p.panel(10, y0 + 210, 420, A.panel_h(3, A.ROW, top=18, bottom=6), 'Fuel Film')
-    y = p.check(ww, 10, 16, 'Wall-film model enabled', FC + 'wallfilm_enabled')
-    won = '[#fuel_calculator.wallfilm_enabled] == 1'
-    # The SAME field appears on Fuel Setup, and carries the same gate there: an evaporation time of zero
-    # switches the wall-film model off, so the fraction it deposits is a number nobody reads.
-    y = p.field(ww, 10, y + 6, 'Film Pooling', FC + 'wallfilm_x_pct', 'configedit', 110, '%',
-                enable=f'{won} and [#fuel_calculator.wallfilm_tau_ms] > 0', lbl_w=170)
-    p.field(ww, 10, y, 'Evaporation Time', FC + 'wallfilm_tau_ms', 'configedit', 110, 'ms',
-            enable=won, lbl_w=170)
-    p.note(10, y0 + 210 + A.panel_h(3, A.ROW, top=18, bottom=6) + 6,
-           'Pooling is how much of each injection lands on the port wall: 5-10% for a well matched port '
-           'and injector on a warm engine, 25-30% where the inlet turns sharply or the spray misses the '
-           'valve, around 50% cold. Evaporation is how long the film takes to give it back — about '
-           '200 ms warm, up to 400 ms cold. Optimise injection TIMING first: a lean spike caused by '
-           'closed-valve injection is not a pooling problem, and pooling used to hide it just makes the '
-           'engine rich everywhere else.', w=410)
+    tables = p.panel(810, y0 + 270, 430, A.panel_h(4, 28, top=12, bottom=6), 'Tables')
+    y = 12
+    for label, node, flag in (('Predicted MAP', 'Predicted MAP', 'map_predict_enabled'),
+                              ('Transient TPS Scaling', 'Transient TPS Scaling', 'map_predict_enabled'),
+                              ('Film Pooling Percentage', 'Film Pooling Percentage', 'wallfilm_enabled'),
+                              ('Film Evaporation Time Constant', 'Film Evaporation Time Constant', 'wallfilm_enabled')):
+        y = p.switch(tables, 10, y, label, '', link=f'{MPF}/{node}', w=370, pitch=28,
+                     enable=f'[#fuel_calculator.{flag}] == 1')
 
-    live = p.panel(450, y0, 400, 260, 'Right Now')
+    live = p.panel(420, y0, 380, 260, 'Right Now')
     for i, (lbl, ch, fmt) in enumerate((('Manifold Pressure', 'map_est', '%.1f'),
                                         ('Measured', 'map', '%.1f'),
                                         ('Predicted', 'map_predicted', '%.1f'),
                                         ('Throttle Rate', 'tps_rate', '%.0f'),
                                         ('Film Correction', 'fuel_corr_film', '%.3f'),
                                         ('Injector PW', 'inj_pw', '%.2f'))):
-        # PITCH 70, NOT 74. A panel gives its children h - titleBarH() - 4, so this 260-tall box has 234
-        # of content; three rows at 74 end at 212 and the state row below them ran to 262 — 28px past
-        # the box, clipped on screen and invisible to a checker that only measures panels against the
-        # canvas. Six pixels a row is what buys the last row its place.
-        p.readout(live, 16 + (i % 2) * 195, 14 + (i // 2) * 70, lbl, f'[${ch}]', fmt, w=180)
-    # The state, in words: measured / predicted / predicted because the sensor failed. A number would
-    # need a legend, and the legend is the whole content of the row.
-    p.add(p._new('value', 16, 206, 370, 26,
+        p.readout(live, 14 + (i % 2) * 180, 14 + (i // 2) * 70, lbl, f'[${ch}]', fmt, w=170)
+    # The state, in words: measured / predicted / failed (reading atmosphere).
+    p.add(p._new('value', 14, 206, 350, 26,
                  {'signalName': '[$map_source]', 'format': '%s', 'fontName': A.FONT_LBL,
                   'align': 'Left', 'showUnit': '0'}), into=live)
 
-    p.graph(450, y0 + 270, 820, 200, 'map_est')
+    p.graph(420, y0 + 270, 380, 200, 'map_est')
 
-    nxt = p.panel(870, y0, 400, A.panel_h(3, 28, top=12, bottom=6), 'Instead Of')
-    y = 12
-    y = p.switch(nxt, 10, y, 'Transient Throttle  (the classic one)', 'transient_throttle.enabled',
-                 link=f'Configuration/Fuel Tuning/Transient Throttle', w=340, pitch=28)
-    p.switch(nxt, 10, y, 'Predicted MAP Table', '', link='Configuration/Fuel Tuning/Predicted MAP',
-             w=340, pitch=28)
-    p.switch(nxt, 10, y + 28, 'Transient TPS Scaling', '',
-             link='Configuration/Fuel Tuning/MAP Prediction/Transient TPS Scaling', w=340, pitch=28)
+    film = p.panel(810, y0, 430, 260, 'Fuel Film')
+    FILM_NOTE = ('Part of every injection wets the port wall and reaches the cylinder over the following '
+                 'cycles. The film is tracked all the time and each injection corrected for it: x1.000 steady, '
+                 'more on a load rise to build the film, less on a fall. Pooling is how much sticks (5-10 % warm '
+                 'and well matched, 25-30 % sharp ports, ~50 % cold); evaporation is how fast it comes off '
+                 '(~200 ms warm, up to 400 ms cold). Optimise injection TIMING first: a lean spike from '
+                 'closed-valve injection is not a pooling problem. A direct-injected stage has no film '
+                 '(Stage N > Fuel > Port Film).')
+    p.wrapped(10, 8, 396, FILM_NOTE, into=film)
     return p

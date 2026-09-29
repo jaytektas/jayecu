@@ -75,6 +75,16 @@ int main(int argc, char** argv) {
     check(std::fabs(ve * (1.0 + pct / 100.0) - 91.8) < 1e-9, "8 % on 85 VE gives 91.8");
     check(std::fabs(ve * (1.0 + 0.0 / 100.0) - ve) < 1e-12, "a 0 % cell leaves the base untouched");
 
+    std::printf("\n=== a duty offset folds in by ADDING ===\n");
+    // The fuel trim is a percentage of the VE cell; the boost trim is a duty offset the firmware adds
+    // (Boost.cpp: base + ltt). Folding the boost trim by multiplying turned +5 points on a 40 % cell
+    // into 42 %, not 45 %. The schema says which (apply_mode), and it has to reach the TableImage.
+    check(!trim.applyAdd, TRIM + " multiplies (a percentage)");
+    const TableImage boost = meta.resolveTable("boost.boost_ltt");
+    check(boost.valid && !boost.applyTo.empty(), "boost.boost_ltt resolves and names a base table");
+    check(boost.applyAdd, "boost.boost_ltt adds (a duty offset)");
+    check(std::fabs((40.0 + 5.0) - 45.0) < 1e-12, "+5 on a 40 % duty cell gives 45");
+
     std::printf("\n%s\n", failures ? (std::to_string(failures) + " FAILED").c_str() : "ALL PASSED");
     return failures ? 1 : 0;
 }

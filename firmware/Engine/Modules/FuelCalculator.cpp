@@ -34,7 +34,7 @@ void FuelCalculator::on_engine_start() {
 }
 
 void FuelCalculator::on_engine_stop() {
-    film_pw_ = 0.0f;   // clear the wall-film model; the next start re-anchors post-start via on_engine_start()
+    for (float& f : film_pw_) f = 0.0f;   // clear the fuel-film model; the next start re-anchors post-start via on_engine_start()
     running_ = false;  // and run time goes back to 0 — a stopped engine has not been running for a while
     // outputs decay on the bus via the normal publish path; nothing else to zero here
 }
@@ -135,8 +135,11 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     // table; when it settles, hand back to the sensor.
     //
     // The trigger is the throttle's RATE against the scaling table, not its position: what makes the
-    // sensor wrong is the change, and how wrong depends on how fast. Below a quarter of the threshold
-    // nothing happens (that band is sensor noise on a still pedal); from there it scales in linearly.
+    // sensor wrong is the change, and how wrong depends on how fast. At or above the table's rate the
+    // estimate IS the predicted MAP; below it, rate / table of the way from measured to predicted.
+    // Under a tenth of the table's rate is NOT a movement: the filtered rate decays towards zero without
+    // reaching it, and a still pedal's noise sits there too (the table is set about ten times it) — both
+    // would otherwise re-arm the hold for ever, and closed-loop O2 holds while prediction is active.
     // Prediction takes the HIGHER of the two, never the lower — this exists to cover a lean hole, and a
     // predicted value below the measured one would only ever make one.
     const float predicted_map = tbl::table_eval(predicted_map_table_desc(cfg_), bus);
@@ -157,19 +160,26 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     uint8_t map_source = 0;                                      // 0 measured, 1 predicted, 2 failover
     if (cfg_->map_predict_enabled) {
         const float thr = tbl::table_eval(map_predict_scale_table_desc(cfg_), bus);
-        if (thr > 0.0f && tps_rate_ > 0.0f) {
-            const float frac = tps_rate_ / thr;
-            const float wt   = std::clamp((frac - 0.25f) / 0.75f, 0.0f, 1.0f);
+        // A LIFT is predicted only when asked for (map_predict_tipout): the rate's size is compared the
+        // same way, and the estimate goes DOWN towards the table — the lower of the two, as a tip-in
+        // takes the higher. Off, a closing throttle is left to the sensor.
+        const bool  down = cfg_->map_predict_tipout && tps_rate_ < 0.0f;
+        const float rate = down ? -tps_rate_ : tps_rate_;
+        if (thr > 0.0f && rate > 0.0f) {
+            const float ratio = rate / thr;
+            const float wt    = ratio >= 0.1f ? std::min(ratio, 1.0f) : 0.0f;
             // A stronger movement re-arms the hold and raises the weight; a weaker one during an
             // existing hold does not cut it short — the sensor still has not caught up.
             if (wt > 0.0f && (wt >= predict_wt_ || static_cast<int32_t>(now - predict_until_ms_) >= 0)) {
                 predict_wt_       = wt;
                 predict_until_ms_ = now + cfg_->map_predict_hold_ms;
+                predict_down_     = down;
             }
         }
         if (static_cast<int32_t>(now - predict_until_ms_) < 0 && predict_wt_ > 0.0f) {
-            const float higher = std::max(map_meas, predicted_map);
-            map_kpa    = map_meas + predict_wt_ * (higher - map_meas);
+            const float toward = predict_down_ ? std::min(map_meas, predicted_map)
+                                               : std::max(map_meas, predicted_map);
+            map_kpa    = map_meas + predict_wt_ * (toward - map_meas);
             map_source = 1;
         } else {
             predict_wt_ = 0.0f;
@@ -533,11 +543,8 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
             cfg_->enable_revlimit ? 1.0f + tbl::table_eval(rev_limit_fuel_corr_table_desc(cfg_), bus) / 100.0f : 1.0f,
             true, now, ttl());
 
-    // MAP correction — load-driven, stays per-cycle. (warmup/iat/fuelcomp/baro/gear/generic1-4 are
-    // slow → produced by FuelTrim off this path; the m() in Step 4 reads them off the bus.)
-    bus.set(wk::fuel_corr_map,
-            cfg_->enable_map ? 1.0f + tbl::table_eval(map_corr_table_desc(cfg_), bus) / 100.0f : 1.0f,
-            true, now, ttl());
+    // (warmup/iat/fuelcomp/baro/gear/generic1-4 are slow → produced by FuelTrim off this path; the m()
+    // in Step 4 reads them off the bus.)
 
     // Overall (global % scalar) — trivial, stays here.
     bus.set(wk::fuel_corr_overall,
@@ -562,7 +569,6 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     m(wk::fuel_corr_poststart, 0.2f, 5.0f);
     m(wk::fuel_corr_iat,       0.2f, 5.0f);
     m(wk::fuel_corr_revlimit,  0.2f, 5.0f);
-    m(wk::fuel_corr_map,       0.2f, 5.0f);
     m(wk::fuel_corr_generic1,  0.2f, 5.0f);
     m(wk::fuel_corr_generic2,  0.2f, 5.0f);
     m(wk::fuel_corr_generic3,  0.2f, 5.0f);
@@ -592,35 +598,9 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     // meaningless. When not running we hold the
     // film at zero and disarm the dt clock so the first running frame re-primes cleanly. (run_state was
     // read once in Step 3.)
+    // (The fuel film is applied PER STAGE after the split below: a direct-injected stage has no port wall,
+    // and each stage's film is its own injectors' fuel.)
     float fuel_pw = std::max(0.0f, base_pw_us * mass_mult);
-    if (run_state != EngineRunState::RUNNING) {
-        film_pw_ = 0.0f;
-        wf_last_ms_ = 0;
-    } else if (cfg_->wallfilm_enabled && cfg_->wallfilm_tau_ms > 0) {
-        const uint32_t now_ms = platform_get_tick_ms();
-        const float dt_s = (wf_last_ms_ != 0) ? (now_ms - wf_last_ms_) / 1000.0f : 0.0f;
-        wf_last_ms_ = now_ms;
-        if (dt_s > 0.0f && dt_s < 1.0f && bus.valid(wk::fuel_cut)) {
-            // NOTHING IS INJECTED DURING A CUT, so the film only evaporates. The cut is applied at the
-            // output stage and the run state stays RUNNING, so this used to go on depositing film as if
-            // fuel were flowing — and on leaving the cut the model believed the walls were wet when they
-            // were dry, added nothing to re-wet them, and the engine stumbled lean on the way back in.
-            const float evap_frac = 1.0f - std::exp(-dt_s / (cfg_->wallfilm_tau_ms / 1000.0f));
-            film_pw_ = std::max(0.0f, film_pw_ * (1.0f - evap_frac));
-        } else if (dt_s > 0.0f && dt_s < 1.0f) {
-            const float X         = std::clamp(cfg_->wallfilm_x_pct * 0.1f / 100.0f, 0.0f, 0.9f);
-            const float evap_frac = 1.0f - std::exp(-dt_s / (cfg_->wallfilm_tau_ms / 1000.0f));
-            const float evap      = film_pw_ * evap_frac;
-            const float injected  = std::max(0.0f, (fuel_pw - evap) / (1.0f - X));
-            film_pw_ = std::max(0.0f, film_pw_ + X * injected - evap);
-            // What the film asked for, as a multiplier, so it reads beside every other correction:
-            // 1.000 is the steady-state pulse, 1.100 is a tenth more to fill the film.
-            bus.set(SIG_FUEL_CORR_FILM, (fuel_pw > 0.0f) ? injected / fuel_pw : 1.0f, true, now, ttl());
-            fuel_pw  = injected;
-        }
-    } else {
-        bus.set(SIG_FUEL_CORR_FILM, 1.0f, true, now, ttl());
-    }
     // --- Split the cycle's charge across its injection EVENTS. Everything above computes what one
     //     chamber needs for one engine CYCLE; the distribution mode decides how many squirts that
     //     arrives in (injection_events_per_cycle — the same function the scheduler builds its event
@@ -750,6 +730,45 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
             if (s > 0 && stage_fuel_pw[s] > 0.0f) bus.set(SG_SIG[s], stage_sg[s], true, now, ttl());
         }
         if (mass > 0.0f) { charge_ethanol_ = eth / mass; charge_known_ = true; }
+    }
+
+    // --- THE FUEL FILM, PER STAGE. Part of every port injection wets the wall and reaches the cylinder over
+    //     the following cycles. Each stage's film is tracked in its own per-cycle PW: every update X of what
+    //     is injected sticks and a fraction 1 - e^(-dt/tau) of the film evaporates in. The injection is the
+    //     one that makes the cylinder receive what was asked: steady state x1.000 (deposit = evaporation), a
+    //     load rise injects more to build the film, a fall gives it back. It runs all the time — the
+    //     correction at a throttle snap depends on how big the film already is. During a cut nothing is
+    //     injected, so the film only evaporates. X and tau are tables (Film Pooling %: CLT x MAP; Film
+    //     Evaporation Time: RPM x CLT); a stage with Port Film off (direct injection) has no film. ---
+    {
+        const bool running = run_state == EngineRunState::RUNNING;
+        const uint32_t now_ms = platform_get_tick_ms();
+        const float dt_s = (running && wf_last_ms_ != 0) ? (now_ms - wf_last_ms_) / 1000.0f : 0.0f;
+        wf_last_ms_ = running ? now_ms : 0u;
+        const uint8_t film_on[kStages] = { cfg_->stage1_film_enabled, cfg_->stage2_film_enabled,
+                                           cfg_->stage3_film_enabled, cfg_->stage4_film_enabled };
+        float wanted_sum = 0.0f, injected_sum = 0.0f;
+        if (!running || !cfg_->wallfilm_enabled) {
+            for (float& f : film_pw_) f = 0.0f;
+        } else if (dt_s > 0.0f && dt_s < 1.0f) {
+            const float X     = std::clamp(tbl::table_eval(film_pool_table_desc(cfg_), bus) / 100.0f, 0.0f, 0.9f);
+            const float tau_s = std::clamp(tbl::table_eval(film_evap_table_desc(cfg_), bus), 1.0f, 1000.0f) / 1000.0f;
+            const float evap_frac = 1.0f - std::exp(-dt_s / tau_s);
+            const bool  cut = bus.valid(wk::fuel_cut);
+            const float ev  = static_cast<float>(std::max<uint8_t>(inj_events, 1));   // per event <-> per cycle
+            for (uint8_t st = 0; st < nstages; ++st) {
+                if (!film_on[st]) { film_pw_[st] = 0.0f; continue; }
+                const float evap = film_pw_[st] * evap_frac;
+                if (cut) { film_pw_[st] = std::max(0.0f, film_pw_[st] - evap); continue; }
+                const float wanted   = stage_fuel_pw[st] * ev;
+                const float injected = std::max(0.0f, (wanted - evap) / (1.0f - X));
+                film_pw_[st] = std::max(0.0f, film_pw_[st] + X * injected - evap);
+                wanted_sum += wanted; injected_sum += injected;
+                stage_fuel_pw[st] = injected / ev;
+            }
+        }
+        // What the film asked for, as one multiplier beside every other correction: 1.000 steady.
+        bus.set(SIG_FUEL_CORR_FILM, wanted_sum > 0.0f ? injected_sum / wanted_sum : 1.0f, true, now, ttl());
     }
 
     // Stage 1 (primary): its fuel + primary dead-time/short-pulse. When single-stage this is the whole

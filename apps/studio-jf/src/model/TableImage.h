@@ -74,6 +74,7 @@ struct TableImage {
     // `apply_to`. A learned trim IS a correction on another map, and this is the only place that
     // relationship is expressed as data rather than prose.
     std::vector<std::string> applyTo;
+    bool applyAdd = false;   // fold in by adding (duty offset) rather than multiplying (a percentage)
     std::string      elemArray;                        // "sensors.sensor" when this is an element table
     int              elemIndex = -1;                   // …and which element
     // Per-axis HEADINGS, when the definition gives names instead of numbers (the VVT trim's cams, the

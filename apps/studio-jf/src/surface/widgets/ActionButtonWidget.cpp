@@ -90,7 +90,7 @@ std::vector<ActionButtonWidget::Write> ActionButtonWidget::pending() const {
         // NOT FINITE OR ZERO: SKIPPED, NOT WRITTEN. See the header — this button computes measurements,
         // and neither an infinity nor a zero is one. It is what lets a single Capture calibrate whichever
         // pickups are turning without erasing the ones that are not.
-        if (!std::isfinite(v) || v == 0.0) continue;
+        if (!std::isfinite(v) || (v == 0.0 && m_writeZeros != "1")) continue;   // a settings button writes 0
         out.push_back(Write{ path, v });
     }
     return out;

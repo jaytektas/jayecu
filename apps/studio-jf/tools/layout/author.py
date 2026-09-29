@@ -826,7 +826,7 @@ class Page:
         self.add(self._new('label', lx, y - 2, w, min(LBL_H, max(15, pitch)), lp, g), into=panel)
         return y + pitch
 
-    def action(self, panel, x, y, w, label, writes, enable='', h=25):
+    def action(self, panel, x, y, w, label, writes, enable='', h=25, write_zeros=False):
         """A button that works out settings and writes them — see ActionButtonWidget.
 
         `writes` is a list of (config path, expression) pairs, or a single pair. The expressions are in
@@ -839,6 +839,7 @@ class Page:
         props = {'labelText': label,
                  'writes': ';'.join(f'{t} = {e}' for t, e in writes)}
         if enable: props['enableCondition'] = enable
+        if write_zeros: props['writeZeros'] = '1'       # a settings button: it may switch things OFF
         return self.add(self._new('action', x, y, w, h, props), into=panel)
 
     def subtabs(self, x, y, w, h, var, names):

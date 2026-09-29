@@ -1223,6 +1223,9 @@ int main(int argc, char** argv) {
     // THE CONNECTED ECU'S FIRMWARE, from its identity reply. Set on every jayecu connect; the offer
     // below compares it with the newest kit once the tune has been read.
     static std::string s_ecuBoard, s_ecuFwVersion, s_ecuFwBuild, s_ecuLayout;
+    // The layout the pages on screen were loaded for (g_loadProjectDoc). A reconnect to the same ECU keeps
+    // the live layout only while this still matches what the ECU reports — see g_adoptConnectedEcu.
+    static std::string s_docLayout;
     static bool s_firmwareAsked = false;           // this connection has been asked already (reset on open)
     // Straight after the ECU identifies itself: if the studio has newer firmware for this board, ask.
     // Returns false when there is nothing to ask — the caller just carries on. When it does ask, the
@@ -5286,6 +5289,7 @@ int main(int argc, char** argv) {
 
     g_loadProjectDoc = [&]{
         if (!ecu) return;
+        s_docLayout = s_ecuLayout;
         // PcVariables FIRST: they are paths, and the document about to load may bind widgets to them.
         if (g_applyProjectPcVars) g_applyProjectPcVars();
         // NO PROJECT FILE YET → SEED THE NAVIGATION TREE FROM THE META. The firmware's codegen emits a
@@ -5347,8 +5351,13 @@ int main(int argc, char** argv) {
         // this was recorded, are theirs to decide about — asked once per shipped version (DashboardOrigin.h).
         bool askNewPages = false;
         std::string newPages;
-        if (meta.isValid()) {
-            const std::string hash = link.isOpen() && !s_ecuLayout.empty() ? s_ecuLayout : meta.layoutHash();
+        // THE LAYOUT COMES FROM THE ECU when connected — its identity carries it, and it arrives BEFORE the
+        // meta for it is loaded. Guarding this on the meta skipped it on every connect: the pages load
+        // straight after the identity, so an ECU updated to new firmware kept the old firmware's pages.
+        const std::string pagesHash = link.isOpen() && !s_ecuLayout.empty() ? s_ecuLayout
+                                    : meta.isValid()                        ? meta.layoutHash() : std::string();
+        if (!pagesHash.empty()) {
+            const std::string& hash = pagesHash;
             newPages = dashorigin::newestFor(allKits(), ecu->board(), hash, STUDIO_VERSION,
                                              exactDashboard(ecu->board(), hash));
             const std::string crc = newPages.empty() ? std::string() : dashorigin::fileCrc(newPages);
@@ -5546,9 +5555,23 @@ int main(int argc, char** argv) {
     };
     g_adoptConnectedEcu = [&](Ecu* e, std::function<void()> after) {
         if (!e) return;
-        if (ecu && ecu->uid() == e->uid()) {              // reconnecting to the same ECU: keep the live layout
-            JLOGC("ui", jf::JLogLevel::Info) << "[connect] same ECU (" << e->uid() << ") — keeping the live layout";
-            if (after) after();
+        // RECONNECTING TO THE SAME ECU keeps the live layout — unless its FIRMWARE LAYOUT CHANGED, which is
+        // what a firmware update does. Keeping it then left the old firmware's pages on screen (Corrections ▸
+        // Fuel Composition after it had moved per stage) and never ran the "newer pages for this ECU" check
+        // that lives in g_loadProjectDoc: the update wrote the firmware and the tune, and the pages stayed
+        // the ones from before it.
+        if (ecu && ecu->uid() == e->uid()) {
+            if (s_ecuLayout.empty() || s_ecuLayout == s_docLayout) {
+                JLOGC("ui", jf::JLogLevel::Info) << "[connect] same ECU (" << e->uid() << ") — keeping the live layout";
+                if (after) after();
+                return;
+            }
+            JLOGC("ui", jf::JLogLevel::Info) << "[connect] same ECU (" << e->uid() << "), layout " << s_docLayout
+                                             << " -> " << s_ecuLayout << " — reloading its pages";
+            maybeSaveThen([&, after] {
+                if (g_loadProjectDoc) g_loadProjectDoc();
+                if (after) after();
+            });
             return;
         }
         maybeSaveThen([&, e, after] {                      // dirty layout → ask; cancelling abandons the adopt

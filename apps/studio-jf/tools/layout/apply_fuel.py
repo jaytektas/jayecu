@@ -79,11 +79,6 @@ def build():
     # the VE table's air on measured MAP. Appears when Blend is the air model — nothing else reads it.
     tree.append(add(f'{B}/Alpha-N VE Table', 'Alpha-N VE Table', ALPHA_VE_PAGE(),
                     cond='[#fuel_calculator.fuel_model] == 3'))
-    # MAP PREDICTION'S TABLE: what the manifold would read at this RPM and throttle, used only while the
-    # throttle is moving and the sensor lags. Appears when MAP Prediction is on — it used to appear with
-    # the Blend model, which no longer reads it.
-    tree.append(add(f'{B}/Predicted MAP', 'Predicted MAP', PREDICTED_MAP_PAGE(),
-                    cond='[#fuel_calculator.map_predict_enabled] == 1'))
     # The WHOLE start sequence on one page — prime, crank, flood clear, post-start, warmup — in the
     # order it happens. The per-table nodes below are for tuning one curve; this is for understanding
     # (and for the flood-clear box, which belongs beside the cranking threshold and nowhere else).
@@ -139,20 +134,40 @@ def build():
         tree.append({'name': f'Stage {st}', 'expanded': False,
                      'condition': f'[#engine.num_inj_stages] >= {st}', 'children': kids})
 
-    # The alternative to transient throttle, and shown as such: prediction fixes the measurement, the
-    # film model fixes the fuel. Opt-in, so the node appears when it is switched on.
-    mp_scale = add(f'{B}/MAP Prediction/Transient TPS Scaling', 'Transient TPS Scaling',
-                   FT.table_page('Transient TPS Scaling', FC + 'map_predict_scale_table',
-                                 [('Throttle Rate', 'tps_rate', '%.0f'), ('Throttle', 'tps', '%.1f'),
-                                  ('MAP Source', 'map_source', '%s'), ('MAP (est)', 'map_est', '%.1f')],
-                                 'The throttle RATE at which prediction is fully applied, per operating '
-                                 'point. Below a quarter of the cell nothing happens; between the two it '
-                                 'scales in. Watch Throttle Rate with your foot still — whatever it '
-                                 'wanders by is noise, and this wants to be about ten times that, or the '
-                                 'noise triggers prediction at constant throttle.'))
-    tree.append(add(f'{B}/MAP Prediction', 'MAP Prediction', F.page_map_prediction(),
-                    cond='[#fuel_calculator.map_predict_enabled] == 1',
-                    children=[mp_scale]))
+    # THE TRANSIENT STRATEGY THAT REPLACES CLASSIC TRANSIENT FUEL: MAP prediction + the fuel film, and
+    # every table of both, under one node. Appears when either half is on.
+    MPF = f'{B}/MAP Prediction & Fuel Film'
+    PRED = '[#fuel_calculator.map_predict_enabled] == 1'
+    FILM = '[#fuel_calculator.wallfilm_enabled] == 1'
+    mpf_kids = [
+        add(f'{MPF}/Predicted MAP', 'Predicted MAP', PREDICTED_MAP_PAGE(), cond=PRED),
+        add(f'{MPF}/Transient TPS Scaling', 'Transient TPS Scaling',
+            FT.table_page('Transient TPS Scaling', FC + 'map_predict_scale_table',
+                          [('Throttle Rate', 'tps_rate', '%.0f'), ('Throttle', 'tps', '%.1f'),
+                           ('MAP Source', 'map_source', '%s'), ('MAP (est)', 'map_est', '%.1f')],
+                          'The throttle RATE at which the full predicted MAP is used, per operating point. '
+                          'Below it, rate / cell of the way from measured to predicted. Watch Throttle '
+                          'Rate with your foot still — whatever it wanders by is noise, and this wants to be '
+                          'about ten times that, or the noise triggers prediction at constant throttle.'),
+            cond=PRED),
+        add(f'{MPF}/Film Pooling Percentage', 'Film Pooling Percentage',
+            FT.table_page('Film Pooling Percentage', FC + 'film_pool_table',
+                          [('Film Correction', 'fuel_corr_film', '%.3f'), ('Coolant', 'clt', '%.0f'),
+                           ('MAP', 'map', '%.1f')],
+                          'How much of each injection stays on the port wall, against coolant and manifold '
+                          'pressure: 5-10 % warm with a well-matched injector and port, 25-30 % for sharp inlet '
+                          'turns, around 50 % cold. As little as gives a clean transient.'),
+            cond=FILM),
+        add(f'{MPF}/Film Evaporation Time Constant', 'Film Evaporation Time Constant',
+            FT.table_page('Film Evaporation Time Constant', FC + 'film_evap_table',
+                          [('Film Correction', 'fuel_corr_film', '%.3f'), ('Engine RPM', 'rpm', '%.0f'),
+                           ('Coolant', 'clt', '%.0f')],
+                          'How fast the film comes off the wall, as a time constant: about 98 % of it has gone '
+                          'in four times this. Around 200 ms warm and at speed, up to 400 ms cold or at low RPM.'),
+            cond=FILM),
+    ]
+    tree.append(add(MPF, 'MAP Prediction & Fuel Film', F.page_map_prediction(),
+                    cond=f'{PRED} || {FILM}', children=mpf_kids))
     tt = add(f'{B}/Transient Throttle', 'Transient Throttle', F.page_transient())
     # A transient table may name the flag the firmware gates it on as a fifth element; the node carries
     # it too, so a curve nothing reads is out of the tree rather than merely greyed.

@@ -237,6 +237,7 @@ bool MetaModel::loadFile(const std::string &path)
     defaultImage_.clear();
     segments_.clear();
     autotune_ = {};             // a new definition states its own autotune contract, or none
+    valueAutotunes_.clear();
     signals_.clear();
     signalByIndex_.clear();
     enums_.clear();
@@ -386,6 +387,25 @@ bool MetaModel::loadFile(const std::string &path)
             fl.value   = f["value"].number<double>();
             if (!fl.channel.empty()) autotune_.filters.push_back(fl);
         }
+    }
+
+    for (const jf::JJson &t : root["value_autotune"].arr()) {
+        ValueAutotune v;
+        v.name         = t["name"].str();
+        v.table        = t["table"].str();
+        v.valueChannel = t["value_channel"].str();
+        v.settleMs     = t["settle_ms"].number<double>();
+        for (const jf::JJson &x : t["steady"].arr())
+            v.steady.push_back({ x["channel"].str(), x["span"].number<double>() });
+        for (const jf::JJson &f : t["filters"].arr()) {
+            AutotuneFilter fl;
+            fl.name    = f["name"].str();
+            fl.channel = f["channel"].str();
+            fl.above   = f["op"].str() == ">";
+            fl.value   = f["value"].number<double>();
+            if (!fl.channel.empty()) v.filters.push_back(fl);
+        }
+        if (!v.table.empty() && !v.valueChannel.empty()) valueAutotunes_.push_back(v);
     }
 
     // Outside-world wiring: resource/signal name -> {connector terminal, wire colour}. Drives the
@@ -560,6 +580,7 @@ bool MetaModel::loadFile(const std::string &path)
                 ct.help     = e["help"].str();
                 for (const jf::JJson &a : e["apply_to"].arr())   // learned surface -> its base table
                     if (!a.str().empty()) ct.applyTo.push_back(a.str());
+                ct.applyAdd = e["apply_mode"].str() == "add";
                 const jf::JJson &axes = e["axes"];
                 const std::string modPrefix = modKey + ".";
                 for (const jf::JJson &av2 : axes.arr()) {
@@ -1077,6 +1098,7 @@ TableImage MetaModel::resolveTable(const std::string &path) const
         ti.cellBase = t.offset; ti.cellType = t.datatype; ti.cellSize = t.cellSize; ti.cellScale = t.scale;
         ti.cellMinV = t.minV; ti.cellMaxV = t.maxV;
         ti.applyTo = t.applyTo;
+        ti.applyAdd = t.applyAdd;
         ti.rowLabels = t.rowLabels;
         ti.colLabels = t.colLabels;
         ti.label = t.label;

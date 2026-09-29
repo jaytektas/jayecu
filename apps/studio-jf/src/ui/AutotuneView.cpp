@@ -75,8 +75,8 @@ void AutotuneView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
     }
 
     // ---- the title line: what is being shown, and what its axes are ---------------------------------
-    const char* modeName = mode_ == Mode::Base     ? "Base VE"
-                         : mode_ == Mode::Proposed ? "Proposed VE"
+    const char* modeName = mode_ == Mode::Base     ? "Base"
+                         : mode_ == Mode::Proposed ? "Proposed"
                          : mode_ == Mode::Weight   ? "Records per cell"
                                                    : "Change %";
     std::string title = modeName;

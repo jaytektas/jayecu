@@ -113,7 +113,7 @@
     "fuel_corr_generic4": 109,
     "fuel_corr_iat": 110,
     "fuel_corr_ltft": 111,
-    "fuel_corr_map": 112,
+    "lambda_cl_hold": 112,
     "fuel_corr_overall": 113,
     "fuel_corr_poststart": 114,
     "fuel_corr_protection": 115,

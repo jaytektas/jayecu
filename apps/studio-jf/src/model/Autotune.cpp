@@ -73,6 +73,20 @@ void Engine::setGrid(std::vector<double> xb, std::vector<double> yb) {
 
 void Engine::setBase(std::vector<double> cells) { base_ = std::move(cells); }
 
+void Engine::setValueMode(double settleMs, std::vector<Steady> steady) {
+    valueMode_ = true;
+    settleMs_  = std::max(0.0, settleMs);
+    steady_    = std::move(steady);
+    clear();
+}
+
+void Engine::setRatioMode() {
+    valueMode_ = false;
+    settleMs_  = 0.0;
+    steady_.clear();
+    clear();
+}
+
 void Engine::clear() {
     const size_t n = xb_.size() * yb_.size();
     w_.assign(n, 0.0);
@@ -104,8 +118,12 @@ void Engine::add(const Sample& s) {
     // answer to "what was the engine doing 300 ms ago", and dropping it would leave holes exactly
     // where the conditions were changing.
     ring_.push_back(s);
-    const uint32_t keep = 3000;   // comfortably past the delay table's ceiling
+    // Comfortably past the delay table's ceiling — and past the settle time, which value mode reads
+    // the same history for.
+    const uint32_t keep = std::max<uint32_t>(3000u, static_cast<uint32_t>(settleMs_) + 500u);
     while (!ring_.empty() && s.ms - ring_.front().ms > keep) ring_.pop_front();
+
+    if (valueMode_) { addValue(s); return; }
 
     const auto reject = [&](const char* why) { ++st_.filtered; st_.activeFilter = why; };
 
@@ -136,7 +154,11 @@ void Engine::add(const Sample& s) {
     const double mult = p->ego * (s.lambda / p->target);
     const double pct  = (mult - 1.0) * 100.0;
 
-    const Site sx = siteOn(xb_, p->x), sy = siteOn(yb_, p->y);
+    credit(p->x, p->y, pct);
+}
+
+void Engine::credit(double x, double y, double v) {
+    const Site sx = siteOn(xb_, x), sy = siteOn(yb_, y);
     const int nx = static_cast<int>(xb_.size());
     const int x0 = sx.i, x1 = std::min(sx.i + 1, nx - 1);
     const int y0 = sy.i, y1 = std::min(sy.i + 1, static_cast<int>(yb_.size()) - 1);
@@ -148,7 +170,7 @@ void Engine::add(const Sample& s) {
             if (w <= 0.0) continue;
             const size_t k = static_cast<size_t>(cy[b]) * nx + cx[a];
             w_[k]   += w;
-            sum_[k] += w * pct;
+            sum_[k] += w * v;
         }
 
     ++st_.used;
@@ -159,13 +181,64 @@ void Engine::add(const Sample& s) {
     lastRow_ = sy.f >= 0.5 ? y1 : y0;
 }
 
+// VALUE MODE. The filters read the record as it stands — there is no production instant to go back to,
+// the value is about now — and the steadiness test reads the history: every steadiness channel must
+// have stayed within its span across the whole settle time, and there must BE a whole settle time of
+// history. A session's first half-second is not evidence that anything was steady.
+void Engine::addValue(const Sample& s) {
+    const auto reject = [&](const std::string& why) { ++st_.filtered; st_.activeFilter = why; };
+    if (xb_.size() < 2 || yb_.size() < 2) { reject("no grid"); return; }
+    if (!s.ok)                            { reject("value not readable"); return; }
+    for (size_t i = 0; i < filters_.size(); ++i) {
+        const double v = i < s.filt.size() ? s.filt[i] : 0.0;
+        if (filters_[i].rejects(v)) { reject(filters_[i].name); return; }
+    }
+    const uint32_t settle = static_cast<uint32_t>(settleMs_);
+    if (ring_.empty() || s.ms - ring_.front().ms < settle) { reject("waiting for history"); return; }
+    for (size_t k = 0; k < steady_.size(); ++k) {
+        double lo = 1e300, hi = -1e300;
+        for (const Sample& r : ring_) {
+            if (s.ms - r.ms > settle || k >= r.steady.size()) continue;
+            lo = std::min(lo, r.steady[k]);
+            hi = std::max(hi, r.steady[k]);
+        }
+        if (hi - lo > steady_[k].span) { reject("not settled: " + steady_[k].channel); return; }
+    }
+    credit(s.x, s.y, s.value);
+}
+
 double Engine::weight(int col, int row) const {
     if (col < 0 || row < 0 || col >= cols() || row >= rows()) return 0.0;
     return w_[static_cast<size_t>(row) * xb_.size() + col];
 }
 
+// VALUE MODE: how far the cell moves towards what was measured there. The same evidence rule as a
+// ratio — a quarter of the weight, a quarter of the way — and the same two authority limits, applied to
+// the move itself: at most maxCellAbs in the cell's units, and at most maxCellPct of the cell.
+double Engine::valueDelta(int col, int row) const {
+    if (col < 0 || row < 0 || col >= cols() || row >= rows()) return 0.0;
+    const size_t k = static_cast<size_t>(row) * xb_.size() + col;
+    const double w = w_[k];
+    if (w <= 0.0) return 0.0;
+    const double b          = k < base_.size() ? base_[k] : 0.0;
+    const double confidence = std::min(1.0, w / fullWeightOf(set_.resistance));
+    double d = (sum_[k] / w - b) * confidence;
+    d = std::clamp(d, -set_.maxCellAbs, set_.maxCellAbs);
+    if (b != 0.0) {
+        const double lim = std::fabs(b) * set_.maxCellPct / 100.0;
+        d = std::clamp(d, -lim, lim);
+    }
+    return d;
+}
+
 double Engine::changePct(int col, int row) const {
     if (col < 0 || row < 0 || col >= cols() || row >= rows()) return 0.0;
+    if (valueMode_) {
+        const double d = valueDelta(col, row);
+        const double b = base(col, row);
+        // A cell at zero has no percentage to move by; any move of it is a whole change.
+        return b != 0.0 ? d / b * 100.0 : (d > 0.0 ? 100.0 : d < 0.0 ? -100.0 : 0.0);
+    }
     const size_t k = static_cast<size_t>(row) * xb_.size() + col;
     const double w = w_[k];
     if (w <= 0.0) return 0.0;
@@ -193,6 +266,7 @@ double Engine::base(int col, int row) const {
 }
 
 double Engine::proposed(int col, int row) const {
+    if (valueMode_) return base(col, row) + valueDelta(col, row);
     const size_t k = static_cast<size_t>(row) * xb_.size() + col;
     const double b = k < base_.size() ? base_[k] : 0.0;
     return b * (1.0 + changePct(col, row) / 100.0);

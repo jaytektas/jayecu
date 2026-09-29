@@ -42,8 +42,11 @@ AutotunePanel::AutotunePanel(JSceneGraph& g) : JContainer(g) {
     // rig learn nothing is engine-specific — a bench with no coolant sensor never clears "Minimum CLT",
     // and a car on a dyno wants a different minimum throttle than one on the road. The reference
     // implementation marks each filter "user adjustable" for exactly this reason.
+    // ROWS OF FOUR. One row held every filter and then the two Max Change boxes, and at seven filters the
+    // row ran past the right edge and took the Max Change boxes with it — controls nobody could reach.
+    // A column of rows, sized to how many rows buildFilters makes.
     filterRow_ = add(std::make_unique<JContainer>(g));
-    filterRow_->setLayoutMode(JLayoutMode::Flex)->setDirection(JFlexDirection::JRow)->setGap(6.f);
+    filterRow_->setLayoutMode(JLayoutMode::Flex)->setDirection(JFlexDirection::Column)->setGap(2.f);
     filterRow_->setBounds({ 0.f, 0.f, 640.f, 26.f });
     filterRow_->setVSizePolicy(JSizePolicyMode::Fixed, 0);
 
@@ -67,6 +70,9 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
     row->setBounds({ 0.f, 0.f, 640.f, 26.f });
     row->setVSizePolicy(JSizePolicyMode::Fixed, 0);
 
+    // WHICH TABLE. Filled from the definition on attach (VE Table, Predicted MAP, …).
+    row->add(std::make_unique<JLabel>(g, "Tune", 34.f, 22.f));
+    targetBox_ = row->add(std::make_unique<JComboBox>(g, std::vector<std::string>{}, 130.f, 22.f));
     startBtn_ = row->add(std::make_unique<JButton>(g, "Start Auto Tune", 128.f, 22.f));
     applyBtn_ = row->add(std::make_unique<JButton>(g, "Apply", 70.f, 22.f));
     resetBtn_ = row->add(std::make_unique<JButton>(g, "Reset", 70.f, 22.f));
@@ -85,7 +91,7 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
     // identified. (Asked within a minute of the panel first being looked at.)
     row->add(std::make_unique<JLabel>(g, "  Show", 44.f, 22.f));
     modeBox_ = row->add(std::make_unique<JComboBox>(
-        g, std::vector<std::string>{ "Change %", "Proposed VE", "Base VE", "Records" }, 120.f, 22.f));
+        g, std::vector<std::string>{ "Change %", "Proposed", "Base", "Records" }, 120.f, 22.f));
     modeBox_->setCurrentIndex(0);
     row->add(std::make_unique<JLabel>(g, "Resistance", 68.f, 22.f));
     resistBox_ = row->add(std::make_unique<JComboBox>(
@@ -111,6 +117,7 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
                               : AutotuneView::Mode::Change);
     });
     resistBox_->onIndexChanged.connect([this](int) { applySettings(); refresh(); });
+    targetBox_->onIndexChanged.connect([this](int i) { if (!selecting_) selectTarget(i); });
 }
 
 void AutotunePanel::populateRenderPrimitives(JPrimitiveBuffer& buf) {
@@ -119,8 +126,13 @@ void AutotunePanel::populateRenderPrimitives(JPrimitiveBuffer& buf) {
     JContainer::populateRenderPrimitives(buf);
 }
 
-std::string AutotunePanel::settingKey(const std::string& channel) {
-    return "autotune.filter." + channel;
+// EACH TARGET REMEMBERS ITS OWN THRESHOLDS. "Minimum RPM" on the VE target and on Predicted MAP read the
+// same channel for different reasons, and one edit should not quietly move the other.
+std::string AutotunePanel::settingPrefix() const {
+    return isValue_ ? "autotune." + tablePath_ + "." : std::string("autotune.");
+}
+std::string AutotunePanel::settingKey(const std::string& channel) const {
+    return settingPrefix() + "filter." + channel;
 }
 
 void AutotunePanel::buildFilters(JSceneGraph& g, const std::vector<autotune::Filter>& fs) {
@@ -131,26 +143,43 @@ void AutotunePanel::buildFilters(JSceneGraph& g, const std::vector<autotune::Fil
     if (fs.empty()) return;
 
     auto& st = JSettings::instance();
-    filterRow_->add(std::make_unique<JLabel>(g, "Reject when", 74.f, 22.f));
-    for (const autotune::Filter& f : fs) {
+    constexpr size_t kPerRow = 4;
+    const auto newRow = [&] {
+        auto* r = filterRow_->add(std::make_unique<JContainer>(g));
+        r->setLayoutMode(JLayoutMode::Flex)->setDirection(JFlexDirection::JRow)->setGap(6.f);
+        r->setBounds({ 0.f, 0.f, 640.f, 24.f });
+        r->setVSizePolicy(JSizePolicyMode::Fixed, 0);
+        return r;
+    };
+    JContainer* row = newRow();
+    int rows = 1;
+    row->add(std::make_unique<JLabel>(g, "Reject when", 74.f, 22.f));
+    for (size_t k = 0; k < fs.size(); ++k) {
+        const autotune::Filter& f = fs[k];
+        if (k > 0 && k % kPerRow == 0) {
+            row = newRow(); ++rows;
+            row->add(std::make_unique<JLabel>(g, "", 74.f, 22.f));   // lines up under "Reject when"
+        }
         // THE COMPARISON IS ON SCREEN, not implied by the name. "Minimum RPM 500" and "dTPS 50" are
         // opposite tests, and a bare number beside a name gives no way to tell which way one runs.
-        filterRow_->add(std::make_unique<JLabel>(
+        row->add(std::make_unique<JLabel>(
             g, f.name + (f.op == autotune::Filter::Op::Above ? " >" : " <"),
             static_cast<float>(f.name.size()) * 7.f + 16.f, 22.f));
-        auto* sp = filterRow_->add(std::make_unique<JDoubleSpinBox>(g, -10000.0, 30000.0, 1.0, 1, 76.f, 22.f));
+        auto* sp = row->add(std::make_unique<JDoubleSpinBox>(g, -10000.0, 30000.0, 1.0, 1, 76.f, 22.f));
         sp->setValue(st.get<double>(settingKey(f.channel), f.value));
         sp->onValueChanged.connect([this](double) { applySettings(); refresh(); });
         filterSpins_.push_back(sp);
     }
-    filterRow_->add(std::make_unique<JLabel>(g, "    Max change %", 100.f, 22.f));
-    maxPct_ = filterRow_->add(std::make_unique<JDoubleSpinBox>(g, 0.0, 100.0, 1.0, 1, 70.f, 22.f));
-    maxPct_->setValue(st.get<double>("autotune.maxCellPct", eng_.settings().maxCellPct));
+    row->add(std::make_unique<JLabel>(g, "    Max change %", 100.f, 22.f));
+    maxPct_ = row->add(std::make_unique<JDoubleSpinBox>(g, 0.0, 100.0, 1.0, 1, 70.f, 22.f));
+    maxPct_->setValue(st.get<double>(settingPrefix() + "maxCellPct", eng_.settings().maxCellPct));
     maxPct_->onValueChanged.connect([this](double) { applySettings(); refresh(); });
-    filterRow_->add(std::make_unique<JLabel>(g, "Max change", 72.f, 22.f));
-    maxAbs_ = filterRow_->add(std::make_unique<JDoubleSpinBox>(g, 0.0, 1000.0, 1.0, 1, 70.f, 22.f));
-    maxAbs_->setValue(st.get<double>("autotune.maxCellAbs", eng_.settings().maxCellAbs));
+    row->add(std::make_unique<JLabel>(g, "Max change", 72.f, 22.f));
+    maxAbs_ = row->add(std::make_unique<JDoubleSpinBox>(g, 0.0, 1000.0, 1.0, 1, 70.f, 22.f));
+    maxAbs_->setValue(st.get<double>(settingPrefix() + "maxCellAbs", eng_.settings().maxCellAbs));
     maxAbs_->onValueChanged.connect([this](double) { applySettings(); refresh(); });
+    filterRow_->setBounds({ 0.f, 0.f, 640.f, rows * 24.f + (rows - 1) * 2.f });
+    filterRow_->invalidate();
 }
 
 void AutotunePanel::applySettings() {
@@ -173,8 +202,8 @@ void AutotunePanel::applySettings() {
         st.set(settingKey(fs[k].channel), JVariant(fs[k].value));
     }
     eng_.setFilters(std::move(fs));
-    if (maxPct_) st.set("autotune.maxCellPct", JVariant(s.maxCellPct));
-    if (maxAbs_) st.set("autotune.maxCellAbs", JVariant(s.maxCellAbs));
+    if (maxPct_) st.set(settingPrefix() + "maxCellPct", JVariant(s.maxCellPct));
+    if (maxAbs_) st.set(settingPrefix() + "maxCellAbs", JVariant(s.maxCellAbs));
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -183,29 +212,86 @@ void AutotunePanel::applySettings() {
 void AutotunePanel::attach() {
     Cache& c = Cache::instance();
     const MetaModel* m = c.meta();
-    tablePath_.clear(); targetTable_.clear(); targetChannel_.clear(); lambdaChannel_.clear();
-    xChannel_.clear(); yChannel_.clear(); egoChannels_.clear();
-    eng_.setFilters({});
+    targetNames_.clear();
+    valueTargets_.clear();
+    hasVe_ = false;
+    if (m) {
+        hasVe_ = m->autotune().valid();
+        if (hasVe_) {
+            const TableImage t = c.resolveTable(m->autotune().table);
+            targetNames_.push_back(t.valid && !t.label.empty() ? t.label : std::string("VE Table"));
+        }
+        for (const MetaModel::ValueAutotune& v : m->valueAutotunes()) {
+            valueTargets_.push_back(v);
+            targetNames_.push_back(v.name);
+        }
+    }
+    // The selection survives a reload by NAME: the definition may add a target ahead of it.
+    const std::string want = JSettings::instance().get<std::string>("autotune.target", std::string());
+    int idx = 0;
+    for (size_t k = 0; k < targetNames_.size(); ++k)
+        if (targetNames_[k] == want) idx = static_cast<int>(k);
+    selecting_ = true;
+    targetBox_->setItems(targetNames_);
+    targetBox_->setCurrentIndex(idx);
+    selecting_ = false;
+    selectTarget(idx);
+}
 
-    if (!m) { view_->setNotice("No definition loaded"); refresh(); return; }
-    const MetaModel::Autotune& a = m->autotune();
-    if (!a.valid()) {
+void AutotunePanel::selectTarget(int i) {
+    if (recording_) stop();
+    Cache& c = Cache::instance();
+    const MetaModel* m = c.meta();
+    tablePath_.clear(); targetTable_.clear(); targetChannel_.clear(); lambdaChannel_.clear();
+    xChannel_.clear(); yChannel_.clear(); egoChannels_.clear(); egoMissing_.clear();
+    gridNote_.clear();
+    eng_.setFilters({});
+    isValue_ = false;
+
+    if (!m) { view_->setNotice("No definition loaded"); buildFilters(m_graph, {}); refresh(); return; }
+    if (targetNames_.empty()) {
         // Said plainly rather than shown as an empty grid: this ECU's definition does not describe an
         // autotune, and no amount of driving will change that.
         view_->setNotice("This definition does not declare an autotune contract");
+        buildFilters(m_graph, {});
         refresh();
         return;
     }
+    target_  = std::clamp(i, 0, static_cast<int>(targetNames_.size()) - 1);
+    isValue_ = !hasVe_ || target_ > 0;
+    JSettings::instance().set("autotune.target", JVariant(targetNames_[static_cast<size_t>(target_)]));
 
-    tablePath_     = a.table;
-    targetTable_   = a.targetTable;
-    targetChannel_ = a.targetChannel;
-    lambdaChannel_ = a.lambdaChannel;
-    egoChannels_   = a.egoChannels;
+    std::vector<autotune::Filter> fs;
+    if (isValue_) {
+        valueTarget_ = valueTargets_[static_cast<size_t>(target_ - (hasVe_ ? 1 : 0))];
+        tablePath_   = valueTarget_.table;
+        std::vector<autotune::Steady> st;
+        for (const auto& x : valueTarget_.steady) st.push_back({ x.channel, x.span });
+        eng_.setValueMode(valueTarget_.settleMs, std::move(st));
+        for (const auto& f : valueTarget_.filters)
+            fs.push_back({ f.name, f.channel,
+                           f.above ? autotune::Filter::Op::Above : autotune::Filter::Op::Below,
+                           f.value, true });
+    } else {
+        const MetaModel::Autotune& a = m->autotune();
+        tablePath_     = a.table;
+        targetTable_   = a.targetTable;
+        targetChannel_ = a.targetChannel;
+        lambdaChannel_ = a.lambdaChannel;
+        egoChannels_   = a.egoChannels;
+        eng_.setRatioMode();
+        for (const auto& f : a.filters)
+            fs.push_back({ f.name, f.channel,
+                           f.above ? autotune::Filter::Op::Above : autotune::Filter::Op::Below,
+                           f.value, true });
+    }
+    // The ECU's trims are the VE target's business only: a measured pressure has no correction folded in.
+    if (openLoopBtn_) setTrimState(trimActive_, canRestore_);
 
     const TableImage t = c.resolveTable(tablePath_);
     if (!t.valid || t.axes.size() < 2) {
         view_->setNotice("The table this definition names does not resolve: " + tablePath_);
+        buildFilters(m_graph, {});
         refresh();
         return;
     }
@@ -218,33 +304,36 @@ void AutotunePanel::attach() {
                          yChannel_.empty() ? t.axes[1].label : yChannel_);
 
     seedGrid();
-
-    std::vector<autotune::Filter> fs;
-    for (const auto& f : a.filters)
-        fs.push_back({ f.name, f.channel,
-                       f.above ? autotune::Filter::Op::Above : autotune::Filter::Op::Below,
-                       f.value, true });
     eng_.setFilters(fs);
-    buildFilters(m_graph, fs);   // one spin per declared filter, seeded from what was last used
+    // A VALUE TARGET'S OWN LIMITS BY DEFAULT. VE's 50 % is a limit on a table that is roughly right; a
+    // Predicted MAP table nobody has filled is often half the real pressure, and 50 % would take several
+    // passes to get there. Its remembered values, once set, win (buildFilters reads them).
+    if (isValue_) { autotune::Settings vs = eng_.settings(); vs.maxCellPct = 100.0; vs.maxCellAbs = 100.0; eng_.setSettings(vs); }
+    else          { autotune::Settings vs = eng_.settings(); vs.maxCellPct = 50.0;  vs.maxCellAbs = 50.0;  eng_.setSettings(vs); }
+    buildFilters(m_graph, fs);   // one spin per declared filter, seeded from what this target last used
 
     // THE ECU'S OWN DELAY MAP when it has one. The firmware already carries a measured transport-delay
     // surface for its own learning, and the studio using a second, different one would credit readings
-    // to different cells than the ECU does — two answers to one physical question.
-    autotune::DelayTable d;
-    if (!a.delayTable.empty()) {
-        const TableImage dt = c.resolveTable(a.delayTable);
-        if (dt.valid && dt.axes.size() >= 2) {
-            d.xb = c.tiBins(dt, 0);
-            d.yb = c.tiBins(dt, 1);
-            const int nx = c.tiLiveN(dt, 0), ny = c.tiLiveN(dt, 1);
-            d.cells.reserve(static_cast<size_t>(nx) * ny);
-            for (int r = 0; r < ny; ++r)
-                for (int cc = 0; cc < nx; ++cc) d.cells.push_back(c.tiCell(dt, cc, r, 0));
-            d.xb.resize(static_cast<size_t>(nx));
-            d.yb.resize(static_cast<size_t>(ny));
+    // to different cells than the ECU does — two answers to one physical question. (VE only: a value
+    // target reads what is happening now.)
+    if (!isValue_) {
+        const MetaModel::Autotune& a = m->autotune();
+        autotune::DelayTable d;
+        if (!a.delayTable.empty()) {
+            const TableImage dt = c.resolveTable(a.delayTable);
+            if (dt.valid && dt.axes.size() >= 2) {
+                d.xb = c.tiBins(dt, 0);
+                d.yb = c.tiBins(dt, 1);
+                const int nx = c.tiLiveN(dt, 0), ny = c.tiLiveN(dt, 1);
+                d.cells.reserve(static_cast<size_t>(nx) * ny);
+                for (int r = 0; r < ny; ++r)
+                    for (int cc = 0; cc < nx; ++cc) d.cells.push_back(c.tiCell(dt, cc, r, 0));
+                d.xb.resize(static_cast<size_t>(nx));
+                d.yb.resize(static_cast<size_t>(ny));
+            }
         }
+        eng_.setDelay(d.valid() ? d : autotune::defaultDelay());
     }
-    eng_.setDelay(d.valid() ? d : autotune::defaultDelay());
     applySettings();
     refresh();
 }
@@ -361,6 +450,22 @@ void AutotunePanel::onFrame() {
     s.ms = nowMs();
     s.x  = chanOr(c, xChannel_, 0.0);
     s.y  = chanOr(c, yChannel_, 0.0);
+
+    if (isValue_) {
+        // THE MEASURED ANSWER, and what has to hold still for it to count. No lambda, target or trims.
+        const std::string& vc = valueTarget_.valueChannel;
+        s.ok    = c.has(vc);
+        s.value = chanOr(c, vc, 0.0);
+        s.steady.reserve(valueTarget_.steady.size());
+        for (const auto& x : valueTarget_.steady) s.steady.push_back(chanOr(c, x.channel, 0.0));
+        s.filt.reserve(eng_.filters().size());
+        for (const autotune::Filter& f : eng_.filters()) s.filt.push_back(chanOr(c, f.channel, 0.0));
+        eng_.add(s);
+        if (live_ && eng_.hasProposal() && s.ms - lastApplyMs_ > 2000u) applyProposal();
+        refresh();
+        return;
+    }
+
     s.lambda = chanOr(c, lambdaChannel_, 0.0);
     s.ok     = !lambdaChannel_.empty() && c.has(lambdaChannel_) && s.lambda > 0.0;
 
@@ -426,7 +531,9 @@ void AutotunePanel::applyProposal() {
         for (int cc = 0; cc < nx; ++cc) {
             const double pct = eng_.changePct(cc, r);
             if (pct == 0.0) continue;                       // untouched cells are left exactly alone
-            c.tiSetCell(t, cc, r, plane_, c.tiCell(t, cc, r, plane_) * (1.0 + pct / 100.0));
+            // A value target proposes the cell's new VALUE (a cell at zero has no percentage to scale).
+            c.tiSetCell(t, cc, r, plane_, isValue_ ? eng_.proposed(cc, r)
+                                                   : c.tiCell(t, cc, r, plane_) * (1.0 + pct / 100.0));
         }
     c.endEdit("Auto Tune");
 
@@ -448,7 +555,7 @@ void AutotunePanel::setTrimState(bool anyTrimActive, bool canRestore) {
         // Shown while there is something to say: trims on (offer to leave closed loop) or trims this
         // panel switched off (offer to put them back). Trims someone else switched off leave nothing
         // to offer — restoring a state the panel never saw would be inventing one.
-        openLoopBtn_->setVisible(static_cast<bool>(onSetOpenLoop) && (anyTrimActive || canRestore));
+        openLoopBtn_->setVisible(!isValue_ && static_cast<bool>(onSetOpenLoop) && (anyTrimActive || canRestore));
         openLoopBtn_->setLabel(anyTrimActive ? "Open Loop" : "Restore Trims");
     }
     refresh();
@@ -472,6 +579,7 @@ std::string AutotunePanel::statusText() const {
     // WHY NOTHING IS HAPPENING, in the words of whatever is stopping it. "Active Filter" is the first
     // thing a tuner looks for when the counters are not moving.
     if (!st.activeFilter.empty()) return "Filtered: " + st.activeFilter;
+    if (isValue_) return "Learning " + valueTarget_.name + " (settled readings only)";
     if (trimActive_) return "Learning (ECU trims active - folded in)";
     return canRestore_ ? "Learning (open loop - trims held for Restore)" : "Learning";
 }

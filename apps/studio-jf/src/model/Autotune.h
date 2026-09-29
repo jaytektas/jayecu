@@ -83,8 +83,19 @@ struct Sample {
     double   lambda = 0.0;       // what the wideband reads now
     double   target = 1.0;       // what was commanded now (the production sample's is the one used)
     double   ego    = 1.0;       // the correction the ECU is applying now, as a multiplier (1 = none)
-    bool     ok     = false;     // is the lambda reading usable at all
+    bool     ok     = false;     // is the lambda reading usable at all (value mode: the value reading)
     std::vector<double> filt;    // one reading per configured filter, in order
+    // VALUE MODE only (see Engine::setValueMode): the measured answer itself, and one reading per
+    // steadiness channel, in the order they were declared.
+    double   value  = 0.0;
+    std::vector<double> steady;
+};
+
+// A channel that has to hold still before a VALUE-mode record counts: it may wander by at most `span`
+// over the settle time. "rpm, 150" is an engine holding its speed; "tps, 1.0" a foot holding still.
+struct Steady {
+    std::string channel;
+    double      span = 0.0;
 };
 
 // A coarse rpm x load surface of milliseconds: how long ago the gas being read now actually left the
@@ -120,6 +131,17 @@ public:
     void setDelay(DelayTable d) { delay_ = std::move(d); }
     void setFilters(std::vector<Filter> f) { filters_ = std::move(f); }
     void setSettings(Settings s) { set_ = s; }
+    // VALUE MODE: the table is learned from a channel that MEASURES the cell's answer directly — the
+    // manifold pressure a steady throttle and speed settle to IS what the Predicted MAP table should hold
+    // there — rather than from a ratio against a target. No transport delay (the reading is about now),
+    // no ego fold, and the proposal is the cell's new VALUE, not a percentage. A record counts only once
+    // every steadiness channel has held within its span for `settleMs`: a value read while the engine is
+    // still getting there is the transient, which is the one thing this table must not learn from.
+    // Resets the accumulated records, like a new grid.
+    void setValueMode(double settleMs, std::vector<Steady> steady);
+    void setRatioMode();
+    bool valueMode() const { return valueMode_; }
+    const std::vector<Steady>& steadiness() const { return steady_; }
 
     const std::vector<Filter>& filters()  const { return filters_; }
     const Settings&            settings() const { return set_; }
@@ -135,7 +157,8 @@ public:
     void add(const Sample& s);                     // offer one record
 
     // What the proposal would do to a cell, as a percentage of its current value. Already clamped by
-    // both authority limits and scaled by how much evidence the cell has.
+    // both authority limits and scaled by how much evidence the cell has. (Value mode: the change the
+    // proposed VALUE makes, expressed the same way, so every view and stat reads either mode.)
     double changePct(int col, int row) const;
     double weight(int col, int row) const;         // evidence accumulated, in records
     // The cell as the proposal would leave it. Needs setBase(); without it returns the change alone.
@@ -153,6 +176,9 @@ private:
     struct Site { int i = 0; double f = 0.0; };
     static Site siteOn(const std::vector<double>& b, double v);
     const Sample* production(uint32_t at) const;   // the ring entry nearest a past instant
+    void credit(double x, double y, double v);     // spread one record over its (up to) four cells
+    void addValue(const Sample& s);                // Engine::add, value mode
+    double valueDelta(int col, int row) const;     // value mode: the clamped move, in the cell's units
 
     std::vector<double> xb_, yb_, base_;
     std::vector<double> w_, sum_;                  // per cell: weight, and weight x percent
@@ -162,6 +188,9 @@ private:
     Settings            set_;
     Stats               st_;
     int                 lastCol_ = -1, lastRow_ = -1;
+    bool                valueMode_ = false;
+    double              settleMs_  = 0.0;
+    std::vector<Steady> steady_;
 };
 
 }  // namespace autotune

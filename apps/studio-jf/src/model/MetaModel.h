@@ -307,6 +307,7 @@ public:
         // The base table(s) this one's values can be ROLLED INTO — a learned correction names the map it
         // corrects (schema `apply_to`). Empty for an ordinary table. See Surface::tableApplyToBase.
         std::vector<std::string> applyTo;
+        bool applyAdd = false;       // …folded in by ADDING (a duty offset), not multiplying (a percentage)
         std::string xAxis;         // "module.<rpm_axis>" config array for column headers (or "")
         std::string yAxis;         // row headers
         std::string zAxis;         // depth (plane) breakpoints, when 3D (or "")
@@ -530,6 +531,16 @@ public:
         std::vector<AutotuneFilter>  filters;
         bool valid() const { return !table.empty() && !lambdaChannel.empty(); }
     };
+    // A table the studio learns from a channel that MEASURES its answer (schema `value_autotune`):
+    // Predicted MAP is the manifold pressure a steady throttle and speed settle to. A record counts once
+    // every `steady` channel has held within its span for `settleMs`. See autotune::Engine::setValueMode.
+    struct ValueAutotuneSteady { std::string channel; double span = 0.0; };
+    struct ValueAutotune {
+        std::string name, table, valueChannel;
+        double      settleMs = 500.0;
+        std::vector<ValueAutotuneSteady> steady;
+        std::vector<AutotuneFilter>      filters;
+    };
     // How many characters a text field holds, as the definition states it; 0 when it does not say.
     // See ConfigField::maxChars — the VIN is the case that makes the distinction matter.
     int textCapacity(const std::string &path) const {
@@ -538,6 +549,7 @@ public:
     }
 
     const Autotune &autotune() const { return autotune_; }
+    const std::vector<ValueAutotune> &valueAutotunes() const { return valueAutotunes_; }
     // Resolve a whole-region binding to a byte span: "module.array" (every element) or
     // "module.array[index]" (one element, e.g. electronic_throttle.etb[0] — its relax_pct + ff_table +
     // all fields). Used by the gen-watch scoped refresh to re-read the regions a command rewrites.
@@ -827,6 +839,7 @@ private:
     std::vector<uint8_t> defaultImage_;             // packed EcuConfig default tune (offline baseline)
     std::vector<Segment> segments_;
     Autotune             autotune_;                 // cache blocks (config + nvram/volatile), by device offset
+    std::vector<ValueAutotune> valueAutotunes_;
     std::vector<SensorType> sensorTypes_;   // catalog order — index == the stored `type` byte
     // channel name -> {array key, element index} of the sensor that publishes it.
     std::unordered_map<std::string, std::pair<std::string, int>> signalOwner_;

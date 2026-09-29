@@ -69,8 +69,14 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
         }
     }
     if (!g.ok) {
-        if (cells) text(buf, r.x + (r.width - textW("Drop a table here")) * 0.5f,
-                                             r.y + (r.height - lh) * 0.5f, "Drop a table here", jf::Colors::TextSecondary, r.width);
+        // A table that NAMES one this meta does not have is not an empty slot: it is a page newer than
+        // the firmware (the ECU needs updating), and "Drop a table here" sent the user looking for a
+        // wrong binding. Say which table and why.
+        const std::string bound = el.prop("signalName");
+        const std::string msg = bound.empty() ? std::string("Drop a table here")
+                                              : "Not in this ECU's firmware: " + bound + " (update the firmware)";
+        if (cells) text(buf, r.x + std::max(0.f, (r.width - textW(msg)) * 0.5f),
+                        r.y + (r.height - lh) * 0.5f, msg, jf::Colors::TextSecondary, r.width);
         return;
     }
     uint8_t fgb[4]; const uint8_t* fg = fgOf(el, fgb);

@@ -12,6 +12,11 @@
 // how much, on what evidence, and what it threw away. An autotuner that quietly rewrites a fuel table
 // is asking to be trusted about an engine it cannot hear.
 //
+// MORE THAN ONE TABLE. The VE table is learned from a wideband ratio; a table whose answer a channel
+// MEASURES directly — Predicted MAP, the pressure a steady throttle and speed settle to — is learned from
+// that channel (MetaModel::ValueAutotune). The "Tune" selector picks which; both are the same record,
+// review and Apply flow, and the value kind proposes the cell's new value rather than a percentage.
+//
 // TWO SOURCES, ONE VIEW. Which channels to watch comes from the loaded definition (MetaModel::autotune)
 // — our schema declares it, a TunerStudio ini declares the same facts in [VeAnalyze] — so a rusEFI ECU
 // and a native one are the same code path with different names in it. See MetaModel::Autotune.
@@ -109,7 +114,9 @@ private:
     void buildFilters(jf::JSceneGraph& g, const std::vector<autotune::Filter>& fs);
     // Where a filter's threshold is remembered between sessions. Keyed on the CHANNEL, not the display
     // name: the name is prose a definition may reword, the channel is what the filter actually reads.
-    static std::string settingKey(const std::string& channel);
+    std::string settingKey(const std::string& channel) const;
+    std::string settingPrefix() const;   // "autotune." for VE, "autotune.<table>." for a value target
+    void selectTarget(int i);            // the Tune selector: set the engine up for target i
     void readBase();         // pull the table's live cells into the engine (values only)
     void seedGrid();         // …and its BINS, which discards whatever was accumulated against the old ones
     void applySettings();    // combo/entry state -> engine settings
@@ -122,6 +129,7 @@ private:
     jf::JButton*   resetBtn_ = nullptr;
     jf::JButton*   openLoopBtn_ = nullptr;
     jf::JComboBox* modeBox_ = nullptr;
+    jf::JComboBox* targetBox_ = nullptr;
     jf::JComboBox* resistBox_ = nullptr;
     jf::JCheckBox* liveBox_ = nullptr;
     jf::JLabel*    status_ = nullptr;
@@ -136,6 +144,15 @@ private:
     std::string tablePath_, targetTable_, targetChannel_, lambdaChannel_;
     std::string xChannel_, yChannel_;
     std::vector<MetaModel::AutotuneEgo> egoChannels_;
+    // The targets this definition offers, in selector order: the VE contract first when it has one, then
+    // each value target. `valueTarget_` is the selected one when it is a value target (isValue_).
+    std::vector<std::string>                targetNames_;
+    std::vector<MetaModel::ValueAutotune>   valueTargets_;
+    bool                                    hasVe_   = false;
+    int                                     target_  = 0;
+    bool                                    isValue_ = false;
+    MetaModel::ValueAutotune                valueTarget_;
+    bool                                    selecting_ = false;   // selector repopulating: ignore its signal
 
     int         plane_ = 0;  // the plane this run is about; a change discards the proposal
     std::string linkNotice_;

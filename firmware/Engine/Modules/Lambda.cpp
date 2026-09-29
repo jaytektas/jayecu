@@ -406,7 +406,16 @@ void Lambda::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& 
                             (now - running_since_ms_) < static_cast<uint32_t>(cfg_->cl_start_delay_s) * 1000u;
     const bool cold       = bus.valid(wk::clt) && bus.get(wk::clt, 0.0f) < static_cast<float>(cfg_->cl_min_clt);
     const bool off_range  = src_wide_ && bus.valid(src_sig_) && !measured;   // readable, outside its domain
-    const bool cl_hold    = in_cut || after_cut || unsettled || cold || off_range;
+    // A THROTTLE TRANSIENT, while MAP prediction is standing in for the sensor (Map Source 1). The mixture
+    // the wideband sees then is the transient's — the air estimate and the fuel film are catching up — not
+    // the operating point's, so correcting it would chase an error the VE table does not have.
+    const bool transient  = bus.valid(SIG_MAP_SOURCE) && static_cast<int>(bus.get(SIG_MAP_SOURCE, 0.0f)) == 1;
+    const bool cl_hold    = in_cut || after_cut || unsettled || cold || off_range || transient;
+    // WHY it is held, first reason wins — a state that said only "open loop" could not tell a fuel cut
+    // from a cold engine from a transient. 0 None, 1 Fuel Cut, 2 After Cut, 3 Settling, 4 Cold,
+    // 5 Off Range, 6 Transient (schema: lambda_cl_hold).
+    bus.set(SIG_LAMBDA_CL_HOLD, static_cast<float>(in_cut ? 1 : after_cut ? 2 : unsettled ? 3 : cold ? 4
+                                                   : off_range ? 5 : transient ? 6 : 0), true, now, ttl());
 
     const bool nb_on = cfg_->enabled != 0 && !src_fault_ && !measured && nb_valid && tgt_stoich && dt_s > 0.0f
                     && !cl_hold;

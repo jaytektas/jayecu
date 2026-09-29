@@ -52,6 +52,11 @@ public:
         // Shown under the button while it is usable, so a button that computes something says what.
         m.add("hint", this, &ActionButtonWidget::m_hint,
               JPropertyMeta{ .label = "Hint", .order = 103 });
+        // A SETTINGS button, not a capture: "1" writes zeros too. A capture skips a zero because a
+        // measurement of zero is no measurement; a button that SETS things (turn this strategy on and that
+        // one off) has to be able to write the off.
+        m.add("writeZeros", this, &ActionButtonWidget::m_writeZeros,
+              JPropertyMeta{ .label = "Write Zeros", .def = "", .order = 104 });
     }
 
 protected:
@@ -70,6 +75,6 @@ private:
     static std::string cookExpr(const std::string& expr);
 
     std::unique_ptr<jf::JButton> m_btn;
-    std::string m_labelText = "Calibrate", m_writes, m_hint;
+    std::string m_labelText = "Calibrate", m_writes, m_hint, m_writeZeros;
     bool m_lastEnabled = false;
 };
