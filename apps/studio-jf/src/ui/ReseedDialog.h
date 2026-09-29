@@ -189,7 +189,7 @@ private:
         const float W = static_cast<float>(kW), H = static_cast<float>(kH);
         const float r = JStyle::current().cornerRadius;
         buf.pushRectangle(0.f, 0.f, W, H, Colors::Surface1, r, 1.f, Colors::Border);
-        JTitleBar::draw(buf, 0.f, 0.f, W, kHeader(), "Reseed from the ECU definition",
+        JTitleBar::draw(buf, 0.f, 0.f, W, kHeader(), "Add missing navigation entries",
                         r, 1, 0.f, _closeRect().width + 14.f);
         const JRect cr = _closeRect();
         JCloseButton::draw(buf, cr, _inRect(cr, mx, my));

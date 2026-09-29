@@ -468,7 +468,6 @@ Instruments that measure something. Each opens as a tab.
 | **Trigger Log** | The raw trigger edges the ECU saw (chapter 43). | jayecu ECU, connected |
 | **Knock Scope** | The knock system's last capture (chapter 41). | jayecu ECU, connected |
 | **Auto Tune** | The VE autotuner (chapter 40). | definitions with an autotuner; connected |
-| **Update Navigation from Definition…** | Adds tree nodes that a newer definition has gained since your tree was saved (chapter 49). | a project, when the definition has a navigation tree |
 | **Reset ECU** | Same as the toolbar button. | jayecu ECU, connected |
 | **Install Firmware Kit…** | Adds a firmware kit someone has sent you (its `kit.json`), to be offered like a downloaded one (chapter 46). | always |
 
@@ -496,6 +495,8 @@ every session**. It is off by default.
 |---|---|---|---|
 | **User Manual** | F1 | Opens this manual, installed with the studio, in your web browser. | always |
 | **Lua API Reference** | | Opens the Lua reference for the loaded definition in your web browser (chapter 35). | definitions that declare Lua functions |
+| **Check for Updates…** | | Looks online for a newer studio and newer ECU firmware — the same check as **Check now** in Preferences. | always |
+| **Add Missing Navigation Entries…** | | Offers the navigation entries the definition has that your tree does not, and adds the ones you pick. Nothing is changed or removed (chapter 49). | Editing mode, with a project open, when the definition has a navigation tree |
 | **About jayecu Studio…** | | The studio's version. | always |
 
 <!-- src: apps/studio-jf/main.cpp (Help menu) (gate) -->

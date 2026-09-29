@@ -20,7 +20,7 @@ changing them.
 | Add, rename, move and hide pages in the navigation tree | the tree's right-click menu, in Editing mode |
 | Build your own tabs of instruments | **View ▸ New Surface Tab** |
 | Keep the layout for this ECU, or share it | **File ▸ Save Layout**, **Save Layout As…**, **Open Layout…** |
-| Pick up pages a new firmware added | **Tools ▸ Update Navigation from Definition…** |
+| Pick up pages a new firmware added | **Help ▸ Add Missing Navigation Entries…** (Editing mode) |
 | Change colours, fonts, snapping, keys | **Edit ▸ Preferences…** |
 
 Changing the layout never changes the tune. In **Editing** mode the tune is read-only, so a misplaced
@@ -85,7 +85,7 @@ Undo).
 
 ### 5 · A new firmware's pages
 
-After a firmware update adds features, **Tools ▸ Update Navigation from Definition…** shows, on the
+After a firmware update adds features, **Help ▸ Add Missing Navigation Entries…** (Editing mode) shows, on the
 left, everything the firmware's own tree has that yours does not, and on the right your tree as it is.
 Select what you want and import it. It only ever **adds** — nothing you have is removed, renamed or
 moved — and it is one undo step. A page you deleted on purpose simply shows up on the left each time:
@@ -140,7 +140,7 @@ Bindings…**) and **Updates** (chapters 3 and 46).
     Layout… Their tune is untouched.
 
 !!! example "Example 3 — after a firmware update adds cruise control"
-    The tree has no Cruise Control page. Tools ▸ Update Navigation from Definition…: the left side shows
+    The tree has no Cruise Control page. Help ▸ Add Missing Navigation Entries…: the left side shows
     Vehicle Functions ▸ Cruise Control. Import it; it lands in the same place as in the firmware's own
     tree.
 
@@ -154,7 +154,7 @@ Bindings…**) and **Updates** (chapters 3 and 46).
 | The docks are not there | Locked mode | They appear in Editing mode |
 | A control vanished | Its visibility condition is false | View ▸ Show Hidden Widgets |
 | Changes gone after restart | Layout not saved | File ▸ Save Layout |
-| A page is missing after an update | Your tree predates it | Tools ▸ Update Navigation from Definition… |
+| A page is missing after an update | Your tree predates it | Help ▸ Add Missing Navigation Entries… |
 | Opened someone's layout and lost mine | Open Layout replaces the layout | Save Layout As first, to keep a copy |
 
 ## Related

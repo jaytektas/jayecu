@@ -100,7 +100,7 @@ static std::function<void()> g_trackDockHomes, g_syncViewToggles;
 #include "ui/ChannelPropsDialog.h"
 #include "model/ChannelPrefs.h"
 #include "model/UnitManager.h"
-#include "ui/ReseedDialog.h"           // Tools▸Update Navigation from Definition: nodes the definition has gained
+#include "ui/ReseedDialog.h"           // Help▸Add Missing Navigation Entries: nodes the definition has gained
 #include "ui/NewTuneDialog.h"       // New Tune: name + schema picker (app dialog on framework primitives)
 #include "ui/LandingView.h"
 #include "ui/FilterTree.h"
@@ -1813,7 +1813,7 @@ int main(int argc, char** argv) {
     // Home-surface layout file (auto-loaded/saved; also File▸Save / Open / Save As target).
     auto activeModel = [&activeSurf]() -> PanelModel* { auto* s = activeSurf(); return s ? s->model() : nullptr; };
     std::function<void()> openSchemaFn;   // "Open Schema…" — bound after the dictionary tree exists (below)
-    std::function<void()> reseedFn;       // "Reseed from ECU Definition…" — bound with the tree (below)
+    std::function<void()> reseedFn;       // Help▸"Add Missing Navigation Entries…" — bound with the tree (below)
     std::function<void()> newTuneFn;      // "New Tune…"    — ditto
     std::function<void()> importIniFn;    // "Import TunerStudio .ini…" — ditto
     std::function<void()> closeProjectFn; // "Close Project" — back to the landing (bound after landingView)
@@ -2012,7 +2012,8 @@ int main(int argc, char** argv) {
 
     // FILE is the open ECU's documents and nothing else:
     //   [New Tune · Open ECU · Recent ECUs · Open Tune] | [Save Tune] | [Open / Save / Save As Layout] | [Close ECU] | [Quit]
-    // Definitions and trigger wheels are the Library; reseeding the navigation is a Tool.
+    // Definitions and trigger wheels are the Library; adding the definition's missing navigation entries is
+    // under Help, in edit mode only.
     JMenu fileMenu("File");
     addChordItem(fileMenu, "New Tune…", "Ctrl+N", [&]{ if (newTuneFn) newTuneFn(); });
     addChordItem(fileMenu, "Open ECU…", "Ctrl+O", [&]{ if (openEcuFn) openEcuFn(); });
@@ -2349,7 +2350,6 @@ int main(int argc, char** argv) {
     toolsMenu.addSeparator(g);
     // Pick up nodes the definition has gained since this tree was written. A saved tree stops tracking
     // the meta by design (it is yours), so this is how a new sensor/module reaches an existing project.
-    toolsMenu.add(g, "Update Navigation from Definition\xE2\x80\xA6")->onTriggered.connect([&]{ if (reseedFn) reseedFn(); });
     toolsMenu.add(g, "Reset ECU")->onTriggered.connect([]{ if (s_resetEcu) s_resetEcu(); });
     // A FIRMWARE KIT BY HAND: a test build sent to one person, without publishing anything. Pick the
     // kit's kit.json; the folder is checked as a kit (every file it names present), copied in beside the
@@ -2493,6 +2493,17 @@ int main(int argc, char** argv) {
         if (helppages::openLuaReference(meta, why)) win.showStatus("Lua API reference opened in your browser", 3000);
         else                                        win.showStatus(why, 8000);
     });
+    helpMenu.addSeparator(g);
+    // Where people look for it. The same check as Preferences ▸ Check now — a newer studio and newer ECU
+    // firmware — so the two can never answer differently.
+    helpMenu.add(g, "Check for Updates…")->onTriggered.connect([]{
+        if (PreferencesDialog::onCheckForUpdates) PreferencesDialog::onCheckForUpdates();
+    });
+    // NAMED FOR WHAT IT DOES. It was "Tools ▸ Update Navigation from Definition…", which reads like an
+    // update — it is not one. It offers the entries the definition's navigation tree has and yours does
+    // not, and adds the ones you pick; nothing is changed or removed. It edits the layout, so it is shown
+    // in Editing mode only (gated below).
+    helpMenu.add(g, "Add Missing Navigation Entries\xE2\x80\xA6")->onTriggered.connect([&]{ if (reseedFn) reseedFn(); });
     helpMenu.addSeparator(g);
     helpMenu.add(g, "About jayecu Studio…")->onTriggered.connect([]{
         // THE FRAMEWORK'S OWN MESSAGE DIALOG, with a picture — the case JDialogRequest::imageRgba exists
@@ -5147,7 +5158,7 @@ int main(int argc, char** argv) {
         g_docDirty = true;
     };
 
-    // Tools▸"Update Navigation from Definition…". A SAVED tree is the user's and stops tracking the meta by
+    // Help▸"Add Missing Navigation Entries…". A SAVED tree is the user's and stops tracking the meta by
     // design; this is how a node the definition has since gained (a new sensor, a new module) reaches an
     // existing project. The left pane is the meta tree PRUNED to what the current tree lacks, so it shows
     // what is genuinely on offer rather than the whole definition again.
@@ -5582,8 +5593,6 @@ int main(int argc, char** argv) {
         gate.item(toolsMenu, "Knock Scope",      [imported, nativeUp, engine] { return Gate{ !imported() && engine(), nativeUp() }; });
         gate.item(toolsMenu, "Auto Tune",        [nativeUp, tsUp] {
             return Gate{ meta.isValid() && meta.autotune().valid(), nativeUp() || tsUp() }; });
-        gate.item(toolsMenu, "Update Navigation from Definition\xE2\x80\xA6", [project] {
-            return Gate{ meta.isValid() && !meta.navigationTree().arr().empty(), project() }; });
         gate.item(toolsMenu, "Reset ECU",        [imported, nativeUp, engine] { return Gate{ !imported() && engine(), nativeUp() }; });
 
         // LOGGING — the PC-side recording needs a definition with telemetry; the card is a jayecu thing.
@@ -5595,6 +5604,8 @@ int main(int argc, char** argv) {
         gate.item(logMenu, "Logs on Card\xE2\x80\xA6",    [imported, engine] { return Gate{ !imported() && engine(), true }; });
 
         // HELP — the Lua reference is built from the definition; offered when it declares one.
+        gate.item(helpMenu, "Add Missing Navigation Entries\xE2\x80\xA6", [project] {
+            return Gate{ lockBtn.isToggled(), meta.isValid() && !meta.navigationTree().arr().empty() && project() }; });
         gate.item(helpMenu, "Lua API Reference", [] {
             return Gate{ meta.isValid() && (!meta.luaFunctions().empty() || !meta.luaCallbacks().empty()), true }; });
 
