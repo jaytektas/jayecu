@@ -266,6 +266,34 @@ int main() {
     }
 
     // -------------------------------------------------------------------
+    SECTION("overboost HELD over the limit stays ACTIVE past its expiry (not edge-only)");
+    {
+        // The code is raised with an expiry and stays active only while it keeps being raised. Raising on
+        // the edge alone let it go inactive a second or so into an overboost that was still going on.
+        auto cfg = make_cfg();                          // map_cut 250 kPa
+        EngineProtection ep; ep.init(cfg);
+        DtcManager dtc; dtc.init(1); ep.set_dtc(&dtc);
+        EngineFrame frame{};
+        const uint32_t t0 = g_tick_ms;
+        for (int i = 0; i < 1000; ++i) {                // 10 s at 10 ms frames, boost held at 300 kPa
+            g_tick_ms = t0 + static_cast<uint32_t>(i) * 10u;
+            SignalBus bus{}; set_all_fresh(bus, 80.0f, 300.0f);
+            bus.invalidate(wk::fuel_cut); bus.invalidate(wk::ign_cut);
+            ep.update(make_pos(), bus, frame);
+            dtc.age(g_tick_ms);                         // the table's own expiry sweep, as the firmware runs it
+        }
+        fprintf(stdout, "    P0234 severity after 10 s held: %u\n", (unsigned)dtc.code_severity(P_OVERBOOST));
+        CHECK(dtc.code_severity(P_OVERBOOST) == 3);     // still ACTIVE
+        // ...and it lets go once boost falls back under the limit.
+        g_tick_ms += 10u;
+        { SignalBus bus{}; set_all_fresh(bus, 80.0f, 150.0f);
+          bus.invalidate(wk::fuel_cut); bus.invalidate(wk::ign_cut);
+          ep.update(make_pos(), bus, frame); }
+        CHECK(dtc.code_severity(P_OVERBOOST) == 0);
+        g_tick_ms = t0;
+    }
+
+    // -------------------------------------------------------------------
     SECTION("CLT warning — P0216 only (level 1), no cut");
     {
         auto cfg = make_cfg();

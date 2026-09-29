@@ -94,19 +94,32 @@ void EngineProtection::reset_edges() {
 }
 
 // ---------------------------------------------------------------------------
-// Edge-guarded detection — only call the DTC table on a condition TRANSITION.
-// A steady condition (true OR false) returns immediately: no raise(), no heal(),
-// no 64-slot find() scan. The table is only touched on false→true (raise) and
-// true→false (heal), which is where the real work (count/freeze-frame/persist)
-// belongs anyway. Cuts ~14 per-frame scans down to ~0 in steady state.
+// Detection, cheap in steady state but NOT edge-only.
+//
+// A code is raised with an expiry (dtc_ttl()) and stays ACTIVE only while it keeps being raised — that
+// is how a fault the module stops reporting clears itself. This used to raise on the false→true edge
+// ONLY, so a condition that simply stayed true (boost held over the limit, coolant over the cut) went
+// inactive a second or so later while the engine was still over the limit; it also never reached
+// CONFIRMED, which takes holding active for DTC_CONFIRM_MS; and a condition that began while the key
+// was off (the table refuses runtime raises then) was never raised at all once the key came on.
+//
+// So a TRUE condition refreshes its code every quarter of the expiry — a few table touches a second,
+// not one per frame — and a FALSE one is healed once, on its edge.
 // ---------------------------------------------------------------------------
 void EngineProtection::detect(uint8_t idx, uint16_t code, uint8_t severity,
                               bool condition, uint32_t now_ms) {
     if (!dtc_ || idx >= CHECK_COUNT) return;
-    if (condition == prev_cond_[idx]) return;   // no transition → nothing to do
+    const bool edge = condition != prev_cond_[idx];
     prev_cond_[idx] = condition;
-    if (condition) dtc_->raise(code, DtcSource::PROTECTION, severity, now_ms, dtc_ttl());
-    else           dtc_->heal(code);
+    if (!condition) {
+        if (edge) dtc_->heal(code);
+        return;
+    }
+    const uint32_t refresh = dtc_ttl() / 4u;
+    if (edge || static_cast<uint32_t>(now_ms - last_raise_ms_[idx]) >= refresh) {
+        dtc_->raise(code, DtcSource::PROTECTION, severity, now_ms, dtc_ttl());
+        last_raise_ms_[idx] = now_ms;
+    }
 }
 
 // ---------------------------------------------------------------------------

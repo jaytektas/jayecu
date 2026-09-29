@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- A protection fault that stays true (boost held over the limit, coolant or air temperature held over its cut) now stays active for as long as it lasts. It used to go inactive about a second in, while the engine was still over the limit.
 
 ## 0.4.3
 - Diagnostics ▸ Sensors — Raw: a pin that is not on a connector says so on one line instead of being cut off.

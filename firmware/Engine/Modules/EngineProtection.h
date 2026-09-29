@@ -84,6 +84,7 @@ private:
     // Previous condition per check (the edge guard). One slot per detect() call site.
     static constexpr uint8_t CHECK_COUNT = 16;   // battery low/high detection moved to the sensor; 15 = a disarmed monitor
     bool prev_cond_[CHECK_COUNT] = {};
+    uint32_t last_raise_ms_[CHECK_COUNT] = {};   // when each true condition last refreshed its code
 
     // Trigger NOISE is reported off a free-running counter, so the condition is "the counter moved
     // recently" rather than a level. Held briefly, or it would raise and heal at 1 kHz for as long
