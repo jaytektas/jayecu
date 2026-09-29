@@ -278,6 +278,7 @@ void FirmwareUpgrade::pulled(const std::vector<uint8_t>& image) {
     Ui::Changes c;
     c.fromVersion = fromVersion_;
     c.toVersion   = kit_.version;
+    c.notes       = fwkits::notesSince(kit_, fromVersion_);
     c.oldPages    = pagesOf(e ? e->dashboardPath() : std::string());   // the tuner's own pages
     c.newPages    = pagesOf(kit_.dashboard);                           // the new firmware's pages
     if (!c.newPages) c.newPages = c.oldPages;                          // no shipped dashboard: theirs, then

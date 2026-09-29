@@ -18,7 +18,8 @@ FW_VERSION=$(cat firmware/version.txt 2>/dev/null || echo "0.1.0")
 # what the image is built from, and -dirty means one of THOSE has uncommitted changes. version.h itself
 # is left out of both: this script rewrites it, so counting it made every build after the first report
 # -dirty with nothing edited, and a commit that only carried it would have moved the hash.
-FW_PATHS=(firmware definition codegen generated third_party cmake ':(exclude)firmware/version.h')
+FW_PATHS=(firmware definition codegen generated third_party cmake ':(exclude)firmware/version.h'
+          ':(exclude)firmware/CHANGES.md')   # a change note is not a firmware change (tools/release_notes.py)
 GIT_HASH=$(git log -1 --format=%h -- "${FW_PATHS[@]}" 2>/dev/null || true)
 [ -n "$GIT_HASH" ] || GIT_HASH="unknown"
 if [ -n "$(git status --porcelain -- "${FW_PATHS[@]}" 2>/dev/null || true)" ]; then

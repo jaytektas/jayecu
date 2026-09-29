@@ -64,5 +64,13 @@ if gui.exists():
     import stamp_dashboard
     label['dashboard'] = f'{stem}.gui'
     stamp_dashboard.stamp_file(gui, kit_dir / label['dashboard'], meta, strict=True)
+# WHAT CHANGED, in words, for every version up to this one (firmware/CHANGES.md): the studio shows the
+# ones newer than the ECU runs, so someone skipping three versions reads all three. A kit whose own
+# version has no notes is refused — the studio would offer an update it cannot explain.
+import release_notes
+label['notes'] = [n for n in release_notes.released()
+                  if release_notes.vkey(n['version']) <= release_notes.vkey(version)]
+if not a.version and not any(n['version'] == version for n in label['notes']):
+    sys.exit(f'firmware/CHANGES.md has no "## {version}" section — make release writes it from Unreleased')
 (kit_dir / 'kit.json').write_text(json.dumps(label, indent=2) + '\n')
 print(f'  kit: {kit_dir}  ({a.board} {version}, layout {m["layout_hash"]}, build {label["build"]})')

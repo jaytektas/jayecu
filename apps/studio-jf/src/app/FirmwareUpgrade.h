@@ -71,6 +71,7 @@ public:
             const MetaModel* newMeta = nullptr;
             std::vector<uint8_t> tune, migrated;      // the tune in each firmware's layout
             std::shared_ptr<PanelLibrary> oldPages, newPages;
+            std::vector<fwkits::Note> notes;           // what changed, in words, since the ECU's version
         };
         std::function<void(Changes, std::function<void(bool proceed)>)> showChanges;
         // The upgrade is over — finished, refused or failed. `identity` is what the ECU last said it

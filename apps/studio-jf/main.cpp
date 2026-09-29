@@ -1361,7 +1361,7 @@ int main(int argc, char** argv) {
                 std::move(goes), std::move(comes), std::string("Update firmware"), std::string("Not now"),
                 std::string("Updating needs the ignition OFF and the ECU on USB power only. Your tune is saved first "
                             "and put back afterwards."),
-                std::move(proceed));
+                std::move(c.notes), std::move(proceed));
         },
         [&win](const std::string& identity) {
             if (!identity.empty() && link.isOpen()) s_onIdentity(identity);

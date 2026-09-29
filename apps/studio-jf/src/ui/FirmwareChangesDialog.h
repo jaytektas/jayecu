@@ -36,6 +36,7 @@
 #endif
 
 #include "../model/TuneDiff.h"
+#include "../model/FirmwareKits.h"    // fwkits::Note — what changed, in words
 #include "../model/Cache.h"
 #include "../surface/Surface.h"
 #include "../surface/CanvasWidget.h"
@@ -79,11 +80,17 @@ public:
 
     // result: true = go ahead with the update, false = not now. `footnote` sits over the buttons: what
     // saying yes involves (ignition off, the tune kept), said before it is said.
+    //
+    // `notes` is what changed IN WORDS (firmware/CHANGES.md), newest version first. Settings are only half
+    // of an update: 0.4.1 changed how the output test behaves and added nothing to configure, and a report
+    // of settings alone said an update had nothing in it. The notes sit under the two sides, and take the
+    // dialog when neither side has anything.
     FirmwareChangesDialog(std::string title, Side left, Side right, std::string actionLabel,
-                          std::string cancelLabel, std::string footnote,
+                          std::string cancelLabel, std::string footnote, std::vector<fwkits::Note> notes,
                           std::function<void(bool)> onResult,
                           jf::JGpuHal& hal, int screenX, int screenY, NativeWinHandleType parent)
-        : m_title(std::move(title)), m_footnote(std::move(footnote)), m_onResult(std::move(onResult))
+        : m_title(std::move(title)), m_footnote(std::move(footnote)), m_notes(std::move(notes))
+        , m_onResult(std::move(onResult))
         , m_window(std::make_unique<PlatformWinType>(m_title, kW, kH, screenX, screenY,
                                                      jf::JPlatformWindowStyle::Borderless, parent))
         , m_surface(hal.createSurface(m_window->nativeHandle(), kW, kH)) {
@@ -143,6 +150,7 @@ public:
         // that cannot show what it counts is not a report.
         const float wheel = m_window->consumeWheel();
         for (Column& c : m_cols) c.scroll.input(mx, my, pressed, held, wheel);
+        m_notesScroll.input(mx, my, pressed, held, wheel);
         for (const auto& ke : m_window->consumeAllKeys()) {
             if (!ke.pressed) continue;
             _roots();
@@ -186,8 +194,17 @@ public:
             const float footH = m_footnote.empty() ? 0.f
                               : wraptext::height(m_footnote, W - 32.f) + rowH() - JTextHelper::lineHeight();
             const float bottom = by - footH;
-            _column(buf, m_cols[0], colX[0], colW, bottom);
-            _column(buf, m_cols[1], colX[1], colW, bottom);
+            // THE NOTES TAKE WHAT THE SIDES DO NOT NEED. With settings on either side the sides keep most
+            // of the height; with none, each side is a heading and one sentence, and the rest is the notes.
+            float colsBottom = bottom;
+            if (!m_notes.empty()) {
+                const float top = hdrH() + 12.f;
+                const bool nothing = m_cols[0].pageCount() == 0 && m_cols[1].pageCount() == 0;
+                colsBottom = nothing ? top + 4.f * rowH() : top + (bottom - top) * 0.62f;
+                _notes(buf, 12.f, colsBottom + 8.f, W - 24.f, bottom - 8.f, nothing);
+            }
+            _column(buf, m_cols[0], colX[0], colW, colsBottom);
+            _column(buf, m_cols[1], colX[1], colW, colsBottom);
             if (!m_footnote.empty())
                 wraptext::draw(buf, 16.f, bottom, m_footnote, Colors::TextPrimary, W - 32.f);
         }
@@ -202,6 +219,47 @@ public:
     }
 
 private:
+    // WHAT CHANGED, IN WORDS: a heading per version and its lines, wrapped to the width and scrolled
+    // (wheel or bar) — a jump over several versions is several sections, and none of them is cut short.
+    void _notes(jf::JPrimitiveBuffer& buf, float x, float y, float w, float bottom, bool only) {
+        using namespace jf;
+        y += wraptext::draw(buf, x + 4.f, y, only ? "What changed" : "What else changed", Colors::TextPrimary, w)
+             + (rowH() - JTextHelper::lineHeight());
+        const float h = std::max(rowH() * 2.f, bottom - y);
+        const float lh = JTextHelper::lineHeight();
+        // One row per DRAWN line, so the scroll moves by lines and a long note scrolls like any other.
+        struct Row { std::string text; bool head; float indent; };
+        std::vector<Row> rows;
+        const float textW = w - 40.f;
+        for (const fwkits::Note& n : m_notes) {
+            rows.push_back({ "Firmware " + n.version, true, 0.f });
+            for (const std::string& c : n.changes) {
+                const std::string wrapped = wraptext::wrap(c, textW - 20.f).text;
+                size_t at = 0;
+                bool first = true;
+                while (at <= wrapped.size()) {
+                    const size_t nl = wrapped.find('\n', at);
+                    const std::string line = wrapped.substr(at, nl == std::string::npos ? std::string::npos : nl - at);
+                    rows.push_back({ (first ? "\xE2\x80\xA2  " : "") + line, false, first ? 8.f : 21.f });
+                    first = false;
+                    if (nl == std::string::npos) break;
+                    at = nl + 1;
+                }
+            }
+        }
+        static const uint8_t clear[4] = { 0, 0, 0, 0 };
+        buf.pushRectangle(x, y, w, h, clear, 4.f, 1.f, Colors::Border);
+        const float iw = m_notesScroll.layout({ x, y, w, h }, int(rows.size()), lh + 2.f);
+        m_notesScroll.drawBar(buf);
+        float ry = y + 6.f;
+        for (int k = m_notesScroll.first; k < m_notesScroll.last(); ++k) {
+            const Row& r = rows[size_t(k)];
+            JTextHelper::pushText(buf, x + 8.f + r.indent, ry, r.text,
+                                  r.head ? Colors::TextPrimary : Colors::TextSecondary, iw - 16.f - r.indent);
+            ry += lh + 2.f;
+        }
+    }
+
     struct Column {
         Side side;
         int page = 0, built = -1;
@@ -353,6 +411,8 @@ private:
     }
 
     std::string m_title, m_footnote;
+    std::vector<fwkits::Note> m_notes;
+    dlgchrome::ListScroll m_notesScroll;
     std::function<void(bool)> m_onResult;
     std::unique_ptr<PlatformWinType> m_window;
     jf::GpuSurfaceId m_surface{ 0 };

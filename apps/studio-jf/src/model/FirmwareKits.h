@@ -24,11 +24,18 @@
 
 namespace fwkits {
 
+// What one firmware version changed, in words (firmware/CHANGES.md, carried in kit.json as "notes").
+struct Note {
+    std::string version;
+    std::vector<std::string> changes;
+};
+
 struct Kit {
     std::string board, version, build, layoutHash, minStudio;
     std::string dir;                                  // the kit's folder
     std::string firmware, meta, dashboard;            // full paths to its files
     bool shipped = false;
+    std::vector<Note> notes;                          // every version up to this one, newest first
 };
 
 // Every readable kit under `root` (one folder per kit). A folder without a valid kit.json, or whose
@@ -40,6 +47,10 @@ std::vector<Kit> scan(const std::string& root, bool shipped);
 // Returns false when there is none.
 bool newestFor(const std::vector<Kit>& kits, const std::string& board, const std::string& studioVersion,
                Kit& out);
+
+// The notes an ECU on `ecuVersion` has not seen: every version newer than it, up to the kit's own, newest
+// first. An ECU with no firmware or an unreadable version gets the kit's own version's notes only.
+std::vector<Note> notesSince(const Kit& kit, const std::string& ecuVersion);
 
 // Is `kitVersion` newer than the version the ECU reports?
 bool isNewerThan(const std::string& kitVersion, const std::string& ecuVersion);

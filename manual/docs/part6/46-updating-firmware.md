@@ -53,9 +53,14 @@ tune into the new layout as a trial and shows the result in two halves:
 - **Going out** — what your tune has set that the new firmware no longer has, with your values.
 - **New in firmware …** — settings to configure, on the pages where they live.
 
+Under them, **What else changed** says in words what each newer version changes — how something
+behaves, a fix, a page that reads better — which the two halves cannot show because no setting moved.
+If your ECU is several versions behind, every one of them is listed, newest first. When no setting
+changes at all, this is most of the report, headed **What changed**.
+
 That report is the question: **Update firmware** or **Not now**. Not now changes nothing; the next
 connect asks again.
-<!-- src: apps/studio-jf/main.cpp; apps/studio-jf/src/app/FirmwareUpgrade.h -->
+<!-- src: apps/studio-jf/main.cpp; apps/studio-jf/src/app/FirmwareUpgrade.h; apps/studio-jf/src/ui/FirmwareChangesDialog.h; firmware/CHANGES.md -->
 
 ### 4 · The steps
 
@@ -94,7 +99,8 @@ connect asks again.
 
 1. Park, **ignition off**. Connect the ECU to the laptop by USB (it runs from USB power).
 2. Connect in the studio. If newer firmware exists, the changes report opens.
-3. Read it. Note anything in **Going out** you rely on, and look at **New in** for settings to set.
+3. Read it. Note anything in **Going out** you rely on, look at **New in** for settings to set, and
+   read **What else changed**.
 4. **Update firmware**. Do not unplug USB until it says it has finished.
 5. Check the new settings the report listed, and the engine, before driving.
 

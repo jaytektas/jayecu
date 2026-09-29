@@ -82,6 +82,7 @@ META_LIB  ?= $(HOME)/.local/share/jayecu/jayecu Studio/meta
 # headers, ecu.ini and ecu.json — so a bare `make` already produces it, then installs it into
 # the studio's meta library.
 codegen:
+	@git config core.hooksPath tools/hooks 2>/dev/null || true   # the change-note reminder (tools/hooks)
 	bash codegen/update_version.sh $(BOARD)
 	$(PYTHON) codegen/codegen.py --board $(BOARD)
 	$(PYTHON) codegen/board_codegen.py definition/boards/$(BOARD).board.yaml generated/boards/$(BOARD)_board.h
@@ -381,10 +382,13 @@ package:
 # ONE RELEASE CARRIES BOTH: the studio packages and a firmware kit for every board, tagged with the STUDIO's
 # version (the studio's updater compares the tag with its own). A kit for each other board first, then the
 # packages for $(BOARD) — last, because generated/ holds one board at a time and the packages bundle the
-# newest kit. tools/make_release.py then gathers it all into release/v$(STUDIO_VERSION)/, named the way both
+# newest kit. FIRST, tools/release_notes.py prepare: if the firmware changed since the last published kit, its
+# notes (firmware/CHANGES.md, Unreleased) must exist, and the version is raised and committed — nothing to
+# remember at release time. tools/make_release.py then gathers it all into release/v$(STUDIO_VERSION)/, named the way both
 # update checks read it, with the SHA256SUMS they verify against. Upload that folder's files as the release.
 RELEASE_BOARDS ?= $(patsubst definition/boards/%.board.yaml,%,$(wildcard definition/boards/*.board.yaml))
 release:
+	$(PYTHON) tools/release_notes.py prepare --board $(BOARD)
 	@for b in $(filter-out $(BOARD),$(RELEASE_BOARDS)); do $(MAKE) kit BOARD=$$b || exit 1; done
 	$(MAKE) package
 	$(PYTHON) tools/make_release.py --studio-version $(STUDIO_VERSION) --boards "$(RELEASE_BOARDS)"

@@ -4,6 +4,7 @@
 
 #include <j/config/Json.h>
 
+#include <algorithm>
 #include <filesystem>
 
 namespace fwkits {
@@ -28,6 +29,13 @@ std::vector<Kit> scan(const std::string& root, bool shipped) {
         k.minStudio  = j["min_studio"].str();
         k.dir        = dir.string();
         k.shipped    = shipped;
+        for (const jf::JJson& n : j["notes"].arr()) {
+            Note note{ n["version"].str(), {} };
+            for (const jf::JJson& c : n["changes"].arr()) if (!c.str().empty()) note.changes.push_back(c.str());
+            if (jf::JVersion::parse(note.version).valid) k.notes.push_back(std::move(note));
+        }
+        std::sort(k.notes.begin(), k.notes.end(), [](const Note& a, const Note& b) {
+            return jf::JVersion::parse(a.version).isNewerThan(jf::JVersion::parse(b.version)); });
         auto file = [&](const char* key) -> std::string {
             const std::string name = j[key].str();
             if (name.empty() || name.find('/') != std::string::npos || name.find('\\') != std::string::npos)
@@ -68,6 +76,17 @@ bool newestFor(const std::vector<Kit>& kits, const std::string& board, const std
 bool isNewerThan(const std::string& kitVersion, const std::string& ecuVersion) {
     const auto k = jf::JVersion::parse(kitVersion), e = jf::JVersion::parse(ecuVersion);
     return k.valid && e.valid && k.isNewerThan(e);
+}
+
+std::vector<Note> notesSince(const Kit& kit, const std::string& ecuVersion) {
+    const jf::JVersion from = jf::JVersion::parse(ecuVersion), to = jf::JVersion::parse(kit.version);
+    std::vector<Note> out;
+    for (const Note& n : kit.notes) {
+        const jf::JVersion v = jf::JVersion::parse(n.version);
+        if (v.isNewerThan(to)) continue;                               // not in this kit
+        if (from.valid ? v.isNewerThan(from) : n.version == kit.version) out.push_back(n);
+    }
+    return out;
 }
 
 }  // namespace fwkits

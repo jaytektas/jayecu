@@ -58,6 +58,29 @@ int main() {
     check(!k.dashboard.empty() && k.firmware.find("fw.bin") != std::string::npos, "the kit's files are full paths");
     check(fwkits::newestFor(kits, "proteus_f7", "0.1.0", k) && k.version == "0.3.0", "each board gets its own kit");
     check(!fwkits::newestFor(kits, "nosuchboard", "0.1.0", k), "no kit for a board is 'none', not a guess");
+
+    // WHAT CHANGED, IN WORDS. A kit carries every version's notes up to its own; the studio shows the
+    // ones the ECU has not had — all of them when it skipped some, just the kit's own for a blank ECU.
+    {
+        const fs::path d = tmp / "notes" / "n";
+        fs::create_directories(d);
+        std::ofstream(d / "kit.json") << R"({"board":"jaytek_v1","version":"0.4.3","layout_hash":"abcd1234",
+            "firmware":"fw.bin","meta":"m.meta","notes":[
+              {"version":"0.4.1","changes":["one"]},{"version":"0.4.3","changes":["three a","three b"]},
+              {"version":"0.4.2","changes":["two"]},{"version":"0.5.0","changes":["not in this kit"]}]})";
+        std::ofstream(d / "fw.bin") << "x";
+        std::ofstream(d / "m.meta") << "{}";
+        const auto nk = fwkits::scan((tmp / "notes").string(), false);
+        check(nk.size() == 1 && nk[0].notes.size() == 4 && nk[0].notes[0].version == "0.5.0",
+              "a kit's notes are read, newest first");
+        const auto since = nk.empty() ? std::vector<fwkits::Note>{} : fwkits::notesSince(nk[0], "0.4.1");
+        check(since.size() == 2 && since[0].version == "0.4.3" && since[1].version == "0.4.2"
+              && since[0].changes.size() == 2, "an ECU on 0.4.1 is shown 0.4.3 and 0.4.2, not its own");
+        const auto blank = nk.empty() ? std::vector<fwkits::Note>{} : fwkits::notesSince(nk[0], "none");
+        check(blank.size() == 1 && blank[0].version == "0.4.3", "a blank ECU is shown the kit's own version");
+        const auto same = nk.empty() ? std::vector<fwkits::Note>{} : fwkits::notesSince(nk[0], "0.4.3");
+        check(same.empty(), "an ECU already on the kit's version has nothing new");
+    }
     check(fwkits::newestFor(kits, "jaytek_v1", "9.0.0", k) && k.version == "0.9.0",
           "a new enough studio is offered that kit");
 

@@ -1,0 +1,5 @@
+#!/bin/sh
+# A reminder, never a refusal: a firmware change a user would notice gets a line in firmware/CHANGES.md
+# (tools/release_notes.py). Installed by `make codegen` (git config core.hooksPath tools/hooks).
+python3 "$(git rev-parse --show-toplevel)/tools/release_notes.py" check || true
+exit 0
