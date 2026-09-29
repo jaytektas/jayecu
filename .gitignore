@@ -18,7 +18,9 @@ studio/__pycache__/
 # studio/bench transient state
 schema/backups/
 .vscode/
-.claude/
+# Claude Code's local state stays out; the project's SKILLS are shared (.claude/skills/<name>/SKILL.md).
+.claude/*
+!.claude/skills/
 tools/Ardu-Stim/
 
 
@@ -42,6 +44,7 @@ firmware/version.h
 
 # make release output — uploaded to GitHub, never committed
 release/
+!.claude/skills/release/
 
 # make sdk's own JFramework checkout (at the pinned commit)
 .jframework/
