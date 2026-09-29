@@ -368,7 +368,24 @@ void FirmwareUpgrade::runFlash() {
         std::string error;
         // The bootloader takes a moment to appear after the reset.
         for (int i = 0; i < 100 && !dfu::devicePresent(); ++i) std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        auto dev = dfu::devicePresent() ? dfu::openDevice(error) : nullptr;
+        // …AND A MOMENT MORE TO BE OPENABLE. Appearing on the bus is not being ready: on Linux the udev rule
+        // grants access a beat after the device enumerates, and on Windows WinUSB is still binding. One
+        // attempt the instant it appeared failed the update, and Retry — the same attempt a second later —
+        // worked. So keep trying for a few seconds, and report the last reason only if none succeeds.
+        std::unique_ptr<dfu::Transport> dev;
+        if (dfu::devicePresent()) {
+            const auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+            for (int tries = 1;; ++tries) {
+                error.clear();
+                dev = dfu::openDevice(error);
+                if (dev) {
+                    if (tries > 1) JLOGC("firmware", jf::JLogLevel::Info) << "DFU opened on attempt " << tries;
+                    break;
+                }
+                if (std::chrono::steady_clock::now() >= until) break;
+                std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            }
+        }
         if (!dev && error.empty()) error = "the ECU's bootloader did not appear";
         if (dev) {
             const std::string layout = dev->layoutString();
