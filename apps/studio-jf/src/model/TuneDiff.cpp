@@ -4,6 +4,7 @@
 
 #include "../surface/PanelLibrary.h"
 #include "../surface/PanelModel.h"
+#include "MathEvaluator.h"             // resolveTemplate: a page's "[*]" bindings, against its element
 
 #include <algorithm>
 #include <functional>
@@ -67,11 +68,19 @@ int decimalsFor(double scale) {
 std::map<std::string, std::string> pageOfBinding(const PanelLibrary* lib) {
     std::map<std::string, std::string> out;
     if (!lib) return out;
+    //
+    // …AND RESOLVED AGAINST THE PAGE'S ELEMENT. A sensor's page (an output's, a stage's) is one template
+    // whose bindings say "sensors.sensor[*].cal"; the page itself says which sensor it is for
+    // (elementScope "sensors.sensor[map]"). Keyed as written, no template binding matched a real setting,
+    // so a changed MAP calibration was listed as "on no page" — as raw data — beside the very page that
+    // edits it. Resolved, it is "sensors.sensor[map].cal", which is what the comparison looks up.
     for (const auto& [node, page] : lib->pages()) {
         if (!page) continue;
+        const std::string& scope = page->elementScope();
         for (const PanelElement& e : page->elements())
             collectBindings(e, [&](const std::string& b) {
-                out.emplace(b, node);        // emplace: first page in tree order wins
+                const std::string path = scope.empty() ? b : MathEvaluator::resolveTemplate(b, scope);
+                out.emplace(path, node);     // emplace: first page in tree order wins
             });
     }
     return out;

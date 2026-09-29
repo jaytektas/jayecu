@@ -12,6 +12,7 @@
 #include "model/MetaModel.h"
 #include "model/TuneDiff.h"
 #include "model/TuneFile.h"
+#include <j/config/Json.h>
 #include "model/Cache.h"
 #include "surface/PanelLibrary.h"
 #include "surface/PanelModel.h"
@@ -139,6 +140,35 @@ int main() {
         ck(r.pages.size() == 1 && r.pages[0].node == "Configuration/Idle Control",
            "…it is reported on the page whose panel holds it",
            r.pages.empty() ? "no pages" : r.pages[0].node);
+    }
+
+    // A TEMPLATE PAGE IS THE HOME OF ITS ELEMENT'S SETTINGS. Sensor pages are one template bound as
+    // "sensors.sensor[*].cal", each page naming the sensor it is for (elementScope). Keyed as written, the
+    // template never matched a real setting: a changed MAP calibration was listed "on no page", as raw
+    // data, beside the page that edits it. Key pageOfBinding by the written binding again and this goes red.
+    {
+        // Changed the way the tune document holds it: the calibration is a curve among the tune's tables.
+        const auto doc = TuneFile::serialise(base, m);
+        auto j = jf::JJson::tryParse(std::string(doc.begin(), doc.end()));
+        const bool have = j && (*j)["tables"].contains("sensors.sensor[map].cal");
+        ck(have, "the tune document carries sensors.sensor[map].cal");
+        if (have) {
+            jf::JJson& cal = (*j)["tables"]["sensors.sensor[map].cal"];
+            cal["c"] = jf::JJson::array();                    // a different output range: 0..1234
+            cal["c"].push(0.0); cal["c"].push(1234.0);
+            const std::string edited = j->dump(-1);
+            MigrationReport rep;
+            const std::vector<uint8_t> ecu = TuneFile::deserialise(std::vector<uint8_t>(edited.begin(), edited.end()), m, rep);
+            PanelLibrary lib;
+            PanelModel& page = lib.forNode("Configuration/Sensors/Engine Sync/Manifold Pressure");
+            page.setElementScope("sensors.sensor[map]");
+            page.add("curve", 0, 0, 400, 200, {{ "signalName", "sensors.sensor[*].cal" }});
+            const tunediff::Report r = tunediff::compare(m, base, ecu, &lib);
+            ck(find(r, "sensors.sensor[map].cal") != nullptr, "the changed calibration is reported");
+            ck(r.pages.size() == 1 && r.pages[0].node == "Configuration/Sensors/Engine Sync/Manifold Pressure",
+               "…on the sensor's own page, not as a setting on no page",
+               r.pages.empty() ? (r.unpaged.empty() ? "nothing" : "unpaged: " + r.unpaged[0].path) : r.pages[0].node);
+        }
     }
 
     // ---- THE SEAM THE SIDE-BY-SIDE RENDER RESTS ON --------------------------------------------------
