@@ -20,7 +20,7 @@ void PinWireWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const 
         // NOT IN THE CONNECTOR MAP. Say so rather than drawing an empty row, which reads as a page
         // that failed: an internal pin with no terminal is a fact about the board, not a fault.
         static const wirecol::RGBA kDim{ 0x8a, 0x8f, 0x98, 255 };
-        const std::string why = m_resource + " — not brought out to a connector";   // a sentence: it wraps
+        const std::string why = m_resource + " — not on a connector";   // short: it shares a row with a reading
         wraptext::draw(buf, r.x + 4.f, r.y + std::max(0.f, (r.height - wraptext::height(why, r.width - 8.f)) * 0.5f),
                        why, kDim.data(), r.width - 8.f);
         return;

@@ -265,10 +265,16 @@ def _fill_raw(p, panel, ids, ch):
     # connector badge "CN3 (BLUE) 23" with its padding, a gap, and the 34px wire.
     conns, wiring = meta().get('connectors', {}), meta().get('wiring', {})
 
+    # MEASURED WITH HEADROOM. The ruler's font is not the studio's to the pixel, and a pin row is ONE
+    # line: text a few pixels wider than its box wraps to a second line the row has no room for, and is
+    # clipped — AV12's "not on a connector" was cut in half exactly that way. 15% is the margin.
     def wire_w(res):
+        return 1.15 * _wire_w(res)
+
+    def _wire_w(res):
         w = wiring.get(res)
         if not w:
-            return r.width(f'{res} — not brought out to a connector') + 8
+            return r.width(f'{res} — not on a connector') + 8
         conn, _, term = w['pin'].partition('-')
         shell = (conns.get(conn) or {}).get('color', '')
         badge = conn + (f' ({shell.upper()})' if shell else '') + (f' {term}' if term else '')

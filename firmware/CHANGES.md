@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Diagnostics ▸ Sensors — Raw: a pin that is not on a connector says so on one line instead of being cut off.
 
 ## 0.4.2
 - Diagnostics shows every reading in the units you chose in Preferences (psi, °F, a raw pin in volts,
