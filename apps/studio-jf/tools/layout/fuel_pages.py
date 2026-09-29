@@ -74,16 +74,10 @@ def page_setup():
                           ('Coolant Temp', 'clt_src', ''),
                           ('Air Temp', 'iat_src', ''),
                           ('Mass Air Flow', 'maf_src', f'{MODEL} == 2'),
-                          ('Ethanol', 'ethanol_src', ''),
                           # Barometric: optional hardware, so the ASSUMPTION sits beside it — the number
                           # that stands in when nothing publishes the channel.
                           ('Barometric', 'baro_src', '')):
         y = p.field(src, 10, y, lbl, FC + path, 'enum', 240, enable=en)
-        if path == 'ethanol_src':
-            # What to fuel for until the sensor has given one good reading (after that a dropout holds
-            # the last good one). Only means anything with a sensor assigned.
-            y = p.field(src, 10, y, 'Ethanol If No Reading', FC + 'flex_fallback_pct', 'configedit', 110, '%',
-                        enable='[#fuel_calculator.ethanol_src] >= 0')
     y = p.field(src, 10, y, 'Assumed Baro', FC + 'baro_assumed_kpa', 'configedit', 110, 'kPa')
     # FUEL PRESSURE IS NOT HERE ANY MORE. It is per stage — a stage can be a second set of injectors on
     # its own rail with its own regulator — so it lives on each stage's page. This panel kept a
@@ -91,11 +85,11 @@ def page_setup():
 
     fuel = p.panel(630, A.TOP, 300, 230, 'Fuel Properties')
     y = 10
-    y = p.field(fuel, 10, y, 'Stoich AFR', FC + 'stoich_afr_x10', 'configedit', 110)
-    # The working stoich ratio is interpolated toward this by MEASURED ethanol, so without a source it is
-    # never reached.
-    y = p.field(fuel, 10, y, 'Stoich AFR (Ethanol)', FC + 'stoich_ethanol_x10', 'configedit', 110,
-                enable='[#fuel_calculator.ethanol_src] >= 0')
+    # THE FUEL ITSELF IS PER STAGE — its stoich ratio, its ethanol (fixed, or measured by a flex sensor)
+    # and its density live on each stage's Setup page, because a second stage is often a second fuel.
+    PER_STAGE = 'Stoich, ethanol and density are per stage: Fuel Tuning \u25b8 Stage N \u25b8 Setup.'
+    p.wrapped(10, y, 280, PER_STAGE, into=fuel, colour=C_DIM)
+    y += A.Page.wrapped_h(PER_STAGE, 280) + 8
     y = p.field(fuel, 10, y, 'Overall Fuel Trim', FC + 'overall_corr_pct', 'configedit', 110, '%')
     # A fuel property like the ones above it, and the only thing that turns the level sender's
     # percentage of its own travel into a quantity anybody can act on. 0 leaves the litres
@@ -320,6 +314,7 @@ def page_injector_stage(n):
     p.switch(more, 10, 10, 'Staging Duty', '', link=f'{CFG}/Fuel Tuning/Stage {n}/Staging Duty', w=310)
     p.switch(more, 10, 35, 'Small-Pulse Correction', '',
              link=f'{CFG}/Fuel Tuning/Stage {n}/Short Pulse Width Adder', w=310)
+    p.switch(more, 10, 60, 'Fuel  (stoich, flex, density)', '', link=f'{CFG}/Fuel Tuning/Stage {n}/Fuel', w=310)
 
     live = p.panel(360, A.TOP + 508, 910, A.CANVAS_H - A.TOP - 512, 'Live')
     # TOP ROW: WHAT THE THREE TABLES ON THIS PAGE ARE PUTTING OUT. That is the number you watch while
@@ -342,6 +337,54 @@ def page_injector_stage(n):
     return p
 
 
+def page_stage_fuel(n):
+    """What stage n burns, on one page: its fuel's settings, its density table and its composition trim.
+
+    A second stage is often a second fuel as well as a second set of injectors — port petrol with a
+    secondary on E85 or methanol — so the fuel is the stage's, not the engine's. Its ethanol is fixed, or
+    measured by a flex sensor several stages may share; its density converts the mass it delivers into
+    the volume its injectors' flow is quoted in; its trim corrects what the stoich blend alone does not.
+    The firmware mixes the stages' fuels by the mass each delivers (FuelCalculator)."""
+    p = A.Page(title=f'Stage {n} Fuel')
+    p.head(f'What stage {n} burns. Stages sharing one fuel system point at the same flex sensor.')
+    flex = f'[#fuel_calculator.stage{n}_flex_enabled] == 1'
+    sfx = '' if n == 1 else f'_{n}'
+
+    fuel = p.panel(10, A.TOP, 330, 250, 'Fuel')
+    y = p.field(fuel, 10, 10, 'Flex Fuel', f'{FC}stage{n}_flex_enabled', 'checkbox')
+    y = p.field(fuel, 10, y, 'Ethanol Source', f'{FC}stage{n}_ethanol_src', 'enum', 190, enable=flex)
+    y = p.field(fuel, 10, y, 'Ethanol %', f'{FC}stage{n}_ethanol_pct', 'configedit', 110, '%')
+    y = p.field(fuel, 10, y, 'Stoich AFR', f'{FC}stage{n}_stoich_x10', 'configedit', 110)
+    y = p.field(fuel, 10, y, 'Stoich AFR (Ethanol)', f'{FC}stage{n}_stoich_ethanol_x10', 'configedit', 110)
+    # WHERE THIS STAGE'S FUEL TEMPERATURE COMES FROM is the density table's temperature axis — a flex
+    # sensor reports its own line's, and a stage sharing that line can point at the same one. Only read
+    # when the table has a temperature axis, which it does not as it ships (a single density).
+    p.field(fuel, 10, y, 'Fuel Temp Source', f'{FC}stage{n}_specific_gravity_table_x_src', 'enum', 190,
+            enable=f'[#fuel_calculator.stage{n}_specific_gravity_table_x_en] == 1')
+
+    NOTE = ('Flex Fuel off: Ethanol % is this stage\'s fixed blend (0 petrol, 85 E85; methanol is its Stoich '
+            'AFR at 0 %). On: the sensor while it reads, the last good reading if it drops out, and Ethanol % '
+            'until it has read once since power-up.')
+    note = p.panel(10, A.TOP + 256, 330, A.Page.wrapped_h(NOTE, 306) + A.PANEL_TITLE + 16, 'How It Is Used')
+    p.wrapped(10, 8, 306, NOTE, into=note)
+
+    sg_w, sg_h = A.table_box(f'{FC}stage{n}_specific_gravity_table')
+    sg = p.panel(350, A.TOP, 920, 250, 'Specific Gravity  (density: fuel temp x ethanol)')
+    p.table(10, 12, min(sg_w, 900), 210, f'{FC}stage{n}_specific_gravity_table', into=sg)
+
+    fc = p.panel(350, A.TOP + 256, 920, 300, 'Fuel Comp Correction  (ethanol x load, while Flex Fuel is on)')
+    p.table(10, 12, 900, 260, f'{FC}stage{n}_fuel_comp_corr_table', into=fc)
+
+    live = p.panel(10, A.TOP + 562, 1260, A.CANVAS_H - A.TOP - 566, 'Live')
+    for i, (lbl, ch, fmt) in enumerate((('Stage Ethanol', f'stage{n}_ethanol', '%.0f'),
+                                        ('Charge Ethanol', 'flex_ethanol', '%.0f'),
+                                        ('Fuel SG', f'fuel_sg{sfx}', '%.3f'),
+                                        ('Fuel Comp Corr', f'fuel_corr_fuelcomp{sfx}', '%.3f'),
+                                        ('Fuel Temp', 'fuel_temp', '%.0f'))):
+        p.readout(live, 12 + i * 200, 4, lbl, ch, fmt, w=190)
+    return p
+
+
 # ---- corrections: same page shape, one per multiplier -------------------------------------------
 CORRECTIONS = [
     ('Air Temp', FC + 'iat_corr_table',
@@ -359,12 +402,6 @@ CORRECTIONS = [
       ('X bins', FC + 'baro_corr_axis_n'), ('Y bins', FC + 'baro_corr_rpm_axis_n')],
      [('Baro Corr', 'fuel_corr_baro', '%.3f'), ('Barometric', 'baro_kpa', '%.0f'), ('MAP', 'map', '%.0f')],
      'Altitude and weather. Thin air, less fuel.'),
-    ('Fuel Composition', FC + 'fuel_comp_corr_table',
-     [('X Channel', FC + 'fuel_comp_corr_table_x_src'), ('Y Channel', FC + 'fuel_comp_corr_table_y_src'),
-      ('X bins', FC + 'fuel_comp_axis_n'), ('Y bins', FC + 'fuel_comp_load_axis_n')],
-     [('Fuel Comp Corr', 'fuel_corr_fuelcomp', '%.3f'), ('Ethanol', 'ethanol', '%.0f'),
-      ('Fuel Temp', 'fuel_temp', '%.0f')],
-     'Flex fuel: ethanol needs roughly a third more fuel than petrol.'),
     ('Gear', FC + 'fuel_gear_table',
      [('X Channel', FC + 'fuel_gear_table_x_src'), ('Y Channel', FC + 'fuel_gear_table_y_src'),
       ('Z Channel', FC + 'fuel_gear_table_z_src'),

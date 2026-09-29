@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
     c.setConfigImage(meta.defaultImage());
 
     const std::vector<std::string> paths = {
-        "engine.cylinder_count", "fuel_calculator.stoich_afr_x10", "idle.enabled",
+        "engine.cylinder_count", "fuel_calculator.stage1_stoich_x10", "idle.enabled",
         "sensors.sensor[clt].enabled", "sensors.sensor[clt].source", "sensors.sensor[tps].scale_x1000",
         "outputs.output[7].function", "outputs.output[7].cyl_mask", "outputs.output[7].min_on_ms",
         "trigger.streams[0].slots", "engine.cyl[3].bank", "electronic_throttle.etb[0].tps_a_src",

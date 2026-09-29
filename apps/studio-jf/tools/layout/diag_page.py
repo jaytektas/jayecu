@@ -59,8 +59,11 @@ def _natural(name):
 # the firmware: a channel added to a subsystem appears here, and one that moves subsystem moves here too.
 VIEWS = [
     ('Engine & Trigger',   lambda m: m in ('Trigger', 'Engine', 'Engine Sync', 'Sensors - Engine Synchronous')),
-    ('Fuel & Spark',       lambda m: m in ('FuelCalculator', 'Ignition', 'Lambda', 'Injection', 'Knock',
-                                           'Misfire', 'TransientThrottle', 'Sensors - O2')),
+    # FUEL AND SPARK WERE ONE VIEW until per-stage fuel gave the fuel side a channel per stage and it no
+    # longer fitted five columns. Split by the question: what the fuel is doing, what the spark is doing.
+    ('Fuel',               lambda m: m in ('FuelCalculator', 'Fuel', 'Lambda', 'Injection',
+                                           'TransientThrottle', 'Sensors - O2')),
+    ('Spark',              lambda m: m in ('Ignition', 'Knock', 'Misfire')),
     ('Air & Throttle',     lambda m: m in ('ElectronicThrottle', 'Idle', 'Stepper', 'Boost', 'Boost/Turbo',
                                            'Sensors - Boost/Turbo', 'Sensors - Atmospheric')),
     # OUTPUTS AND BRIDGES HAD NO VIEW AT ALL, so 46 of the 438 channels were never placed and the tab

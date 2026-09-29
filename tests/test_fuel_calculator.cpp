@@ -16,12 +16,18 @@ static FuelCalculatorConfig make_cfg() {
     // Per-cyl/bank correction is gated by each stage's injection mode now (not a bitmask): the engine
     // config's inj_stage[0].mode defaults to 0 = Sequential, so stage 1 gets per-cyl + per-bank.
     for (unsigned i = 0; i < FUEL_CALCULATOR_STAGE1_INJ_FLOW_TABLE_ALLOC; i++) c.stage1_inj_flow_table[i] = 265;   // uniform flow (cc/min)
-    c.specific_gravity_table[0] = 740;                       // SG 0.740 (98 premium, 1×1 collapsed)
-    c.stoich_afr_x10     = 147;
+    // Each stage's FUEL, as the schema ships it: petrol (stoich 14.7, SG 0.740 as a collapsed 1x1), the
+    // ethanol end at 9.0, and stage 1 flex on the flex sensor (unpublished here -> Ethanol % 0 -> petrol).
+    c.stage1_specific_gravity_table[0] = c.stage2_specific_gravity_table[0] =
+    c.stage3_specific_gravity_table[0] = c.stage4_specific_gravity_table[0] = 740;
+    c.stage1_stoich_x10 = c.stage2_stoich_x10 = c.stage3_stoich_x10 = c.stage4_stoich_x10 = 147;
+    c.stage1_stoich_ethanol_x10 = c.stage2_stoich_ethanol_x10 =
+    c.stage3_stoich_ethanol_x10 = c.stage4_stoich_ethanol_x10 = 90;
+    c.stage1_ethanol_src = c.stage2_ethanol_src = c.stage3_ethanol_src = c.stage4_ethanol_src = SIG_ETHANOL;
+    c.stage1_flex_enabled = 1;
     c.map_src            = SIG_MAP;
     c.clt_src            = SIG_CLT;
     c.iat_src            = SIG_IAT;
-    c.ethanol_src        = SIG_ETHANOL;   // unpublished -> 0% -> stoich = gasoline
     c.stage1_fuel_press_src     = SIG_FUEL_PRESSURE;
     // Atmosphere and rail pressure, as the schema ships them. A zeroed struct says the air is at 0 kPa
     // and the regulator holds 0 bar, which is not a configuration any tune can hold (the schema floors
@@ -36,7 +42,6 @@ static FuelCalculatorConfig make_cfg() {
     c.stage3_fuel_press_base_kpa = c.stage4_fuel_press_base_kpa = 3000;   // 300.0 kPa = 3 bar
     c.stage1_fuel_press_ratio = c.stage2_fuel_press_ratio =
     c.stage3_fuel_press_ratio = c.stage4_fuel_press_ratio = 10;           // 1.0:1 — manifold-referenced
-    c.stoich_ethanol_x10 = 90;
     c.fuel_model         = 0;             // Stage F: 0=SpeedDensity (default)
     c.tps_src            = SIG_TPS;
     c.maf_src            = SIG_MAF;
@@ -45,7 +50,7 @@ static FuelCalculatorConfig make_cfg() {
     // is not the shipped configuration, so the fixture states what the defaults are rather than
     // testing an ECU with every correction switched off.
     c.enable_warmup = c.enable_cranking = c.enable_poststart = c.enable_iat = c.enable_map =
-        c.enable_revlimit = c.enable_baro = c.enable_fuelcomp = c.enable_gear =
+        c.enable_revlimit = c.enable_baro = c.enable_gear =
         c.enable_generic1 = c.enable_generic2 = c.enable_generic3 = c.enable_generic4 =
         c.enable_overall = 1;
     c.flood_clear_tps_pct = 90;      // …and flood clear is opt-in, like the shipped default
@@ -265,7 +270,7 @@ int main() {
 
     SECTION("flex: ethanol shifts stoich richer (E85 ~= +49% fuel)");
     {
-        auto cfg = make_cfg(); cfg.stoich_ethanol_x10 = 90;
+        auto cfg = make_cfg();
         FuelCalculator fc; fc.init(cfg);
         EngineFrame e0{}, e85{};
         { SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_IAT, 20.0f); b.set(SIG_ETHANOL, 0.0f);
@@ -281,7 +286,7 @@ int main() {
     SECTION("flex: a dead sensor holds the last good reading, or the fallback — never 0 %");
     {
         // A dead flex sensor read as 0 % fuelled an E85 engine as petrol: a third lean, silently.
-        auto cfg = make_cfg(); cfg.stoich_ethanol_x10 = 90; cfg.flex_fallback_pct = 85;
+        auto cfg = make_cfg(); cfg.stage1_ethanol_pct = 85;
         auto pw = [&](FuelCalculator& fc, bool publish, float eth) {
             EngineFrame f{};
             SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_IAT, 20.0f);
@@ -298,11 +303,62 @@ int main() {
         CHECK_NEAR(n.first, e85_pw, e85_pw * 0.005);
 
         FuelCalculator held; held.init(cfg);          // read 70 %, then dropped out: holds 70 %
-        cfg.flex_fallback_pct = 0;                    // (the fallback must NOT be what it uses now)
+        cfg.stage1_ethanol_pct = 0;                   // (the fallback must NOT be what it uses now)
         pw(held, true, 70.0f);
         const auto h = pw(held, false, 0.0f);
         fprintf(stdout, "    dropout holds %.0f%%\n", (double)h.second);
         CHECK_NEAR(h.second, 70.0, 0.01);
+    }
+
+    SECTION("mixed fuels: stage 1 petrol + stage 2 fixed E85 burn the same air as the charge needs");
+    {
+        // Each stage delivers its OWN fuel. What must hold is the MIXTURE: the air the two fuels burn at
+        // stoich (mass x stoich, summed) equals what the same charge needs on petrol alone. And the
+        // charge's ethanol (flex_ethanol, next cycle) is the stages' contents weighted by fuel mass.
+        const uint8_t save_n = g_config.engine.num_inj_stages, save_o = g_config.engine.inj_stage[0].num_outputs;
+        auto base = make_cfg();
+        FuelCalculator fb; fb.init(base);
+        EngineFrame f0{};
+        { SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_IAT, 20.0f); fb.update(make_pos(3000.0f), b, f0); }
+        const double air_petrol = double(f0.cyl[0].inj_pw_us) * 265.0 * 0.740 * 14.7;
+
+        g_config.engine.num_inj_stages = 2; g_config.engine.inj_stage[0].num_outputs = 4;
+        auto cfg = make_cfg();
+        cfg.stage1_staging_duty_table[0] = 20;                    // 2 % cap: stage 2 carries most of it
+        for (unsigned i = 0; i < FUEL_CALCULATOR_STAGE2_INJ_FLOW_TABLE_ALLOC; i++) cfg.stage2_inj_flow_table[i] = 530;
+        cfg.stage2_flex_enabled = 0; cfg.stage2_ethanol_pct = 85;  // a fixed E85 stage, no sensor
+        cfg.stage2_specific_gravity_table[0] = 785;
+        FuelCalculator fc; fc.init(cfg);
+        EngineFrame f{};
+        SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_IAT, 20.0f);
+        fc.update(make_pos(3000.0f), b, f);
+        const double m1 = double(f.cyl[0].inj_pw_us) * 265.0 * 0.740;
+        const double m2 = double(f.cyl[0].staged_pw_us[0]) * 530.0 * 0.785;
+        const double st2 = 0.15 * 14.7 + 0.85 * 9.0;
+        const double air_mixed = m1 * 14.7 + m2 * st2;
+        fprintf(stdout, "    air burnt: petrol-only %.0f, mixed %.0f (ratio %.4f)\n", air_petrol, air_mixed, air_mixed / air_petrol);
+        CHECK(f.cyl[0].staged_pw_us[0] > 0u);
+        CHECK_NEAR(air_mixed / air_petrol, 1.0, 0.01);
+        CHECK_NEAR(b.get(SIG_STAGE2_ETHANOL, -1.0f), 85.0, 0.01);
+        SignalBus b2 = make_bus(100.0f, 80.0f); b2.set(SIG_IAT, 20.0f);
+        fc.update(make_pos(3000.0f), b2, f);                       // the blend lands next cycle
+        const double blend = m2 * 85.0 / (m1 + m2);
+        fprintf(stdout, "    charge ethanol %.1f%% (mass-weighted %.1f%%)\n", (double)b2.get(SIG_FLEX_ETHANOL, -1.0f), blend);
+        CHECK_NEAR(b2.get(SIG_FLEX_ETHANOL, -1.0f), blend, 0.5);
+        g_config.engine.num_inj_stages = save_n; g_config.engine.inj_stage[0].num_outputs = save_o;
+    }
+
+    SECTION("shared flex sensor: two flex stages on one sensor both read it");
+    {
+        auto cfg = make_cfg();
+        cfg.stage2_flex_enabled = 1;                               // both on SIG_ETHANOL (the fixture's source)
+        FuelCalculator fc; fc.init(cfg);
+        EngineFrame f{};
+        SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_IAT, 20.0f); b.set(SIG_ETHANOL, 70.0f);
+        fc.update(make_pos(3000.0f), b, f);
+        CHECK_NEAR(b.get(SIG_STAGE1_ETHANOL, -1.0f), 70.0, 0.01);
+        CHECK_NEAR(b.get(SIG_STAGE2_ETHANOL, -1.0f), 70.0, 0.01);
+        CHECK_NEAR(b.get(SIG_STAGE3_ETHANOL, -1.0f), 0.0, 0.01);   // not flex: its fixed Ethanol % (0)
     }
 
     SECTION("injector dead-time TABLE (inj pressure diff × battery voltage)");
@@ -448,21 +504,25 @@ int main() {
         CHECK_NEAR(b.get(SIG_BARO_KPA, 0.0f), 101.3, 0.2);
     }
 
-    SECTION("speed-density with a FAILED MAP fails over to the predicted table, not to baro");
+    SECTION("speed-density with a FAILED MAP reads atmosphere — never the predicted table");
     {
-        // It fell back to atmospheric whenever prediction was off (the default) — idle fuelled for 100 kPa
-        // when the manifold was at ~35, about three times rich.
-        auto cfg = make_cfg();
-        cfg.fuel_model = 0; cfg.map_predict_enabled = 0;
-        for (auto& v : cfg.predicted_map_table) v = 350;     // 35.0 kPa everywhere
-        FuelCalculator fc; fc.init(cfg);
-        EngineFrame f{};
-        SignalBus b;                                          // MAP configured but not publishing
-        b.set(SIG_CLT, 80.0f); b.set(SIG_IAT, 20.0f); b.set(SIG_TPS, 2.0f); b.set(SIG_BATTERY, 14.0f);
-        fc.update(make_pos(800.0f), b, f);
-        fprintf(stdout, "    map used = %.1f kPa, source = %.0f\n", (double)b.get(SIG_MAP_EST, -1.0f), (double)b.get(SIG_MAP_SOURCE, -1.0f));
-        CHECK_NEAR(b.get(SIG_MAP_SOURCE, -1.0f), 2.0, 0.01);  // failover
-        CHECK_NEAR(b.get(SIG_MAP_EST, 0.0f), 35.0, 0.5);      // the predicted value, not ~101
+        // The predicted table is for transients, and only when prediction is on. It was also used as a
+        // failover, switched on or not: a disabled MAP sensor fuelled on an untuned 25 kPa and every
+        // reading looked plausible. A failed MAP reads the assumed baro (rich at idle: the safe side).
+        for (int enabled = 0; enabled <= 1; ++enabled) {
+            auto cfg = make_cfg();
+            cfg.fuel_model = 0; cfg.map_predict_enabled = static_cast<uint8_t>(enabled);
+            for (auto& v : cfg.predicted_map_table) v = 350;     // 35.0 kPa everywhere
+            FuelCalculator fc; fc.init(cfg);
+            EngineFrame f{};
+            SignalBus b;                                          // MAP configured but not publishing
+            b.set(SIG_CLT, 80.0f); b.set(SIG_IAT, 20.0f); b.set(SIG_TPS, 2.0f); b.set(SIG_BATTERY, 14.0f);
+            fc.update(make_pos(800.0f), b, f);
+            fprintf(stdout, "    prediction %s: map used = %.1f kPa, source = %.0f\n", enabled ? "on " : "off",
+                    (double)b.get(SIG_MAP_EST, -1.0f), (double)b.get(SIG_MAP_SOURCE, -1.0f));
+            CHECK_NEAR(b.get(SIG_MAP_SOURCE, -1.0f), 2.0, 0.01);  // failed
+            CHECK_NEAR(b.get(SIG_MAP_EST, 0.0f), 101.3, 0.2);     // atmosphere, not the table's 35
+        }
     }
 
     SECTION("MAF model with a dead MAF falls back to speed-density, not to zero fuel");
@@ -582,28 +642,47 @@ int main() {
         CHECK_NEAR(air_maf, air_sd, 2.0);
     }
 
-    SECTION("Blend (fuel_model=3): MAP-prediction crossfade — predicted -> measured by RPM");
+    SECTION("Blend (fuel_model=3): two maps — Alpha-N air at baro crossfades into MAP air, smoothly");
     {
-        // One VE table fed by effective MAP = crossfade(predicted_map_table, measured) over
-        // [2000,4000] rpm. Predicted = 100 kPa (flat table), measured MAP = 50 kPa. So below the
-        // band eff=100, above eff=50, mid eff=75 — SD air is linear in pressure, so air halves and
-        // the mid-band is the exact average.
+        // The VE table (80 %, fixture) on MEASURED MAP 50 kPa; the Alpha-N VE table (60 %, RPM x throttle)
+        // at BARO 101.3 kPa. Below the band the charge is all Alpha-N, above it all MAP, and the AIR
+        // MASSES (not the VE numbers) are mixed between — so the middle is their exact average and the
+        // sweep through the band has no step at either end. The Predicted MAP table is not read at all.
         auto cfg = make_cfg(); cfg.charge_temp_iat_pct = 1000;
         cfg.fuel_model = 3; cfg.blend_rpm_lo = 2000; cfg.blend_rpm_hi = 4000;
-        cfg.predicted_map_table_y_axis_n = 16;
-        for (int i = 0; i < 16; i++)      cfg.predicted_map_table_y_axis[i] = static_cast<uint16_t>(i * 100 / 15);  // 0..100%
-        for (unsigned i = 0; i < FUEL_CALCULATOR_PREDICTED_MAP_TABLE_ALLOC; i++) cfg.predicted_map_table[i] = 1000;                      // 100.0 kPa flat
+        cfg.alpha_ve_table_x_src = SIG_RPM; cfg.alpha_ve_table_y_src = SIG_TPS;
+        cfg.alpha_ve_table_x_axis_n = 2; cfg.alpha_ve_table_y_axis_n = 2;
+        cfg.alpha_ve_table_x_axis[0] = 500;  cfg.alpha_ve_table_x_axis[1] = 8000;
+        cfg.alpha_ve_table_y_axis[0] = 0;    cfg.alpha_ve_table_y_axis[1] = 100;
+        for (unsigned i = 0; i < FUEL_CALCULATOR_ALPHA_VE_TABLE_ALLOC; i++) cfg.alpha_ve_table[i] = 600;   // 60.0 %
+        for (unsigned i = 0; i < FUEL_CALCULATOR_PREDICTED_MAP_TABLE_ALLOC; i++) cfg.predicted_map_table[i] = 3000; // must not matter
         FuelCalculator fc; fc.init(cfg);
-        auto air_at = [&](float rpm){ EngineFrame f{}; SignalBus b = make_bus(50.0f, 80.0f);
-            b.set(SIG_IAT, 20.0f); b.set(SIG_TPS, 50.0f); fc.update(make_pos(rpm), b, f);
-            return b.get(SIG_AIR_MASS, 0.0f); };
-        const float lo = air_at(1000.0f);   // below band -> eff = predicted (100 kPa)
-        const float mid = air_at(3000.0f);  // w=0.5 -> eff = 75 kPa
-        const float hi = air_at(5000.0f);   // above band -> eff = measured (50 kPa)
-        fprintf(stdout, "    blend air: @1000(pred100)=%.1f  @3000(eff75)=%.1f  @5000(meas50)=%.1f\n",
-                (double)lo, (double)mid, (double)hi);
-        CHECK(lo > hi * 1.5f);                         // predicted 100 >> measured 50
-        CHECK_NEAR(mid, (lo + hi) / 2.0f, lo * 0.03f); // mid-band = the average
+        auto at = [&](float rpm){ EngineFrame f{}; SignalBus b = make_bus(50.0f, 80.0f);
+            b.set(SIG_IAT, 20.0f); b.set(SIG_TPS, 20.0f); fc.update(make_pos(rpm), b, f);
+            return std::make_pair(b.get(SIG_AIR_MASS, 0.0f), b.get(SIG_CHARGE_LOAD, -1.0f)); };
+        const auto lo = at(1000.0f), mid = at(3000.0f), hi = at(5000.0f);
+        fprintf(stdout, "    air  @1000 %.1f mg (load %.1f%%)  @3000 %.1f  @5000 %.1f mg (load %.1f%%)\n",
+                (double)lo.first, (double)lo.second, (double)mid.first, (double)hi.first, (double)hi.second);
+        CHECK_NEAR(lo.second, 60.0, 0.5);                           // Alpha-N: 60 % VE at baro
+        CHECK_NEAR(hi.second, 80.0 * 50.0 / 101.3, 0.5);            // MAP: 80 % VE at 50 of 101.3 kPa
+        CHECK_NEAR(mid.first, (lo.first + hi.first) / 2.0f, lo.first * 0.01f);   // air averaged, not VE
+        float worst = 0.0f, prev = at(1500.0f).first;
+        for (float r = 1550.0f; r <= 4500.0f; r += 50.0f) {         // no step at 2000 or 4000
+            const float a = at(r).first; worst = std::max(worst, std::fabs(a - prev)); prev = a;
+        }
+        const float per_step = std::fabs(lo.first - hi.first) / 40.0f;   // the band is 40 steps of 50 rpm
+        fprintf(stdout, "    largest step through the sweep %.3f mg (a smooth ramp is %.3f)\n", (double)worst, (double)per_step);
+        CHECK(worst <= per_step * 1.05f);
+    }
+
+    SECTION("charge load: speed-density = VE x MAP / baro");
+    {
+        auto cfg = make_cfg(); cfg.charge_temp_iat_pct = 1000;
+        FuelCalculator fc; fc.init(cfg);
+        EngineFrame f{}; SignalBus b = make_bus(70.0f, 80.0f); b.set(SIG_IAT, 20.0f);
+        fc.update(make_pos(3000.0f), b, f);
+        CHECK_NEAR(b.get(SIG_CHARGE_LOAD, -1.0f), 80.0 * 70.0 / 101.3, 0.5);
+        CHECK_NEAR(b.get(SIG_BLEND_ALPHA_SHARE, -1.0f), 0.0, 0.01);   // outside Blend the Alpha-N map has none of it
     }
 
     SECTION("VE telemetry field matches 80 configured");
@@ -783,7 +862,7 @@ int main() {
         // so a transposed read (or swapped axes) returns a different number.
         FuelCalculatorConfig c{};
         for (int i=0;i<28;i++) c.stage1_inj_flow_table[i]=265;
-        c.stoich_afr_x10  = 147;
+        c.stage1_stoich_x10 = 147;
         c.map_src = SIG_MAP;   c.clt_src = SIG_CLT;
         c.ve_table_x_src = SIG_RPM; c.ve_table_y_src = SIG_FUEL_LOAD; c.ve_table_z_en = 0;
         c.target_lambda_table_x_src = SIG_RPM; c.target_lambda_table_y_src = SIG_FUEL_LOAD;

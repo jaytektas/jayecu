@@ -358,6 +358,20 @@ target_compile_definitions(pc_vars_test PRIVATE
 add_test(NAME pc_vars COMMAND pc_vars_test)
 add_dependencies(studio_tests pc_vars_test)
 
+# A new air model offers its load axis — which maps are off target, and how their rows convert.
+#   cmake --build build --target air_model_load_test && ./build/air_model_load_test
+add_executable(air_model_load_test EXCLUDE_FROM_ALL
+    tests/test_air_model_load.cpp
+    )
+target_link_libraries(air_model_load_test PRIVATE studio_model)
+target_include_directories(air_model_load_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../generated)
+target_link_libraries(air_model_load_test PRIVATE JFramework::platform ${STUDIO_TLS_LIBS})
+target_compile_definitions(air_model_load_test PRIVATE
+    REAL_META="${CMAKE_CURRENT_SOURCE_DIR}/../../shared/tuneit-meta.json")
+add_test(NAME air_model_load COMMAND air_model_load_test)
+add_dependencies(studio_tests air_model_load_test)
+
 # Collecting the ECU's logs off the card — a real directory of real MLG bytes, because the card at
 # key-off is exactly that and nothing about this path is worth mocking.
 #   cmake --build build --target card_logs_test && ./build/card_logs_test

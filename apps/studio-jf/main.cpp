@@ -51,6 +51,7 @@
 #include "ui/SelectConnectionDialog.h"
 #include "ui/OutputWizardDialog.h"
 #include "model/EngineOutputLayout.h"   // the studio lays out coil + injector output rows
+#include "model/AirModelLoad.h"         // the load axis each air model wants its lambda + timing maps on
 #include "surface/widgets/ComboBoxWidget.h"   // …and filters a row's Cylinder picker (optionFilter)
 #include "surface/widgets/LabelWidget.h"      // the audit measures a caption the way its paint does
 #include "model/CardLogs.h"
@@ -6018,6 +6019,33 @@ int main(int argc, char** argv) {
     // THE STUDIO LAYS OUT THE COILS AND INJECTORS — never the firmware. An edit to a setting that decides them
     // (cylinder count, cycle, ignition mode, stages) rewrites those output rows in the same undo step.
     engine_outputs::install(Cache::instance());
+    // …AND A NEW AIR MODEL OFFERS ITS LOAD AXIS. Target Lambda and the ignition map are indexed on a load,
+    // and each model has a natural one (AirModelLoad.h). Asked, never done silently: the cells were tuned
+    // against the axis they are on. Asked after the edit lands, so a Yes is its own undo step.
+    Cache::instance().configEdited.connect([&win](const std::string& p, double before, double after) {
+        if (p != "fuel_calculator.fuel_model" || before == after) return;
+        const int model = static_cast<int>(std::lround(after));
+        jf::JMainThreadDispatcher::instance().post([&win, model] {
+            Cache& c = Cache::instance();
+            const std::vector<std::string> tables = airload::offTarget(c, model);
+            if (tables.empty()) return;
+            const std::string want = airload::preferredLoad(model);
+            const std::string label = airload::loadLabel(c, want);
+            const std::vector<std::string> models = { "Speed-Density", "Alpha-N", "MAF", "Blend" };
+            const std::string name = model >= 0 && model < int(models.size()) ? models[size_t(model)] : "this air model";
+            win.openModal<ChoiceDialog>(
+                std::string("Load axis for ") + name,
+                name + " works best with Target Lambda and the Ignition map on " + label + ". Point them at it?"
+                "\n\nTheir load breakpoints are converted (kPa rows become the % of a full charge they hold, so boost "
+                "rows stay boost rows; throttle rows are spread 0-100 %). The cells are kept as they are, so check "
+                "them against the new axis. Keeping them leaves both maps exactly as they are.",
+                std::vector<ChoiceDialog::Choice>{ { "Keep as they are", jf::JDialogButtonBox::Role::Action },
+                                                   { "Point them at " + label, jf::JDialogButtonBox::Role::Accept } },
+                std::function<void(int)>([tables, want](int i) {
+                    if (i == 1) airload::apply(Cache::instance(), tables, want);
+                }));
+        });
+    });
     // …and a row's Cylinder picker offers only what this engine and that row's stage can use.
     ComboBoxWidget::optionFilter = [](const std::string& b) { return engine_outputs::cylinderOptions(Cache::instance(), b); };
     Cache::instance().tableEdited.connect(applyNodeConditions);

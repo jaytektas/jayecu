@@ -500,6 +500,19 @@
     "flex_ethanol": 496,
     "maf_failover": 497,
     "spark_below_map": 498,
-    "no_tune": 499
+    "no_tune": 499,
+    "stage1_ethanol": 500,
+    "stage2_ethanol": 501,
+    "stage3_ethanol": 502,
+    "stage4_ethanol": 503,
+    "fuel_corr_fuelcomp_2": 504,
+    "fuel_corr_fuelcomp_3": 505,
+    "fuel_corr_fuelcomp_4": 506,
+    "fuel_sg_2": 507,
+    "fuel_sg_3": 508,
+    "fuel_sg_4": 509,
+    "charge_load": 510,
+    "ve_alpha": 511,
+    "blend_alpha_share": 512
   }
 }

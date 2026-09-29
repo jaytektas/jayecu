@@ -109,16 +109,16 @@ def page_root(_unused=None):
 
 
 # ---- Fuel: the branch's own switchboard ---------------------------------------------------------
-BLEND_ONLY = '[#fuel_calculator.fuel_model] == 3'   # the air model that reads the predicted-MAP table
+BLEND_ONLY = '[#fuel_calculator.fuel_model] == 3'   # the air model that reads the Alpha-N VE map
 
 FUEL_ROWS = [
     ('Fuel Setup',         '',                                   f'{CFG}/Engine Configuration/Fuel System/Fuel Setup'),
     ('VE Table',           '',                                   f'{CFG}/Fuel Tuning/VE Table'),
     ('Target Lambda',      '',                                   f'{CFG}/Fuel Tuning/Target Lambda'),
-    # Predicted MAP is opt-in through the AIR MODEL, not a flag of its own: it is read only by Blend
-    # (FuelCalculator, model == 3), and a second switch beside the selector would be a second way to say
-    # the same thing — and a way for the two to disagree. The row greys out until Blend is chosen.
-    ('Predicted MAP',      '',                                   f'{CFG}/Fuel Tuning/Predicted MAP'),
+    # The Blend air model's low-RPM map is opt-in through the AIR MODEL, not a flag of its own: a second
+    # switch beside the selector would be a second way to say the same thing. The row greys until Blend is
+    # chosen. (Predicted MAP is MAP Prediction's table and is reached from the MAP Prediction row.)
+    ('Alpha-N VE Table',   '',                                   f'{CFG}/Fuel Tuning/Alpha-N VE Table'),
     ('Prime Pulse',        'fuel_calculator.prime_enable',        f'{CFG}/Fuel Tuning/Fuel Prime Pulse'),
     ('Cranking',           'fuel_calculator.enable_cranking',     f'{CFG}/Fuel Tuning/Cranking'),
     ('Warmup (Coolant)',   '',                                   f'{CFG}/Fuel Tuning/Corrections/Coolant Temp'),
@@ -156,7 +156,7 @@ def page_fuel_top():
     y = 12
     for label, flag, link in FUEL_ROWS:
         y = p.switch(sw, 10, y, label, flag, link=link,
-                     enable=BLEND_ONLY if label == 'Predicted MAP' else '')
+                     enable=BLEND_ONLY if label == 'Alpha-N VE Table' else '')
 
     model_y = A.TOP + A.panel_h(len(FUEL_ROWS), 25, top=12, bottom=8) + 10
     model = p.panel(10, model_y, 330, A.CANVAS_H - model_y - 14, 'Air Model')

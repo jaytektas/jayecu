@@ -75,19 +75,15 @@ def build():
                                   'applied.',
                                   learned='reset'),      # two scalars: no base map to fold them into
                     cond='[#lambda.ltft_enabled] == 1 and [#engine.cylinder_count] > 0'))
-    # THE BLEND MODEL'S OWN TABLE. It had no page: the air model can be set to Blend on Fuel Setup and
-    # the table that model reads was reachable only through the dictionary.
-    # OPT-IN, through the air model: the node appears when Blend is selected, the same way every other
-    # feature node appears when its feature is on. Nothing reads this table under the other three models.
-    tree.append(add(f'{B}/Predicted MAP', 'Predicted MAP',
-                    FT.table_page('Predicted MAP', FC + 'predicted_map_table',
-                                  [('MAP', 'map', '%.1f'), ('Throttle', 'tps', '%.1f'),
-                                   ('Engine RPM', 'rpm', '%.0f')],
-                                  'What the manifold WOULD read at this RPM and throttle. The Blend air '
-                                  'model crossfades from this to the measured MAP as RPM rises, which is '
-                                  'how one VE table serves an ITB engine: alpha-N down low, speed '
-                                  'density up top. Read only by the Blend model (Fuel Setup).'),
+    # THE BLEND MODEL'S LOW-RPM MAP: VE against RPM x throttle, whose air (at baro) crossfades by RPM into
+    # the VE table's air on measured MAP. Appears when Blend is the air model — nothing else reads it.
+    tree.append(add(f'{B}/Alpha-N VE Table', 'Alpha-N VE Table', ALPHA_VE_PAGE(),
                     cond='[#fuel_calculator.fuel_model] == 3'))
+    # MAP PREDICTION'S TABLE: what the manifold would read at this RPM and throttle, used only while the
+    # throttle is moving and the sensor lags. Appears when MAP Prediction is on — it used to appear with
+    # the Blend model, which no longer reads it.
+    tree.append(add(f'{B}/Predicted MAP', 'Predicted MAP', PREDICTED_MAP_PAGE(),
+                    cond='[#fuel_calculator.map_predict_enabled] == 1'))
     # The WHOLE start sequence on one page — prime, crank, flood clear, post-start, warmup — in the
     # order it happens. The per-table nodes below are for tuning one curve; this is for understanding
     # (and for the flood-clear box, which belongs beside the cranking threshold and nowhere else).
@@ -106,16 +102,6 @@ def build():
                                   'Applies below the cranking threshold, until the engine catches.',
                                   extra_fields=[('Cranking Threshold', ENG + 'cranking_rpm', 'configedit', 'RPM')],
                                   enable_path=FC + 'enable_cranking')))
-
-    # SPECIFIC GRAVITY sits here, not under Corrections: nothing multiplies by it. It is the fuel's
-    # mass/volume conversion — the bridge between the fuel model's milligrams and the injector's
-    # volumetric flow rating — so it belongs beside the setup it serves.
-    tree.append(add(f'{B}/Specific Gravity', 'Specific Gravity',
-                    FT.table_page('Specific Gravity', FC + 'specific_gravity_table',
-                                  [('Fuel Temp', 'fuel_temp', '%.0f'), ('Ethanol', 'ethanol', '%.0f')],
-                                  'Fuel density: the mass/volume conversion between the fuel model and '
-                                  'the injector flow rating. ONE table for the engine — the flow tables '
-                                  'are per stage, this is a property of the fuel in the rail.')))
 
     # Corrections: every multiplier that sits on top of the VE table, per-cylinder trims included. Each
     # carries its own enable now, so the page it lives on shows the tick and the folder gets a real
@@ -148,6 +134,8 @@ def build():
                     FT.table_page(f'Stage {st} — {name}', f'{FC}stage{st}_{suffix}', live, note))
                 for name, suffix, live, note in FT.STAGE_TABLES]
         kids.insert(0, add(f'{B}/Stage {st}/Setup', 'Setup', F.page_injector_stage(st)))
+        # THE STAGE'S FUEL — its settings, density and composition trim, on one page (fuel_pages).
+        kids.insert(1, add(f'{B}/Stage {st}/Fuel', 'Fuel', F.page_stage_fuel(st)))
         tree.append({'name': f'Stage {st}', 'expanded': False,
                      'condition': f'[#engine.num_inj_stages] >= {st}', 'children': kids})
 
@@ -260,6 +248,28 @@ def validate(meta, pages, node_paths=None):
 
 
 # ---- install ------------------------------------------------------------------------------------
+def ALPHA_VE_PAGE():
+    import fuel_tree as FT
+    return FT.table_page('Alpha-N VE Table', F.FC + 'alpha_ve_table',
+                         [('Alpha-N VE', 've_alpha', '%.1f'), ('Throttle', 'tps', '%.1f'),
+                          ('Engine RPM', 'rpm', '%.0f'), ('Alpha-N Share', 'blend_alpha_share', '%.0f'),
+                          ('Charge Load', 'charge_load', '%.1f')],
+                         'The Blend air model\'s low-RPM map: VE against RPM and throttle, its air taken at '
+                         'atmosphere. Between Blend Start and End RPM its air crossfades into the VE table\'s '
+                         '(on measured MAP); Alpha-N Share says how much of the charge is still this map\'s. Each range has its own cells, so tune '
+                         'this one below the crossover and the VE table above it.')
+
+
+def PREDICTED_MAP_PAGE():
+    import fuel_tree as FT
+    return FT.table_page('Predicted MAP', F.FC + 'predicted_map_table',
+                         [('MAP', 'map', '%.1f'), ('Throttle', 'tps', '%.1f'), ('Engine RPM', 'rpm', '%.0f')],
+                         'What the manifold WOULD read at this RPM and throttle, for MAP prediction: while the '
+                         'throttle moves fast the averaged MAP reading lags the plenum, and fuelling takes the '
+                         'higher of this and the measured value until the intake settles. Used only during a '
+                         'transient, with MAP Prediction switched on.')
+
+
 def main():
     meta = load_meta()
     branch, pages = build()

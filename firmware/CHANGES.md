@@ -9,7 +9,17 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- The Blend air model is two maps: an Alpha-N VE table (RPM × throttle) below Blend Start RPM, the VE table on measured MAP above Blend End RPM, and their air masses crossfaded between. Each range has its own cells, so tuning low-RPM fuel no longer moves the cells the upper range uses. It no longer reads the Predicted MAP table, which is now used only by MAP prediction, during throttle transients. A Blend tune needs its Alpha-N VE table filled in after updating.
+- New Charge Load channel: the air in the cylinder as a % of a full charge, from every air model and smooth through Blend's crossover. Changing the Air Model offers to point Target Lambda and the Ignition map at the load that model suits (Charge Load for Blend and MAF), converting their load rows.
+- The VE autotune leaves the VE table alone where Blend's Alpha-N map carries the charge.
+- A failed or disabled MAP sensor no longer fuels from the Predicted MAP table (which was used even with MAP prediction switched off). It reads atmosphere and raises its fault; MAP Source says "Failed (baro)". Predicted MAP is only ever used during a throttle transient, with prediction on.
+- Fuel is per injection stage. Each stage has its own stoich ratio, its own ethanol content (fixed, or measured by a flex sensor that several stages can share), its own fallback when the sensor has not read, its own fuel density table and its own fuel-composition correction. A secondary stage can run a different fuel from the primary; the firmware mixes them by the fuel each delivers. The old single Ethanol Source, Stoich AFR, Specific Gravity and Fuel Composition settings move to Stage 1 — check them after updating.
+- Each stage has a Fuel page (Fuel Tuning ▸ Stage N ▸ Fuel) with those settings and tables together.
 - A protection fault that stays true (boost held over the limit, coolant or air temperature held over its cut) now stays active for as long as it lasts. It used to go inactive about a second in, while the engine was still over the limit.
+- Readings everywhere show at your unit's precision: MAP and fuel load read 0.0 kPa, not 0.
+- Diagnostics: the Fuel & Spark view is two views, Fuel and Spark, and every channel now has a place (charge ethanol and MAF failover had none).
+- Every tick box's name sits level with its box (1,835 rows across the pages, text was 1-4 px high).
+- Fuel Setup: Ethanol If No Reading is a number you can enter again; it was an empty drop-down.
 
 ## 0.4.3
 - Diagnostics ▸ Sensors — Raw: a pin that is not on a connector says so on one line instead of being cut off.

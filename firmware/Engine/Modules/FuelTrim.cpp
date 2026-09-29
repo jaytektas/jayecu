@@ -15,20 +15,26 @@ void FuelTrim::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame
 
     using DescFn = tbl::TableDesc (*)(const FuelCalculatorConfig*);
     static const DescFn SLOW[N] = {
-        clt_corr_table_desc, iat_corr_table_desc, fuel_comp_corr_table_desc,
+        clt_corr_table_desc, iat_corr_table_desc, stage1_fuel_comp_corr_table_desc,
         baro_corr_table_desc, fuel_gear_table_desc,
         generic1_corr_table_desc, generic2_corr_table_desc,
         generic3_corr_table_desc, generic4_corr_table_desc,
+        stage2_fuel_comp_corr_table_desc, stage3_fuel_comp_corr_table_desc, stage4_fuel_comp_corr_table_desc,
     };
 
     // Each correction carries its own enable, in the SAME order as SLOW[] — the table is not evaluated
     // at all when its correction is off, and the publish below then reports exactly 1.000. "Off" used to
     // mean a table tuned to 0%, which still cost this evaluation every visit and still read its axis
     // channels; the flag says what a neutral table only implies.
+    //
+    // FUEL COMPOSITION IS PER STAGE: each stage's own table, on that stage's own ethanol, switched by that
+    // stage's Flex Fuel — a fixed-blend stage has no ethanol to trim against. FuelCalculator applies each
+    // to the fuel its stage delivers, not to the whole charge.
     const uint8_t on[N] = {
-        cfg_->enable_warmup,   cfg_->enable_iat,      cfg_->enable_fuelcomp,
+        cfg_->enable_warmup,   cfg_->enable_iat,      cfg_->stage1_flex_enabled,
         cfg_->enable_baro,     cfg_->enable_gear,
         cfg_->enable_generic1, cfg_->enable_generic2, cfg_->enable_generic3, cfg_->enable_generic4,
+        cfg_->stage2_flex_enabled, cfg_->stage3_flex_enabled, cfg_->stage4_flex_enabled,
     };
 
     // Distribute the load: re-evaluate ONE table this frame, never the whole stack. At 1 kHz the full
@@ -55,4 +61,7 @@ void FuelTrim::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame
     bus.set(wk::fuel_corr_generic2, mult(6), true, now, ttl());
     bus.set(wk::fuel_corr_generic3, mult(7), true, now, ttl());
     bus.set(wk::fuel_corr_generic4, mult(8), true, now, ttl());
+    bus.set(SIG_FUEL_CORR_FUELCOMP_2, mult(9),  true, now, ttl());
+    bus.set(SIG_FUEL_CORR_FUELCOMP_3, mult(10), true, now, ttl());
+    bus.set(SIG_FUEL_CORR_FUELCOMP_4, mult(11), true, now, ttl());
 }

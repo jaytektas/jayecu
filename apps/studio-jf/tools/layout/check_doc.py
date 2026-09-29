@@ -274,6 +274,26 @@ def main():
                     f'{name}: {bw}x{h}, expected {want}x{want}'
                     f'{" (page pitch)" if name in CHECK_EXEMPT else ""}')
 
+    # …AND ITS NAME SITS ON IT. A one-line label beside a tick box in the same group is centred on the
+    # box (author.py Page.to_json, centre_ticks). Twelve builders once chose twelve offsets and the text
+    # of 1835 rows floated 1-4 px off its box — visible on every switchboard, and invisible to every
+    # size check. Paired within ONE sibling list: coordinates are relative to the panel they sit in.
+    def tick_rows(ws, name):
+        boxes = [w for w in ws if w.get('type') == 'checkbox' and w.get('groupId')]
+        for w in ws:
+            if w.get('type') == 'label' and w.get('groupId') and w.get('h', 0) <= A.LBL_H:
+                for b in boxes:
+                    if b['groupId'] == w['groupId'] and 0 <= w['x'] - (b['x'] + b['w']) <= 16:
+                        want_y = b['y'] + (b['h'] - w['h']) // 2
+                        if w['y'] != want_y:
+                            bad['tick box label is not centred on its box'].append(
+                                f'{name}: "{(w.get("props") or {}).get("labelText", "").strip()}" at y={w["y"]}, '
+                                f'box centre wants {want_y}')
+                        break
+            tick_rows(_kids(w), name)
+    for name, pan in sorted(lib.items()):
+        tick_rows(pan.get('widgets') or [], name)
+
     total = sum(len(v) for v in bad.values())
     print(f'{len(lib)} pages, {len(surfaces)} surfaces, {len(nodes)} tree nodes, {widgets} widgets')
     for kind in sorted(bad):

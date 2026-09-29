@@ -74,15 +74,39 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     // Now: the sensor while it is valid; the LAST GOOD reading if it drops out (the tank does not change
     // mid-drive); the configured fallback if it has never read since power-up. The sensor's own P0177-79
     // say why; this makes sure the engine is fuelled sanely while they do.
+    //
+    // PER STAGE. Each stage's fuel is its own (FuelCalculatorConfig stageN_*): a stage with Flex Fuel OFF
+    // runs a fixed blend — its Ethanol % — and one with it ON runs the rule above on its own sensor, which
+    // may be the same sensor another stage reads. Turning a stage's flex off forgets its last good
+    // reading, so turning it back on starts from the fallback rather than from a stale blend.
     {
-        const SignalId eth_id = static_cast<SignalId>(cfg_->ethanol_src);
-        if (eth_id != SIG_NONE && bus.valid(eth_id)) {
-            ethanol_pct_  = std::clamp(bus.get(eth_id), 0.0f, 100.0f);
-            ethanol_seen_ = true;
-        } else if (!ethanol_seen_) {
-            ethanol_pct_  = static_cast<float>(cfg_->flex_fallback_pct);
-        }                                   // else: hold the last good reading
-        bus.set(SIG_FLEX_ETHANOL, ethanol_pct_, true, now, ttl());
+        struct StageFuel { uint8_t flex; int16_t src; uint8_t pct; };
+        const StageFuel sf[kStages] = {
+            { cfg_->stage1_flex_enabled, cfg_->stage1_ethanol_src, cfg_->stage1_ethanol_pct },
+            { cfg_->stage2_flex_enabled, cfg_->stage2_ethanol_src, cfg_->stage2_ethanol_pct },
+            { cfg_->stage3_flex_enabled, cfg_->stage3_ethanol_src, cfg_->stage3_ethanol_pct },
+            { cfg_->stage4_flex_enabled, cfg_->stage4_ethanol_src, cfg_->stage4_ethanol_pct },
+        };
+        static const SignalId ETH_SIG[kStages] = {
+            SIG_STAGE1_ETHANOL, SIG_STAGE2_ETHANOL, SIG_STAGE3_ETHANOL, SIG_STAGE4_ETHANOL };
+        for (int s = 0; s < kStages; ++s) {
+            const SignalId eth_id = static_cast<SignalId>(sf[s].src);   // -1 in the tune = SIG_NONE
+            if (!sf[s].flex) {
+                ethanol_pct_[s]  = static_cast<float>(sf[s].pct);
+                ethanol_seen_[s] = false;
+            } else if (eth_id != SIG_NONE && bus.valid(eth_id)) {
+                ethanol_pct_[s]  = std::clamp(bus.get(eth_id), 0.0f, 100.0f);
+                ethanol_seen_[s] = true;
+            } else if (!ethanol_seen_[s]) {
+                ethanol_pct_[s]  = static_cast<float>(sf[s].pct);
+            }                                   // else: hold the last good reading
+            bus.set(ETH_SIG[s], ethanol_pct_[s], true, now, ttl());
+        }
+        // The CHARGE: last cycle's mass-weighted blend once staging has run, else stage 1's own — which
+        // is exact for a one-stage engine, where the blend IS stage 1.
+        const bool staged = std::clamp<uint8_t>(g_config.engine.num_inj_stages, 1, kStages) > 1;
+        bus.set(SIG_FLEX_ETHANOL, (staged && charge_known_) ? charge_ethanol_ : ethanol_pct_[0],
+                true, now, ttl());
     }
 
     // E-2b: FuelCalculator runs on the PER_CYCLE cadence — once per engine cycle (or the 50 ms
@@ -151,20 +175,14 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
             predict_wt_ = 0.0f;
         }
     }
-    // FAILOVER. A MAP sensor that is absent or out of range leaves the fuel model with nothing; the
-    // predicted table is a poor substitute and an excellent one compared to zero. It cannot represent
-    // boost (the table is what the manifold WOULD read at that throttle, and a dead sensor cannot say
-    // how much boost there is), so this is a limp-home, not a mode to tune in.
-    // Not gated on prediction being switched on: a failed sensor is a failed sensor on every engine, and
-    // this used to fall back to BARO whenever prediction was off (the default) — atmospheric pressure at
-    // idle, about three times the fuel it needs.
-    // Only where MAP is actually needed (the same rule as the FUEL_MAP code below: every model but
-    // Alpha-N), or where prediction was asked for. Alpha-N without a MAP sensor is a design, not a fault,
-    // and reads the manifold as atmosphere.
-    if ((cfg_->fuel_model != 1 || cfg_->map_predict_enabled) && map_id != SIG_NONE && !bus.valid(map_id)) {
-        map_kpa    = predicted_map;
-        map_source = 2;
-    }
+    // A FAILED MAP IS NOT PREDICTED. The predicted table is for TRANSIENTS — it stands in only while the
+    // throttle is moving and only when prediction is switched on — and it is only as good as someone has
+    // made it for that job. Used as a failover it drove the fuel model from a table that was
+    // switched off and never tuned: a disabled MAP sensor fuelled on an untuned 25 kPa, and every reading
+    // (fuel load, MAP est) looked plausible, which hid the fault. A missing MAP now reads as atmosphere
+    // (map_meas, above) — rich at idle, which is the safe side — and FUEL_MAP below says why.
+    if (cfg_->fuel_model != 1 && map_id != SIG_NONE && !bus.valid(map_id))
+        map_source = 2;                                          // failed: reading atmosphere, fault raised
     bus.set(SIG_MAP_EST,    map_kpa, true, now, ttl());
     bus.set(SIG_MAP_SOURCE, static_cast<float>(map_source), true, now, ttl());
 
@@ -226,19 +244,27 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
         report(ModuleDtc::FUEL_MAF, need_maf, static_cast<SignalId>(cfg_->maf_src), ModuleDtc::FUEL_MAF_SEV);
     }
     float load_real, density_kpa;
+    // BLEND IS TWO MAPS. Below Blend Start RPM the Alpha-N VE table (RPM x throttle) carries the charge;
+    // above Blend End RPM the VE table on measured MAP does; between, their AIR MASSES are crossfaded (see
+    // below). It used to feed one VE table a MAP estimated from the Predicted MAP table — a table that is
+    // for transients — which made low-RPM fuel depend on two tables and made fixing it move the
+    // MAP-indexed VE cells the upper range shares. Fuel load is MAP here: that is what the VE table reads.
+    float map_share = 1.0f;                            // Blend: the MAP map's share of the charge
     if (model == 3) {                                  // Blend
-        const float predicted = tbl::table_eval(predicted_map_table_desc(cfg_), bus);
         const float lo = static_cast<float>(cfg_->blend_rpm_lo), hi = static_cast<float>(cfg_->blend_rpm_hi);
-        const float wt = (hi > lo) ? std::clamp((pos.rpm - lo) / (hi - lo), 0.0f, 1.0f)
-                                   : (pos.rpm >= hi ? 1.0f : 0.0f);
-        const float eff_map = (1.0f - wt) * predicted + wt * map_kpa;   // predicted -> measured by RPM
-        load_real = eff_map; density_kpa = eff_map;
+        map_share = (hi > lo) ? std::clamp((pos.rpm - lo) / (hi - lo), 0.0f, 1.0f)
+                              : (pos.rpm >= hi ? 1.0f : 0.0f);
+        load_real = map_kpa; density_kpa = map_kpa;
     } else if (model == 1) {                           // Alpha-N
         load_real = tps_pct; density_kpa = baro_kpa;   // no manifold reading — the air is at atmosphere
     } else {                                           // Speed-Density (0) / MAF (2): MAP load + density
         load_real = map_kpa; density_kpa = map_kpa;
     }
     bus.set(wk::fuel_load, load_real, true, now, ttl());
+    // THE ALPHA-N MAP'S SHARE of the charge (0 outside Blend's low range), for every model. Stated this way
+    // round on purpose: the VE autotune rejects records where it is above zero, and a log or record that
+    // does not carry the channel reads it as 0 — which must mean "the VE table carried it", not "reject".
+    bus.set(SIG_BLEND_ALPHA_SHARE, (1.0f - map_share) * 100.0f, true, now, ttl());
 
     // --- VE (one channel-driven lookup drives BOTH the air-mass estimate and wk::ve). The optional
     //     Z/depth axis (ve_table_z_en, default off) adds the flex-composition dimension. ---
@@ -271,8 +297,25 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
         constexpr float R_AIR = 287.05f;               // J/(kg·K)
         const float air_density_mg_cc = (density_kpa * 1000.0f) / (R_AIR * t_charge_k);
         air_mass_mg = cyl_vol_cc * (ve / 100.0f) * air_density_mg_cc;
+        if (model == 3) {
+            // THE ALPHA-N MAP'S AIR, at ATMOSPHERE: its VE was tuned against throttle with no manifold
+            // reading, so baro is its density reference (and altitude comes with it for free). Mixed with
+            // the MAP map's air by the share — air with air, never VE with VE across two references.
+            const float ve_a = tbl::table_eval(alpha_ve_table_desc(cfg_), bus);
+            bus.set(SIG_VE_ALPHA, ve_a, true, now, ttl());
+            const float air_a = cyl_vol_cc * (ve_a / 100.0f) * ((baro_kpa * 1000.0f) / (R_AIR * t_charge_k));
+            air_mass_mg = (1.0f - map_share) * air_a + map_share * air_mass_mg;
+        }
     }
     bus.set(wk::air_mass, air_mass_mg, true, now, ttl());
+    // CHARGE LOAD: that air as a % of a full charge (100 % VE at baro and this charge temperature). Every
+    // model's, in the same terms, and continuous through Blend's crossover — the load axis a Blend or MAF
+    // tune points target lambda and timing at.
+    {
+        constexpr float R_AIR = 287.05f;
+        const float full_mg = cyl_vol_cc * (baro_kpa * 1000.0f) / (R_AIR * t_charge_k);
+        bus.set(SIG_CHARGE_LOAD, (full_mg > 0.0f) ? air_mass_mg / full_mg * 100.0f : 0.0f, true, now, ttl());
+    }
 
     // --- Target lambda — same rpm×load surface as VE ---
     float lambda_target = tbl::table_eval(target_lambda_table_desc(cfg_), bus);
@@ -280,11 +323,21 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     frame.target_lambda = lambda_target;
     bus.set(wk::lambda_target, lambda_target, true, now, ttl());
 
-    // Flex: blend gasoline + ethanol stoich by ethanol fraction (E0 -> stoich_afr, E100 -> ethanol).
-    const float ethanol_pct = ethanol_pct_;   // resolved at the top: sensor / last good / fallback
-    const float ef = std::clamp(ethanol_pct / 100.0f, 0.0f, 1.0f);
-    const float stoich = (1.0f - ef) * (cfg_->stoich_afr_x10 / 10.0f)
-                       + ef          * (cfg_->stoich_ethanol_x10 / 10.0f);
+    // EACH STAGE'S STOICH: its base fuel blended toward ethanol by its own ethanol content (resolved at the
+    // top). Stage 1's is the one the base charge is computed in; the others enter at the split, where
+    // each stage's share of the air is turned back into its own fuel.
+    float stage_stoich[kStages];
+    {
+        const uint16_t base_x10[kStages] = { cfg_->stage1_stoich_x10, cfg_->stage2_stoich_x10,
+                                             cfg_->stage3_stoich_x10, cfg_->stage4_stoich_x10 };
+        const uint16_t eth_x10[kStages]  = { cfg_->stage1_stoich_ethanol_x10, cfg_->stage2_stoich_ethanol_x10,
+                                             cfg_->stage3_stoich_ethanol_x10, cfg_->stage4_stoich_ethanol_x10 };
+        for (int s = 0; s < kStages; ++s) {
+            const float ef = std::clamp(ethanol_pct_[s] / 100.0f, 0.0f, 1.0f);
+            stage_stoich[s] = std::max(1.0f, (1.0f - ef) * (base_x10[s] / 10.0f) + ef * (eth_x10[s] / 10.0f));
+        }
+    }
+    const float stoich = stage_stoich[0];
 
     // Injector pressure differential (rail − manifold) — the X channel of both the flow + dead-time
     // tables, PER STAGE. Not always a measurement: most installs have a regulator and a number written
@@ -354,7 +407,15 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     const float fuel_mass_mg   = air_mass_mg / (std::max(1.0f, stoich) * lambda_target);
     // Fuel MASS → VOLUME: divide by specific gravity (SG = density in g/cc = mg/µl) before the
     // volumetric injector flow. Collapsed 1×1 (0.740 = 98 premium) by default; blend over fuel temp × ethanol.
-    const float fuel_sg = std::max(0.01f, tbl::table_eval(specific_gravity_table_desc(cfg_), bus));  // SG = mg/µl directly
+    // Per stage (each stage's own fuel, temperature and blend); stage 1's converts the base charge.
+    using SgDescFn = tbl::TableDesc (*)(const FuelCalculatorConfig*);
+    static const SgDescFn STAGE_SG[kStages] = {
+        stage1_specific_gravity_table_desc, stage2_specific_gravity_table_desc,
+        stage3_specific_gravity_table_desc, stage4_specific_gravity_table_desc };
+    float stage_sg[kStages];
+    for (int s = 0; s < kStages; ++s)
+        stage_sg[s] = std::max(0.01f, tbl::table_eval(STAGE_SG[s](cfg_), bus));   // SG = mg/µl directly
+    const float fuel_sg = stage_sg[0];
     const float fuel_vol_ul = fuel_mass_mg / fuel_sg;
     // PUBLISH WHAT THE MODEL BELIEVED. On a flex car the specific gravity moves with the blend and the
     // fuel temperature, changing every pulse width with it — and until now nothing could see which
@@ -507,7 +568,8 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     m(wk::fuel_corr_generic3,  0.2f, 5.0f);
     m(wk::fuel_corr_generic4,  0.2f, 5.0f);
     m(wk::fuel_corr_overall,   0.2f, 5.0f);
-    m(wk::fuel_corr_fuelcomp,  0.2f, 5.0f);
+    // (Fuel composition is NOT here: it is per stage, a trim on the fuel each stage delivers — the split
+    // below applies stage 1's and the others' to their own shares.)
     m(wk::fuel_corr_baro,      0.2f, 5.0f);
     m(wk::fuel_corr_gear,      0.2f, 5.0f);
     m(wk::fuel_corr_protection, 0.2f, 5.0f);   // EngineProtection
@@ -614,7 +676,20 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     const float cycle_revs = static_cast<float>(engine_cycle_angle(g_config.engine.cycle_type)) / ANGLE_360;
     const float cycle_us   = (pos.rpm > 0.0f) ? (60.0e6f * cycle_revs / pos.rpm) : 1.0e9f;
     const uint8_t nstages  = std::clamp<uint8_t>(g_config.engine.num_inj_stages, 1, MAX_INJ_STAGES);
-    const float prim_flow  = (inj_flow_ul_us > 0.0f) ? inj_flow_ul_us : 1.0f;
+    // MIXED FUELS. The split below works in AIR, not fuel: a stage delivering its fuel at flow x SG
+    // burns flow x SG x stoich of air per microsecond, and trimming its fuel by its composition
+    // correction delivers the same air in more fuel. That rate is what each stage is compared by, so a
+    // stage on E85 carries its share of the charge in its own fuel, at its own density. With every stage
+    // on one fuel the rates are the flows times one constant, which cancels — the split is the old one.
+    // The base charge (fuel_pw) is in stage 1's fuel with no trim, so in these units it is fuel_pw x
+    // stage 1's trim.
+    const float stage_corr[kStages] = {
+        std::clamp(bus.get(wk::fuel_corr_fuelcomp, 1.0f),       0.2f, 5.0f),
+        std::clamp(bus.get(SIG_FUEL_CORR_FUELCOMP_2, 1.0f),     0.2f, 5.0f),
+        std::clamp(bus.get(SIG_FUEL_CORR_FUELCOMP_3, 1.0f),     0.2f, 5.0f),
+        std::clamp(bus.get(SIG_FUEL_CORR_FUELCOMP_4, 1.0f),     0.2f, 5.0f) };
+    auto rate = [&](int s, float flow) { return flow * stage_sg[s] * stage_stoich[s] / stage_corr[s]; };
+    const float prim_flow  = (inj_flow_ul_us > 0.0f) ? rate(0, inj_flow_ul_us) : 1.0f;   // stage 1's RATE
     // Per-staged-stage flow (µl/µs), evaluated once for the fill. Flow tables index on inj_press_diff ×
     // battery, both already on the bus.
     float staged_flow[MAX_STAGED_STAGES] = {};
@@ -624,12 +699,13 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     float stage_fuel_pw[MAX_INJ_STAGES] = {};   // each stage's OWN fuel PW (before dead-time / short-pulse)
     float stage_mass[MAX_INJ_STAGES]    = {};   // mass each stage carries, in primary-flow-PW units
     float stage_flow_[MAX_INJ_STAGES]   = {};   // per-stage flow (µl/µs), 0 = stage absent
-    float remaining = fuel_pw;                  // total charge, as primary-flow PW (mass proxy)
+    float remaining = fuel_pw * stage_corr[0];  // total charge, as stage 1's rate x PW (air proxy)
     const float full_pw = (inj_events > 0) ? (cycle_us / inj_events) : 0.0f;   // one squirt's 100%-duty PW
     // Pass 1: fill each stage sequentially up to its Staging Duty Cycle. EVERY stage is capped now
     // (including the last) — that is what lets pass 2 raise them all together.
     for (uint8_t s = 0; s < nstages; ++s) {
-        const float flow = (s == 0) ? inj_flow_ul_us : staged_flow[s - 1];
+        const float raw  = (s == 0) ? inj_flow_ul_us : staged_flow[s - 1];
+        const float flow = (raw > 0.0f) ? rate(s, raw) : 0.0f;     // this stage's RATE (see above)
         stage_flow_[s] = flow;
         if (flow <= 0.0f) continue;
         const float max_duty = tbl::table_eval(STAGE_DUTY[s](cfg_), bus) / 100.0f;   // table % -> fraction
@@ -660,6 +736,21 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
             if (stage_flow_[s] > 0.0f) { stage_mass[s] += remaining; break; }
     for (uint8_t s = 0; s < nstages; ++s)   // each stage's mass -> its own PW
         stage_fuel_pw[s] = (stage_flow_[s] > 0.0f) ? stage_mass[s] * prim_flow / stage_flow_[s] : 0.0f;
+    // THE CHARGE'S ETHANOL: each stage's content weighted by the fuel MASS it delivers (PW x flow x SG) —
+    // what the cylinder actually burns, read next cycle by the ethanol-indexed tables (see the top). And
+    // each staged stage's SG, published beside stage 1's (fuel_sg) while it carries fuel.
+    {
+        static const SignalId SG_SIG[kStages] = { SIG_FUEL_SG, SIG_FUEL_SG_2, SIG_FUEL_SG_3, SIG_FUEL_SG_4 };
+        float mass = 0.0f, eth = 0.0f;
+        for (uint8_t s = 0; s < nstages; ++s) {
+            const float raw = (s == 0) ? inj_flow_ul_us : staged_flow[s - 1];
+            const float m   = stage_fuel_pw[s] * std::max(0.0f, raw) * stage_sg[s];
+            mass += m;
+            eth  += m * ethanol_pct_[s];
+            if (s > 0 && stage_fuel_pw[s] > 0.0f) bus.set(SG_SIG[s], stage_sg[s], true, now, ttl());
+        }
+        if (mass > 0.0f) { charge_ethanol_ = eth / mass; charge_known_ = true; }
+    }
 
     // Stage 1 (primary): its fuel + primary dead-time/short-pulse. When single-stage this is the whole
     // charge — byte-identical to the un-staged path.

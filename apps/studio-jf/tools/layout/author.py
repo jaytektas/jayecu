@@ -885,6 +885,35 @@ class Page:
 
     # ---- serialise ------------------------------------------------------------------------------
     def to_json(self):
+        # A TICK BOX'S NAME SITS ON ITS BOX. Twelve builders pair a checkbox with its label and each chose
+        # its own vertical offset — y-2, y+2, y-3, y-1 — so across the dashboard the text sat anywhere from
+        # 4 px above its box to 1 px below it, and a switchboard read as a column of boxes with the words
+        # floating off them. Centred once, here, for every page: a one-line label beside a checkbox in the
+        # same group is placed so its centre is the box's centre.
+        # A READING IN A UNIT THE STUDIO KNOWS IS SHOWN AT THAT UNIT'S PRECISION (and in the unit the user
+        # chose — psi, °F — which it is either way). Pages hard-coded '%.0f' on MAP and fuel load and the
+        # reading lost the decimal the kPa unit carries. A page format is kept only when it asks for MORE
+        # than the unit gives (injector pulse width in hundredths of a ms): that is precision, not habit.
+        def unit_formats(ws):
+            ws = [dict(w) for w in ws]
+            for w in ws:
+                if w.get('type') == 'value' and (w.get('props') or {}).get('format'):
+                    if unit_keeps_format(w['props'].get('signalName', ''), w['props']['format']) is False:
+                        w['props'] = {k: v for k, v in w['props'].items() if k != 'format'}
+            return ws
+
+        def centre_ticks(ws):
+            ws = [dict(w) for w in ws]
+            boxes = [w for w in ws if w.get('type') == 'checkbox' and w.get('groupId')]
+            for w in ws:
+                if w.get('type') != 'label' or not w.get('groupId') or w.get('h', 0) > LBL_H:
+                    continue
+                for b in boxes:
+                    if b['groupId'] == w['groupId'] and 0 <= w['x'] - (b['x'] + b['w']) <= 16:
+                        w['y'] = b['y'] + (b['h'] - w['h']) // 2
+                        break
+            return ws
+
         # NOTHING LEAVES WIDER THAN THE BOX IT IS IN. A panel hands its children w-4, and a child authored
         # to the panel's full width is therefore 2-4 px past what it is given. Individually those are
         # invisible; collectively they are what the document's own geometry check counts, and chasing them
@@ -894,6 +923,7 @@ class Page:
         # So it is enforced once, on the way out, where every widget from every installer passes. Only
         # something ALREADY overflowing is touched, which is the case that was wrong anyway.
         def pack(ws, box_w=None, box_h=None):
+            ws = unit_formats(centre_ticks(ws))
             out = []
             for w in ws:
                 w = dict(w)
@@ -1179,3 +1209,37 @@ def caption_complaints(name, tops, child_of):
         for k in child_of(w):
             one(k, f'in "{w["props"].get("labelText", "panel")}", ')
     return bad
+
+
+# ---- unit precision -----------------------------------------------------------------------------
+# The Studio's own unit table (src/model/UnitManager.cpp): each unit's default decimals. A reading of a
+# channel in one of these units is formatted by the unit, not the page (Page.to_json, unit_formats).
+UNIT_DECIMALS = {
+    'Nm': 1, 'lb-ft': 1, 'kg-m': 2, 'W': 0, 'kW': 1, 'hp': 1, 'ps': 1, 'm/s': 1, 'km/h': 1, 'mph': 1,
+    'deg': 1, 'RPM': 0, 'rad/s': 1, 'deg/s': 0, 'RPS': 2, 'Hz': 1, 'kHz': 2, 'MHz': 3,
+    's': 2, 'ms': 1, 'us': 0, 'min': 2, 'Pa': 0, 'kPa': 1, 'bar': 2, 'psi': 1, 'C': 1, 'F': 1, 'K': 1,
+    'pulses/km': 0, 'pulses/mi': 0, 'RPM/km/h': 1, 'RPM/mph': 1, 'mV': 0, 'V': 2, 'ADC': 0,
+}
+
+
+FINER_THAN_UNIT = {'inj_pw', 'narrowband_1', 'narrowband_2'}
+
+
+def unit_keeps_format(signal, fmt, telemetry=None):
+    """False when a page format on `signal` should give way to its unit's precision; True when the page
+    asks for more decimals than the unit gives; None when the channel has no unit the Studio knows."""
+    import re
+    ch = re.sub(r'^\[\$|\]$', '', signal or '')
+    tel = telemetry if telemetry is not None else Page._meta().get('telemetry', {})
+    e = tel.get(ch) if isinstance(tel, dict) else None
+    if not e:
+        return None
+    u = e.get('units') or ''
+    if u not in UNIT_DECIMALS:
+        return None
+    m = re.search(r'\.(\d+)f', fmt or '')
+    # FINER THAN THE UNIT ONLY WHERE IT IS MEANT. Injector pulse width in hundredths of a ms (it matters at
+    # idle) and a narrowband's volts (it lives inside 0.1-0.9 V). Everything else asking for more — a µs to
+    # a decimal, hundredths of a degree the firmware sends in tenths — was habit, not precision.
+    return (int(m.group(1)) if m else 0) > UNIT_DECIMALS[u] and ch in FINER_THAN_UNIT
+

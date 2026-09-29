@@ -29,7 +29,7 @@ public:
     void update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame) override;
 
 private:
-    static constexpr int N = 9;   // warmup(clt), iat, fuelcomp, baro, gear, generic1..4
+    static constexpr int N = 12;  // warmup(clt), iat, fuelcomp (stage 1), baro, gear, generic1..4, fuelcomp stages 2..4
     const FuelCalculatorConfig* cfg_ = nullptr;
     float   pct_[N] = {};         // last raw table value (%) of each slow correction
     uint8_t rr_ = 0;              // round-robin: which table we refresh this frame

@@ -31,8 +31,17 @@ public:
     void update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame) override;
 
 private:
-    float ethanol_pct_  = 0.0f;     // flex: the ethanol content fuelling uses (see update())
-    bool  ethanol_seen_ = false;    // a valid reading has been had since power-up
+    // PER-STAGE FUEL (see update()). Each stage's ethanol content — its sensor while it reads, the last good
+    // reading if it drops out, its Ethanol % if it has never read (or is not flex) — and whether that
+    // stage's sensor has read since power-up. Four entries: MAX_INJ_STAGES (Scheduler/SchedulerTypes.h).
+    static constexpr int kStages = 4;
+    float ethanol_pct_[kStages]  = {};
+    bool  ethanol_seen_[kStages] = {};
+    // THE CHARGE'S ethanol: the stages' contents mixed by the fuel MASS each delivered LAST cycle. The
+    // ethanol-indexed tables (VE / target-lambda / ignition planes, cranking, ignition fuel comp) are read
+    // before this cycle's split exists, so they take the last one; a blend does not move in a cycle.
+    float charge_ethanol_ = 0.0f;
+    bool  charge_known_   = false;  // a split has happened since power-up (else: stage 1's own)
     const FuelCalculatorConfig* cfg_ = nullptr;
     DtcManager*                 dtc_ = nullptr;
 
