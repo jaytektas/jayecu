@@ -31,6 +31,7 @@ import urllib.request
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 LATEST = "https://api.github.com/repos/jaytektas/jayecu/releases/latest"
+RELEASES = "https://api.github.com/repos/jaytektas/jayecu/releases?per_page=100"
 
 
 def version_key(v: str):
@@ -110,10 +111,33 @@ def main():
         try:
             with urllib.request.urlopen(urllib.request.Request(LATEST, headers={"User-Agent": "jayecu-release"}),
                                         timeout=15) as r:
-                latest = json.load(r).get("tag_name", "")
+                rel = json.load(r)
+            latest = rel.get("tag_name", "")
             if latest and version_key(ver) <= version_key(latest):
                 die(f"the latest published release is {latest}; v{ver} is not newer, so no studio would offer "
                     f"it. Raise the studio's version (apps/studio-jf/CMakeLists.txt project VERSION).")
+            # A KIT IS KNOWN BY ITS VERSION ALONE. The studio compares kit versions and never looks at the
+            # build, so different firmware under a version already published is never offered to anyone —
+            # and the packages would bundle it under a name that means something else. Same build is fine
+            # (a studio-only release carrying the unchanged kit); a different one needs version.txt raised.
+            # EVERY release, not just the latest: an older one still serves its kits, and a clash with any
+            # of them is the same clash.
+            with urllib.request.urlopen(urllib.request.Request(RELEASES, headers={"User-Agent": "jayecu-release"}),
+                                        timeout=15) as r:
+                releases = json.load(r)
+            for board in a.boards.split():
+                ours = json.loads((out / f"{board}-{fw_ver}-kit.json").read_text()).get("build", "")
+                for rel in releases:
+                    url = {x.get("name"): x.get("browser_download_url")
+                           for x in rel.get("assets", [])}.get(f"{board}-{fw_ver}-kit.json")
+                    if not url:
+                        continue
+                    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "jayecu-release"}),
+                                                timeout=15) as k:
+                        published = json.load(k).get("build", "")
+                    if published != ours:
+                        die(f"{rel.get('tag_name')} already ships {board} {fw_ver} as build {published}; this one is "
+                            f"build {ours}. No studio would offer it. Raise firmware/version.txt and make release again.")
             print(f"  latest published: {latest or 'none'}")
         except urllib.error.HTTPError as e:
             if e.code != 404:
