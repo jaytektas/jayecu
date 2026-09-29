@@ -9,6 +9,11 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Diagnostics shows every reading in the units you chose in Preferences (psi, °F, a raw pin in volts,
+  millivolts or counts), at that unit's precision. A raw analog pin read "3" beside "ADC"; it now reads
+  "3.214 V".
+- Diagnostics ▸ Sensors — Raw shows each input pin's connector and wire colours beside its reading, and
+  a digital pin's frequency, pulse width, SENT and level across one row.
 
 ## 0.4.1
 - Output test: the repeat count goes up to 100,000, and a long test is no longer stopped after

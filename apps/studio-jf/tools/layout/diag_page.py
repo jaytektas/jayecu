@@ -210,20 +210,133 @@ def _fill(p, panel, groups, ch):
             p.add(p._new('label', x, y + 3, name_w, A.LBL_H,
                          {'labelText': e.get('label') or item, 'align': 'Left',
                           'fontName': A.FONT_LBL}, g), into=panel)
-            # ITS OWN precision, from the descriptor: a blanket "%.2f" printed the 1 kHz frame counter
-            # as 46254220.00 and gave a cam angle transmitted in tenths a second decimal it never had.
-            p.add(p._new('value', x + name_w + 4, y + 1, val_w, VAL_H,
-                         {'signalName': item, 'format': f'%.{int(e.get("digits", 2))}f',
-                          'fontName': A.FONT_LBL, 'align': 'Right',
-                          'showUnit': '0', 'borderWidth': '1', 'borderRadius': '3'}, g), into=panel)
-            if e.get('units'):
-                p.add(p._new('label', x + name_w + 8 + val_w, y + 3, unit_w, A.LBL_H,
-                             {'labelText': e['units'], 'align': 'Left', 'fontName': A.FONT_SMALL,
-                              'fgColor': C_DIM}, g), into=panel)
+            # IN THE USER'S UNIT, AT ITS PRECISION, SAID BY THE READING ITSELF. This wrote the channel's
+            # own unit as a label beside the box and its digits as the format — so a reading converted to
+            # the unit the user prefers (psi, °F, a raw pin in volts) came out under the wrong name, at
+            # the wrong precision: a 0-5 V pin read "3" beside "ADC". A blank format lets the displayed
+            # unit decide, and falls back to the channel's own digits when the unit has no view — so the
+            # 1 kHz frame counter still reads 46254220, not 46254220.00. The box takes the unit's room.
+            p.add(p._new('value', x + name_w + 4, y + 1, val_w + (4 + unit_w if e.get('units') else 0), VAL_H,
+                         {'signalName': item, 'fontName': A.FONT_LBL, 'align': 'Right',
+                          'borderWidth': '1', 'borderRadius': '3'}, g), into=panel)
             y += ROW_H
         x += col_w + 10
     if x - 10 > panel['w'] - 8:
         raise SystemExit(f'diagnostics: {len(plan)} columns need {x - 10}px, card is {panel["w"]}px')
+    return placed, 0
+
+
+# THE RAW VIEW IS PER PIN, not per channel. Its channels are readings OF A PIN — "Raw AV3", "DIG2
+# Frequency" — and the question you bring to it has a loom in the other hand: which wire is AV3, and
+# is it reading. So each row leads with the pin's connector and wire, drawn by the same pinwire widget
+# the output pages use, and a digital pin's four readings sit across one row rather than four.
+# The pin is read off the channel id (hw_av3 -> AV3, hw_dig2_freq -> DIG2), so a pin the board adds
+# arrives here by itself; the wiring comes from the meta, and a pin with none says so on its row.
+RAW_DIG = [('freq', 'Frequency'), ('pulse', 'Pulse Width'), ('sent', 'SENT'), ('level', 'Level')]
+RAW_VAL_W = 120    # a reading AND its unit: "4.999 V", "65535 Hz", "4095 counts"
+RAW_GROUPS = [('av', 'Analog Inputs'), ('at', 'Analog Temperature Inputs'), ('dig', 'Digital Inputs')]
+
+
+def _raw_pins(ids):
+    """{kind: {pin number: {field: channel id}}} from the hw_* ids, and the ids it did not understand."""
+    import re
+    pins, odd = {}, []
+    for n in ids:
+        m = re.fullmatch(r'hw_(av|at|dig)(\d+)(?:_(\w+))?', n)
+        if not m or (m.group(1) == 'dig') != bool(m.group(3)):
+            odd.append(n); continue
+        pins.setdefault(m.group(1), {}).setdefault(int(m.group(2)), {})[m.group(3) or 'raw'] = n
+    return pins, odd
+
+
+def _fill_raw(p, panel, ids, ch):
+    """The Sensors — Raw view: one row per pin, its wiring first. Returns (placed, left) like _fill."""
+    from ruler import ruler
+    r = ruler()
+    pins, odd = _raw_pins(ids)
+    if odd:
+        raise SystemExit(f'diagnostics: raw channel(s) {odd} name no pin (expected hw_av<n>, hw_at<n>, '
+                         f'hw_dig<n>_<field>) — teach _raw_pins, or they would silently go missing')
+    unknown = {f for d in pins.get('dig', {}).values() for f in d} - {f for f, _ in RAW_DIG}
+    if unknown:
+        raise SystemExit(f'diagnostics: digital field(s) {sorted(unknown)} have no column in RAW_DIG')
+
+    # AS WIDE AS THE WIDEST PIN'S WIRING, measured the way PinWireWidget draws it: "DIG8 - ", the
+    # connector badge "CN3 (BLUE) 23" with its padding, a gap, and the 34px wire.
+    conns, wiring = meta().get('connectors', {}), meta().get('wiring', {})
+
+    def wire_w(res):
+        w = wiring.get(res)
+        if not w:
+            return r.width(f'{res} — not brought out to a connector') + 8
+        conn, _, term = w['pin'].partition('-')
+        shell = (conns.get(conn) or {}).get('color', '')
+        badge = conn + (f' ({shell.upper()})' if shell else '') + (f' {term}' if term else '')
+        return 4 + r.width(f'{res} - ') + r.width(badge) + 8 + 10 + 34 + 6
+    res_of = {'av': 'AV{}', 'at': 'AT{}', 'dig': 'DIG{}'}
+    pw = int(max(wire_w(res_of[k].format(n)) for k in pins for n in pins[k]))
+
+    # THE READING SAYS ITS OWN UNIT, and picks its own precision. A raw analog pin is ADC counts on the
+    # wire and the studio shows it in the unit the user chose for it — volts by default, "1.234 V" —
+    # so a unit label written here ("ADC") and a format taken from the channel's digits ("%.0f") would
+    # print a pin voltage as a whole number under the wrong name, which is exactly what this view did.
+    # Blank format means the displayed unit decides; a channel with no unit falls back to its digits.
+    def reading(x, y, n, g):
+        e = ch[n]
+        p.add(p._new('value', x, y + 1, RAW_VAL_W, VAL_H,
+                     {'signalName': n, 'fontName': A.FONT_LBL, 'align': 'Right',
+                      'borderWidth': '1', 'borderRadius': '3', 'toolTip': e.get('label') or n}, g), into=panel)
+        return x + RAW_VAL_W + 12
+
+    def heading(x, y, w, text):
+        p.add(p._new('label', x, y + 2, w, 22, {'labelText': text, 'align': 'Left', 'fontName': '|16|1|0'}),
+              into=panel)
+        p.add(p._new('panel', x, y + HEAD_H - 4, w, 1, {'bgColor': C_DIM, 'padding': '0'}), into=panel)
+        return y + HEAD_H
+
+    placed = 0
+    # LEFT: the analog pins, one reading each. RIGHT: the digital pins, a column per reading with its
+    # name over it once, rather than "DIG5 Pulse Width" spelled out on every row.
+    x, y = 8, 8
+    col_a = pw + 4 + RAW_VAL_W
+    for kind, title in RAW_GROUPS[:2]:
+        if kind not in pins:
+            continue
+        y = heading(x, y, col_a, title)
+        for num in sorted(pins[kind]):
+            g = p.group()
+            p.add(p._new('pinwire', x, y + 1, pw, VAL_H, {'resource': res_of[kind].format(num)}, g), into=panel)
+            reading(x + pw + 4, y, pins[kind][num]['raw'], g)
+            placed += 1
+            y += ROW_H
+        y += 8
+
+    if 'dig' in pins:
+        x += col_a + 30
+        fields = [f for f, _ in RAW_DIG if any(f in d for d in pins['dig'].values())]
+        col_d = pw + 4 + sum(RAW_VAL_W + 12 for f in fields) - 12
+        y = heading(x, 8, col_d, RAW_GROUPS[2][1])
+        cx = x + pw + 4
+        for f, name in RAW_DIG:
+            if f in fields:
+                p.add(p._new('label', cx, y, RAW_VAL_W, A.LBL_H,
+                             {'labelText': name, 'align': 'Right', 'fontName': A.FONT_SMALL, 'fgColor': C_DIM}),
+                      into=panel)
+                cx += RAW_VAL_W + 12
+        y += ROW_H
+        for num in sorted(pins['dig']):
+            g = p.group()
+            p.add(p._new('pinwire', x, y + 1, pw, VAL_H, {'resource': res_of['dig'].format(num)}, g), into=panel)
+            cx = x + pw + 4
+            for f in fields:
+                if f in pins['dig'][num]:
+                    reading(cx, y, pins['dig'][num][f], g)
+                    placed += 1
+                cx += RAW_VAL_W + 12
+            y += ROW_H
+        x += col_d
+    if x > panel['w'] - 8 or y > panel['h'] - 30:
+        raise SystemExit(f'diagnostics: the raw view needs {x}x{y}px, card is {panel["w"]}x{panel["h"]}px')
     return placed, 0
 
 
@@ -244,7 +357,10 @@ def page():
             mod = e.get('module') or 'Other'
             if belongs(mod):
                 groups.setdefault(mod, []).append(n)
-        got, left = _fill(p, panel, groups, ch)
+        if name == 'Sensors — Raw':
+            got, left = _fill_raw(p, panel, [n for g in groups.values() for n in g], ch)
+        else:
+            got, left = _fill(p, panel, groups, ch)
         placed += got
         short += left
         if left:
