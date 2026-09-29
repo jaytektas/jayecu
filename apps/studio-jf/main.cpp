@@ -1897,7 +1897,68 @@ int main(int argc, char** argv) {
     // OPEN A PROJECT: bring up the definition it was written against, then the project and its tune. Used
     // by Open ECU…, the Recent ECUs submenu and reopen-on-launch — each of which used to call openTune
     // directly and inherit whatever definition happened to be loaded.
-    g_openProject = [&win, openTune, tuneLayoutHash, metaForLayoutHash](Ecu* e, const std::string& name) {
+    // AN OFFLINE PROJECT IS PINNED TO THE SETTINGS IT WAS STARTED ON ("offline:<layout>"), so a firmware that
+    // came later — new tables, retired ones — never reached it: its pages were drawn for the new firmware
+    // and pointed at tables its settings did not have ("Drop a table here"). So when a newer firmware's
+    // settings exist for its board, it is OFFERED the move: every tune in it is carried into a new offline
+    // project for that firmware (each value that still exists kept, new ones at their defaults), and this
+    // one is left exactly as it is. Keeping it is remembered per firmware, so it is not asked again.
+    auto offerNewerLayout = [&win](Ecu* e, const std::string& name) {
+        if (!e || e->uid().rfind("offline:", 0) != 0) return;
+        const std::string have = e->uid().substr(8);
+        fwkits::Kit k;
+        if (!fwkits::newestFor(allKits(), e->board(), STUDIO_VERSION, k) || k.layoutHash.empty() ||
+            k.layoutHash == have || k.meta.empty())
+            return;
+        const std::string key = "offline.kept." + e->uid();
+        if (jf::JSettings::instance().get<std::string>(key, std::string()) == k.layoutHash) return;
+        const std::string uid = e->uid(), board = e->board(), metaPath = k.meta, ver = k.version,
+                          hash = k.layoutHash;
+        win.openModal<ChoiceDialog>(
+            std::string("Newer firmware settings"),
+            "This offline project was written for an older firmware's settings. Firmware " + ver +
+            " has newer ones, and its pages are drawn for them.\n\nMoving copies every tune in this project "
+            "into a new offline project for firmware " + ver + ": each value that still exists is kept, "
+            "settings that are new start at their defaults, and ones the firmware dropped are left behind. "
+            "This project is kept as it is. Keeping it means this is not asked again for firmware " + ver + ".",
+            std::vector<ChoiceDialog::Choice>{ { "Keep this one",               jf::JDialogButtonBox::Role::Action },
+                                               { "Move to firmware " + ver,     jf::JDialogButtonBox::Role::Accept } },
+            std::function<void(int)>([&win, uid, board, metaPath, ver, hash, have, key, name](int i) {
+                if (i == 0) { jf::JSettings::instance().set(key, jf::JVariant(hash)); return; }
+                if (i != 1) return;                                   // closed: ask again next time
+                MetaModel nm;
+                if (!nm.loadFile(metaPath)) { win.showStatus("Could not read firmware " + ver + "'s settings", 6000); return; }
+                Ecu* src = Ecu::openOrCreate(uid, board);
+                Ecu* dst = Ecu::openOrCreate("offline:" + nm.layoutHash(), board);
+                if (!src || !dst) return;
+                const std::vector<std::string> already = dst->tuneNames();
+                int moved = 0, kept = 0, defaulted = 0, dropped = 0;
+                std::string openName = name;
+                for (const std::string& t : src->tuneNames()) {
+                    const std::vector<uint8_t> raw = src->loadTune(t);
+                    if (!TuneFile::isDictFormat(raw)) continue;
+                    MigrationReport rep;
+                    std::vector<uint8_t> host;
+                    const std::vector<uint8_t> img = TuneFile::deserialise(raw, nm, rep, &host);
+                    if (img.empty()) continue;
+                    // Never over a tune the new project already has: that one is somebody's work too.
+                    std::string out = t;
+                    if (std::find(already.begin(), already.end(), out) != already.end()) out = t + " (" + have + ")";
+                    dst->saveTune(out, TuneFile::serialise(img, nm, host.empty() ? nullptr : &host));
+                    if (t == name) openName = out;
+                    ++moved; kept += rep.migrated; defaulted += rep.defaulted;
+                    dropped += static_cast<int>(rep.unmapped.size());
+                }
+                if (!moved) { win.showStatus("Nothing in this project could be moved", 6000); return; }
+                installKitMetas();                                    // the library holds its settings for the open
+                if (g_openProject) g_openProject(dst, openName);
+                win.showStatus("Moved " + std::to_string(moved) + " tune(s) to firmware " + ver + ": " +
+                               std::to_string(kept) + " setting(s) kept, " + std::to_string(defaulted) +
+                               " new at defaults, " + std::to_string(dropped) + " dropped", 10000);
+            }));
+    };
+
+    g_openProject = [&win, openTune, tuneLayoutHash, metaForLayoutHash, offerNewerLayout](Ecu* e, const std::string& name) {
         if (!e) return;
         // The definition FIRST — a tune is a set of named values that means nothing without the layout it
         // was written for, and openTune needs it to decode the file at all.
@@ -1924,6 +1985,7 @@ int main(int argc, char** argv) {
         openTune(e, name);
         bootMark("openProject: tune opened");
         if (g_showSurfaces) g_showSurfaces();
+        offerNewerLayout(e, name);
     };
 
     // WHICH LAYOUT IS THIS ECU? Asked of the library entry, without connecting to anything.
@@ -3427,7 +3489,17 @@ int main(int argc, char** argv) {
     // the dictionary from it (the offline core of New Tune / Open ECU). meta is
     // static, so the lambda reaches it directly.
     // Shared: point the app at a schema meta and rebuild the dictionary from it (the loadMeta core).
-    auto loadSchema = [&win, &dictTree, &activeSurf, openTune, noteTsProto](const std::string& path, const std::string& tuneName) {
+    auto loadSchema = [&win, &dictTree, &activeSurf, openTune, noteTsProto, saveActiveTune](const std::string& path, const std::string& tuneName) {
+        // THE OUTGOING TUNE IS SAVED AGAINST THE SETTINGS IT WAS MADE WITH — before they change. The meta is
+        // one object, re-read in place below, and openTune saves the project it is leaving: called after
+        // this, it wrote the OLD project's image under the NEW settings. Opening a project on another
+        // firmware (or moving an offline project to newer settings) turned the project being left into a
+        // tune for the wrong layout. Saved here, while image and settings still agree; and the tune name is
+        // let go, because the image in the cache no longer belongs to it.
+        if (ecu && !activeTuneName.empty() && Cache::instance().meta() && Cache::instance().hasConfig()) {
+            saveActiveTune();
+            activeTuneName.clear();
+        }
         if (meta.loadFile(path)) {
             noteTsProto(path);
             EditorSettings::instance().setLastSchema(path);   // come up on this one next launch

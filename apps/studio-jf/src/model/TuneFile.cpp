@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cctype>
+#include <set>
 
 #include <j/config/Json.h>
 #include <j/core/Log.h>
@@ -575,11 +576,26 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
         ++report.migrated;
     }
 
-    // Count fields that exist in the current meta but weren't in the tune (new firmware features).
-    const int totalMetaFields = static_cast<int>(meta.config().size())
-                              + static_cast<int>(meta.configTables().size())
-                              + static_cast<int>(meta.arrays1d().size());
-    report.defaulted = std::max(0, totalMetaFields - report.migrated - static_cast<int>(report.unmapped.size()));
+    // SETTINGS THIS FIRMWARE HAS THAT THE TUNE DID NOT, counted BY NAME against what a tune for this
+    // firmware carries — what serialise writes: tables by their instance paths, host fields only with a
+    // host block. This was (meta fields - migrated - unmapped), which set top-level settings against
+    // applied VALUES (every array element and table counts in migrated, 12,000+ against ~1,300) and took
+    // away fields that are not in the meta at all — so it was 0 whatever the firmware had added. (The
+    // meta's own lists are not the same names either, and counted 18 settings as new on the firmware the
+    // tune came from.)
+    const auto names = [](const jf::JJson &doc) {
+        std::set<std::string> out;
+        for (const char* sec : { "scalars", "tables", "axes", "arrays", "expressions" })
+            for (const auto &[key, val] : doc[sec].obj()) out.insert(key);
+        return out;
+    };
+    const std::set<std::string> inTune = names(root);
+    // (Without the host block: PC-side variables are the studio's, not settings the firmware added.)
+    const std::vector<uint8_t> probe = serialise(meta.defaultImage(), meta);
+    int added = 0;
+    if (auto pj = jf::JJson::tryParse(std::string(probe.begin(), probe.end())))
+        for (const std::string &k : names(*pj)) if (!inTune.count(k)) ++added;
+    report.defaulted = added;
 
     return image;
 }

@@ -26,6 +26,7 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 - MAP prediction can also predict a fast throttle LIFT (Predict Tip-Out, off by default): the estimate moves down towards Predicted MAP, as a tip-in moves it up.
 - Closed-loop O2 holds its trim while MAP prediction is active; the new Closed-Loop Hold channel says why the trim is held (fuel cut, after cut, settling, cold, off range or transient).
 - Fuel Tuning ▸ MAP Prediction & Fuel Film holds the transient strategy's switches and all four of its tables. One button chooses it (and turns Classic Transient Fuel off); Transient Throttle has the matching button, and both pages warn while the two strategies are on together.
+- Fuel Tuning ▸ Corrections points to the fuel composition correction, which is per stage (Stage N ▸ Fuel).
 - The MAP fuel correction table (Fuel Tuning ▸ Corrections ▸ MAP) is removed. It was a MAP × RPM trim on top of the VE table, indexed on measured MAP rather than the fuel model's load; put anything it held into the VE table or a Generic correction.
 - Each stage's fuel-composition correction has up to 8 load rows (was 16), to make room for the film tables.
 

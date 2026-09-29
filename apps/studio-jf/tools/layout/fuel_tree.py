@@ -229,7 +229,12 @@ def page_corrections_branch():
             'The multipliers all multiply: the total is their product, capped by an authority guard, and '
             'the fuel that comes out is the base calculation times that.')
     nh = A.Page.wrapped_h(note, 324)
-    side = p.panel(640, y0, 350, A.panel_h(1, nh + 2 * A.ROW + 12, top=10, bottom=8), 'How They Combine')
+    # FUEL COMPOSITION IS NOT ON THIS LIST ANY MORE — it is per injection stage, with each stage's fuel —
+    # and this is where people look for it, so the way there is here.
+    FC_NOTE = 'Fuel composition (ethanol) correction is per injection stage, with that stage\'s fuel:'
+    fh = A.Page.wrapped_h(FC_NOTE, 324)
+    side = p.panel(640, y0, 350, A.panel_h(1, nh + 2 * A.ROW + 12 + fh + 8 + 28, top=10, bottom=8),
+                   'How They Combine')
     p.wrapped(10, 10, 324,
               note,
               into=side)
@@ -237,6 +242,9 @@ def page_corrections_branch():
     for label, node in (('Fuel Setup', f'{ROOT}/Engine Configuration/Fuel System/Fuel Setup'),
                         ('VE Table', f'{ROOT}/Fuel Tuning/VE Table')):
         y = p.switch(side, 10, y, label, '', link=node, w=296, pitch=28)
+    p.wrapped(10, y + 8, 324, FC_NOTE, into=side)
+    p.switch(side, 10, y + 8 + fh + 4, 'Fuel Composition  (Stage 1 \u25b8 Fuel)', '',
+             link=f'{ROOT}/Fuel Tuning/Stage 1/Fuel', w=296, pitch=28)
 
     live = p.panel(1000, y0, 270, 240, 'Right Now')
     p.readout(live, 15, 14, 'Inj PW', 'inj_pw', A.Page.chan_fmt('inj_pw'), 110)
