@@ -1138,6 +1138,38 @@ int main() {
         CHECK_NEAR(after.get(SIG_MAP_EST, 0.0f), 40.0f, 0.5f);
     }
 
+    SECTION("a throttle DROPOUT is not a movement: no rate, no prediction when it comes back");
+    {
+        auto cfg = make_cfg();
+        cfg.fuel_model = 0; cfg.map_predict_enabled = 1; cfg.map_predict_hold_ms = 200;
+        cfg.map_predict_scale_table_x_src = SIG_RPM; cfg.map_predict_scale_table_y_en = 0;
+        for (unsigned i = 0; i < FUEL_CALCULATOR_MAP_PREDICT_SCALE_TABLE_ALLOC; i++) cfg.map_predict_scale_table[i] = 100;
+        for (unsigned k = 0; k < FUEL_CALCULATOR_PREDICTED_MAP_TABLE_ALLOC; k++) cfg.predicted_map_table[k] = 1000;
+        FuelCalculator fc; fc.init(cfg); EngineFrame frame{};
+        uint32_t t = 1000; SignalBus last{};
+        auto step = [&](bool tps_valid, uint32_t ms) {
+            for (uint32_t k = 0; k < ms; k += 5) {
+                t += 5; SignalBus b = make_bus(40.0f, 80.0f);
+                if (tps_valid) b.set(SIG_TPS, 30.0f); else b.set(SIG_TPS, 0.0f, false);
+                g_test_ms = t; fc.update(make_pos(1000.0f), b, frame); last = b;
+            }
+            return last;
+        };
+        step(true, 200);                                      // held at 30 %
+        SignalBus gone = step(false, 20);                     // the sensor drops out for 20 ms
+        float peak = 0.0f; int src = 0;
+        for (int k = 0; k < 20; ++k) {                        // …and comes back at the same 30 %
+            SignalBus b = step(true, 5);
+            peak = std::max(peak, b.get(SIG_TPS_RATE, 0.0f));
+            src = std::max(src, static_cast<int>(b.get(SIG_MAP_SOURCE, 0.0f)));
+        }
+        fprintf(stdout, "    dropout: rate while gone %.1f, peak rate after %.1f, map_source max %d\n",
+                (double)gone.get(SIG_TPS_RATE, -1.0f), (double)peak, src);
+        CHECK_NEAR(gone.get(SIG_TPS_RATE, -1.0f), 0.0, 1e-6);
+        CHECK_NEAR(peak, 0.0, 1e-6);
+        CHECK(src == 0);
+    }
+
     SECTION("tip-out prediction is opt-in: a fast lift predicts DOWN only when asked");
     {
         for (int opt = 0; opt <= 1; ++opt) {

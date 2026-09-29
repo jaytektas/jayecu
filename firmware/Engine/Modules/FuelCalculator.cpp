@@ -141,9 +141,17 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     // reaching it, and a still pedal's noise sits there too (the table is set about ten times it) — both
     // would otherwise re-arm the hold for ever, and closed-loop O2 holds while prediction is active.
     // Prediction takes the HIGHER of the two, never the lower — this exists to cover a lean hole, and a
-    // predicted value below the measured one would only ever make one.
+    // predicted value below the measured one would only ever make one. (The opt-in exception is a LIFT
+    // with Predict Tip-Out on, which moves down towards the table — below.)
     const float predicted_map = tbl::table_eval(predicted_map_table_desc(cfg_), bus);
-    {
+    // A THROTTLE THAT IS NOT READING IS NOT AT 0 %. get() hands back its fallback for an invalid channel,
+    // and a dropout — a sensor fault, or the bench's Lua script being replaced, which withdraws what it
+    // wrote — read as the pedal snapping shut and then, when it came back, as a stab: a rate that armed
+    // prediction with nobody touching the throttle. No reading, no rate; the next valid one starts afresh.
+    if (!bus.valid(static_cast<SignalId>(cfg_->tps_src))) {
+        tps_rate_ = 0.0f;
+        tps_last_ms_ = 0;
+    } else {
         const float dt_s = (tps_last_ms_ != 0) ? (now - tps_last_ms_) / 1000.0f : 0.0f;
         tps_last_ms_ = now;
         if (dt_s > 0.0f && dt_s < 0.5f) {
