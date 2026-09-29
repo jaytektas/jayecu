@@ -41,9 +41,11 @@ tune — and one of them is the one open.
 - **File ▸ Open Tune…**: the tunes of the open ECU, **its connect points** (restore points) and the
   tunes saved **before each firmware update**, newest first. A firmware backup is marked
   *(firmware backup)*; opening one copies it in as a named tune and converts it to the firmware the
-  ECU runs now, and the backup itself is left as it was. When connected, it asks whether to send the
-  chosen tune to the ECU.
-  <!-- src: apps/studio-jf/main.cpp (backups listed; copied into tunes/ and opened) -->
+  ECU runs now, and the backup itself is left as it was. **File…** opens a `.tune` file from anywhere
+  (one sent to you, or saved under another ECU): it is copied into this ECU's tunes — numbered rather
+  than replacing a tune of the same name — and converted like any other. When connected, it asks
+  whether to send the chosen tune to the ECU.
+  <!-- src: apps/studio-jf/main.cpp (backups listed; copied into tunes/ and opened; File…) -->
 - **File ▸ New Tune…**: a new tune from a firmware's defaults — give it a name and pick the firmware.
 - **File ▸ Save Tune** (Ctrl+S): save the open tune now. It is also saved when you disconnect, switch
   ECU or tune, and close the studio.

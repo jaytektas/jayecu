@@ -1702,10 +1702,36 @@ int main(int argc, char** argv) {
             kinds.push_back("backup");
             names.push_back(f.string());
         }
-        if (labels.empty()) { win.showStatus("This ECU has no saved tunes yet", 3000); return; }
+        // A TUNE FROM ANYWHERE, not only this ECU's own: one sent by someone else, kept on a stick, or
+        // saved under another ECU. It is copied into this ECU's tunes under its own name — never over one
+        // already there — and opened from there, so it is an ordinary tune from then on: migrated onto
+        // this firmware's layout on load, like any other.
+        auto fromFile = [&win, openTune] {
+            jf::JDialog::openFile("Open a tune file", { "tune" }, [&win, openTune](std::string path) {
+                if (!ecu || path.empty()) return;
+                const fs::path src(path);
+                const fs::path dir = fs::path(ecu->dir()) / "tunes";
+                std::error_code ec2;
+                fs::create_directories(dir, ec2);
+                std::string name = src.stem().string();
+                // The same file picked again is simply opened; a different file with a taken name gets a
+                // number rather than replacing someone's tune.
+                if (fs::exists(dir / (name + ".tune"), ec2) && !fs::equivalent(src, dir / (name + ".tune"), ec2)) {
+                    int n = 2;
+                    while (fs::exists(dir / (name + " (" + std::to_string(n) + ").tune"), ec2)) ++n;
+                    name += " (" + std::to_string(n) + ")";
+                }
+                if (!fs::equivalent(src, dir / (name + ".tune"), ec2))
+                    fs::copy_file(src, dir / (name + ".tune"), fs::copy_options::none, ec2);
+                if (ec2) { win.showStatus("Could not copy " + src.filename().string() + ": " + ec2.message(), 6000); return; }
+                openTune(ecu, name);
+            });
+        };
+        if (labels.empty()) { fromFile(); return; }         // nothing saved here yet: the file is the only way in
 
         win.openModal<ListPickerDialog>(
-            std::string("Open Tune \xC2\xB7 " + ecu->board()), labels, false,
+            std::string("Open Tune \xC2\xB7 " + ecu->board()), labels,
+            ListPickerDialog::Extra{ "File\xE2\x80\xA6", fromFile },
             std::function<void(int, std::string)>([&win, openTune, kinds, names](int i, std::string) {
                 if (i < 0 || i >= static_cast<int>(names.size())) return;
                 const std::string& sel = names[static_cast<size_t>(i)];

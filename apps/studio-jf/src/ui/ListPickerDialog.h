@@ -13,6 +13,7 @@
 #include <j/core/JLineEdit.h>
 #include <j/core/JListView.h>
 #include <j/core/JDialogButtonBox.h>
+#include <j/core/MainThreadDispatcher.h>
 #include <j/core/FocusManager.h>
 #include <j/graphics/GpuHal.h>
 #include <j/graphics/RenderPrimitive.h>
@@ -100,6 +101,21 @@ public:
         m_message = std::move(message);
     }
 
+    // ONE MORE WAY TO ANSWER, beside the list: a button that closes the picker and hands over to something
+    // else — "File…" on Open Tune, for a tune that is not in this ECU's collection. It runs AFTER the
+    // picker has closed (posted to the main loop), so whatever it opens is not stacked on a dead dialog.
+    struct Extra { std::string label; std::function<void()> run; };
+    ListPickerDialog(std::string title, std::vector<std::string> items, Extra extra,
+                     std::function<void(int, std::string)> onAccept,
+                     jf::JGpuHal& hal, int sx, int sy, NativeWinHandleType parent)
+        : ListPickerDialog(std::move(title), std::move(items), false, std::move(onAccept),
+                           std::function<void()>{}, std::string{}, hal, sx, sy, parent) {
+        m_extra = std::move(extra);
+        const float w = std::max(kBtnW, jf::JTextHelper::measureWidth(m_extra.label) + 28.f);
+        jf::JButton* b = m_box->addButton(m_extra.label, jf::JDialogButtonBox::Role::Action, w);
+        b->onClicked.connect([this] { m_extraChosen = true; m_done = true; });
+    }
+
     // The same, plus onDismiss: called when the dialog closes WITHOUT a choice — Cancel, Escape, the
     // close [x], the window manager. A caller whose question has consequences either way (a connection
     // held open behind the prompt, say) needs to hear about the third answer too, and silence is not it.
@@ -132,7 +148,13 @@ public:
 
     // Every way out that is not an accept funnels here — there are several (footer, key, [x], WM), and
     // one of them getting missed is exactly how a dismissal turns into silence.
-    ~ListPickerDialog() { if (!m_accepted && m_onDismiss) m_onDismiss(); }
+    ~ListPickerDialog() {
+        if (m_extraChosen && m_extra.run) {
+            jf::JMainThreadDispatcher::instance().post(std::move(m_extra.run));
+            return;
+        }
+        if (!m_accepted && m_onDismiss) m_onDismiss();
+    }
 
     void destroySurface(jf::JGpuHal& hal) { hal.destroySurface(m_surface); }
 
@@ -247,6 +269,8 @@ private:
     std::function<void()> m_onDismiss;
     jf::JButton* m_accept = nullptr;   // the footer's accept, greyed while nothing can be chosen
     bool m_accepted = false;
+    Extra m_extra;                 // the optional third button (see the Extra constructor)
+    bool m_extraChosen = false;
     std::unique_ptr<PlatformWinType> m_window;
     jf::GpuSurfaceId m_surface{0};
     jf::JSceneGraph  m_graph;

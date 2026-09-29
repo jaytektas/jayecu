@@ -403,7 +403,7 @@ The open ECU's documents: its tunes and its layout.
 |---|---|---|---|
 | **New Tune…** | Ctrl+N | Starts a tune offline from a definition in the studio's library, with that definition's default values. | offline |
 | **Open ECU…** | Ctrl+O | Lists every ECU project the studio knows; pick one, then one of its tunes. An ECU with no saved tune opens on its definition's defaults, named *defaults*. | offline |
-| **Open Tune…** | Ctrl+Shift+O | Lists this ECU's tunes, its connect points (marked *(connect point)*) and the tunes saved before firmware updates (marked *(firmware backup)*), newest first. Saves the open tune first. If connected, asks whether to send the chosen tune to the ECU. | a project |
+| **Open Tune…** | Ctrl+Shift+O | Lists this ECU's tunes, its connect points (marked *(connect point)*) and the tunes saved before firmware updates (marked *(firmware backup)*), newest first. **File…** picks a `.tune` file from anywhere instead: it is copied into this ECU's tunes under its own name (numbered if that name is taken) and opened. Saves the open tune first. If connected, asks whether to send the chosen tune to the ECU. | a project |
 | **Recent ECUs** | | The last eight ECU projects opened. The list is read when the studio starts. | offline |
 | **Save Tune** | Ctrl+S | Writes the studio's copy of the tune to its file. Does not burn. | a project |
 | **Save Tune As…** | | Saves the open tune under a new name, which becomes the open tune. | a project |
