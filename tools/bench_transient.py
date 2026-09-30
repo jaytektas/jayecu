@@ -24,7 +24,7 @@ prediction, noise floor and tip-out are all worked out there.
 import struct, sys, time
 sys.path.insert(0, ".")
 from tools.ts_bench import TsLink, Meta
-from tools.gen_rebench import open_stim, select, configure, WHEELS, STREAM0, STREAM_STRIDE
+from tools.gen_rebench import open_stim, select, configure, stim_halt, WHEELS, STREAM0, STREAM_STRIDE
 
 WHEEL_IDX = 6            # 36-1
 TTL_MS    = 500
@@ -195,6 +195,10 @@ def main():
         L.execute("key auto")
         L.close()
         if sp:
+            # STOP THE WHEEL. 'F' sets a speed the stim then holds for good; left spinning, the bench ECU
+            # sat at 2000 rpm afterwards, and an output test (engine-stopped only) cancelled itself the
+            # instant it started — no signal on the scope and nothing to say why.
+            stim_halt(sp)
             sp.close()
         print("\n  (every setting put back as it was; nothing burned)")
 
