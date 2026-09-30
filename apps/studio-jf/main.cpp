@@ -1419,7 +1419,9 @@ int main(int argc, char** argv) {
                 std::string("Remember my choice"),
                 std::function<void(int, bool)>([answer](int i, bool remember) { answer(i == 1, remember); }));
         },
-        [] { return jf::JProgressDialog::active() != nullptr; },
+        [](std::function<void()> onCancel) {
+            if (auto* d = jf::JProgressDialog::active()) d->setCancel(std::move(onCancel));
+        },
     });
     s_startUpgrade = [](const fwkits::Kit& kit, const std::string& identity) {
         s_upgrade.start(kit, identity, link.portName());
@@ -6650,8 +6652,15 @@ int main(int argc, char** argv) {
             if (hash.empty() || board.empty() || ver.empty()) { askForMeta(); return; }
             win.openModal<jf::JProgressDialog>(std::string("Fetching schema"),
                                                board + " " + ver + " from its firmware release");
+            // A DOWNLOAD CAN STALL, so it can be cancelled: the answer, when it comes, is then ignored, and
+            // the schema is asked for as though the release had none.
+            static int s_schemaFetch = 0;
+            const int fetchNo = ++s_schemaFetch;
+            if (auto* d = jf::JProgressDialog::active())
+                d->setCancel([askForMeta] { ++s_schemaFetch; if (link.isOpen()) askForMeta(); });
             fwfetch::fetchVersion(board, ver, hash, true, true,
-                [&win, hash, lib, board, ver, loadSchema, askForMeta](const fwfetch::VersionFiles& r) {
+                [&win, hash, lib, board, ver, loadSchema, askForMeta, fetchNo](const fwfetch::VersionFiles& r) {
+                    if (fetchNo != s_schemaFetch) return;                       // cancelled
                     if (auto* d = jf::JProgressDialog::active()) d->dismiss();
                     if (!link.isOpen() || s_ecuLayout != hash) return;          // disconnected meanwhile
                     if (r.meta.empty()) {

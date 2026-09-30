@@ -75,8 +75,8 @@ this ECU. Burn any unburned changes before using it.
 2. **Show** the changes (section 3).
 3. **Safe?** The ignition must be **off**, the engine stopped and the ECU on **USB power only**,
    judged from live data after you answer. If not, it waits: **Turn the ignition off** stays up, and
-   the update carries on by itself once the ignition is off and the engine stopped. Close that window
-   to cancel; nothing has been changed.
+   the update carries on by itself once the ignition is off and the engine stopped. **Cancel** stops
+   it; nothing has been changed.
 4. **USB access**, if it is missing: on Linux the USB permission rule, through the system password
    prompt; on Windows the USB driver for the bootloader (WinUSB), through the administrator prompt
    (chapter 3). Asked once, and before the ECU is put into its bootloader.

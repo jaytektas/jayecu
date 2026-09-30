@@ -81,8 +81,9 @@ public:
         // A question with two named answers and a "Remember my choice" box: answer(yes, remember).
         std::function<void(const std::string& title, const std::string& body, const std::string& yesLabel,
                            const std::string& noLabel, std::function<void(bool yes, bool remember)> answer)> askRemember;
-        // Is the progress window still up? It is how waiting for the ignition is cancelled: closing it.
-        std::function<bool()> progressShown;
+        // Put a Cancel on the progress window that is up; `onCancel` runs if the person uses it (or closes
+        // the window). For a wait on something outside the studio — the ignition — never for a write.
+        std::function<void(std::function<void()> onCancel)> cancellable;
     };
 
     FirmwareUpgrade(EcuLink& link, Ui ui);

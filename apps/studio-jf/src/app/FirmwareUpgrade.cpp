@@ -170,19 +170,21 @@ void FirmwareUpgrade::safetyCheck() {
                                         "update from here. Nothing was changed."); return; }
     // KEY ON: WAIT FOR IT, don't give up. This used to refuse outright — "turn the ignition off and
     // connect again" — and nothing in the studio offered the update a second time. Now the update waits
-    // for the key, and carries on by itself the moment it is off and the engine stopped. Closing the
-    // window, or the link dropping, cancels it; nothing has been changed either way.
+    // for the key, and carries on by itself the moment it is off and the engine stopped. Cancel, or the
+    // link dropping, ends it; nothing has been changed either way.
     if (key != 0.0 || rpm != 0.0) {
         if (!waitingForKey_) {
             waitingForKey_ = true;
             ui_.openProgress("Turn the ignition off",
                              "Firmware is only updated with the ignition OFF and the engine stopped, the ECU "
-                             "powered from USB alone. The update carries on by itself once the ignition is off. "
-                             "Close this window to cancel.");
-        } else if (ui_.progressShown && !ui_.progressShown()) {
-            waitingForKey_ = false;
-            abandon("Cancelled. Nothing was changed.");
-            return;
+                             "powered from USB alone. The update carries on by itself once the ignition is off.");
+            std::weak_ptr<std::atomic<bool>> alive = alive_;
+            if (ui_.cancellable)
+                ui_.cancellable([this, alive] {
+                    if (!alive.lock() || !waitingForKey_ || step_ != Step::Safety) return;
+                    waitingForKey_ = false;
+                    abandon("Cancelled. Nothing was changed.");
+                });
         }
         if (!link_.isOpen()) {
             waitingForKey_ = false;
