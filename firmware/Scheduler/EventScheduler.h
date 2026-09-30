@@ -164,6 +164,9 @@ public:
     // scheduler's previously-held pins first, so a reconfigure that drops a pin
     // returns it to the pool. Call after set_config(); needs the arbiter.
     void claim_outputs() noexcept;
+    // KEY OFF: every coil and injector pin back to Hi-Z and the channels forgotten, so nothing drives a
+    // firing pin while the ECU is only on USB or the key is off. claim_outputs() brings them back.
+    void release_outputs() noexcept;
 
     // ---- Compute hook (ISR, from a STATIC schedule node) --------------------
     // `index` is indexed BY THE ACTION, because the two schedules are indexed differently:

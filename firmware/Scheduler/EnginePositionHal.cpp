@@ -368,6 +368,25 @@ void EnginePositionHal::service() noexcept
     // Pick up a timing-light adjustment without stopping the engine (see the member's comment).
     trig_offset_btdc_ = static_cast<AngleDeg10>(trig_src_.trigger_offset_btdc);
 
+    // NOTHING IS DRIVEN WITH THE KEY OFF. Generic outputs already let go of their pins (OutputManager);
+    // the coils and injectors did not — the scheduler claimed them at wiring and held them push-pull at
+    // their idle level whatever the key said, so with the ECU on USB or the key off an injector or coil
+    // line was actively driven low. Key off: firing stops and every firing pin goes back to Hi-Z. Key on:
+    // they are claimed again at their idle level, and generic outputs rebuild around them.
+    {
+        extern bool g_system_active;
+        if (g_system_active != key_was_on_) {
+            key_was_on_ = g_system_active;
+            if (!key_was_on_) {
+                scheduler_.set_firing_enabled(false);
+                scheduler_.release_outputs();
+            } else if (assignment_.pin_arbiter) {
+                scheduler_.claim_outputs();
+            }
+            ++g_firing_bind_generation;
+        }
+    }
+
     // Phase-sync rpm band (min/max_full_sync_rpm_x10). The decoder trusts the cam stream to acquire
     // full (PHASE) sync only while rpm is inside the band; outside it the cam is ignored for acquisition
     // and correction, and an already-locked phase is retained on crank counting. min==max==0 disables it

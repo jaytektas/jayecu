@@ -44,6 +44,8 @@ struct Pin final : ITimerChannel {
     [[nodiscard]] uint32_t get_ticks_per_second() const noexcept override { return 1000000; }
     void enable_output(OutputAction a) noexcept override { ++enables; enabled_at = a; }
     void force_output_now(OutputAction a) noexcept override { drives.push_back(a); }
+    int  disables = 0;
+    void disable_output() noexcept override { ++disables; }
 };
 
 struct Alarm final : IAlarmTimer {
@@ -94,6 +96,31 @@ struct Rig {
 int main() {
     fprintf(stdout, "=== Output map ===\n");
     EngineConfig e = engine4();
+
+    // ---- the key: nothing driven while it is off -----------------------------------------------------
+    SECTION("key off: every coil and injector pin back to Hi-Z and nothing fires; key on claims them again");
+    {
+        EngineConfig c = engine4();
+        Rig r(c, layout_output_map(c, TestCoils::COP));
+        const uint8_t ign0 = OUT_ROW_IGN_BASE, inj0 = OUT_ROW_LS_BASE;
+        CHECK(r.arb.owner_of(ign0) == PinOwner::IGNITION);
+        CHECK(r.arb.owner_of(inj0) == PinOwner::INJECTION);
+        r.sched.release_outputs();                               // what EnginePositionHal does at key off
+        CHECK(r.arb.owner_of(ign0) == PinOwner::FREE);
+        CHECK(r.arb.owner_of(inj0) == PinOwner::FREE);
+        CHECK(r.pins[ign0].disables >= 1 && r.pins[inj0].disables >= 1);   // Hi-Z, not left driven
+        size_t before = 0;
+        for (auto& p : r.pins) before += p.drives.size();
+        r.run_injection();                                       // even if something fired…
+        size_t after = 0;
+        for (auto& p : r.pins) after += p.drives.size();
+        fprintf(stdout, "    key off: drives during a cycle %zu -> %zu\n", before, after);
+        CHECK(after == before);                                  // …no pin is touched
+        const int en = r.pins[ign0].enables;
+        r.sched.claim_outputs();                                 // key on
+        CHECK(r.arb.owner_of(ign0) == PinOwner::IGNITION);
+        CHECK(r.pins[ign0].enables == en + 1);                   // back out of Hi-Z at its idle level
+    }
 
     // ---- what a row's cylinder value names --------------------------------------------------------
     SECTION("coil-on-plug: each coil fires only its own cylinder");

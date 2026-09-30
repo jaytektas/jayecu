@@ -248,6 +248,14 @@ void EventScheduler::claim_outputs() noexcept {
     for (uint8_t k = 0; k < MAX_INJ_CHANNELS; ++k) if (inj & (OutputMask(1) << k)) claim_one_inj(k);
 }
 
+void EventScheduler::release_outputs() noexcept {
+    if (!arbiter_) return;
+    arbiter_->release_owner(PinOwner::IGNITION);
+    arbiter_->release_owner(PinOwner::INJECTION);
+    for (uint8_t i = 0; i < MAX_IGN_CHANNELS; ++i) ign_channels_[i] = nullptr;
+    for (uint8_t i = 0; i < MAX_INJ_CHANNELS; ++i) inj_channels_[i] = nullptr;
+}
+
 void EventScheduler::claim_one_ign(uint8_t idx) noexcept {
     if (idx >= MAX_IGN_CHANNELS || ign_channels_[idx]) return;   // unused slot / already claimed
     const uint8_t row = static_cast<uint8_t>(OUT_ROW_IGN_BASE + idx);

@@ -428,6 +428,9 @@ private:
     // Set when the deadline has already reported this silence, so a stopped engine reports ONE
     // missed tooth and then one absent-signal, rather than a code per virtual tooth for ever.
     volatile bool tooth_overdue_reported_ = false;
+    // The key as service() last saw it. Starts ON so an ECU that boots with the key off releases the
+    // firing pins its boot wiring claimed on the very first frame.
+    bool key_was_on_ = true;
     // Latched by the deadline when it declares the wheel stopped; cleared by the next position
     // tooth. This is the one trigger-health signal that is TRUE while nothing is happening, which is
     // exactly what the fault table had no way to express before.
