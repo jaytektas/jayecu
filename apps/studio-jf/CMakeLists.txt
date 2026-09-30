@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-# THE STUDIO'S VERSION — the one place it is set. It is baked into StudioVersion.h (below), shown in
+# THE STUDIO'S VERSION — the one place it is set. It is baked into StudioVersion.cpp (below), shown in
 # Help > About, and compared against the newest GitHub release tag by the update check. A release
 # tagged vX.Y.Z must be built with X.Y.Z here.
 project(jframework_studio VERSION 0.3.7 LANGUAGES CXX)
@@ -142,8 +142,9 @@ if(STUDIO_VERSION_OVERRIDE)
 else()
     set(STUDIO_VERSION_TEXT "${PROJECT_VERSION}")
 endif()
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/app/StudioVersion.h.in
-               ${CMAKE_CURRENT_BINARY_DIR}/generated/StudioVersion.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/app/StudioVersion.cpp.in
+               ${CMAKE_CURRENT_BINARY_DIR}/generated/StudioVersion.cpp @ONLY)
+target_sources(studio PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/generated/StudioVersion.cpp)
 # The udev rule the studio installs for itself on Linux (FirmwareUpgrade.cpp, through JUdevRule): read from the ONE copy in
 # the firmware tree at configure time, so the rule the studio installs is always the rule in the repo.
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../../tools/udev/70-jayecu.rules)
@@ -1778,7 +1779,8 @@ add_dependencies(studio_tests help_pages_test)
 # A released version's descriptor and dashboard, fetched from a release served locally: the right release,
 # checksums, the ECU's layout, a missing version (FirmwareFetch::fetchVersion).
 #   cmake --build build --target firmware_version_fetch_test && ./build/firmware_version_fetch_test
-add_executable(firmware_version_fetch_test EXCLUDE_FROM_ALL tests/test_firmware_version_fetch.cpp src/app/FirmwareFetch.cpp)
+add_executable(firmware_version_fetch_test EXCLUDE_FROM_ALL tests/test_firmware_version_fetch.cpp src/app/FirmwareFetch.cpp
+               ${CMAKE_CURRENT_BINARY_DIR}/generated/StudioVersion.cpp)
 target_link_libraries(firmware_version_fetch_test PRIVATE studio_model JFramework::platform ${STUDIO_TLS_LIBS})
 target_include_directories(firmware_version_fetch_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/generated)
 add_test(NAME firmware_version_fetch COMMAND firmware_version_fetch_test)

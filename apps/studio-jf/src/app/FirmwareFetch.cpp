@@ -2,7 +2,7 @@
 
 #include <j/update/JSha256.h>
 #include <j/update/JVersion.h>
-#include "StudioVersion.h"
+#include "app/StudioVersion.h"
 
 #include <j/config/Json.h>
 #include <j/core/MainThreadDispatcher.h>
@@ -27,7 +27,7 @@ std::string releasesUrl() {
 namespace {
 
 const std::vector<jf::JHttpHeader> kHeaders = {
-    { "User-Agent", "jayecu-studio/" STUDIO_VERSION },   // GitHub refuses requests without one
+    { "User-Agent", std::string("jayecu-studio/") + STUDIO_VERSION },   // GitHub refuses requests without one
 };
 
 std::string httpWhy(const jf::JHttpResponse& r) {

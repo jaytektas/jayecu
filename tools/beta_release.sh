@@ -69,7 +69,7 @@ KITS="$SHIP" apps/studio-jf/tools/make_appimage.sh apps/studio-jf/build > /tmp/b
     || { tail -20 /tmp/beta_release_appimage.log >&2; die "AppImage failed"; }
 say "studio (windows) + installer"
 make -s studio-win > /tmp/beta_release_win.log 2>&1 || { tail -20 /tmp/beta_release_win.log >&2; die "windows build failed"; }
-grep -q "\"$STUDIO_VER\"" apps/studio-jf/build-win/generated/StudioVersion.h || die "the windows build does not say $STUDIO_VER"
+grep -q "\"$STUDIO_VER\"" apps/studio-jf/build-win/generated/StudioVersion.cpp || die "the windows build does not say $STUDIO_VER"
 (cd apps/studio-jf && WINEDEBUG=-all ${ISCC:-wine C:/InnoSetup/ISCC.exe} /DAppVersion="$STUDIO_VER" \
     '/DKitsDir=..\..\..\firmware\build\ship-kits-beta' installer/studio.iss) > /tmp/beta_release_iss.log 2>&1 \
     || { tail -20 /tmp/beta_release_iss.log >&2; die "installer failed"; }

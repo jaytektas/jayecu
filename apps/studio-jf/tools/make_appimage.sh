@@ -17,8 +17,8 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD="${1:-$HERE/build}"
-VERSION="$(sed -n 's/^#define STUDIO_VERSION *"\([^"]*\)".*/\1/p' "$BUILD/generated/StudioVersion.h")"
-[ -n "$VERSION" ] || { echo "make_appimage: no version in $BUILD/generated/StudioVersion.h" >&2; exit 1; }
+VERSION="$(sed -n 's/^#define STUDIO_VERSION_STRING *"\([^"]*\)".*/\1/p' "$BUILD/generated/StudioVersion.cpp")"
+[ -n "$VERSION" ] || { echo "make_appimage: no version in $BUILD/generated/StudioVersion.cpp" >&2; exit 1; }
 OUT="$BUILD/jayecu-studio-$VERSION-x86_64.AppImage"
 
 command -v appimagetool >/dev/null || { echo "make_appimage: appimagetool is not on PATH" >&2; exit 1; }
