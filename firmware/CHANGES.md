@@ -25,7 +25,7 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 - Transient TPS Scaling's default rises with RPM, from 150 %/s at 500 rpm through 300 at 2000 to 700 at 6000 (was 100 everywhere): at speed the MAP sensor lags less, so it takes a faster stab to need prediction.
 - MAP prediction can also predict a fast throttle LIFT (Predict Tip-Out, off by default): the estimate moves down towards Predicted MAP, as a tip-in moves it up.
 - A throttle sensor that drops out no longer reads as the pedal snapping shut and then stabbing: MAP prediction is not triggered by a TPS dropout.
-- Output wizard: a Check Engine Light — on while any trouble code is active, with a bulb check at key-on; it fails lit if the ECU cannot read its count.
+- Output wizard: a Check Engine Light — on while any trouble code is active or a protection level is in force (a level can hold after its fault clears), with a bulb check at key-on; it fails lit if the ECU cannot read its state.
 - With the key off (or the ECU only on USB), coil and injector outputs are no longer driven: their pins are released to high impedance, like every other output, and claimed again at key-on. They used to be held driven low whatever the key said.
 - The studio greys out settings that only apply when the engine stops (the trigger streams, the engine's shape, an output's coil or injector assignment) while it is connected and the engine is turning. Trigger Offset BTDC and the full-sync RPM band stay editable: the ECU reads them at once.
 - The bench output test needs the key on: with the key off it is refused and a running test stops (nothing is driven with the key off). On the output pages Test is greyed out unless the key is on and the engine stopped; Stop and Stop All always work.
