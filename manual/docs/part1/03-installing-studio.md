@@ -338,6 +338,9 @@ or refused). Nothing was changed."
     - **Include beta firmware** (off by default): the firmware check also looks at beta releases, and
       the newest firmware wins, beta or not. Betas are published between releases for testing; leave
       this off on a car you depend on.
+    - **Include beta studio versions** (off by default): the studio update check also looks at beta
+      studios, and offers the newest, beta or not. A beta studio is replaced by the release that
+      follows it, because a release always counts as newer than its betas.
     - **Copy the meta and dashboard to the ECU's SD card**: after a
       firmware update or recovery, put the ECU's meta and pages on its SD card, so another
       studio can read the ECU with no internet. It takes about a minute. The studio asks each time

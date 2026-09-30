@@ -76,7 +76,7 @@ ST_PROG   ?= STM32_Programmer_CLI
 META_LIB  ?= $(HOME)/.local/share/jayecu/jayecu Studio/meta
 
 .DEFAULT_GOAL := codegen
-.PHONY: help all package release manual-publish ship-kits stim sdk sdk-win jframework-src sdk-check sdk-win-check codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio bench-beta manual
+.PHONY: help all package release manual-publish ship-kits stim sdk sdk-win jframework-src sdk-check sdk-win-check codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio bench-beta beta-release manual
 
 # codegen.py emits shared/tuneit-meta.json (the TuneIt Data Dictionary) along with the C++
 # headers, ecu.ini and ecu.json — so a bare `make` already produces it, then installs it into
@@ -285,6 +285,12 @@ manual: codegen
 bench-beta:
 	@[ -n "$(BENCH)" ] || { echo "make bench-beta: say which machine — BENCH=<ssh host>" >&2; exit 1; }
 	STUDIO=$(STUDIO) tools/bench_beta.sh $(BENCH) $(BOARD)
+
+# A BETA RELEASE for the opt-in studios: beta studio packages + a beta kit per board in release/v<beta>/,
+# published as a GitHub PRE-RELEASE (tools/beta_release.sh; the `beta` skill). Builds only — never publishes.
+BETA_BOARDS ?= $(BOARD)
+beta-release:
+	BOARD=$(BOARD) tools/beta_release.sh "$(BETA_BOARDS)"
 
 bench-studio: studio-appimage
 	@[ -n "$(BENCH)" ] || { echo "make bench-studio: say which machine — BENCH=<ssh host>" >&2; exit 1; }

@@ -78,6 +78,10 @@ if gui.exists():
 import release_notes
 label['notes'] = [n for n in release_notes.released()
                   if release_notes.vkey(n['version']) <= release_notes.vkey(version)]
+# A BETA's own changes are still under Unreleased: they are its notes, so a beta tester is told what
+# the beta changes rather than nothing.
+if '-' in version and release_notes.unreleased():
+    label['notes'].insert(0, {'version': version, 'changes': release_notes.unreleased()})
 if not a.version and not any(n['version'] == version for n in label['notes']):
     sys.exit(f'firmware/CHANGES.md has no "## {version}" section — make release writes it from Unreleased')
 (kit_dir / 'kit.json').write_text(json.dumps(label, indent=2) + '\n')

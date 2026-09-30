@@ -2,6 +2,7 @@
 """Gather one release into one folder, named the way the studio's two update checks read it.
 
     python3 tools/make_release.py --studio-version X.Y.Z [--boards "jaytek_v1 proteus_f7"] [--out DIR]
+    python3 tools/make_release.py --studio-version X.Y.Z-beta.N --fw-version A.B.C-beta.M   (make beta-release)
 
 `make release` builds everything first and then runs this. The folder it writes is uploaded, file for file,
 as the assets of ONE GitHub release on jaytektas/jayecu, tagged vX.Y.Z (the studio's version):
@@ -50,6 +51,7 @@ def die(msg: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--studio-version", required=True)
+    ap.add_argument("--fw-version", help="default: firmware/version.txt; a beta's kits are in <board>/betas")
     ap.add_argument("--boards", default="jaytek_v1")
     ap.add_argument("--out", help="default: release/v<studio-version>")
     ap.add_argument("--offline", action="store_true", help="skip the check against the published release")
@@ -57,7 +59,8 @@ def main():
     a = ap.parse_args()
 
     ver = a.studio_version
-    fw_ver = (REPO / "firmware" / "version.txt").read_text().strip()
+    fw_ver = a.fw_version or (REPO / "firmware" / "version.txt").read_text().strip()
+    kits = "betas" if "-" in fw_ver else "kits"
     out = pathlib.Path(a.out) if a.out else REPO / "release" / f"v{ver}"
     if out.exists():
         shutil.rmtree(out)
@@ -76,12 +79,12 @@ def main():
     put(REPO / f"apps/studio-jf/build/jayecu-studio-{ver}-x86_64.AppImage", f"jayecu-studio-{ver}-x86_64.AppImage")
     put(REPO / f"apps/studio-jf/installer/Output/jayecu-studio-{ver}-setup.exe", f"jayecu-studio-{ver}-setup.exe")
 
-    # One kit per board, the one for firmware/version.txt.
+    # One kit per board, the one for this firmware version.
     for board in a.boards.split():
-        kit = REPO / "firmware" / "build" / board / "kits" / f"{board}-{fw_ver}"
+        kit = REPO / "firmware" / "build" / board / kits / f"{board}-{fw_ver}"
         label_path = kit / "kit.json"
         if not label_path.is_file():
-            die(f"no kit for {board} {fw_ver} at {kit} — make kit BOARD={board}")
+            die(f"no kit for {board} {fw_ver} at {kit} — make kit BOARD={board} (a beta: make beta-release)")
         label = json.loads(label_path.read_text())
         if label.get("board") != board or label.get("version") != fw_ver:
             die(f"{label_path} describes {label.get('board')} {label.get('version')}, not {board} {fw_ver}")
@@ -125,6 +128,12 @@ def main():
             with urllib.request.urlopen(urllib.request.Request(RELEASES, headers={"User-Agent": "jayecu-release"}),
                                         timeout=15) as r:
                 releases = json.load(r)
+            # A BETA must also be newer than every published beta: a beta studio compares the tag with
+            # its own, pre-releases included, so v0.3.8-beta.2 after v0.3.8-beta.3 reaches nobody.
+            if "-" in ver:
+                newest = max((x.get("tag_name", "") for x in releases), key=version_key, default="")
+                if newest and version_key(ver) <= version_key(newest):
+                    die(f"{newest} is already published; v{ver} is not newer, so no beta studio would offer it")
             for board in a.boards.split():
                 ours = json.loads((out / f"{board}-{fw_ver}-kit.json").read_text()).get("build", "")
                 for rel in releases:
