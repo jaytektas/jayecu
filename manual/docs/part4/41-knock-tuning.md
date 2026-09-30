@@ -77,8 +77,8 @@ with RPM is normal — the floor rises with it.
 
 ### Step 1 — Listen in the right place
 
-Chapter 30: **Knock Frequency** 0 (worked out from the bore), **Window Start** −10° (10° after TDC:
-+ is before TDC, as with spark advance) and **Window Duration** 40° to begin with. Check on the Knock Scope with the engine warm and clean:
+Chapter 30: **Knock Frequency** 0 (worked out from the bore), **Window Start** 10° before the spark
+and **Window Duration** 80° to begin with. Check on the Knock Scope with the engine warm and clean:
 
 - The bars should be low and fairly flat through the window.
 - A tall bar at the **same crank angle** every time, on a clean engine, is mechanical noise — a valve
@@ -139,9 +139,9 @@ The honest check is real knock, heard and seen together. With headphones on the 
 
 ### Step 6 — Pre-ignition (boosted engines)
 
-With **Pre-Ignition Detection** on, each window opens **Look-Ahead** (10°) before its own spark
-(chapter 30), so it follows the timing without Window Start being moved. On the scope, pre-ignition
-is energy at or before the spark line. Raise **Pre-Ignition
+With **Pre-Ignition Detection** on, nothing about the window needs moving: it already opens Window
+Start before every spark (chapter 30). On the scope, pre-ignition is energy at or before the spark
+line. Raise **Pre-Ignition
 Margin** or **Events Before Action** if the cut trips on a healthy engine; never switch it off to
 cure a real one.
 

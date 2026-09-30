@@ -657,27 +657,22 @@ void EnginePositionHal::recompute_ignition(uint8_t cyl) noexcept
     }
 
     // Knock sampling window: arm this cylinder's ADC burst once per cycle, only when knock windowing is
-    // enabled — at Window Start, or earlier by the pre-ignition look-ahead before THIS spark.
+    // enabled — Window Start before THIS cylinder's spark, so it follows the timing.
     //
     // ARMED FROM THE IGNITION SCHEDULE, not the injection one. The window is a per-cylinder
     // observation of a per-cylinder combustion event, and injection is no longer per cylinder: under
     // multi-point an eight-cylinder engine holds two injection events, so hanging the windows off
     // INJ_SCHEDULE would have armed two of the eight and silently stopped listening to the rest.
     if (knock_window_en_) {
-        const AngleDeg10 open = knock_open_btdc(knock_window_start_, knock_lookahead_, shadow_[cyl].spark_btdc);
+        const AngleDeg10 open = knock_open_btdc(knock_before_spark_, shadow_[cyl].spark_btdc);
         knock_open_btdc_[cyl] = open;
         scheduler_.arm_knock_window(cyl, angle_btdc(tdc, open, cyc));
     }
 }
 
-AngleDeg10 EnginePositionHal::knock_open_btdc(AngleDeg10 start_btdc, AngleDeg10 lookahead,
-                                              AngleDeg10 spark_btdc) noexcept
+AngleDeg10 EnginePositionHal::knock_open_btdc(AngleDeg10 before_spark, AngleDeg10 spark_btdc) noexcept
 {
-    AngleDeg10 open = start_btdc;
-    if (lookahead > 0) {
-        const AngleDeg10 pre = static_cast<AngleDeg10>(spark_btdc + lookahead);
-        if (pre > open) open = pre;
-    }
+    const AngleDeg10 open = static_cast<AngleDeg10>(spark_btdc + before_spark);
     // ARMED FROM IGN_SCHEDULE, which runs SCHED_COMPUTE_LEAD (90 deg) before TDC: a window asked to open
     // earlier than that is already behind the crank when it is armed, and would fire a whole cycle late.
     // 5 deg of margin for the compute itself.

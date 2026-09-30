@@ -291,12 +291,11 @@ extern "C" void SPDIF_RX_IRQHandler(void) {
 // BUFFER SIZE IS A WINDOW LIMIT, not just an allocation. The sample count is window_duration_deg
 // scaled to the current RPM, so a fixed buffer caps the window in TIME and therefore truncates it in
 // ANGLE at low RPM — the opposite end from where you would expect to run out. At the 281.25 kHz
-// sample rate, 3072 samples is 10.9 ms: the default 40 deg window down to ~610 rpm, and a window opened
-// early for pre-ignition (10 deg before a 30 deg spark, closing 50 deg ATDC: 90 deg) down to ~1370 rpm.
-// It was 2048 until the look-ahead made windows longer — 7.28 ms, 90 deg only above ~2060 rpm, and
-// low-speed pre-ignition lives below that. (512 once reached only ~3660 rpm, so a 40 deg window at idle
-// was silently sampling ~11 deg.) s_knock_truncs counts every clamp so the ceiling is visible on the
-// bench instead of being mistaken for a quiet engine.
+// sample rate, 3072 samples is 10.9 ms: the default 80 deg window (it opens before the spark and has to
+// reach well past TDC) down to ~1220 rpm. It was 2048 when the window was 40 deg from TDC — 7.28 ms,
+// which would have held 80 deg only above ~1830 rpm, and low-speed pre-ignition lives below that. (512
+// once reached only ~3660 rpm, so a 40 deg window at idle was silently sampling ~11 deg.) s_knock_truncs
+// counts every clamp so the ceiling is visible on the bench instead of being mistaken for a quiet engine.
 static KnockDetector g_knock_detector;
 static uint16_t __attribute__((section(".dma_nocache"))) s_knock_buf[3072];
 static uint16_t      s_knock_cfg_freq = 0;      // last DSP band-center configured (worker-owned)
@@ -359,13 +358,10 @@ static void knock_task(void*) {
                 s_knock_cfg_freq = freq;
             }
 
-            // THE WINDOW RUNS FROM WHERE IT OPENED TO WHERE IT CLOSES. It opens at Window Start, or earlier
-            // by the pre-ignition look-ahead before this cylinder's spark (the scheduler says which), and
-            // it always closes at Window Start - Window Duration: the knock part is the same either way,
-            // and the look-ahead only adds the stretch before it.
-            const float open_btdc  = static_cast<float>(g_epos_hal.knock_window_open_btdc(cyl)) * 0.1f;
-            const float close_btdc = static_cast<float>(kc.window_start_btdc) - static_cast<float>(kc.window_duration_deg);
-            const float span_deg   = open_btdc - close_btdc;
+            // Where this cylinder's window opened — Window Start before ITS spark, which the scheduler
+            // armed — and it runs Window Duration from there.
+            const float open_btdc = static_cast<float>(g_epos_hal.knock_window_open_btdc(cyl)) * 0.1f;
+            const float span_deg  = static_cast<float>(kc.window_duration_deg);
             // Sample count = that span's worth of time at the current RPM,
             // clamped to the buffer. oneDegreeUs = 60e6 / (360*rpm) = 1.6667e6 / rpm_x10.
             const uint32_t rpm_x10 = g_epos_hal.get_rpm_x10();
@@ -564,13 +560,11 @@ static void config_save_task(void* /*pv*/) {
         }
 
         // Knock sampling window: track the live Knock config each pass (cheap). Enabled only for the
-        // onboard source. Window Start is degrees BTDC, + advanced / - retarded like spark advance, and
-        // SIGNED: the default -10 opens 10 deg after TDC. With pre-ignition detection on, the look-ahead
-        // opens each window that far before its own spark instead (EnginePositionHal::knock_open_btdc).
+        // onboard source. It opens Window Start before each cylinder's own spark, so it follows the timing
+        // (EnginePositionHal::knock_open_btdc).
         g_epos_hal.set_knock_window(
             g_config.knock.enabled != 0 && g_config.knock.source == 0,
-            static_cast<AngleDeg10>(g_config.knock.window_start_btdc * 10),
-            static_cast<AngleDeg10>(g_config.knock.preign_enabled ? g_config.knock.preign_lookahead_deg * 10 : 0));
+            static_cast<AngleDeg10>(g_config.knock.window_before_spark_deg * 10));
 
         // Persist the DTC table to SD when it changed (raise/heal/clear/clear_all +
         // freeze-frame writes set the dirty flag; the save takes it). The whole
@@ -959,17 +953,17 @@ static void cmd_knk(const Cli::Argv&, Cli::Out& o) {
     }
     o.put("\r\n");
 
-    // THE WINDOW HAS TO REACH THE SPARK, or pre-ignition detection is switched on and blind. With the
-    // look-ahead it opens before every spark by itself; this still catches a look-ahead of 0, and a
-    // spark so advanced that the window hit its earliest-possible limit (85 deg BTDC).
+    // THE WINDOW HAS TO REACH THE SPARK, or pre-ignition detection is switched on and blind. It opens
+    // Window Start before every spark by itself; this still catches a Window Start of 0, and a spark so
+    // advanced that the window hit its earliest-possible limit (85 deg BTDC).
     if (g_config.knock.preign_enabled && sh.profile.hasPhase() &&
-        sh.profile.start_deg > -sh.spark_deg) {
+        sh.profile.start_deg > -sh.spark_deg - 1.0f) {                 // not even 1 deg before the spark
         o.put("  WARNING: pre-ignition is ENABLED but the window opens at ");
         o.print_i32(static_cast<int32_t>(-sh.profile.start_deg));
-        o.put(" deg BTDC, AFTER the spark at ");
+        o.put(" deg BTDC, not before the spark at ");
         o.print_i32(static_cast<int32_t>(sh.spark_deg));
-        o.put(" deg BTDC. Nothing before the spark is sampled -> it can never fire.\r\n"
-              "           Set knock.preign_lookahead_deg above 0 (e.g. 10).\r\n");
+        o.put(" deg BTDC. Nothing before the spark is sampled -> the timing check can never fire.\r\n"
+              "           Set knock.window_before_spark_deg above 0 (e.g. 10).\r\n");
     }
 }
 

@@ -248,23 +248,21 @@ public:
     [[nodiscard]] uint8_t   config_trigger_fault() const noexcept { return config_fault_; }
 
     // --- Knock sampling window (A1) ---
-    // Enable + where the per-cylinder ADC knock burst window opens, in decidegrees BTDC (+ advanced,
-    // - retarded — the sense of spark advance). `lookahead` (decidegrees, 0 = off) opens it that far
-    // before the cylinder's OWN spark instead, when that is earlier: pre-ignition lights the charge at
-    // or before the spark, so a window that follows the timing is the only one that sees it at every
-    // advance. The window's dispatch deposits the fired cylinder into the ISR->worker mailbox.
-    void set_knock_window(bool enabled, AngleDeg10 start_btdc, AngleDeg10 lookahead) noexcept {
-        knock_window_en_ = enabled; knock_window_start_ = start_btdc; knock_lookahead_ = lookahead;
+    // Enable + how far BEFORE each cylinder's own spark its ADC knock burst window opens (decidegrees).
+    // The window follows the timing: pre-ignition lights the charge at or before the spark, so a window
+    // anchored to the spark sees it at every advance, where one fixed to TDC sees it at only some. The
+    // window's dispatch deposits the fired cylinder into the ISR->worker mailbox.
+    void set_knock_window(bool enabled, AngleDeg10 before_spark) noexcept {
+        knock_window_en_ = enabled; knock_before_spark_ = before_spark;
     }
-    // Where THIS cylinder's window last opened (decidegrees BTDC) — Window Start, or its spark plus the
-    // look-ahead. The worker sizes the burst and stamps the profile from it.
+    // Where THIS cylinder's window last opened (decidegrees BTDC, + advanced). The worker stamps the
+    // profile from it.
     [[nodiscard]] AngleDeg10 knock_window_open_btdc(uint8_t cyl) const noexcept {
-        return cyl < MAX_CYLINDERS ? knock_open_btdc_[cyl] : knock_window_start_;
+        return cyl < MAX_CYLINDERS ? knock_open_btdc_[cyl] : 0;
     }
-    // The open angle for a spark at `spark_btdc`: the earlier of Window Start and spark + look-ahead,
-    // never earlier than the ignition schedule point that arms it (it could not be armed in time).
-    [[nodiscard]] static AngleDeg10 knock_open_btdc(AngleDeg10 start_btdc, AngleDeg10 lookahead,
-                                                    AngleDeg10 spark_btdc) noexcept;
+    // The open angle (BTDC) for a spark at `spark_btdc`: `before_spark` ahead of it, never earlier than
+    // the ignition schedule point that arms it (it could not be armed in time).
+    [[nodiscard]] static AngleDeg10 knock_open_btdc(AngleDeg10 before_spark, AngleDeg10 spark_btdc) noexcept;
     // Drain one fired-window cylinder for the knock worker. Returns false when empty. Single consumer
     // (worker) against the single-producer ISR deposit — lock-free SPSC.
     [[nodiscard]] bool pop_knock_cyl(uint8_t& cyl) noexcept;
@@ -397,8 +395,7 @@ private:
     // Knock sampling window + the ISR->worker mailbox (SPSC ring of fired cylinders). Producer is the
     // ADC_TRIGGER dispatch (compute hook, ISR); consumer is the knock worker via pop_knock_cyl.
     bool                     knock_window_en_    = false;
-    AngleDeg10               knock_window_start_ = 0;      // decidegrees BTDC (+ advanced)
-    AngleDeg10               knock_lookahead_    = 0;      // decidegrees before the spark; 0 = off
+    AngleDeg10               knock_before_spark_ = 0;      // decidegrees the window opens before the spark
     AngleDeg10               knock_open_btdc_[MAX_CYLINDERS] = {};   // where each window last opened
     static constexpr uint8_t KNOCK_RING          = 8;      // pow2; drops on overflow (worker behind)
     volatile uint8_t         knock_ring_[KNOCK_RING] = {};

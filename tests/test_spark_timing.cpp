@@ -494,20 +494,19 @@ int main() {
         CHECK(ws <= 3400u);                                         // a wasted pair fires every 360°
     }
 
-    SECTION("the knock window opens at Window Start, or LOOK-AHEAD before this cylinder's spark if earlier");
+    SECTION("the knock window opens Window Start BEFORE this cylinder's spark, wherever the timing is");
     {
-        // Angles BTDC, + advanced. A fixed window angle cannot follow the timing: -40 straddled a 17 deg
-        // spark and was after a 45 deg one, which is exactly where pre-ignition is likeliest.
+        // Angles BTDC, + advanced. A window fixed to TDC cannot follow the timing: one that straddled a
+        // 17 deg spark was after a 45 deg one, which is exactly where pre-ignition is likeliest.
         using EPH = EnginePositionHal;
-        CHECK(EPH::knock_open_btdc(-100, 0, 170) == -100);      // no look-ahead: Window Start (10 ATDC)
-        CHECK(EPH::knock_open_btdc(-100, 100, 170) == 270);     // 10 before a 17 deg spark
-        CHECK(EPH::knock_open_btdc(-100, 100, 450) == 550);     // …and before a 45 deg one: it follows
-        CHECK(EPH::knock_open_btdc(-100, 100, -50) == 50);      // a retarded spark (5 ATDC) too
-        CHECK(EPH::knock_open_btdc(400, 100, 170) == 400);      // a Window Start already earlier wins
-        CHECK(EPH::knock_open_btdc(-100, 200, 800) == 850);     // never earlier than it can be armed
+        CHECK(EPH::knock_open_btdc(100, 200) == 300);      // 10 before a 20 deg spark = 30 BTDC
+        CHECK(EPH::knock_open_btdc(100, 450) == 550);      // …and before a 45 deg one: it follows
+        CHECK(EPH::knock_open_btdc(100, -50) == 50);       // a retarded spark (5 ATDC): 5 BTDC
+        CHECK(EPH::knock_open_btdc(0, 170) == 170);        // 0 opens right at the spark
+        CHECK(EPH::knock_open_btdc(200, 800) == 850);      // never earlier than it can be armed
         // and armed where it says: 27 deg BTDC is 27 deg before this cylinder's TDC
         const AngleDeg10 tdc = 1800;
-        CHECK(fwd(EPH::angle_btdc(tdc, EPH::knock_open_btdc(-100, 100, 170), ANGLE_720), tdc) == 270);
+        CHECK(fwd(EPH::angle_btdc(tdc, EPH::knock_open_btdc(100, 170), ANGLE_720), tdc) == 270);
     }
 
     return test_summary();

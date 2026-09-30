@@ -38,10 +38,12 @@ The **Knock Control** module (`knock`):
 - **Detection Source**: **Onboard** samples KNOCK1 and KNOCK2 (CN4-23, CN4-22) directly.
   **External** reads a knock intensity in dB from another device over the bus (**External
   Intensity**); it has no per-cylinder detail, so it retards all cylinders together.
-- **Window Start** (default **−10°**) and **Window Duration** (40°) set when to listen, measured from
-  each cylinder's own TDC, so the window follows the firing order. Like spark advance, **+ is before
-  TDC and − after**: −10 opens the window 10° after TDC, and it closes 40° later, at 50° after.
-  <!-- src: definition/ecu.schema.yaml (knock.window_start_btdc); firmware/Scheduler/EnginePositionHal.cpp (knock_open_btdc) -->
+- **Window Start (before spark)** (default **10°**) and **Window Duration** (80°) set when to listen.
+  The window opens that many degrees before **each cylinder's own spark**, so it follows the timing and
+  the firing order: a 20° spark opens it at 30° BTDC, and it listens for 80° from there, to 50° after
+  TDC. It opens before the spark so it can hear pre-ignition (below), and runs well past TDC because
+  knock rings through the expansion stroke. It never opens earlier than 85° BTDC.
+  <!-- src: definition/ecu.schema.yaml (knock.window_before_spark_deg); firmware/Scheduler/EnginePositionHal.cpp (knock_open_btdc); firmware/main.cpp (knock_task) -->
 - **Knock Frequency**: the centre of the filter. **0** (the default) works it out from the engine's
   **Bore** (chapter 15): 900 ÷ (π × bore/2) kHz — about 7.2 kHz for an 80 mm bore — or 7 kHz if no bore
   is set.
@@ -98,14 +100,9 @@ normal rate. **Knock Suppress Below TPS** (0 = off) adds a throttle gate if you 
 
 ### 4 · Pre-ignition
 
-Pre-ignition lights the charge at or before the spark, so it can only be seen in a window that opens
-before the spark. With **Pre-Ignition Detection** on, each cylinder's window opens **Pre-Ignition
-Look-Ahead** (10°) before **that cylinder's own spark**, wherever the timing is: at 17° of advance it
-opens at 27° before TDC, at 40° at 50°. It still closes where Window Start and Duration put it, so the
-knock part is unchanged; the window just starts earlier. It never opens earlier than 85° before TDC.
-<!-- src: firmware/Scheduler/EnginePositionHal.cpp (knock_open_btdc); firmware/main.cpp (knock_task) -->
-
-A loud event is judged **pre-ignition** when either:
+Pre-ignition lights the charge at or before the spark. The window always opens **Window Start**
+before each spark, so the energy before the spark is always in it, at any timing. With
+**Pre-Ignition Detection** on, a loud event is judged **pre-ignition** when either:
 
 - at least **Pre-Spark Energy Fraction** (35 %) of its energy came before the spark and it is
   **Pre-Ignition Margin** (6 dB) louder than the knock threshold; or
@@ -143,7 +140,8 @@ Open **Configuration ▸ Ignition Tuning ▸ Knock Control** and tick **Enabled*
 
 ![The Knock Control page](../img/studio/knock-page.png)
 
-1. **Listening:** Source Onboard; Knock Frequency 0 (from the bore); Window Start −10°, Duration 40°.
+1. **Listening:** Source Onboard; Knock Frequency 0 (from the bore); Window Start 10° before the spark,
+   Duration 80°.
 2. **Sensor per cylinder:** leave on Auto, or set each cylinder to the sensor nearest it.
 3. **Response:** keep Retard Step 0.5° and Recovery 1 °/s.
 4. **Learn the floor:** drive gently through the range with the engine warm. Watch the **Noise Floor**
@@ -162,8 +160,8 @@ Open **Configuration ▸ Ignition Tuning ▸ Knock Control** and tick **Enabled*
     Banks set in chapter 15; Auto sends bank 1 to Knock 1 and bank 2 to Knock 2.
 
 !!! example "Example 3 — watching for pre-ignition on a boosted engine"
-    Window Start −10°, Duration 40° (knock, as before); Pre-Ignition Detection on with Look-Ahead 10°,
-    so every window opens 10° before its spark; Events Before Action 2, Cut Fuel on, Cut Hold 0.
+    Window Start 10° before the spark, Duration 80°; Pre-Ignition Detection on, Events Before Action 2,
+    Cut Fuel on, Cut Hold 0.
 
 ## Tuning it
 

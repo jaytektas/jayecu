@@ -36,13 +36,13 @@ def page_knock():
     y = p.field(det, 10, y, 'External Intensity', K + 'external_intensity_sig', 'enum', 190,
                 enable=f'{ON} and [#knock.source] != 0')
     y = p.field(det, 10, y, 'Knock Frequency', K + 'knock_frequency', 'configedit', 110, 'Hz', enable=ON)
-    y = p.field(det, 10, y, 'Window Start', K + 'window_start_btdc', 'configedit', 110, 'deg', enable=ON)
+    y = p.field(det, 10, y, 'Window Start (before spark)', K + 'window_before_spark_deg', 'configedit', 110, 'deg', enable=ON)
     p.field(det, 10, y, 'Window Duration', K + 'window_duration_deg', 'configedit', 110, 'deg', enable=ON)
     h_det = A.panel_h(5, A.ROW, top=12, bottom=6)
     p.note(10, y0 + h_det + 6,
-           'Frequency 0 derives the resonance from the bore. The window is measured from each '
-           'cylinder\'s own TDC (+ before, - after, like spark advance), so it follows the firing order '
-           'without being told it — open it too wide and valve noise arrives inside it.', w=420)
+           'Frequency 0 derives the resonance from the bore. The window opens Window Start before each '
+           'cylinder\'s own spark, so it follows the timing and the firing order without being told '
+           'either — open it too wide and valve noise arrives inside it.', w=420)
 
     # ---- 2 · Response ----------------------------------------------------------------------------
     y_res = y0 + h_det + 92
@@ -73,14 +73,11 @@ def page_knock():
            'Runtime state persisted to the SD card, not tune data.', w=390)
 
     y_pre = y0 + h_learn + 62
-    h_pre = A.panel_h(8, A.ROW, top=10, bottom=4)
+    h_pre = A.panel_h(7, A.ROW, top=10, bottom=4)
     pre = p.panel(450, y_pre, 400, h_pre, 'Pre-Ignition')
     pon = f'{ON} and [#knock.preign_enabled] == 1'
     y = 12
     y = p.field(pre, 10, y, 'Pre-Ignition Detection', K + 'preign_enabled', 'checkbox', enable=ON)
-    # THE WINDOW FOLLOWS THE SPARK: with this on, each window opens this far before its own cylinder's
-    # spark, wherever the timing is — the setting that makes the rest of this panel able to see anything.
-    y = p.field(pre, 10, y, 'Look-Ahead', K + 'preign_lookahead_deg', 'configedit', 110, 'deg', enable=pon)
     y = p.field(pre, 10, y, 'Pre-Window Fraction', K + 'preign_pre_frac', 'configedit', 110, enable=pon)
     y = p.field(pre, 10, y, 'Margin', K + 'preign_margin_db', 'configedit', 110, 'dB', enable=pon)
     y = p.field(pre, 10, y, 'Extreme', K + 'preign_extreme_db', 'configedit', 110, 'dB', enable=pon)
