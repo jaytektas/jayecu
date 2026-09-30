@@ -9,7 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
-- Knock: the window now opens Window Start before each cylinder's own spark (default 10°), so it follows the timing and always covers the moment before the spark, where pre-ignition shows. Before, it opened at a fixed angle after TDC, after the spark, so pre-ignition could only be caught by its loudness. Window Duration now defaults to 80°, so the window still reaches well past TDC for knock. Window Start is a new setting: updating drops a tune's old one and uses the default.
+- Knock: the window now opens Window Start before each cylinder's own spark (default 10°), so it follows the timing and always covers the moment before the spark, where pre-ignition shows. Before, it opened at a fixed angle after TDC, after the spark, so pre-ignition could only be caught by its loudness. Window Duration now defaults to 80°, so the window still reaches well past TDC for knock. Both are new settings: updating drops a tune's old Window Start and Window Duration and uses the new defaults (an old 40° duration would now end the window near TDC, before the knock).
 
 ## 0.4.4
 - Fuel Tuning ▸ MAP Prediction & Fuel Film: the readouts under the Predicted MAP and Transient TPS Scaling tables no longer run off the bottom of the page.

@@ -37,7 +37,7 @@ def page_knock():
                 enable=f'{ON} and [#knock.source] != 0')
     y = p.field(det, 10, y, 'Knock Frequency', K + 'knock_frequency', 'configedit', 110, 'Hz', enable=ON)
     y = p.field(det, 10, y, 'Window Start (before spark)', K + 'window_before_spark_deg', 'configedit', 110, 'deg', enable=ON)
-    p.field(det, 10, y, 'Window Duration', K + 'window_duration_deg', 'configedit', 110, 'deg', enable=ON)
+    p.field(det, 10, y, 'Window Duration', K + 'window_length_deg', 'configedit', 110, 'deg', enable=ON)
     h_det = A.panel_h(5, A.ROW, top=12, bottom=6)
     p.note(10, y0 + h_det + 6,
            'Frequency 0 derives the resonance from the bore. The window opens Window Start before each '

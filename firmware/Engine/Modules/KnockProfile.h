@@ -18,7 +18,7 @@
 // 7 kHz knock frequency and a 281.25 kHz sample rate one knock period is ~40 samples, so a bucket
 // narrower than that reports noise dressed as a measurement.
 //
-// The burst is not a fixed length either: the worker scales the sample count to window_duration_deg
+// The burst is not a fixed length either: the worker scales the sample count to window_length_deg
 // at the current RPM, so a 40 deg window is ~2048 samples at idle and ~313 at 6000 rpm. A FIXED
 // bucket count would therefore be honest at one end of the range and meaningless at the other —
 // 32 buckets of 313 samples is 10 samples each, a quarter of one oscillation.

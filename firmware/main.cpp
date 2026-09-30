@@ -288,7 +288,7 @@ extern "C" void SPDIF_RX_IRQHandler(void) {
 // bounded and drops when full, so at high RPM the worker samples a subset of windows rather than
 // falling behind.
 //
-// BUFFER SIZE IS A WINDOW LIMIT, not just an allocation. The sample count is window_duration_deg
+// BUFFER SIZE IS A WINDOW LIMIT, not just an allocation. The sample count is window_length_deg
 // scaled to the current RPM, so a fixed buffer caps the window in TIME and therefore truncates it in
 // ANGLE at low RPM — the opposite end from where you would expect to run out. At the 281.25 kHz
 // sample rate, 3072 samples is 10.9 ms: the default 80 deg window (it opens before the spark and has to
@@ -361,7 +361,7 @@ static void knock_task(void*) {
             // Where this cylinder's window opened — Window Start before ITS spark, which the scheduler
             // armed — and it runs Window Duration from there.
             const float open_btdc = static_cast<float>(g_epos_hal.knock_window_open_btdc(cyl)) * 0.1f;
-            const float span_deg  = static_cast<float>(kc.window_duration_deg);
+            const float span_deg  = static_cast<float>(kc.window_length_deg);
             // Sample count = that span's worth of time at the current RPM,
             // clamped to the buffer. oneDegreeUs = 60e6 / (360*rpm) = 1.6667e6 / rpm_x10.
             const uint32_t rpm_x10 = g_epos_hal.get_rpm_x10();

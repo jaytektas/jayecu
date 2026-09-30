@@ -11095,7 +11095,7 @@ knock.retard_step_deg                                                    scalar 
 knock.source                                                             scalar     off=14961    dt=U08  scale=1          bits=[-1:-1] n=0     stride=0
 knock.suppress_min_tps                                                   scalar     off=14974    dt=U16  scale=0.1        bits=[-1:-1] n=0     stride=0
 knock.window_before_spark_deg                                            scalar     off=14964    dt=U16  scale=1          bits=[-1:-1] n=0     stride=0
-knock.window_duration_deg                                                scalar     off=14966    dt=U16  scale=1          bits=[-1:-1] n=0     stride=0
+knock.window_length_deg                                                  scalar     off=14966    dt=U16  scale=1          bits=[-1:-1] n=0     stride=0
 lambda.cl_after_cut_ms                                                   scalar     off=225      dt=U16  scale=1          bits=[-1:-1] n=0     stride=0
 lambda.cl_min_clt                                                        scalar     off=227      dt=S16  scale=1          bits=[-1:-1] n=0     stride=0
 lambda.cl_start_delay_s                                                  scalar     off=224      dt=U08  scale=1          bits=[-1:-1] n=0     stride=0
