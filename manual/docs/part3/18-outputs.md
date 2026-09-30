@@ -343,7 +343,7 @@ run. With this firmware they are:
 | **Starter Motor** | Digital | Fixed 100 % | Off | **Maximum Crank** (10 s), **Rest Before Retry** (3 s); interlocks to tick: in neutral, clutch down, brake pressed |
 | **Main Relay** | Digital | Fixed 100 % | On | nothing: on whenever the ECU is awake |
 | **Shift Light** | Digital | Fixed 100 % | Off | **Light On Above** (6500 rpm), **Light Off Below** (6300 rpm) |
-| **Check Engine Light** | Digital | Fixed 100 % | On | **Bulb Check** (3 s): lit at key-on, then slow flash at protection level 1, fast flash at level 2, on at level 3 |
+| **Check Engine Light** | Digital | Fixed 100 % | On | **Bulb Check** (3 s): lit at key-on; then on for any current code or level 3, fast flash for level 2 and slow flash for level 1 once their codes have cleared |
 | **Tachometer** | PWM | Fixed 50 % | Off | **Pulses per Rev** (2), **Squelch Below** (60 rpm); frequency = rpm × pulses ÷ 60 |
 | **Boost Solenoid (Wastegate)** | PWM 30 Hz | Candidate `wastegate_duty` | Off | **Stop Below RPM** (200) |
 | **VVT Solenoid (Intake Bank 1)** … **(Exhaust Bank 2)** | PWM 250 Hz | Candidate `vvt_duty_1` … `vvt_duty_4` | Off | **Stop Below RPM** (200); four templates, one per cam (chapter 25) |
@@ -354,14 +354,15 @@ run. With this firmware they are:
 
 The full text of each template, with its conditions, is in the reference (*Output templates*).
 
-The **Check Engine Light** says how serious things are, from **Protection Level** `prot_level`: a
-**slow flash** (1 Hz) while protection level 1 is in force, a **fast flash** (4 Hz) at level 2, and **on**
-at level 3. An active code always puts its severity's level in force, and a level can hold after its fault
-has gone, or act on stored faults (chapter 29), so the lamp shows limp mode for as long as it lasts. The
-key-on flash is the bulb check: a lamp that never lights at key-on is a dead bulb or an open circuit, not a
-healthy engine. It fails **on**: if the ECU cannot read the level, the lamp lights. Which codes are active,
-and why, is on the Diagnostic Trouble Codes list (chapter 44). The flashers it uses, **Flasher (slow, 1 Hz)**
-`blink_slow` and **Flasher (fast, 4 Hz)** `blink_fast`, can be read by any output's conditions.
+The **Check Engine Light** is **on** while any code is current (**Active DTC Count** `dtc_active`) and
+**on** at protection level 3. A protection level can hold after its codes have cleared, or act on stored
+codes (chapter 29); then level 2 gives a **fast flash** (4 Hz) and level 1 a **slow flash** (1 Hz), so the
+lamp still says the engine is in limp mode. A level only ever adds a flash: it never turns the lamp off
+while a code is current. The key-on flash is the bulb check: a lamp that never lights at key-on is a dead
+bulb or an open circuit, not a healthy engine. It fails **on**: if the ECU cannot read its state, the lamp
+lights. Which codes are active, and why, is on the Diagnostic Trouble Codes list (chapter 44). The flashers
+it uses, **Flasher (slow, 1 Hz)** `blink_slow` and **Flasher (fast, 4 Hz)** `blink_fast`, can be read by
+any output's conditions.
 <!-- src: definition/ecu.schema.yaml (output_templates: check_engine_light) -->
 
 - The numbers you enter land in the output's **Template Numbers** (A–D), and the conditions read them

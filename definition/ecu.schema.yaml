@@ -7646,8 +7646,8 @@ output_templates:
 
 - id: check_engine_light
   name: Check Engine Light
-  blurb: 'Says which protection level is in force: slow flash level 1, fast flash level 2, on level 3.'
-  detail: 'The key-on flash is the bulb check: a lamp that never lights at key-on is a dead bulb or an open circuit, not a healthy engine. After it, the lamp says how serious things are: a SLOW flash while protection level 1 is in force, a FAST flash at level 2, ON at level 3 (an active code always puts its severity''s level in force). A level can hold after its fault has cleared, or act on stored faults — the lamp keeps showing it until the level lets go. Which codes and why is on the Diagnostic Trouble Codes list. If the ECU cannot read any of it the lamp is ON: a warning light fails lit.'
+  blurb: 'On for any current code or level 3; slow flash for level 1, fast for level 2 once their codes have cleared.'
+  detail: 'The key-on flash is the bulb check: a lamp that never lights at key-on is a dead bulb or an open circuit, not a healthy engine. After it, the lamp is ON while any code is current, and ON at protection level 3. A level can hold after its codes have cleared, or act on stored codes; then level 2 FLASHES FAST and level 1 FLASHES SLOWLY, so the lamp still says the engine is in limp. A level only ever adds a flash: it never turns the lamp off while a code is current. Which codes and why is on the Diagnostic Trouble Codes list. If the ECU cannot read any of it the lamp is ON: a warning light fails lit.'
   kind: 1
   value_source: 2
   fixed_pct: 100
@@ -7655,8 +7655,9 @@ output_templates:
   params:
   - {name: bulb_s, label: Bulb Check, units: s, default: 3, min: 0, max: 10, digits: 1, help: 'How long the lamp lights at key-on before it shows the state. 0 skips the check.'}
   # One condition, no Turn Off: the lamp follows it (an empty off condition means "when this stops").
-  # (No separate "any active code" term: an active code always puts its severity's level in force.)
-  on_when:  'uptime_s < {bulb_s} or prot_level == 3 or (prot_level == 2 and blink_fast) or (prot_level == 1 and blink_slow)'
+  # ON for any current code or level 3; levels 1 and 2 only FLASH, and only when neither holds — a level
+  # can add a flash, never turn the lamp off.
+  on_when:  'uptime_s < {bulb_s} or dtc_active > 0 or prot_level == 3 or (prot_level == 2 and blink_fast) or (prot_level == 1 and blink_slow)'
   off_when: ''
 
 - id: tachometer

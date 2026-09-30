@@ -192,7 +192,8 @@ and clear them, are in chapter 44.
 
 The **Diagnostic Trouble Codes** dock shows the level in force beside the code counts, "Protection level 2
 in force", and keeps showing it after the codes that set it have cleared, for as long as the level holds.
-A **Check Engine Light** output (chapter 18) flashes it: slowly at level 1, fast at level 2, on at level 3.
+A **Check Engine Light** output (chapter 18) is on for any current code or level 3, and flashes a level
+that is still holding after its codes cleared: slowly for level 1, fast for level 2.
 <!-- src: firmware/Engine/Modules/EngineProtection.cpp (prot_level, blink_slow/fast); apps/studio-jf/src/ui/DtcDock.h; definition/ecu.schema.yaml (check_engine_light) -->
 
 ## Troubleshooting
