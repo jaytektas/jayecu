@@ -1144,17 +1144,45 @@ int main(int argc, char** argv) {
     };
     // Every kit's meta into the meta library, under the name connect looks for ("<board> <hash>.meta").
     // Then an ECU already running a kit's firmware is recognised at once, without reading its SD card.
-    // Only ever ADDS: a meta already in the library for that hash is the same layout and is left alone.
+    //
+    // THE NEWEST KIT'S META WINS FOR ITS LAYOUT. This used to only ever ADD — "a meta already in the library
+    // for that hash is the same layout" — but the same layout is not the same meta: a later build with the
+    // settings in the same places can carry new apply rules, new output templates, new labels and help.
+    // Kept first-come, the library went on serving the oldest copy of a layout for good, and a Studio that
+    // locks engine-stop settings while the engine turns read a meta that did not say which they were. So
+    // for each board+layout the meta of the newest kit (by version) replaces a library copy that differs.
     // …and every kit's DASHBOARD into the dashboard library, named for its layout the same way
     // ("<board> <hash>.gui"), so an ECU is given the pages drawn for the firmware it actually runs.
     static const auto installKitMetas = [] {
         namespace fs = std::filesystem;
         const fs::path lib = StudioPaths::dataDir("meta"), dlib = StudioPaths::dataDir("dashboards");
-        for (const fwkits::Kit& k : allKits()) {
-            if (k.layoutHash.empty()) continue;
-            const fs::path dest = lib / (k.board + " " + k.layoutHash + ".meta");
+        std::map<std::string, const fwkits::Kit*> newest;     // "<board> <hash>" -> the newest kit for it
+        const std::vector<fwkits::Kit> kits = allKits();
+        for (const fwkits::Kit& k : kits) {
+            if (k.layoutHash.empty() || k.meta.empty()) continue;
+            const fwkits::Kit*& best = newest[k.board + " " + k.layoutHash];
+            if (!best || jf::JVersion::parse(k.version).isNewerThan(jf::JVersion::parse(best->version))) best = &k;
+        }
+        const auto sameBytes = [](const fs::path& a, const fs::path& b) {
+            std::error_code e1, e2;
+            if (fs::file_size(a, e1) != fs::file_size(b, e2) || e1 || e2) return false;
+            std::ifstream fa(a, std::ios::binary), fb(b, std::ios::binary);
+            return std::equal(std::istreambuf_iterator<char>(fa), std::istreambuf_iterator<char>(),
+                              std::istreambuf_iterator<char>(fb));
+        };
+        for (const auto& [name, k] : newest) {
+            const fs::path dest = lib / (name + ".meta");
             std::error_code ec;
-            if (!fs::exists(dest, ec)) fs::copy_file(k.meta, dest, ec);
+            if (!fs::exists(dest, ec) || !sameBytes(k->meta, dest)) {
+                fs::create_directories(lib, ec);
+                fs::copy_file(k->meta, dest, fs::copy_options::overwrite_existing, ec);
+                JLOGC("firmware", jf::JLogLevel::Info) << "meta library: " << name << " <- kit " << k->version
+                                                       << (ec ? " (FAILED: " + ec.message() + ")" : "");
+            }
+        }
+        for (const fwkits::Kit& k : kits) {
+            if (k.layoutHash.empty()) continue;
+            std::error_code ec;
             if (!k.dashboard.empty() && fs::exists(k.dashboard, ec)) {
                 fs::create_directories(dlib, ec);
                 const fs::path dd = dlib / (k.board + " " + k.layoutHash + ".gui");
