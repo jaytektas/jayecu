@@ -776,6 +776,13 @@ private:
         fwBeta->setChecked(JSettings::instance().get<bool>("updates.firmwareBeta", false));
         fwBeta->onStateChanged.connect([](bool on) { JSettings::instance().set("updates.firmwareBeta", on); });
 
+        // …and THE STUDIO'S OWN: off, the update check only ever offers a full release; on, a newer beta
+        // studio too (JAppUpdater's beta channel reads every release, not just the latest).
+        f->add(std::make_unique<JLabel>(m_graph, "Include beta studio versions", 240.f));
+        JCheckBox* stBeta = f->add(std::make_unique<JCheckBox>(m_graph, "", 30.f));
+        stBeta->setChecked(JSettings::instance().get<bool>("updates.studioBeta", false));
+        stBeta->onStateChanged.connect([](bool on) { JSettings::instance().set("updates.studioBeta", on); });
+
         // THE SD COPY after installing firmware (FirmwareUpgrade::copyToSd). Asked each time unless the
         // answer was remembered; this is that answer. Unset, the box shows the likely one, and changing it
         // counts as remembering.
@@ -801,10 +808,10 @@ private:
 
         f->add(std::make_unique<JLabel>(m_graph, "", 240.f));
         addNote(f, 7, "Checks online for a newer studio and newer ECU firmware. Firmware is downloaded "
-                      "and kept, but never put on an ECU without asking. Beta firmware is for testing: "
-                      "leave it off on a car you depend on. The SD card copy lets another studio read the "
+                      "and kept, but never put on an ECU without asking. Betas (firmware or studio) are for "
+                      "testing: leave them off on a car you depend on. The SD card copy lets another studio read the "
                       "ECU with no internet; the studio asks each time unless you tell it to remember.");
-        m_rows[7] = 9 + menuRows;
+        m_rows[7] = 10 + menuRows;
     }
 
     void buildEditor() {

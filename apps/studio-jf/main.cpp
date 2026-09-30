@@ -1130,9 +1130,11 @@ int main(int argc, char** argv) {
     // ONE RELEASE CARRIES BOTH the studio packages and the firmware kits, and its TAG IS THE STUDIO'S
     // VERSION: this compares the tag with STUDIO_VERSION, so every release bumps the studio's version,
     // even one that only changes firmware. The kits carry their own versions (FirmwareFetch.h).
+    // THE BETA CHANNEL (Preferences > Updates > Include beta studio versions): with it on, a newer BETA
+    // studio is offered too — a pre-release carrying a package for this platform.
     static jf::JAppUpdater s_updater(win, { "jayecu Studio", STUDIO_VERSION,
                                             "https://api.github.com/repos/jaytektas/jayecu/releases/latest",
-                                            "JAYECU_UPDATE_URL" });
+                                            "JAYECU_UPDATE_URL", "updates.studioBeta" });
 
     // ECU FIRMWARE KITS (FirmwareKits.h): the ones shipped beside the studio and the ones downloaded
     // since. Scanned on demand — a handful of folders — so a kit fetched a minute ago counts at once.

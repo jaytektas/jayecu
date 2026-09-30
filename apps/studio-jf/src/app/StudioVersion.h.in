@@ -5,7 +5,7 @@
 // so a release tagged v0.2.0 must be built from a tree that says 0.2.0, or every user of it is told
 // that the version they already have is an update.
 
-#define STUDIO_VERSION       "@PROJECT_VERSION@"
+#define STUDIO_VERSION       "@STUDIO_VERSION_TEXT@"   // a beta build: "0.3.8-beta.1"
 #define STUDIO_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
 #define STUDIO_VERSION_MINOR @PROJECT_VERSION_MINOR@
 #define STUDIO_VERSION_PATCH @PROJECT_VERSION_PATCH@

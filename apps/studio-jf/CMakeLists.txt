@@ -134,6 +134,14 @@ target_precompile_headers(studio_surface PRIVATE ${STUDIO_PCH})
 add_executable(studio main.cpp ${STUDIO_APP_SRC} ${STUDIO_UI_SRC})
 target_link_libraries(studio PRIVATE studio_model studio_surface)
 target_include_directories(studio PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# A BETA BUILD's version: -DSTUDIO_VERSION_OVERRIDE=0.3.8-beta.1 (tools/beta_release.sh). The project()
+# VERSION above cannot carry a pre-release suffix, and the update check compares the whole string.
+set(STUDIO_VERSION_OVERRIDE "" CACHE STRING "Full studio version for a beta build (empty: the project version)")
+if(STUDIO_VERSION_OVERRIDE)
+    set(STUDIO_VERSION_TEXT "${STUDIO_VERSION_OVERRIDE}")
+else()
+    set(STUDIO_VERSION_TEXT "${PROJECT_VERSION}")
+endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/app/StudioVersion.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/generated/StudioVersion.h @ONLY)
 # The udev rule the studio installs for itself on Linux (FirmwareUpgrade.cpp, through JUdevRule): read from the ONE copy in
