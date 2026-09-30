@@ -105,7 +105,7 @@ void FirmwareUpgrade::recover(const fwkits::Kit& kit) {
 void FirmwareUpgrade::start(const fwkits::Kit& kit, const std::string& identity, const std::string& port) {
     kit_ = kit; identity_ = identity; port_ = port;
     recovering_ = false;
-    tuneDict_.clear(); noTune_ = false; pushed_.clear(); report_ = {}; backupPath_.clear(); lastTelemetry_.clear();
+    tuneDict_.clear(); noTune_ = false; pushed_.clear(); report_ = {}; backupPath_.clear(); lastTelemetry_.clear(); waitingForKey_ = false;
     // identity = "jayecu <board> <version> <build> <layout_hash> <device_uid> t<telemetry_size>"
     const auto w = words(identity);
     board_       = w.size() > 1 ? w[1] : "";
@@ -168,12 +168,33 @@ void FirmwareUpgrade::safetyCheck() {
     const double key = value("key_on", haveKey), rpm = value("rpm", haveRpm);
     if (!haveKey || !haveRpm) { abandon("The ECU's live data has no ignition or RPM reading, so it is not safe to "
                                         "update from here. Nothing was changed."); return; }
+    // KEY ON: WAIT FOR IT, don't give up. This used to refuse outright — "turn the ignition off and
+    // connect again" — and nothing in the studio offered the update a second time. Now the update waits
+    // for the key, and carries on by itself the moment it is off and the engine stopped. Closing the
+    // window, or the link dropping, cancels it; nothing has been changed either way.
     if (key != 0.0 || rpm != 0.0) {
-        abandon(std::string(rpm != 0.0 ? "The engine is running." : "The ignition is on.") +
-                "\n\nFirmware is only updated with the ignition OFF and the engine stopped, the ECU powered "
-                "from USB alone. Turn the ignition off and connect again.\n\nNothing was changed.");
+        if (!waitingForKey_) {
+            waitingForKey_ = true;
+            ui_.openProgress("Turn the ignition off",
+                             "Firmware is only updated with the ignition OFF and the engine stopped, the ECU "
+                             "powered from USB alone. The update carries on by itself once the ignition is off. "
+                             "Close this window to cancel.");
+        } else if (ui_.progressShown && !ui_.progressShown()) {
+            waitingForKey_ = false;
+            abandon("Cancelled. Nothing was changed.");
+            return;
+        }
+        if (!link_.isOpen()) {
+            waitingForKey_ = false;
+            abandon("The ECU disconnected while waiting for the ignition. Nothing was changed.");
+            return;
+        }
+        ui_.progress(0, rpm != 0.0 ? "The engine is running." : "The ignition is on.");
+        std::weak_ptr<std::atomic<bool>> alive = alive_;
+        jf::JTimer::singleShot(std::chrono::milliseconds(200), [this, alive] { if (alive.lock()) safetyCheck(); });
         return;
     }
+    if (waitingForKey_) { waitingForKey_ = false; ui_.closeProgress(); }
     checkPermission();
 }
 

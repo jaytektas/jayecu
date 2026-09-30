@@ -11,7 +11,8 @@
 //                   set that the new firmware drops, and what the new firmware adds, each on its own
 //                   pages, highlighted (FirmwareChangesDialog). That report IS the question — Update
 //                   firmware / Not now. "Not now" writes nothing and the connect carries on.
-//   3. SAFE?        ignition off and engine stopped, from live data arriving AFTER the answer.
+//   3. SAFE?        ignition off and engine stopped, from live data arriving AFTER the answer. With the
+//                   key on it WAITS for it to go off (closing the wait cancels).
 //   PERMISSION      the USB rule (Linux) or the WinUSB driver (Windows), through the system's own
 //                   administrator prompt if missing.
 //                   Before DFU, never after: a bootloader nobody may open is a board stuck in DFU.
@@ -80,6 +81,8 @@ public:
         // A question with two named answers and a "Remember my choice" box: answer(yes, remember).
         std::function<void(const std::string& title, const std::string& body, const std::string& yesLabel,
                            const std::string& noLabel, std::function<void(bool yes, bool remember)> answer)> askRemember;
+        // Is the progress window still up? It is how waiting for the ignition is cancelled: closing it.
+        std::function<bool()> progressShown;
     };
 
     FirmwareUpgrade(EcuLink& link, Ui ui);
@@ -152,5 +155,6 @@ private:
     bool sdAnswered_ = false, sdYes_ = false;   // the SD question, answered this run without "remember"                                                  // what happened on the card
     std::vector<uint8_t> lastTelemetry_;
     int waitTicks_ = 0;
+    bool waitingForKey_ = false;          // the ignition was on at the safety check: waiting for it
     std::shared_ptr<std::atomic<bool>> alive_ = std::make_shared<std::atomic<bool>>(true);
 };

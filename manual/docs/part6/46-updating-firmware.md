@@ -59,7 +59,9 @@ If your ECU is several versions behind, every one of them is listed, newest firs
 changes at all, this is most of the report, headed **What changed**.
 
 That report is the question: **Update firmware** or **Not now**. Not now changes nothing; the next
-connect asks again.
+connect asks again, and so does **Tools ▸ Check for ECU Firmware Update…** at any time while connected.
+That checks the releases for anything newer first, then offers the newest firmware the studio has for
+this ECU. Burn any unburned changes before using it.
 <!-- src: apps/studio-jf/main.cpp; apps/studio-jf/src/app/FirmwareUpgrade.h; apps/studio-jf/src/ui/FirmwareChangesDialog.h; firmware/CHANGES.md -->
 
 ### 4 · The steps
@@ -72,8 +74,9 @@ connect asks again.
 1. **Read** the tune off the ECU.
 2. **Show** the changes (section 3).
 3. **Safe?** The ignition must be **off**, the engine stopped and the ECU on **USB power only**,
-   judged from live data after you answer. If not, it stops with nothing changed: turn the ignition off
-   and connect again.
+   judged from live data after you answer. If not, it waits: **Turn the ignition off** stays up, and
+   the update carries on by itself once the ignition is off and the engine stopped. Close that window
+   to cancel; nothing has been changed.
 4. **USB access**, if it is missing: on Linux the USB permission rule, through the system password
    prompt; on Windows the USB driver for the bootloader (WinUSB), through the administrator prompt
    (chapter 3). Asked once, and before the ECU is put into its bootloader.
@@ -113,8 +116,8 @@ connect asks again.
     the tune comes back exactly as it was, and the new table waits to be switched on.
 
 !!! example "Example 2 — asked with the ignition on"
-    Update firmware → "Firmware is only updated with the ignition OFF and the engine stopped, the ECU
-    powered from USB alone." Nothing was changed. Ignition off, connect again, update.
+    Update firmware → **Turn the ignition off**: "The ignition is on." Turn the key off; the window
+    closes and the update carries on.
 
 ## Pitfalls and troubleshooting
 
@@ -123,7 +126,8 @@ connect asks again.
 | Symptom | Likely causes | Check |
 |---|---|---|
 | No update offered | No newer kit; the offer is switched off; the kit needs a newer studio | Preferences ▸ Updates; update the studio |
-| Stops at the safety check | Ignition on; engine turning | Ignition off, USB only |
+| Waits at **Turn the ignition off** | Ignition on; engine turning | Ignition off, USB only |
+| Said Not now, want it back | The offer is made once per connection | **Tools ▸ Check for ECU Firmware Update…** |
 | Linux: cannot open the bootloader | The USB permission rule | Chapter 3 |
 | Windows: "the USB driver … is not installed" or "has another driver" | The administrator prompt was declined; another program's driver (for example ST's) is bound to the bootloader | Run **Install the jayecu USB driver** from the Start menu, then connect again |
 | Flash failed part-way | USB unplugged or disturbed | The ECU waits in its bootloader: answer **Try again**, or press Connect later (chapter 47) |

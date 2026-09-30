@@ -1214,7 +1214,9 @@ int main(int argc, char** argv) {
     // met OR has firmware for — the shipped kits are what recovery installs on a virgin board, so they are
     // kept current too. `manual` = the Check now button, which reports every outcome; at startup only a
     // download is worth mentioning, and only in the status line — nothing is put on an ECU from here.
-    static std::function<void(bool)> s_checkFirmware = [&win](bool manual) {
+    // `then` runs once the check is over, whatever it found (the ECU menu's check offers the update from there).
+    static std::function<void(bool, std::function<void()>)> s_checkFirmware =
+        [&win](bool manual, std::function<void()> then) {
         std::vector<std::string> boards;
         for (const Ecu::Summary& e : Ecu::list())
             if (!e.board.empty() && std::find(boards.begin(), boards.end(), e.board) == boards.end())
@@ -1224,11 +1226,12 @@ int main(int argc, char** argv) {
                 boards.push_back(k.board);
         if (boards.empty()) {
             if (manual) win.showStatus("No ECU has been connected yet, so there is no firmware to look for", 6000);
+            if (then) then();
             return;
         }
         fwfetch::fetchLatest(boards, allKits(), STUDIO_VERSION, StudioPaths::dataDir("firmware"),
             jf::JSettings::instance().get<bool>("updates.firmwareBeta", false),
-            [&win, manual](const fwfetch::Result& r) {
+            [&win, manual, then](const fwfetch::Result& r) {
                 JLOGC("updates", jf::JLogLevel::Info)
                     << "firmware check: " << fwfetch::releasesUrl() << " -> latest '" << r.latest << "', "
                     << r.installed.size() << " kit(s) fetched" << (r.error.empty() ? "" : ", error: " + r.error);
@@ -1246,13 +1249,15 @@ int main(int argc, char** argv) {
                     else if (!r.error.empty())  win.showStatus("Could not check for firmware: " + r.error, 8000);
                     else                        win.showStatus("ECU firmware is up to date", 5000);
                 }
+                if (then) then();
             });
     };
-    PreferencesDialog::onCheckForUpdates = [] { s_updater.check(true); s_checkFirmware(true); };
+    PreferencesDialog::onCheckForUpdates = [] { s_updater.check(true); s_checkFirmware(true, {}); };
 
     // THE CONNECTED ECU'S FIRMWARE, from its identity reply. Set on every jayecu connect; the offer
     // below compares it with the newest kit once the tune has been read.
     static std::string s_ecuBoard, s_ecuFwVersion, s_ecuFwBuild, s_ecuLayout;
+    static std::string s_ecuIdentity;              // what the connected ECU last said it is (the whole line)
     // The layout the pages on screen were loaded for (g_loadProjectDoc). A reconnect to the same ECU keeps
     // the live layout only while this still matches what the ECU reports — see g_adoptConnectedEcu.
     static std::string s_docLayout;
@@ -1264,16 +1269,20 @@ int main(int argc, char** argv) {
     // Yes hands the ECU to the upgrade (assigned once the link exists, further down).
     static std::function<void(const fwkits::Kit&, const std::string& identity)> s_startUpgrade;
     static std::function<void()> s_offerRecovery;   // an ECU found waiting in its bootloader
-    static std::function<bool(const std::string&, std::function<void()>)> s_askFirmware =
-        [&win](const std::string& identity, std::function<void()> resume) {
-        if (!jf::JSettings::instance().get<bool>("updates.firmwareOnConnect", true)) return false;
+    // The newest kit this studio has for the connected ECU's board, when it is newer than what the ECU runs.
+    static std::function<bool(fwkits::Kit&)> s_newerKit = [](fwkits::Kit& kit) {
         if (s_ecuBoard.empty() || s_ecuFwVersion.empty()) return false;
-        fwkits::Kit kit;
         if (!fwkits::newestFor(allKits(), s_ecuBoard, STUDIO_VERSION, kit)) return false;
         if (!fwkits::isNewerThan(kit.version, s_ecuFwVersion)) return false;
         // Already running that image. The build alone is not enough: every build from an uncommitted tree
         // is "<hash>-dirty", so two different images share it — the layout tells those apart.
-        if (!kit.build.empty() && kit.build == s_ecuFwBuild && kit.layoutHash == s_ecuLayout) return false;
+        return kit.build.empty() || kit.build != s_ecuFwBuild || kit.layoutHash != s_ecuLayout;
+    };
+    static std::function<bool(const std::string&, std::function<void()>)> s_askFirmware =
+        [&win](const std::string& identity, std::function<void()> resume) {
+        if (!jf::JSettings::instance().get<bool>("updates.firmwareOnConnect", true)) return false;
+        fwkits::Kit kit;
+        if (!s_newerKit(kit)) return false;
         JLOGC("updates", jf::JLogLevel::Info) << "ECU " << s_ecuBoard << " runs " << s_ecuFwVersion
             << "; kit " << kit.version << (kit.shipped ? " (shipped)" : " (downloaded)") << " at " << kit.dir;
         // NO BLIND QUESTION. The offer is the report of what the update changes (FirmwareUpgrade reads
@@ -1410,6 +1419,7 @@ int main(int argc, char** argv) {
                 std::string("Remember my choice"),
                 std::function<void(int, bool)>([answer](int i, bool remember) { answer(i == 1, remember); }));
         },
+        [] { return jf::JProgressDialog::active() != nullptr; },
     });
     s_startUpgrade = [](const fwkits::Kit& kit, const std::string& identity) {
         s_upgrade.start(kit, identity, link.portName());
@@ -2480,6 +2490,33 @@ int main(int argc, char** argv) {
     // A FIRMWARE KIT BY HAND: a test build sent to one person, without publishing anything. Pick the
     // kit's kit.json; the folder is checked as a kit (every file it names present), copied in beside the
     // downloaded kits, and from then on it is offered like any other — newest wins.
+    // ASK AGAIN. The update is offered once per connection; "Not now", or an update that stopped before
+    // it changed anything, left no way to get the offer back short of reconnecting. This checks the
+    // releases first (a newer kit may have been published since), then offers the newest the studio
+    // has — downloaded or installed by hand — for the ECU that is connected.
+    toolsMenu.add(g, "Check for ECU Firmware Update\xE2\x80\xA6")->onTriggered.connect([&win]{
+        if (!link.isOpen() || s_ecuIdentity.empty()) {
+            jf::JDialog::message("ECU firmware", "Connect the ECU first: the update is for the ECU that is connected.");
+            return;
+        }
+        if (s_upgrade.active()) return;
+        if (tuneburn::pending() && tuneburn::pending()()) {
+            jf::JDialog::message("ECU firmware", "The tune has changes that are not burned. Burn them first, so "
+                                 "the update carries the tune you mean across.");
+            return;
+        }
+        win.showStatus("Checking for ECU firmware \xE2\x80\xA6", 5000);
+        s_checkFirmware(false, [&win] {
+            if (!link.isOpen() || s_upgrade.active()) return;
+            fwkits::Kit kit;
+            if (!s_newerKit(kit)) {
+                jf::JDialog::message("ECU firmware", "This ECU runs firmware " + s_ecuFwVersion +
+                                     ", the newest this studio has for it. Nothing to update.");
+                return;
+            }
+            s_startUpgrade(kit, s_ecuIdentity);
+        });
+    });
     toolsMenu.add(g, "Install Firmware Kit\xE2\x80\xA6")->onTriggered.connect([&win]{
         jf::JDialog::openFile("Choose the kit's kit.json", { "json" }, [&win](std::string path) {
             namespace fs = std::filesystem;
@@ -5730,7 +5767,7 @@ int main(int argc, char** argv) {
     if (settings.get<bool>("updates.checkOnStartup", true) && !g_run.any())
         s_updater.check(false);
     if (settings.get<bool>("updates.firmwareOnStartup", true) && !g_run.any())
-        s_checkFirmware(false);
+        s_checkFirmware(false, {});
     // THE APPLICATIONS MENU (Linux AppImage only; DesktopIntegration.h). Already there: say nothing, and
     // quietly re-point it if this AppImage has moved. Not there: ask once — and a "no" is remembered as
     // the Preferences ▸ Updates tick box, so nobody is asked at every launch. Never in a scripted run.
@@ -6476,6 +6513,7 @@ int main(int argc, char** argv) {
         s_ecuFwVersion = p.size() > 2 ? p[2] : std::string();
         s_ecuFwBuild   = p.size() > 3 ? p[3] : std::string();
         s_ecuLayout    = p.size() > 4 ? p[4] : std::string();
+        s_ecuIdentity  = sig;
         // NEWER FIRMWARE? Asked HERE, before the meta, the dashboard or the tune are loaded: if the
         // answer is to upgrade, none of that belongs to the firmware the ECU is about to run. Asked
         // once per connection — the answer re-enters this handler, which then goes straight past.
