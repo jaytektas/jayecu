@@ -124,6 +124,7 @@ public:
 
 private:
     float quiet_ms_[2] = { 0.0f, 0.0f };   // how long each sensor has read below quiet_db
+    float judge_ms_    = 0.0f;             // how long the sensors have been judgeable (combustion, over the floor)
     [[nodiscard]] uint16_t cell_index(float rpm, float load) const;
     // Teach the live cell that this cylinder sounded like `db` on a clean cycle.
     void learn(uint8_t cyl, float db);

@@ -420,7 +420,13 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
         // window is sampled and the channel expires on a perfectly good sensor. Judged then, a cut
         // caused by one fault reported a second one (P1750) that was nothing but its consequence.
         const bool combustion = !bus.valid(wk::fuel_cut) && !bus.valid(wk::ign_cut);
-        const bool judge = combustion && rpm >= static_cast<float>(cfg_->learn_min_rpm);
+        // …AND NOT AT ONCE. The first window is sampled a few firings after spark begins; judged in the
+        // frame the engine crosses the floor, the channel has not been published yet. A real start ramps
+        // through cranking and hides that, but key-on into a crank already turning (a bench, a bump
+        // start) jumps straight over the floor and reported P1750 on a sensor that had not been read.
+        const bool running = combustion && rpm >= static_cast<float>(cfg_->learn_min_rpm);
+        judge_ms_ = running ? std::min(judge_ms_ + std::min(dt * 1000.0f, 100.0f), 1000.0f) : 0.0f;  // a gap is not time running
+        const bool judge = judge_ms_ >= 1000.0f;
         static constexpr SignalId SIG[2]  = { SIG_KNOCK_1, SIG_KNOCK_2 };
         static constexpr uint16_t CODE[2] = { ModuleDtc::KNOCK_1, ModuleDtc::KNOCK_2 };
         static constexpr uint8_t  SEV[2]  = { ModuleDtc::KNOCK_1_SEV, ModuleDtc::KNOCK_2_SEV };

@@ -531,8 +531,12 @@ int main() {
         DtcManager dtc; dtc.init(1); dtc.set_active(true); k.set_dtc(&dtc);
         SignalBus bus{};
         bus.set(wk::fuel_load, 100.0f); bus.set(wk::rpm, 4000.0f); bus.set(wk::tps, 50.0f);
+        // KEY-ON INTO A TURNING CRANK: over the floor at once, and no window sampled yet. Not judged until
+        // it has been running for a second (P1750 on the bench at every key cycle).
+        for (int t = 0; t < 9; ++t) { g_stub_tick_ms += 100; k.update(pos, bus, frame); }
+        CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) == 0);
         bus.set(SIG_KNOCK_1, -20.0f, true, g_stub_tick_ms, 1000u);   // sensor 1 reporting
-        k.update(pos, bus, frame);
+        for (int t = 0; t < 5; ++t) { g_stub_tick_ms += 100; k.update(pos, bus, frame); }
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) == 0);
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_2) == 0);       // no cylinder uses Knock 2: not a fault
         bus.invalidate(SIG_KNOCK_1);                              // the bursts stop (it expired)
@@ -542,6 +546,8 @@ int main() {
         g_stub_tick_ms += 100; k.update(pos, bus, frame);
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) == 0);
         bus.invalidate(wk::ign_cut);                              // combustion again, still no bursts
+        for (int t = 0; t < 9; ++t) { g_stub_tick_ms += 100; k.update(pos, bus, frame); }
+        CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) == 0);       // a second of it first
         g_stub_tick_ms += 100; k.update(pos, bus, frame);
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) != 0);
 
@@ -550,7 +556,7 @@ int main() {
         for (auto& c : q.cyl_sensor) c.input = 0;
         Knock k2; k2.init(q, &ign);
         DtcManager d2; d2.init(1); d2.set_active(true); k2.set_dtc(&d2);
-        for (int t = 0; t < 15; ++t) {
+        for (int t = 0; t < 25; ++t) {
             g_stub_tick_ms += 100;
             bus.set(SIG_KNOCK_1, -80.0f, true, g_stub_tick_ms, 1000u);   // far too quiet
             k2.update(pos, bus, frame);

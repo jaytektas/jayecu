@@ -555,6 +555,32 @@ int main() {
     }
 
     // -------------------------------------------------------------------
+    SECTION("key off is a stop: sync dropping then is not P0335, at key-on or ever");
+    {
+        // The decoder takes no edges with the key off, so on a bench with the crank still turning sync
+        // dropped at 2000 rpm — a "loss at speed" that raised P0335 the moment the key came back.
+        auto cfg = make_cfg();
+        EngineProtection ep; ep.init(cfg);
+        DtcManager dtc; dtc.init(1); ep.set_dtc(&dtc);
+        SignalBus bus{}; set_all_fresh(bus);
+        auto step = [&](float rpm, SyncLevel s) {
+            EngineFrame f{}; bus.invalidate(wk::fuel_cut); bus.invalidate(wk::ign_cut);
+            ep.update(make_pos(rpm, s), bus, f);
+        };
+        step(2000.0f, SyncLevel::CRANK);                  // running, synced
+        g_system_active = false;                          // key off…
+        step(0.0f, SyncLevel::NONE);                      // …and sync goes with it
+        CHECK(dtc.code_severity(P_SYNC_LOSS) == 0);
+        g_system_active = true;                           // key on, still searching for sync
+        step(0.0f, SyncLevel::NONE);
+        step(0.0f, SyncLevel::NONE);
+        CHECK(dtc.code_severity(P_SYNC_LOSS) == 0);
+        step(2000.0f, SyncLevel::CRANK);                  // and a real loss after that still counts
+        step(0.0f, SyncLevel::NONE);
+        CHECK(dtc.code_severity(P_SYNC_LOSS) == 3);
+    }
+
+    // -------------------------------------------------------------------
     SECTION("edge-guard: reset_edges re-raises a still-true condition after a table clear");
     {
         auto cfg = make_cfg();

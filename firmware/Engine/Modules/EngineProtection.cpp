@@ -187,8 +187,15 @@ void EngineProtection::update(const EnginePosition& pos,
     // tells them apart is the speed the engine was doing while it still had sync: at or above the
     // Cranking Threshold it was running, and losing position then is a fault; below it, it was
     // winding down or cranking. The code holds until sync returns, and heals then (no latch).
+    // KEY OFF IS A STOP. The decoder takes no edges with the key off, so sync drops then at whatever
+    // speed the crank is doing — on a bench still turning, which read as a loss at speed and raised
+    // P0335 the moment the key came back. With the key off, nothing about sync is a fault.
+    extern bool g_system_active;
     const bool currently_synced = (pos.sync_level >= SyncLevel::CRANK);
-    if (currently_synced) {
+    if (!g_system_active) {
+        was_synced_   = false;
+        lost_running_ = false;
+    } else if (currently_synced) {
         was_synced_   = true;
         synced_rpm_   = pos.rpm;
         lost_running_ = false;

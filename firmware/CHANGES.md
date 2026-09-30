@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Turning the key off and on with the engine still turning no longer raises P0335 (sync lost) or P1750 (knock sensor missing). Key off counts as a stop, and a knock sensor is judged only after the engine has run over the knock learn floor for a second.
 - The Blend air model is two maps: an Alpha-N VE table (RPM × throttle) below Blend Start RPM, the VE table on measured MAP above Blend End RPM, and their air masses crossfaded between. Each range has its own cells, so tuning low-RPM fuel no longer moves the cells the upper range uses. It no longer reads the Predicted MAP table, which is now used only by MAP prediction, during throttle transients. A Blend tune needs its Alpha-N VE table filled in after updating.
 - New Charge Load channel: the air in the cylinder as a % of a full charge, from every air model and smooth through Blend's crossover. Changing the Air Model offers to point Target Lambda and the Ignition map at the load that model suits (Charge Load for Blend and MAF), converting their load rows.
 - The VE autotune leaves the VE table alone where Blend's Alpha-N map carries the charge.
