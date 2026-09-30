@@ -77,4 +77,5 @@ grep -q "\"$STUDIO_VER\"" apps/studio-jf/build-win/generated/StudioVersion.h || 
 # 5. gathered
 python3 tools/make_release.py --studio-version "$STUDIO_VER" --fw-version "$FW_VER" --boards "$BOARDS"
 say "ready: release/v$STUDIO_VER — publish ONLY after the go-ahead, as a pre-release:"
+say "  git push --force origin HEAD:refs/heads/beta     (the tag's commit on GitHub — the beta branch, not the work branch)"
 say "  gh release create v$STUDIO_VER --prerelease --target <commit> --title \"jayecu v$STUDIO_VER (beta)\" --notes-file <notes> release/v$STUDIO_VER/*"

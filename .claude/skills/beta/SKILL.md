@@ -61,10 +61,10 @@ studio updates itself) and **Include beta firmware** (the kits are offered on co
    built here, builds firmware → kit per board, builds and packages the studio as that version with those
    kits, puts the build dirs back to the plain version, and gathers `release/v<studio beta>/`.
 4. Check it (`ls release/v<beta>/`, each `*-kit.json`'s version and build = the last firmware commit).
-5. **Ask the user before publishing** — it is public. The tag's commit must be on GitHub, so publishing
-   pushes the branch (or master) first:
+5. **Ask the user before publishing** — it is public. The tag's commit must be on GitHub: push it to the
+   **`beta`** branch there — never the local work branch (its name belongs to other work):
    ```
-   git push origin <branch>
+   git push --force origin HEAD:refs/heads/beta
    gh release create v<studio beta> --prerelease --target <commit> --title "jayecu v<studio beta> (beta)" \
        --notes-file <notes> release/v<studio beta>/*
    gh release view v<studio beta> --json isPrerelease,assets --jq '{pre:.isPrerelease,n:(.assets|length)}'
