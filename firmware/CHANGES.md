@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.5
 - Knock: the window now opens Window Start before each cylinder's own spark (default 10°), so it follows the timing and always covers the moment before the spark, where pre-ignition shows. Before, it opened at a fixed angle after TDC, after the spark, so pre-ignition could only be caught by its loudness. Window Duration now defaults to 80°, so the window still reaches well past TDC for knock. Both are new settings: updating drops a tune's old Window Start and Window Duration and uses the new defaults (an old 40° duration would now end the window near TDC, before the knock).
 - After a firmware update the studio no longer says the ECU has no real-time clock. The clock kept time, but the ECU could not read it until its next restart, so the first connect after an update left it unset.
 - The ECU no longer restarts (reported as a stack overflow in 'MSC') when a PC writing to its SD card over USB falls out of step with it, as when a write stalls part-way.
