@@ -1400,6 +1400,15 @@ target_compile_definitions(action_button_test PRIVATE REAL_META="${CMAKE_CURRENT
 add_test(NAME action_button COMMAND action_button_test)
 add_dependencies(studio_tests action_button_test)
 
+# Engine-stop settings lock while the engine turns: the rule in the meta, and the lock's two conditions.
+add_executable(engine_stop_lock_test EXCLUDE_FROM_ALL tests/test_engine_stop_lock.cpp)
+target_link_libraries(engine_stop_lock_test PRIVATE studio_model)
+target_include_directories(engine_stop_lock_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(engine_stop_lock_test PRIVATE JFramework::platform ${STUDIO_TLS_LIBS})
+target_compile_definitions(engine_stop_lock_test PRIVATE REAL_META="${CMAKE_CURRENT_SOURCE_DIR}/../../shared/tuneit-meta.json")
+add_test(NAME engine_stop_lock COMMAND engine_stop_lock_test)
+add_dependencies(studio_tests engine_stop_lock_test)
+
 # A CALIBRATION LEAVES THE STUDIO AND COMES BACK UNCHANGED — the table CSV round trip.
 #   cmake --build build --target table_file_test && ./build/table_file_test
 add_executable(table_file_test EXCLUDE_FROM_ALL tests/test_table_file.cpp

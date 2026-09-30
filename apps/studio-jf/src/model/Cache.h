@@ -75,6 +75,15 @@ public:
     bool hasConfig() const { return !configImage_.empty(); }
     const std::vector<uint8_t> &configImage() const { return configImage_; }
     bool isConfig(const std::string &path) const;          // is this binding a known config scalar?
+    // THE LINK, as the model sees it — set where it opens and closes. With it closed every reading is the
+    // last one received, so nothing here may treat a stale RPM as a turning engine.
+    void setLinkOpen(bool open) { linkOpen_ = open; }
+    bool linkOpen() const { return linkOpen_; }
+    // Connected, and the engine is turning (RPM, or the trigger holding sync). A setting that applies only
+    // at an engine stop cannot be changed then: the edit would sit in RAM doing nothing until the stop.
+    bool engineTurning() const;
+    // …so is THIS binding locked right now: an engine_stop setting while engineTurning().
+    bool lockedWhileRunning(const std::string &path) const;
     double configMin(const std::string &path) const;
     double configMax(const std::string &path) const;
     int    digits(const std::string &path) const;          // meta display decimals for a scalar (default 2)
@@ -480,6 +489,7 @@ public:
     jf::JSignal<int, bool> commandFinished;     // a bench routine ended: (cmdstate op, ok) — drives a status toast
 
 private:
+    bool linkOpen_ = false;
     Cache();
     // Restore a table's cell region (z=0 plane) from an arbitrary source image (default or baseline).
     void restoreTableFrom(const std::string &path, const std::vector<uint8_t> &source);

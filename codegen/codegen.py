@@ -5120,6 +5120,20 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
             enums[eid] = [{"value": v, "id": i, "label": lbl}
                           for v, (i, lbl) in enumerate(pairs)]
 
+    # WHEN EACH SETTING TAKES EFFECT, for the settings that do not take effect at once. A shadowed module's
+    # members are copied into the firmware's working copy only at the next engine stop (Trigger, Engine,
+    # …) or the next boot, so an edit made while the engine turns sits in RAM doing nothing — a trigger
+    # stream switched off on a running engine kept its RPM. The studio greys those controls out while the
+    # engine is turning (engine_stop) and says a reboot one applies at the next restart; live and
+    # unshadowed settings carry nothing.
+    for _mod_name, _members in _module_shadow_members(prim, modules).items():
+        _cm = config.get(module_snake(_mod_name), {})
+        for _m in _members:
+            if not _m["shadow"] or _m["when"] not in ("engine_stop", "reboot"):
+                continue
+            _e = _cm.get(_m["def"]["name"])
+            if isinstance(_e, dict):
+                _e["applies"] = _m["when"]
     doc = {
         "meta": {
             "proto": 1,                                   # immortal handshake/format version

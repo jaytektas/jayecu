@@ -549,6 +549,19 @@ public:
     }
 
     const Autotune &autotune() const { return autotune_; }
+    // WHEN A SETTING TAKES EFFECT, if not at once: "engine_stop" (copied into the firmware's working copy
+    // at the next engine stop — Trigger, Engine) or "reboot"; "" for everything else. `path` is any binding
+    // into it — "engine.cylinder_count", "trigger.streams[2].enabled", a table — resolved by its module and
+    // top-level name, which is what the schema marks.
+    std::string appliesAt(std::string path) const {
+        if (path.size() >= 4 && path[0] == '[' && path[1] == '#' && path.back() == ']')
+            path = path.substr(2, path.size() - 3);          // the builder's writable-path form
+        const size_t dot = path.find('.');
+        if (dot == std::string::npos) return {};
+        const size_t end = path.find_first_of(".[", dot + 1);
+        const auto it = applies_.find(path.substr(0, end == std::string::npos ? std::string::npos : end));
+        return it == applies_.end() ? std::string() : it->second;
+    }
     const std::vector<ValueAutotune> &valueAutotunes() const { return valueAutotunes_; }
     // Resolve a whole-region binding to a byte span: "module.array" (every element) or
     // "module.array[index]" (one element, e.g. electronic_throttle.etb[0] — its relax_pct + ff_table +
@@ -840,6 +853,7 @@ private:
     std::vector<Segment> segments_;
     Autotune             autotune_;                 // cache blocks (config + nvram/volatile), by device offset
     std::vector<ValueAutotune> valueAutotunes_;
+    std::map<std::string, std::string> applies_;   // "module.name" -> engine_stop | reboot
     std::vector<SensorType> sensorTypes_;   // catalog order — index == the stored `type` byte
     // channel name -> {array key, element index} of the sensor that publishes it.
     std::unordered_map<std::string, std::pair<std::string, int>> signalOwner_;

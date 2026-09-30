@@ -3201,10 +3201,12 @@ int main(int argc, char** argv) {
     link.openedChanged.connect([](bool open) {
         dtcView.setConnected(open);                 // clear the table on disconnect
         AppStateSigilResolver::connected = open;    // [%connected] tracks the live link (the flag was declared but never set)
+        Cache::instance().setLinkOpen(open);        // engine-stop settings lock while connected and turning
         refreshLinkOverlay(open);
     });
     g_noticeWin = &win;
     refreshLinkOverlay(link.isOpen());              // and state the truth before the first frame arrives
+    Cache::instance().setLinkOpen(link.isOpen());
 
     // 1 Hz background poll while connected — drain the ECU text console + refresh the DTC table.
     // WITHOUT it the DTC dock was only ever fed by its manual Refresh

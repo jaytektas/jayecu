@@ -546,6 +546,10 @@ void CanvasWidget::narrowToControl(MetaModel::Location &L) const {
 bool CanvasWidget::enabledNow() const {
     if (!m_el) return true;
     MathEvaluator::ElementScope scope(m_elemContext);   // "[*]" means THIS widget's element, everywhere
+    // A SETTING THAT APPLIES ONLY AT AN ENGINE STOP is locked while the engine turns: the edit would sit in
+    // the ECU's RAM doing nothing — a trigger stream switched off on a running engine kept its RPM — and
+    // look exactly like one that had taken effect. Greyed out, and the tooltip says why (_syncTooltip).
+    if (m_cache && m_cache->lockedWhileRunning(bindPath())) return false;
     const std::string gate = m_el->prop("enableCondition");
     return gate.empty() || MathEvaluator::instance().evaluate(gate) != 0.0;
 }
@@ -617,6 +621,17 @@ void CanvasWidget::_syncTooltip() {
         // as the definition having no help rather than as the lookup asking for the wrong thing.
         const std::string bind = bindPath();
         tip = m_cache->help(bind.empty() ? resolveTemplate(m_helpBind, m_elemContext) : bind);
+    }
+    // WHEN IT TAKES EFFECT, said on the control itself — the reason a greyed one cannot be changed, and
+    // the warning on one that can be changed but will not act until a restart.
+    if (m_cache && m_cache->meta()) {
+        const std::string at = m_cache->meta()->appliesAt(bindPath());
+        // Only while it EXPLAINS something: an engine-stop setting says so while it is locked, not on every
+        // trigger and engine control the rest of the time.
+        const std::string why = (at == "engine_stop" && m_cache->engineTurning())
+                                    ? "Applies when the engine stops \xE2\x80\x94 stop the engine to change it."
+                              : at == "reboot" ? "Applies at the next restart." : std::string();
+        if (!why.empty()) tip = tip.empty() ? why : why + "\n\n" + tip;
     }
     if (tip != tooltip()) setTooltip(tip);
 }

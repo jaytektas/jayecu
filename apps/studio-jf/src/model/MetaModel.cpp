@@ -238,6 +238,7 @@ bool MetaModel::loadFile(const std::string &path)
     segments_.clear();
     autotune_ = {};             // a new definition states its own autotune contract, or none
     valueAutotunes_.clear();
+    applies_.clear();
     signals_.clear();
     signalByIndex_.clear();
     enums_.clear();
@@ -514,6 +515,9 @@ bool MetaModel::loadFile(const std::string &path)
 
     // Config: { module: { field: {type: scalar|table|struct_array, offset, datatype, ...} } }
     const jf::JJson &config = root["config"];
+    for (const auto &[mod, fields] : config.obj())
+        for (const auto &[name, e] : fields.obj())
+            if (e.isObject() && e.contains("applies")) applies_[mod + "." + name] = e["applies"].str();
     for (const auto &[modKey, modVal] : config.obj()) {
         const jf::JJson &fields = modVal;
         for (const auto &[feKey, feVal] : fields.obj()) {

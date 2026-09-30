@@ -701,6 +701,17 @@ void Cache::setConfigImage(const std::vector<uint8_t> &image)
 // Does this path name a config VALUE? A named bit group counts — the widget write gate
 // (writableConfigPath) asks here, so without it a checkbox bound to one silently did nothing. A run or
 // a table names a group of values, not one, so neither is writable through a scalar binding.
+bool Cache::engineTurning() const
+{
+    if (!linkOpen_) return false;
+    return (has("rpm") && value("rpm") > 0.0) || (has("sync_level") && value("sync_level") >= 1.0);
+}
+
+bool Cache::lockedWhileRunning(const std::string &path) const
+{
+    return meta_ && !path.empty() && meta_->appliesAt(path) == "engine_stop" && engineTurning();
+}
+
 bool Cache::isConfig(const std::string &path) const
 {
     if (!meta_)
