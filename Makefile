@@ -76,7 +76,7 @@ ST_PROG   ?= STM32_Programmer_CLI
 META_LIB  ?= $(HOME)/.local/share/jayecu/jayecu Studio/meta
 
 .DEFAULT_GOAL := codegen
-.PHONY: help all package release manual-publish ship-kits stim sdk sdk-win jframework-src sdk-check sdk-win-check codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio manual
+.PHONY: help all package release manual-publish ship-kits stim sdk sdk-win jframework-src sdk-check sdk-win-check codegen tests clean tests-clean firmware-clean studio-clean firmware flash dfu push dash studio-meta studio studio-run studio-win studio-appimage studio-installer kit bench-studio bench-beta manual
 
 # codegen.py emits shared/tuneit-meta.json (the TuneIt Data Dictionary) along with the C++
 # headers, ecu.ini and ecu.json — so a bare `make` already produces it, then installs it into
@@ -280,6 +280,12 @@ manual: codegen
 # The bench machine runs the studio; this machine builds it. Deploy the AppImage there under its fixed
 # name (which the launcher and the updater both use) and prove it starts on the bench's own desktop.
 # The bench is whatever machine you run the hardware from, reached over ssh:  make bench-studio BENCH=<host>
+# A BETA ON THE BENCH: build, kit, version above what the bench has seen, install — in that order, checked
+# (tools/bench_beta.sh; the `beta` skill). STUDIO=1 deploys the studio too when it is closed there.
+bench-beta:
+	@[ -n "$(BENCH)" ] || { echo "make bench-beta: say which machine — BENCH=<ssh host>" >&2; exit 1; }
+	STUDIO=$(STUDIO) tools/bench_beta.sh $(BENCH) $(BOARD)
+
 bench-studio: studio-appimage
 	@[ -n "$(BENCH)" ] || { echo "make bench-studio: say which machine — BENCH=<ssh host>" >&2; exit 1; }
 	apps/studio-jf/tools/bench_deploy.sh \
