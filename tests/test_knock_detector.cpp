@@ -67,7 +67,7 @@ int main() {
 
     SECTION("a window that opens BTDC really does report negative angles");
     {
-        // The reason window_start_deg had to become signed: pre-ignition evidence sits before the
+        // The reason the window start had to become signed: pre-ignition evidence sits before the
         // spark, and a window pinned to 0..180 ATDC cannot address that region at all.
         const auto s = sine(fknock, fs, 1024);
         KnockDetector::Window win;

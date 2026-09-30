@@ -45,7 +45,8 @@ noisy.
   before it is pre-ignition.</figcaption>
 </figure>
 
-- The bars are the band level through the listening window, in crank degrees.
+- The bars are the band level through the listening window, in crank degrees before TDC (+ before,
+  − after, like spark advance).
 - The green line is this cylinder's learned floor here; the red line is the floor plus the threshold.
 - The blue line is the spark. The same bars are knock after it and pre-ignition before it.
 - The scope alternates between the **latest** measurement (so you can see it is live) and the **last
@@ -76,8 +77,8 @@ with RPM is normal — the floor rises with it.
 
 ### Step 1 — Listen in the right place
 
-Chapter 30: **Knock Frequency** 0 (worked out from the bore), **Window Start** 10° and **Window
-Duration** 40° after TDC to begin with. Check on the Knock Scope with the engine warm and clean:
+Chapter 30: **Knock Frequency** 0 (worked out from the bore), **Window Start** −10° (10° after TDC:
++ is before TDC, as with spark advance) and **Window Duration** 40° to begin with. Check on the Knock Scope with the engine warm and clean:
 
 - The bars should be low and fairly flat through the window.
 - A tall bar at the **same crank angle** every time, on a clean engine, is mechanical noise — a valve
@@ -138,8 +139,9 @@ The honest check is real knock, heard and seen together. With headphones on the 
 
 ### Step 6 — Pre-ignition (boosted engines)
 
-With **Pre-Ignition Detection** on, the window must open before the spark (a negative Window Start,
-chapter 30). On the scope, pre-ignition is energy at or before the spark line. Raise **Pre-Ignition
+With **Pre-Ignition Detection** on, each window opens **Look-Ahead** (10°) before its own spark
+(chapter 30), so it follows the timing without Window Start being moved. On the scope, pre-ignition
+is energy at or before the spark line. Raise **Pre-Ignition
 Margin** or **Events Before Action** if the cut trips on a healthy engine; never switch it off to
 cure a real one.
 

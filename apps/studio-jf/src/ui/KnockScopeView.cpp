@@ -139,7 +139,7 @@ void KnockScopeView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
     // ---- The SPARK: which side of it the energy sits on IS the question -------------------------
     if (ref.hasPhase()) {
         const float span = ref.stepDeg * static_cast<float>(ref.buckets.size());
-        const float sparkAngle = -ref.sparkDeg;                    // advance is BTDC; the axis is ATDC-positive
+        const float sparkAngle = -ref.sparkDeg;                    // advance is BTDC; the profile is ATDC-positive (shown BTDC)
         const float t = (sparkAngle - ref.startDeg) / span;
         if (t >= 0.0f && t <= 1.0f) {
             const float x = plot.x + plot.width * t;
@@ -160,14 +160,14 @@ void KnockScopeView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
             const float frac = static_cast<float>(k) / 4.0f;
             const float deg  = ref.startDeg + span * frac;
             const float x    = plot.x + plot.width * frac;
-            std::snprintf(lab, sizeof(lab), "%+.0f", deg);
+            std::snprintf(lab, sizeof(lab), "%+.0f", -deg + 0.0f);   // shown BTDC: + advanced, - retarded
             // Centred on its mark by its MEASURED width, and kept inside the pane: the last label sits on
             // the plot's right edge, and a fixed 10 px lead put half of "+50" past it.
             const float w  = JTextHelper::measureWidth(lab);
             const float lx = std::clamp(x - w * 0.5f, r.x + kPadX, r.x + r.width - kPadX - w);
             JTextHelper::pushText(buf, lx, plot.y + plot.height + 3.f, lab, Colors::TextSecondary, w + 2.f);
         }
-        const char* title = "crank deg ATDC";
+        const char* title = "crank deg BTDC  (+ advanced, - retarded)";
         const float tw2   = JTextHelper::measureWidth(title);
         JTextHelper::pushText(buf, plot.x + (plot.width - tw2) * 0.5f, plot.y + plot.height + 3.f + lh,
                               title, Colors::TextSecondary, tw2 + 2.f);

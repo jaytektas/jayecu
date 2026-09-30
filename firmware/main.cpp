@@ -291,12 +291,14 @@ extern "C" void SPDIF_RX_IRQHandler(void) {
 // BUFFER SIZE IS A WINDOW LIMIT, not just an allocation. The sample count is window_duration_deg
 // scaled to the current RPM, so a fixed buffer caps the window in TIME and therefore truncates it in
 // ANGLE at low RPM — the opposite end from where you would expect to run out. At the 281.25 kHz
-// sample rate, 2048 samples is 7.28 ms, which covers the default 40 deg window down to ~915 rpm
-// (512 samples reached only ~3660 rpm, so a 40 deg window at idle was silently sampling ~11 deg —
-// exactly where lugging knock lives). s_knock_truncs counts every clamp so the ceiling is visible on
-// the bench instead of being mistaken for a quiet engine.
+// sample rate, 3072 samples is 10.9 ms: the default 40 deg window down to ~610 rpm, and a window opened
+// early for pre-ignition (10 deg before a 30 deg spark, closing 50 deg ATDC: 90 deg) down to ~1370 rpm.
+// It was 2048 until the look-ahead made windows longer — 7.28 ms, 90 deg only above ~2060 rpm, and
+// low-speed pre-ignition lives below that. (512 once reached only ~3660 rpm, so a 40 deg window at idle
+// was silently sampling ~11 deg.) s_knock_truncs counts every clamp so the ceiling is visible on the
+// bench instead of being mistaken for a quiet engine.
 static KnockDetector g_knock_detector;
-static uint16_t __attribute__((section(".dma_nocache"))) s_knock_buf[2048];
+static uint16_t __attribute__((section(".dma_nocache"))) s_knock_buf[3072];
 static uint16_t      s_knock_cfg_freq = 0;      // last DSP band-center configured (worker-owned)
 static volatile uint32_t s_knock_captures = 0;  // worker capture count (health diagnostic, 'fire' CLI)
 static volatile uint32_t s_knock_truncs   = 0;  // windows clamped to the buffer (RPM below the floor)
@@ -357,14 +359,21 @@ static void knock_task(void*) {
                 s_knock_cfg_freq = freq;
             }
 
-            // Sample count = window_duration_deg worth of time at the current RPM,
+            // THE WINDOW RUNS FROM WHERE IT OPENED TO WHERE IT CLOSES. It opens at Window Start, or earlier
+            // by the pre-ignition look-ahead before this cylinder's spark (the scheduler says which), and
+            // it always closes at Window Start - Window Duration: the knock part is the same either way,
+            // and the look-ahead only adds the stretch before it.
+            const float open_btdc  = static_cast<float>(g_epos_hal.knock_window_open_btdc(cyl)) * 0.1f;
+            const float close_btdc = static_cast<float>(kc.window_start_btdc) - static_cast<float>(kc.window_duration_deg);
+            const float span_deg   = open_btdc - close_btdc;
+            // Sample count = that span's worth of time at the current RPM,
             // clamped to the buffer. oneDegreeUs = 60e6 / (360*rpm) = 1.6667e6 / rpm_x10.
             const uint32_t rpm_x10 = g_epos_hal.get_rpm_x10();
             const uint16_t cap = static_cast<uint16_t>(sizeof(s_knock_buf) / sizeof(s_knock_buf[0]));
             uint16_t count = cap;
-            if (rpm_x10 > 0 && kc.window_duration_deg > 0) {
+            if (rpm_x10 > 0 && span_deg > 0.0f) {
                 const float one_deg_us = 1666666.7f / static_cast<float>(rpm_x10);
-                float c = static_cast<float>(kc.window_duration_deg) * one_deg_us
+                float c = span_deg * one_deg_us
                           * board_knock_sample_rate() / 1000000.0f;
                 if (c < 100.0f) c = 100.0f;
                 // Clamped = the window we sampled is SHORTER than the one configured. Counted, because
@@ -377,10 +386,10 @@ static void knock_task(void*) {
             // burst semaphore (given by knock_burst_complete from the DMA ISR) — no CPU poll-spin.
             if (!board_knock_start_burst(sensor, s_knock_buf, count)) continue;
             s_knock_captures++;
-            // Timeout guard — it must OUTLAST the burst it is guarding. A full 2048-sample burst is
-            // 7.28 ms at 281.25 kHz, so the old 10 ms left 2.7 ms of margin (it was 8.2 ms when the
-            // buffer was 512). Too tight: a timeout here silently drops the measurement, which reads
-            // as a quiet cylinder. 25 ms still catches a DMA that never completes, just later.
+            // Timeout guard — it must OUTLAST the burst it is guarding. A full 3072-sample burst is
+            // 10.9 ms at 281.25 kHz (the old 10 ms guard was already too tight at 2048: a timeout here
+            // silently drops the measurement, which reads as a quiet cylinder). 25 ms still catches a
+            // DMA that never completes, just later.
             const bool burst_ok = xSemaphoreTake(s_knock_burst_sem, pdMS_TO_TICKS(25)) == pdTRUE;
             // Give ADC3 back FIRST, on both paths. The samples are already in s_knock_buf, so the DSP
             // below does not need the ADC held — and on the timeout path holding it would strand
@@ -388,12 +397,12 @@ static void knock_task(void*) {
             board_knock_end_burst();
             if (!burst_ok) continue;
             const uint16_t n = count;   // the burst filled the whole buffer
-            // The window's geometry, which only this loop knows: where it opened (signed, BTDC
-            // negative — the same value the scheduler armed) and how fast the crank was turning when
-            // it did. rpm_x10 of 0 leaves deg_per_sec at 0, and the profile goes out unstamped rather
-            // than carrying a confident wrong angle.
+            // The window's geometry, which only this loop knows: where it opened (the same angle the
+            // scheduler armed; the profile carries it ATDC-positive, so it is negated) and how fast the
+            // crank was turning when it did. rpm_x10 of 0 leaves deg_per_sec at 0, and the profile goes
+            // out unstamped rather than carrying a confident wrong angle.
             KnockDetector::Window win;
-            win.start_deg   = static_cast<float>(static_cast<int16_t>(kc.window_start_deg));
+            win.start_deg   = -open_btdc;
             win.deg_per_sec = (rpm_x10 > 0) ? static_cast<float>(rpm_x10) * 0.6f : 0.0f;  // rpm*360/60
             const float db = g_knock_detector.on_burst(sensor, s_knock_buf, n, g_engine_task.bus(),
                                                        s_knock_profile, win);
@@ -555,12 +564,13 @@ static void config_save_task(void* /*pv*/) {
         }
 
         // Knock sampling window: track the live Knock config each pass (cheap). Enabled only for the
-        // onboard source; window_start_deg -> decidegrees ATDC, SIGNED — a negative start opens the
-        // window BTDC (before the spark), which is the only place pre-ignition is visible.
-        // angle_atdc() adds and angle_wrap() carries negatives, so this needs nothing downstream.
+        // onboard source. Window Start is degrees BTDC, + advanced / - retarded like spark advance, and
+        // SIGNED: the default -10 opens 10 deg after TDC. With pre-ignition detection on, the look-ahead
+        // opens each window that far before its own spark instead (EnginePositionHal::knock_open_btdc).
         g_epos_hal.set_knock_window(
             g_config.knock.enabled != 0 && g_config.knock.source == 0,
-            static_cast<AngleDeg10>(g_config.knock.window_start_deg * 10));
+            static_cast<AngleDeg10>(g_config.knock.window_start_btdc * 10),
+            static_cast<AngleDeg10>(g_config.knock.preign_enabled ? g_config.knock.preign_lookahead_deg * 10 : 0));
 
         // Persist the DTC table to SD when it changed (raise/heal/clear/clear_all +
         // freeze-frame writes set the dirty flag; the save takes it). The whole
@@ -937,9 +947,10 @@ static void cmd_knk(const Cli::Argv&, Cli::Out& o) {
     if (!sh.profile.hasPhase()) {
         o.put("(no phase stamp)");
     } else {
-        o.put("deg["); o.print_i32(static_cast<int32_t>(sh.profile.start_deg));
-        o.put("..");   o.print_i32(static_cast<int32_t>(sh.profile.start_deg +
-                                     sh.profile.step_deg * static_cast<float>(sh.profile.count)));
+        // BTDC, + advanced / - retarded, like spark= above (the profile itself carries ATDC-positive).
+        o.put("btdc["); o.print_i32(static_cast<int32_t>(-sh.profile.start_deg));
+        o.put("..");    o.print_i32(static_cast<int32_t>(-(sh.profile.start_deg +
+                                      sh.profile.step_deg * static_cast<float>(sh.profile.count))));
         o.put("] step_x10="); o.print_i32(static_cast<int32_t>(sh.profile.step_deg * 10.0f));
     }
     o.put(" dBx10:");
@@ -948,18 +959,17 @@ static void cmd_knk(const Cli::Argv&, Cli::Out& o) {
     }
     o.put("\r\n");
 
-    // THE WINDOW HAS TO REACH THE SPARK, or pre-ignition detection is switched on and blind. The
-    // default window opens 10 deg ATDC — fine for knock, which happens after the spark, and useless
-    // for pre-ignition, which does not. Enabling the feature does not move the window, so without
-    // this the whole thing is a silent no-op that looks exactly like an engine that never pre-ignites.
+    // THE WINDOW HAS TO REACH THE SPARK, or pre-ignition detection is switched on and blind. With the
+    // look-ahead it opens before every spark by itself; this still catches a look-ahead of 0, and a
+    // spark so advanced that the window hit its earliest-possible limit (85 deg BTDC).
     if (g_config.knock.preign_enabled && sh.profile.hasPhase() &&
         sh.profile.start_deg > -sh.spark_deg) {
         o.put("  WARNING: pre-ignition is ENABLED but the window opens at ");
-        o.print_i32(static_cast<int32_t>(sh.profile.start_deg));
-        o.put(" deg, AFTER the spark at ");
-        o.print_i32(static_cast<int32_t>(-sh.spark_deg));
-        o.put(" deg. Nothing before the spark is sampled -> it can never fire.\r\n"
-              "           Set knock.window_start_deg negative (e.g. -40) to straddle the spark.\r\n");
+        o.print_i32(static_cast<int32_t>(-sh.profile.start_deg));
+        o.put(" deg BTDC, AFTER the spark at ");
+        o.print_i32(static_cast<int32_t>(sh.spark_deg));
+        o.put(" deg BTDC. Nothing before the spark is sampled -> it can never fire.\r\n"
+              "           Set knock.preign_lookahead_deg above 0 (e.g. 10).\r\n");
     }
 }
 

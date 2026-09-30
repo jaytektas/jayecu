@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Pre-ignition: with Pre-Ignition Detection on, each cylinder's knock window now opens Pre-Ignition Look-Ahead (new, default 10°) before that cylinder's own spark, so it can see pre-ignition at any timing. Before, the window opened at a fixed angle, after the spark unless Window Start was set negative, and at high advance even a negative start could miss it.
+- Knock Window Start now reads like spark advance: + is before TDC, − after. The default is −10 (10° after TDC, where it was before). It is a new setting, so updating drops a tune's old Window Start and uses the default — check it if you had changed it.
 
 ## 0.4.4
 - Fuel Tuning ▸ MAP Prediction & Fuel Film: the readouts under the Predicted MAP and Transient TPS Scaling tables no longer run off the bottom of the page.

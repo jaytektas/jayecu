@@ -36,13 +36,13 @@ def page_knock():
     y = p.field(det, 10, y, 'External Intensity', K + 'external_intensity_sig', 'enum', 190,
                 enable=f'{ON} and [#knock.source] != 0')
     y = p.field(det, 10, y, 'Knock Frequency', K + 'knock_frequency', 'configedit', 110, 'Hz', enable=ON)
-    y = p.field(det, 10, y, 'Window Start', K + 'window_start_deg', 'configedit', 110, 'deg', enable=ON)
+    y = p.field(det, 10, y, 'Window Start', K + 'window_start_btdc', 'configedit', 110, 'deg', enable=ON)
     p.field(det, 10, y, 'Window Duration', K + 'window_duration_deg', 'configedit', 110, 'deg', enable=ON)
     h_det = A.panel_h(5, A.ROW, top=12, bottom=6)
     p.note(10, y0 + h_det + 6,
            'Frequency 0 derives the resonance from the bore. The window is measured from each '
-           'cylinder\'s own TDC, so it follows the firing order without being told it — open it too '
-           'wide and valve noise arrives inside it.', w=420)
+           'cylinder\'s own TDC (+ before, - after, like spark advance), so it follows the firing order '
+           'without being told it — open it too wide and valve noise arrives inside it.', w=420)
 
     # ---- 2 · Response ----------------------------------------------------------------------------
     y_res = y0 + h_det + 92
@@ -73,16 +73,20 @@ def page_knock():
            'Runtime state persisted to the SD card, not tune data.', w=390)
 
     y_pre = y0 + h_learn + 62
-    pre = p.panel(450, y_pre, 400, A.panel_h(8, A.ROW, top=10, bottom=4), 'Pre-Ignition')
+    h_pre = A.panel_h(8, A.ROW, top=10, bottom=4)
+    pre = p.panel(450, y_pre, 400, h_pre, 'Pre-Ignition')
     pon = f'{ON} and [#knock.preign_enabled] == 1'
     y = 12
     y = p.field(pre, 10, y, 'Pre-Ignition Detection', K + 'preign_enabled', 'checkbox', enable=ON)
+    # THE WINDOW FOLLOWS THE SPARK: with this on, each window opens this far before its own cylinder's
+    # spark, wherever the timing is — the setting that makes the rest of this panel able to see anything.
+    y = p.field(pre, 10, y, 'Look-Ahead', K + 'preign_lookahead_deg', 'configedit', 110, 'deg', enable=pon)
     y = p.field(pre, 10, y, 'Pre-Window Fraction', K + 'preign_pre_frac', 'configedit', 110, enable=pon)
     y = p.field(pre, 10, y, 'Margin', K + 'preign_margin_db', 'configedit', 110, 'dB', enable=pon)
     y = p.field(pre, 10, y, 'Extreme', K + 'preign_extreme_db', 'configedit', 110, 'dB', enable=pon)
     y = p.field(pre, 10, y, 'Events to Act', K + 'preign_events_to_act', 'configedit', 110, enable=pon)
-    y = p.field(pre, 10, y, 'Cut Fuel', K + 'preign_cut_fuel', 'checkbox', enable=pon)
-    y = p.field(pre, 10, y, 'Cut Spark', K + 'preign_cut_spark', 'checkbox', enable=pon)
+    p.field(pre, 10, y, 'Cut Fuel', K + 'preign_cut_fuel', 'checkbox', enable=pon)     # one row: the two
+    y = p.field(pre, 200, y, 'Cut Spark', K + 'preign_cut_spark', 'checkbox', enable=pon)   # are one choice
     p.field(pre, 10, y, 'Cut Hold', K + 'preign_clear_s', 'configedit', 110, 's', enable=pon)
 
     # ---- Which input hears which cylinder ---------------------------------------------------------
@@ -132,7 +136,9 @@ def page_knock():
     # Level is what it hears, in dB over the learned floor; retard is what it has taken away, and it
     # comes back at the reapply rate once the noise stops. (Said in the page's own note rather than
     # under the numbers — the strip is as tall as the panels above it leave room for.)
-    live = p.panel(10, 600, 840, 92, 'Right Now')
+    # UNDER THE LOWEST PANEL above it, not at a fixed 600: the Pre-Ignition panel grew a row (Look-Ahead)
+    # and ran into it.
+    live = p.panel(10, max(600, y_pre + h_pre + 8), 840, 92, 'Right Now')
     for n, (lbl, ch) in enumerate((('Knock Level', 'knock_level'), ('Knock Retard', 'knock_retard'),
                                    ('Knock Count', 'knock_count'), ('Advance', 'advance'),
                                    ('Engine RPM', 'rpm'), ('Fuel Load', 'fuel_load'))):
