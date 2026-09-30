@@ -5795,6 +5795,7 @@ modules:
       # angle ATDC of the first tooth after the gap) is equally common, so the sense is spelled out
       # here rather than assumed from the field name.
       - name: trigger_offset_btdc
+        shadow: false        # read live every frame (EnginePositionHal::service) so a timing light can set it on a running engine
         type: int16
         label: Trigger Offset BTDC
         units: deg
@@ -5819,6 +5820,7 @@ modules:
       #
       # (D = a tooth's decoder angle, crank_angle = 0 at TDC #1.) A 2JZ's pickup is +105.
       - name: sensor_angle
+        shadow: false        # display only: the firmware never reads it
         type: int16
         label: Pickup Angle
         units: deg
@@ -5828,6 +5830,7 @@ modules:
         default: 0
         help: 'Where the trigger pickup sits: degrees from vertical, positive ANTICLOCKWISE (to the left), seen from the front of the engine. A 2JZ is +105. DISPLAY ONLY — the ECU stores it so the studio can draw its trigger setup as you actually see it, and never acts on it. Timing comes from Trigger Offset BTDC alone.'
       - name: min_full_sync_rpm_x10
+        shadow: false        # read live every frame (EnginePositionHal::service)
         type: uint32
         label: Min RPM for Full (PHASE) Sync
         units: RPM
@@ -5837,6 +5840,7 @@ modules:
         default: 0
         help: 'Lower edge of the rpm band in which the phase (cam) stream is trusted to ACQUIRE full sync. Below it the cam is ignored for acquisition — only crank (360°) sync is taken — but an already-locked phase is RETAINED on crank counting as rpm falls (e.g. back to idle). For a VR cam sensor (MAX9924) set ~1500: below that its auto-threshold reset glitches a single cam tooth. 0 with Max also 0 disables the band (phase acquired whenever the cam locks).'
       - name: max_full_sync_rpm_x10
+        shadow: false        # read live every frame (EnginePositionHal::service)
         type: uint32
         label: Max RPM for Full (PHASE) Sync
         units: RPM
@@ -6622,6 +6626,7 @@ modules:
         label: Output
         element:
         - name: function
+          applies: engine_stop   # studio: greyed while the engine turns (a coil/injector change waits for the stop)
           type: enum
           label: Function
           options:
@@ -6636,6 +6641,7 @@ modules:
         # order at run time), so a changed firing order moves no output. ALL is a distributor or a
         # multi-point injector; BANK n is a bank-fired injector. On a rotary the number is the ROTOR.
         - name: cylinder
+          applies: engine_stop   # studio: greyed while the engine turns (a coil/injector change waits for the stop)
           type: enum
           label: Cylinder
           options:
@@ -6658,6 +6664,7 @@ modules:
           default: 0
           help: 'The cylinder this coil or injector serves. On WASTED SPARK a coil names one cylinder and also fires its companion, whichever the firing order makes that. ALL CYLINDERS is a distributor coil, or a multi-point injector. BANK 1 / BANK 2 is an injector shared by every cylinder on that bank. On a rotary the number is the rotor.'
         - name: inj_stage
+          applies: engine_stop   # studio: greyed while the engine turns (a coil/injector change waits for the stop)
           type: enum
           label: Injection Stage
           options:
@@ -6668,6 +6675,7 @@ modules:
           default: 0
           help: 'Which injection stage this injector belongs to: Stage 1 is the primary, Stages 2-4 the staged secondaries — the same stages Fuel Tuning names. The stage''s mode (Fuel System) decides how its injectors fire, and a row in a stage beyond Number of Injection Stages is ignored.'
         - name: ign_plug
+          applies: engine_stop   # studio: greyed while the engine turns (a coil/injector change waits for the stop)
           type: enum
           label: Plug
           options:

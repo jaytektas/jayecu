@@ -466,7 +466,10 @@ private:
             if (ry + kRowH < listY) continue;
             if (ry > listY + listH) break;
             static const uint8_t kSelFg[4] = { 255, 255, 255, 255 };
-            if (i == m_sel) buf.pushRectangle(kPad, ry, kListW, kRowH, Colors::Accent, 0.f);
+            // The highlight stops short of the scrollbar's column, when there is one: across it, the bar's
+            // track and the selected row ran into each other and the orange read as bleeding past the bar.
+            if (i == m_sel) buf.pushRectangle(kPad, ry, kListW - (thumb.second > 0.f ? kBarW + 4.f : 0.f), kRowH,
+                                              Colors::Accent, 0.f);
             const uint8_t* fg = (i == m_sel) ? kSelFg : Colors::TextPrimary;
             if (JTextHelper::hasAtlas()) {
                 JTextHelper::pushText(buf, kPad + 10.f, ry + 6.f, m_templates[i].name, fg);

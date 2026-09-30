@@ -231,11 +231,15 @@ Different parts of the ECU read these settings at different times (Figure 15.1):
   <!-- src: firmware/main.cpp; firmware/Comms/CommsManager.cpp; generated/shadow_meta.h; firmware/Engine/Modules/FuelCalculator.h; firmware/Engine/EngineTask.cpp; firmware/Engine/SystemComposer.cpp; apps/studio-jf/main.cpp -->
 
 !!! warning "Change the engine's shape with the engine stopped"
-    If you change **Cylinders** or **Engine Cycle** while the engine runs, the fuel model uses the new
-    value at once but the scheduler keeps the old one until the engine stops. For that time the fuel
-    is worked out for one engine and delivered to another. The studio only lets you edit the firing
-    order table with the engine stopped (or offline). Treat every setting on these pages the same way.
-    <!-- src: apps/studio-jf/tools/layout/engine_pages.py (ORDER_EDITABLE); firmware/Engine/Modules/FuelCalculator.cpp; firmware/main.cpp -->
+    If you changed **Cylinders** or **Engine Cycle** while the engine ran, the fuel model would use the
+    new value at once but the scheduler would keep the old one until the engine stopped. For that time
+    the fuel would be worked out for one engine and delivered to another. So while the studio is
+    connected and the engine is turning (speed above 0, or the trigger holding sync), every setting that
+    waits for an engine stop is **greyed out**, and hovering it says **Applies when the engine stops —
+    stop the engine to change it**. That covers every setting on these pages, the firing order table,
+    and any button that writes one of them. Offline, or with the engine stopped, they are editable as
+    usual.
+    <!-- src: apps/studio-jf/src/surface/CanvasWidget.cpp (enabledNow); apps/studio-jf/src/model/Cache.cpp (engineTurning); definition/ecu.schema.yaml (Engine shadow) -->
 
 ### 9 · The output gateways
 
@@ -579,7 +583,7 @@ P1654 are not checked while the order itself is invalid.
 | Cranks, no fuel, spark is fine | **Injector Outputs** off; no stage 1 injector (P1654) | The orange warning on Fuel System; `inj_exec_mask`; the LS output pages |
 | Runs, but rough and pops, one or more cylinders dead | Firing order wrong but valid; the engine numbers its cylinders differently from the source you used | The engine's own numbering; **Tools ▸ Engine Cycle** |
 | ORDER BAD after changing Cylinders | The order still holds the old count's entries | Pick the order from Known Engines, or fill in every row |
-| New firing order or cylinder count seems ignored | The engine has not stopped since the change | Stop the engine; the scheduler applies the change at the next stop |
+| New firing order or cylinder count seems ignored | The engine has not stopped since the change (possible from Lua or another tool; the studio greys these settings out while the engine turns) | Stop the engine; the scheduler applies the change at the next stop |
 | TDC Angle column shows old or zero values | Offline, or the engine has not stopped since the change | Connect and stop the engine; the ECU recomputes and the studio reads them back |
 | TDC angles typed by hand keep changing back | **Odd-Fire Engine** is off, so the ECU overwrites them | Tick Odd-Fire Engine if the engine really is odd-fire |
 | `engine_state` shows RUNNING while the engine is still only on the starter | Cranking Threshold below cranking speed | Log `rpm` while cranking; raise the threshold, burn, reset |

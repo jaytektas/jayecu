@@ -4831,6 +4831,10 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
                         "digits": scalar_digits(f.get("scale", 1.0), datatype(typ)),
                         "min": f.get("min", 0),
                         "max": f.get("max", 0),
+                        # WHEN IT TAKES EFFECT, where that is not at once and the module's shadow cannot say
+                        # it for one field (an output's coil/injector assignment waits for an engine stop in
+                        # a module whose generic outputs are live). The studio greys it while turning.
+                        **({"applies": f["applies"]} if f.get("applies") in ("engine_stop", "reboot") else {}),
                         # The field's own default, so a client can RESTORE it rather than hardcode a
                         # sentinel. A picker field gated by a sibling (sensor source, gated by interface)
                         # goes stale when that sibling changes -- its stored number is a pool index, and

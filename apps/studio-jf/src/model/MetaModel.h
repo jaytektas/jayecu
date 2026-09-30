@@ -559,7 +559,18 @@ public:
         const size_t dot = path.find('.');
         if (dot == std::string::npos) return {};
         const size_t end = path.find_first_of(".[", dot + 1);
-        const auto it = applies_.find(path.substr(0, end == std::string::npos ? std::string::npos : end));
+        const std::string top = path.substr(0, end == std::string::npos ? std::string::npos : end);
+        // An element's own field first ("outputs.output[3].function" -> "outputs.output.function").
+        if (end != std::string::npos && path[end] == '[') {
+            const size_t close = path.find(']', end), fdot = close == std::string::npos ? close : path.find('.', close);
+            if (fdot != std::string::npos) {
+                const size_t fend = path.find_first_of(".[", fdot + 1);
+                const auto f = applies_.find(top + "." + path.substr(fdot + 1, fend == std::string::npos
+                                                                              ? std::string::npos : fend - fdot - 1));
+                if (f != applies_.end()) return f->second;
+            }
+        }
+        const auto it = applies_.find(top);
         return it == applies_.end() ? std::string() : it->second;
     }
     const std::vector<ValueAutotune> &valueAutotunes() const { return valueAutotunes_; }

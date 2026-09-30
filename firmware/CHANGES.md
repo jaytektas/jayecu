@@ -26,6 +26,9 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 - MAP prediction can also predict a fast throttle LIFT (Predict Tip-Out, off by default): the estimate moves down towards Predicted MAP, as a tip-in moves it up.
 - A throttle sensor that drops out no longer reads as the pedal snapping shut and then stabbing: MAP prediction is not triggered by a TPS dropout.
 - Output wizard: a Check Engine Light — on while any trouble code is active, with a bulb check at key-on; it fails lit if the ECU cannot read its count.
+- With the key off (or the ECU only on USB), coil and injector outputs are no longer driven: their pins are released to high impedance, like every other output, and claimed again at key-on. They used to be held driven low whatever the key said.
+- The studio greys out settings that only apply when the engine stops (the trigger streams, the engine's shape, an output's coil or injector assignment) while it is connected and the engine is turning. Trigger Offset BTDC and the full-sync RPM band stay editable: the ECU reads them at once.
+- Output wizard: the selected template's highlight no longer runs under the list's scrollbar.
 - Closed-loop O2 holds its trim while MAP prediction is active; the new Closed-Loop Hold channel says why the trim is held (fuel cut, after cut, settling, cold, off range or transient).
 - Fuel Tuning ▸ MAP Prediction & Fuel Film holds the transient strategy's switches and all four of its tables. One button chooses it (and turns Classic Transient Fuel off); Transient Throttle has the matching button, and both pages warn while the two strategies are on together.
 - Fuel Tuning ▸ Corrections points to the fuel composition correction, which is per stage (Stage N ▸ Fuel).

@@ -45,6 +45,12 @@ int main() {
           m.appliesAt("trigger.streams[2].enabled"));
     check(m.appliesAt("engine.cylinder_count") == "engine_stop", "the cylinder count applies at an engine stop");
     check(m.appliesAt("[#engine.cylinder_count]") == "engine_stop", "…in the builder's [#path] form too");
+    check(m.appliesAt("trigger.trigger_offset_btdc").empty(),
+          "Trigger Offset BTDC applies at once (set with a timing light on a running engine)");
+    check(m.appliesAt("trigger.min_full_sync_rpm_x10").empty(), "…and so does the full-sync RPM band");
+    check(m.appliesAt("outputs.output[3].function") == "engine_stop",
+          "an output's Function (coil / injector / generic) applies at an engine stop");
+    check(m.appliesAt("outputs.output[3].pwm_freq_hz").empty(), "…while a generic output's settings apply at once");
     check(m.appliesAt("fuel_calculator.ve_table").empty(), "the VE table applies at once");
     check(m.appliesAt("fuel_calculator.map_predict_enabled").empty(), "an ordinary switch applies at once");
 

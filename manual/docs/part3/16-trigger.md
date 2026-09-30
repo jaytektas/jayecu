@@ -312,9 +312,11 @@ or re-sent.
 :material-circle:{ .level-basic } Basic → :material-circle:{ .level-intermediate } Intermediate
 
 The trigger lives under **Configuration ▸ Engine Configuration ▸ Trigger System**. The trigger
-settings apply when the engine is stopped, except **Trigger Offset BTDC**, which the ECU picks up
-straight away so you can adjust it with a timing light on a running engine.
-<!-- src: definition/ecu.schema.yaml (shadow when engine_stop); firmware/Scheduler/EnginePositionHal.cpp -->
+streams apply when the engine is stopped, so while the studio is connected and the engine is turning
+they are greyed out ("Applies when the engine stops"). **Trigger Offset BTDC** and the **Min / Max RPM
+for Full (PHASE) Sync** band are the exceptions: the ECU reads them straight away, so they stay editable
+and you can set the offset with a timing light on a running engine.
+<!-- src: definition/ecu.schema.yaml (Trigger shadow; shadow: false on the offset and sync band); firmware/Scheduler/EnginePositionHal.cpp (service); apps/studio-jf/src/surface/CanvasWidget.cpp -->
 
 This walk-through uses **Example 1** below: a four-cylinder with a 60-2 crank wheel on VR1 and a
 one-pulse cam sensor on DIG1.

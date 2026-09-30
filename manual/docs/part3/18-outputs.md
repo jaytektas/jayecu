@@ -343,6 +343,7 @@ run. With this firmware they are:
 | **Starter Motor** | Digital | Fixed 100 % | Off | **Maximum Crank** (10 s), **Rest Before Retry** (3 s); interlocks to tick: in neutral, clutch down, brake pressed |
 | **Main Relay** | Digital | Fixed 100 % | On | nothing: on whenever the ECU is awake |
 | **Shift Light** | Digital | Fixed 100 % | Off | **Light On Above** (6500 rpm), **Light Off Below** (6300 rpm) |
+| **Check Engine Light** | Digital | Fixed 100 % | On | **Bulb Check** (3 s): lit at key-on for that long, then on while any trouble code is active |
 | **Tachometer** | PWM | Fixed 50 % | Off | **Pulses per Rev** (2), **Squelch Below** (60 rpm); frequency = rpm × pulses ÷ 60 |
 | **Boost Solenoid (Wastegate)** | PWM 30 Hz | Candidate `wastegate_duty` | Off | **Stop Below RPM** (200) |
 | **VVT Solenoid (Intake Bank 1)** … **(Exhaust Bank 2)** | PWM 250 Hz | Candidate `vvt_duty_1` … `vvt_duty_4` | Off | **Stop Below RPM** (200); four templates, one per cam (chapter 25) |
@@ -352,6 +353,12 @@ run. With this firmware they are:
 <!-- src: definition/ecu.schema.yaml (output_templates) -->
 
 The full text of each template, with its conditions, is in the reference (*Output templates*).
+
+The **Check Engine Light** follows **Active DTC Count** `dtc_active`: on while any code is active, off
+once they have all cleared. The key-on flash is the bulb check: a lamp that never lights at key-on is a
+dead bulb or an open circuit, not a healthy engine. It fails **on**: if the ECU cannot read its own count,
+the lamp lights. Which codes are active, and why, is on the Diagnostic Trouble Codes list (chapter 44).
+<!-- src: definition/ecu.schema.yaml (output_templates: check_engine_light) -->
 
 - The numbers you enter land in the output's **Template Numbers** (A–D), and the conditions read them
   from there. Change a number later on the page, and the template still recognises the output as its

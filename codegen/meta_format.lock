@@ -79,6 +79,7 @@
   "config.*.*.element_types.[]:null",
   "config.*.*.element_types.[]:str",
   "config.*.*.enum:str",
+  "config.*.*.fields.*.applies:str",
   "config.*.*.fields.*.bits.*.bitHi:num",
   "config.*.*.fields.*.bits.*.bitLo:num",
   "config.*.*.fields.*.bits.*.help:str",

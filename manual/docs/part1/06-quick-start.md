@@ -84,8 +84,9 @@ the engine running.
 
 Settings that change the engine's shape wait until the engine is stopped before they take effect.
 That covers the cylinder count and firing order, the injection stages, the trigger streams, and which
-coil or injector an output drives. Change them with the engine off. Trigger Offset BTDC is the
-exception (above).
+coil or injector an output drives. Change them with the engine off: while the studio is connected and
+the engine is turning, the studio greys out the settings that would only wait (hover one to see why).
+Trigger Offset BTDC is the exception (above).
 <!-- src: definition/ecu.schema.yaml (Engine and Trigger shadow: when engine_stop); codegen/codegen.py; outputs.output[].function help -->
 
 ### Edits live in the ECU's memory until you burn them

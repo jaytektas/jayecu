@@ -517,7 +517,12 @@ bool MetaModel::loadFile(const std::string &path)
     const jf::JJson &config = root["config"];
     for (const auto &[mod, fields] : config.obj())
         for (const auto &[name, e] : fields.obj())
-            if (e.isObject() && e.contains("applies")) applies_[mod + "." + name] = e["applies"].str();
+            if (e.isObject()) {
+                if (e.contains("applies")) applies_[mod + "." + name] = e["applies"].str();
+                for (const auto &[fname, fe] : e["fields"].obj())         // a struct array's own fields
+                    if (fe.isObject() && fe.contains("applies"))
+                        applies_[mod + "." + name + "." + fname] = fe["applies"].str();
+            }
     for (const auto &[modKey, modVal] : config.obj()) {
         const jf::JJson &fields = modVal;
         for (const auto &[feKey, feVal] : fields.obj()) {
