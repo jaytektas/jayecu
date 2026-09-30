@@ -55,6 +55,11 @@ bool OutputTest::start(uint8_t row, uint32_t count, uint32_t on_ms, uint32_t off
                        uint32_t now_ms) noexcept {
     if (row >= MAX_ROWS || !cfg_ || row >= OUTPUTS_OUTPUT_COUNT) return false;
     if (count == 0) { cancel(row, now_ms); return true; }        // 0 is the Off button
+    // NOTHING IS DRIVEN WITH THE KEY OFF — the test included. Every other output lets go of its pin then
+    // (OutputManager, and the firing pins in EnginePositionHal), and a test that drove one anyway would
+    // be the single exception to a rule a person wiring the car relies on.
+    extern bool g_system_active;
+    if (!g_system_active) return false;
 
     // WHAT WAS ASKED FOR IS WHAT HAPPENS. The only substitution is for a value the caller omitted —
     // a bare CLI call — and the function picks a sensible one. Nothing is clamped down: the operator
@@ -106,6 +111,9 @@ void OutputTest::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFra
 
 void OutputTest::step(bool engine_stopped, uint32_t now_ms) noexcept {
     if (active_n_ == 0) return;
+    // …and the key going off ends a test in progress, the same way.
+    extern bool g_system_active;
+    if (!g_system_active) { cancel_all(now_ms); return; }
     // A START DROPS EVERYTHING, before any phase is advanced. Same rule as the H-bridge nudge, for the
     // same reason: the engine turning means the firing layer wants these pins back this instant.
     if (!engine_stopped) { cancel_all(now_ms); return; }

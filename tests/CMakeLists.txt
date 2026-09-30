@@ -558,6 +558,13 @@ target_include_directories(test_output_map PRIVATE
 target_link_libraries(test_output_map PRIVATE platform_stub)
 add_test(NAME output_map COMMAND test_output_map)
 
+# The bench output test obeys the key: refused with it off, and stopped when it goes off.
+add_executable(test_output_test test_output_test.cpp ${FW_DIR}/Engine/Modules/OutputTest.cpp)
+target_include_directories(test_output_test PRIVATE
+    ${GEN_DIR} ${GEN_DIR}/modules ${GEN_DIR}/boards ${SCHED_DIR} ${FW_DIR})
+target_link_libraries(test_output_test PRIVATE platform_stub)
+add_test(NAME output_test COMMAND test_output_test)
+
 # The async transient burst: does it spread over the ENGINE CYCLE, whatever that cycle is?
 add_executable(test_async_injection test_async_injection.cpp
     ${SCHED_DIR}/EventScheduler.cpp ${SCHED_DIR}/CycleRecorder.cpp ${GEN_DIR}/default_config.cpp)

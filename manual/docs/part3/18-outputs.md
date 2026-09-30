@@ -490,10 +490,11 @@ With the engine stopped, the **Bench Test** panel on each pin page fires that ou
 3. **Stop** ends this pin's test; **Stop All** ends every test.
    <!-- src: firmware/Engine/Modules/OutputTest.h; firmware/Engine/Modules/OutputTest.cpp; definition/boards/jaytek_v1.dashboard.gui (Bench Test panel: test <row> / test <row> 0 0 0 / test 255 0 0 0) -->
 
-**Test** is greyed out while the studio is connected and the engine is turning. The ECU cancels a test
-the moment the engine turns, because a start takes the coils and injectors back, so on a turning engine
-(or a bench stimulator left spinning) the button would do nothing at all. Stop the engine to test.
-**Stop** and **Stop All** always work.
+**Test** needs the **key on** and the **engine stopped**, and is greyed out otherwise while the studio
+is connected. With the key off nothing is driven, the test included: the ECU refuses it, and a test
+already running stops when the key goes off. The ECU also cancels a test the moment the engine turns,
+because a start takes the coils and injectors back, so on a turning engine (or a bench stimulator left
+spinning) the button would do nothing at all. **Stop** and **Stop All** always work.
 <!-- src: apps/studio-jf/tools/layout/more_pages.py (TEST_ENABLED); firmware/Engine/Modules/OutputTest.cpp (step) -->
 
 The ECU enforces the safety rules, not the studio:

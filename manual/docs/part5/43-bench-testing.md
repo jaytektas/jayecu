@@ -77,8 +77,9 @@ Chapter 17 covers each sensor's checks.
 With the engine stopped, the **Bench Test** panel on each output's pin page fires it — a set number
 of times, for a set on and off time — so you can check each load and its wiring, one at a time
 (chapter 18, Step 10). Use test lights or the real load; watch the
-current on the bench supply. Stop the trigger stimulator first: while it spins the wheel the ECU sees a
-running engine, and **Test** is greyed out.
+current on the bench supply. The key must be on (nothing is driven with it off), and the trigger
+stimulator stopped: while it spins the wheel the ECU sees a running engine. Otherwise **Test** is greyed
+out.
 
 ### Step 4 — Trigger
 

@@ -18,8 +18,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import author as A
 import fuel_tree as FT
 
-# An output test can start only with the engine stopped (or offline, where there is nothing to test).
-TEST_ENABLED = '![%connected] || [$engine_state] == 0'
+# An output test can start only with the key on and the engine stopped (or offline, where there is
+# nothing to test): the firmware refuses it with the key off — nothing is driven then — and cancels it
+# the moment the engine turns.
+TEST_ENABLED = '![%connected] || ([$key_on] == 1 && [$engine_state] == 0)'
 from author import C_DIM
 
 ROOT = 'Configuration'
@@ -490,8 +492,8 @@ def page_output_setup(count=42):
                  {'labelText': 'Test', 'command': 'test %ROW%',
                   'arg0': '[#pc.test_count]', 'arg1': '[#pc.test_on_ms]', 'arg2': '[#pc.test_off_ms]',
                   'enableCondition': TEST_ENABLED,
-                  'tooltip': 'Runs only with the engine stopped: a turning engine cancels a test the moment it '
-                             'starts. Stop the engine (or the stim) to test.'}),
+                  'tooltip': 'Runs only with the key on and the engine stopped: nothing is driven with the key '
+                             'off, and a turning engine cancels a test the moment it starts.'}),
           into=test)
     p.add(p._new('command', 138, ty + 8, 90, 30,
                  {'labelText': 'Stop', 'command': 'test %ROW% 0 0 0'}), into=test)

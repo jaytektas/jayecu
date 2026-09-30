@@ -8,6 +8,7 @@
 #include "../Platform/board_hal.h"          // board_hbridge_set_enable/direction (bench diag)
 #include "../Engine/Modules/KnockDsp.h"      // 'knock' bench command — burst + band level
 #include "../Engine/Modules/OutputTest.h"    // 'test' — bench output test (coil / injector / level)
+extern bool g_system_active;   // the key (Sensors): the output test is refused while it is off
 #include "../Diagnostics/CpuStats.h"        // 'cpu' — MCU load + where the time goes
 #include "../Diagnostics/ReconfigCost.h"  // …and what the last tune write cost the frame
 #include "../Diagnostics/DtcManager.h"       // 'dtc' command — show/clear the DTC table
@@ -132,7 +133,8 @@ void cmd_test(const Argv& a, Out& o) {
     if (count == 0) { o.put(" stopped\r\n"); return; }
     if (!ok) {
         // The pin is spoken for, or there is no pin. Say which rather than looking like a dead output.
-        o.put(": REFUSED — the pin is owned by the firing layer or the row is out of range\r\n");
+        o.put(g_system_active ? ": REFUSED — the pin is owned by the firing layer or the row is out of range\r\n"
+                              : ": REFUSED — the key is off; nothing is driven with the key off\r\n");
         return;
     }
     uint32_t on_ap = 0, off_ap = 0;
