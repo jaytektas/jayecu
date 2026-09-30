@@ -513,6 +513,9 @@
     "fuel_sg_4": 509,
     "charge_load": 510,
     "ve_alpha": 511,
-    "blend_alpha_share": 512
+    "blend_alpha_share": 512,
+    "prot_level": 513,
+    "blink_slow": 514,
+    "blink_fast": 515
   }
 }

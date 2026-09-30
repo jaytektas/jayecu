@@ -17,6 +17,7 @@
 #include <j/core/JLabel.h>
 
 #include "../model/MetaModel.h"   // dtcDescription(code) — the hover explanation for each trouble code
+#include "../model/Cache.h"       // the live protection level (prot_level)
 
 #include <cstdint>
 #include <cstdio>
@@ -184,7 +185,17 @@ public:
             rows.push_back(std::move(r));
         }
         char sum[64]; std::snprintf(sum, sizeof(sum), "%d active \xC2\xB7 %d stored", active, stored);
-        summary_->setText(rows.empty() ? "No trouble codes" : sum);
+        // THE PROTECTION LEVEL IN FORCE, live, beside the codes that put it there — and after they have
+        // gone, since a level can hold past its fault or act on stored ones. Nothing else in the studio
+        // said the engine was in limp.
+        std::string line = rows.empty() ? std::string("No trouble codes") : std::string(sum);
+        const Cache& c = Cache::instance();
+        if (c.linkOpen() && c.has("prot_level")) {
+            const int lv = static_cast<int>(c.value("prot_level") + 0.5);
+            line += lv > 0 ? " \xC2\xB7 Protection level " + std::to_string(lv) + " in force"
+                           : std::string(" \xC2\xB7 no protection");
+        }
+        summary_->setText(line);
         table_->setRows(std::move(rows));
     }
 

@@ -376,6 +376,10 @@ void EngineProtection::update(const EnginePosition& pos,
     // -----------------------------------------------------------------------
     // 6. Protection status bits (telemetry): cut active / any DTC / severe (sev 3)
     // -----------------------------------------------------------------------
+    bus.set(SIG_PROT_LEVEL, static_cast<float>(worst), true, now_ms, ttl());   // 0..3, held levels included
+    // Flashers for output conditions: 1 Hz and 4 Hz, 50 % (a lamp that flashes the protection level).
+    bus.set(SIG_BLINK_SLOW, ((now_ms / 500u) & 1u) ? 1.0f : 0.0f, true, now_ms, ttl());
+    bus.set(SIG_BLINK_FAST, ((now_ms / 125u) & 1u) ? 1.0f : 0.0f, true, now_ms, ttl());
     bus.set_u32(wk::prot_status, static_cast<uint32_t>(
         ((bus.valid(wk::fuel_cut) || bus.valid(wk::ign_cut)) ? 0x01u : 0u) |
         ((worst >= 1)                      ? 0x02u : 0u) |

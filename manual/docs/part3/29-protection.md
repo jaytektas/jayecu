@@ -184,10 +184,16 @@ it, chapter 30), and closed-loop lambda holds its trim during any fuel cut (chap
 :material-circle:{ .level-intermediate } Intermediate
 
 The codes are in section 1 (built-in checks), section 5 (P1770–P177B) and section 3 (P17C0). Live
-channels: `prot_status` (bit 0 cutting, bit 1 a level ≥1 active, bit 2 level 3 active),
+channels: **Protection Level** `prot_level` (0 none, or the level in force, held levels included),
+`prot_status` (bit 0 cutting, bit 1 a level ≥1 active, bit 2 level 3 active),
 `prot_ign_retard`, `fuel_corr_protection`, `monitor_flags`, `lambda_protect_active`,
 `egt_protect_active`, `fuel_corr_egt`, `dfco_active`. The trouble codes themselves, and how to read
 and clear them, are in chapter 44.
+
+The **Diagnostic Trouble Codes** dock shows the level in force beside the code counts, "Protection level 2
+in force", and keeps showing it after the codes that set it have cleared, for as long as the level holds.
+A **Check Engine Light** output (chapter 18) flashes it: slowly at level 1, fast at level 2, on at level 3.
+<!-- src: firmware/Engine/Modules/EngineProtection.cpp (prot_level, blink_slow/fast); apps/studio-jf/src/ui/DtcDock.h; definition/ecu.schema.yaml (check_engine_light) -->
 
 ## Troubleshooting
 

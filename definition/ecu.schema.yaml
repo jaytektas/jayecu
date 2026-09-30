@@ -1301,6 +1301,14 @@ signals:
 # a launch or cranking base, negative trims, the clamp. The torque model's spark-efficiency index.
 - {id: spark_below_map, label: "Timing Below Main Map", units: 'deg', scale: 0.1, telem_type: uint16, min: 0.0, max: 80.0, category: "Ignition", bus_type: float, datalog: true, owner: firmware}
 - {id: prot_status, label: "Protection Status Bits", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 255.0, category: "EngineProtection", bus_type: uint32, owner: firmware}
+# THE PROTECTION LEVEL IN FORCE, 0 (none) to 3 — held levels included. prot_status says only "some level"
+# and "level 3", so levels 1 and 2 could not be told apart: a lamp that should light for level 1 but not
+# level 2 had nothing to read.
+- {id: prot_level, label: "Protection Level", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 3.0, category: "EngineProtection", bus_type: float, datalog: true, owner: firmware}
+# FLASHERS: 50 % square waves any output condition can read — a warning lamp that flashes to say which
+# protection level is in force, a shift light that flashes at the limit. 1 Hz and 4 Hz.
+- {id: blink_slow, label: "Flasher (slow, 1 Hz)", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 1.0, category: "EngineProtection", bus_type: float, owner: firmware}
+- {id: blink_fast, label: "Flasher (fast, 4 Hz)", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 1.0, category: "EngineProtection", bus_type: float, owner: firmware}
 - {id: pw_add_deadtime, label: "PW Add: Dead Time", units: 'us', scale: 1.0, telem_type: uint16, min: 0.0, max: 65000.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 - {id: reverse_sw, label: "Reverse Switch", category: "Sensors - Transmission", bus_type: float}
 - {id: ride_height_f, label: "Ride Height Sensor Front", category: "Sensors - Chassis", bus_type: float}
@@ -7638,16 +7646,18 @@ output_templates:
 
 - id: check_engine_light
   name: Check Engine Light
-  blurb: 'On while any trouble code is active or a protection level is in force; lit for a moment at key-on.'
-  detail: 'The key-on flash is the bulb check: a lamp that never lights at key-on is a dead bulb or an open circuit, not a healthy engine. After it, the lamp is on while any code is active OR a protection level is still in force — a level can hold after its fault has cleared, or act on stored faults, and an engine in limp with the lamp out tells the driver nothing is wrong. Which codes and why is on the Diagnostic Trouble Codes list. If the ECU cannot read either the lamp is ON: a warning light fails lit.'
+  blurb: 'Says which protection level is in force: slow flash level 1, fast flash level 2, on level 3.'
+  detail: 'The key-on flash is the bulb check: a lamp that never lights at key-on is a dead bulb or an open circuit, not a healthy engine. After it, the lamp says how serious things are: a SLOW flash while protection level 1 is in force, a FAST flash at level 2, ON at level 3 (an active code always puts its severity''s level in force). A level can hold after its fault has cleared, or act on stored faults — the lamp keeps showing it until the level lets go. Which codes and why is on the Diagnostic Trouble Codes list. If the ECU cannot read any of it the lamp is ON: a warning light fails lit.'
   kind: 1
   value_source: 2
   fixed_pct: 100
   on_invalid: 1
   params:
-  - {name: bulb_s, label: Bulb Check, units: s, default: 3, min: 0, max: 10, digits: 1, help: 'How long the lamp lights at key-on before it shows the codes. 0 skips the check.'}
-  on_when:  'uptime_s < {bulb_s} or dtc_active > 0 or prot_status >= 2'
-  off_when: 'uptime_s >= {bulb_s} and dtc_active < 1 and prot_status < 2'
+  - {name: bulb_s, label: Bulb Check, units: s, default: 3, min: 0, max: 10, digits: 1, help: 'How long the lamp lights at key-on before it shows the state. 0 skips the check.'}
+  # One condition, no Turn Off: the lamp follows it (an empty off condition means "when this stops").
+  # (No separate "any active code" term: an active code always puts its severity's level in force.)
+  on_when:  'uptime_s < {bulb_s} or prot_level == 3 or (prot_level == 2 and blink_fast) or (prot_level == 1 and blink_slow)'
+  off_when: ''
 
 - id: tachometer
   name: Tachometer
