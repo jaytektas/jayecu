@@ -33,7 +33,7 @@ source:      "EasyEDA Pro schematic, netlist export 2026-05-22"
 # Clock sources
 # ---------------------------------------------------------------------------
 hse_hz:  8000000    # 8 MHz crystal X1 on PH0/PH1 (C105/C106 20 pF)
-lse_hz:  32768      # 32.768 kHz crystal X2 on PC14/PC15 (RTC)
+lse_hz:  32768      # 32.768 kHz crystal X2 on PC14/PC15 (RTC); a backup battery on VBAT keeps it running with the power off
 
 # ---------------------------------------------------------------------------
 # ADC voltage reference

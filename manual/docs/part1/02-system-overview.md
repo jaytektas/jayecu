@@ -412,9 +412,11 @@ on your computer to identify itself, and connects to the ones that answer as jay
     <!-- src: firmware/Comms/OmniProtocol.h (framing) (commands); generated/schema_meta.h (JAYECU_BLOCK_SIZE 1024); firmware/Comms/CommsManager.cpp (read refuses > one block) -->
 
 The studio also sets the ECU's clock from your computer's clock when it connects, so that files the ECU
-writes to its SD card carry the right date. The jaytek_v1 has no clock battery, so its clock restarts
-from a fixed date every time it loses power.
-<!-- src: firmware/Comms/OmniProtocol.h (RTC command; jaytek_v1 has no VBAT cell); apps/studio-jf/main.cpp (rtcSynced on connect) -->
+writes to its SD card carry the right date. The jaytek_v1 has a clock battery and a 32.768 kHz clock
+crystal, so its clock keeps time with the power off; the studio's setting just keeps it right. A board
+without a battery restarts its clock from a fixed date every time it loses power, and until a studio
+connects, its files carry that date.
+<!-- src: firmware/Comms/OmniProtocol.h (RTC command); definition/boards/jaytek_v1.board.yaml (lse_hz, backup battery); apps/studio-jf/main.cpp (rtcSynced on connect) -->
 
 ### The SD card
 

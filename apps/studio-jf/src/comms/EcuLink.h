@@ -115,9 +115,9 @@ public:
     void sdStatus();
     void sdRelease();                     // release override, return to key-driven
     // Push the HOST's wall clock into the ECU's RTC. Called automatically when the identity
-    // handshake completes, because the ECU's clock is otherwise never set by anything: jaytek_v1
-    // has no VBAT cell, so it takes its compiled 2025-01-01 default on EVERY cold boot, and
-    // get_fattime() stamps that onto every SD log file and learned-store totem. Exposed publicly
+    // handshake completes, because the ECU's clock is otherwise never set by anything: on its first
+    // power-up (and on every cold boot of a board with no backup battery) it holds its compiled
+    // 2025-01-01 default, and get_fattime() stamps that onto every SD log file and learned-store totem. Exposed publicly
     // so it can also be re-issued by hand after the host's own clock is corrected.
     //
     // Reads the clock BEFORE setting it, so the log can say what the ECU thought the time was —

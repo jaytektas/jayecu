@@ -304,8 +304,9 @@ extern "C" void platform_set_led_error(bool on)    { board_set_led(BOARD_LED_ERR
 // ---------------------------------------------------------------------------
 // Real-time clock (LSE-backed). The RTC clock source/mux is configured in
 // SystemClock_Config; here we ungate and initialise the peripheral. Time is
-// kept across resets via the backup domain; a default is written only on a
-// cold backup-domain reset (no VBAT battery → set each cold boot).
+// kept across resets via the backup domain, and across power-off on a board with a
+// backup battery on VBAT (jaytek_v1); a default is written only on a cold
+// backup-domain reset — every cold boot, on a board without one.
 // ---------------------------------------------------------------------------
 
 static RTC_HandleTypeDef s_hrtc;

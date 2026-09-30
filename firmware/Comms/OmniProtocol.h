@@ -71,9 +71,9 @@ enum : uint8_t {
     // THIS EXISTS BECAUSE NOTHING EVER SET THE CLOCK. platform_rtc_set() has been there from
     // the start with no caller, so the RTC could only ever hold its cold-boot default of
     // 2025-01-01 — and get_fattime() feeds that to FatFS, stamping every SD log and every
-    // learned-store totem with a date that was never true. jaytek_v1 has no VBAT cell either,
-    // so it takes that default on EVERY cold boot; correcting it on connect is the only way
-    // the timestamps mean anything.
+    // learned-store totem with a date that was never true. jaytek_v1 keeps time on its backup
+    // battery once set; a board without one takes that default on EVERY cold boot, and correcting
+    // it on connect is the only way its timestamps mean anything.
     OMNI_CMD_RTC             = 0x29,
 };
 
