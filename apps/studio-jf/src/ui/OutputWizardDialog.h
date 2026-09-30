@@ -137,6 +137,8 @@ public:
         // Two columns: the personalities on the left, the chosen one's questions on the right.
         const float listY = kHeader() + kPad + 22.f;
         const float listH = float(kH) - listY - (kBtnH() + 2.f * kPad);
+        m_listH = listH;
+        m_listScroll = std::clamp(m_listScroll, 0.f, _listMaxScroll());
         const float colX  = kListW + 2.f * kPad;
         m_box->setBounds({ kPad, float(kH) - kPad - kBtnH(), float(kW) - 2.f * kPad, kBtnH() });
         m_name->setBounds({ colX + 110.f, listY + 4.f, 200.f, kBtnH() });
@@ -181,9 +183,28 @@ public:
         for (auto& j : m_join) if (j) j->handleMouseMove(mx, my);
         for (size_t i : _activePol()) m_pol[i]->handleMouseMove(mx, my);
         m_box->handleMouseMove(mx, my);
+        const bool overList = mx >= kPad && mx < kListW + kPad && my >= listY && my < listY + listH;
+        const auto thumb = _listThumb();
+        const bool overBar = overList && thumb.second > 0.f && mx >= kPad + kListW - kBarW - 2.f;
+        if (const float wheel = m_window->consumeWheel(); wheel != 0.f && overList)
+            m_listScroll = std::clamp(m_listScroll - wheel * kRowH, 0.f, _listMaxScroll());
+        if (m_barDrag) {
+            if (!held) m_barDrag = false;
+            else if (m_listH - thumb.second > 0.f)
+                m_listScroll = std::clamp((my - listY - m_barGrab) / (m_listH - thumb.second) * _listMaxScroll(),
+                                          0.f, _listMaxScroll());
+        }
         if (pressed) {
-            if (mx < kListW + kPad && my >= listY && my < listY + listH) {
-                const int i = int((my - listY) / kRowH);
+            if (overBar) {
+                // On the thumb: grab it where it was taken. On the track: jump the thumb there, then drag.
+                const float ty = listY + thumb.first;
+                m_barGrab = (my >= ty && my < ty + thumb.second) ? my - ty : thumb.second * 0.5f;
+                m_barDrag = true;
+                if (!(my >= ty && my < ty + thumb.second) && m_listH - thumb.second > 0.f)
+                    m_listScroll = std::clamp((my - listY - m_barGrab) / (m_listH - thumb.second) * _listMaxScroll(),
+                                              0.f, _listMaxScroll());
+            } else if (overList) {
+                const int i = int((my - listY + m_listScroll) / kRowH);
                 if (i >= 0 && i < int(m_templates.size())) _select(i);
             } else {
                 // The press decides where the keyboard is. Hit-test first, then deliver: a control that
@@ -272,9 +293,27 @@ private:
     // Choosing a personality builds its questions. Where the slot ALREADY holds this template's
     // parameters (it was set up with it before), those numbers are what the boxes come up with —
     // re-opening the wizard on a fan should offer its temperatures, not the shipped defaults.
+    float _listContentH() const { return float(m_templates.size()) * kRowH; }
+    float _listMaxScroll() const { return std::max(0.f, _listContentH() - m_listH); }
+    // The scrollbar's thumb, when the list is longer than its box: {y, height} inside the list.
+    std::pair<float, float> _listThumb() const {
+        const float content = _listContentH();
+        if (m_listH <= 0.f || content <= m_listH) return { 0.f, 0.f };
+        const float th = std::max(24.f, m_listH * m_listH / content);
+        return { (m_listH - th) * (m_listScroll / _listMaxScroll()), th };
+    }
+    static constexpr float kBarW = 8.f;
+
     void _select(int i) {
         if (m_templates.empty()) return;
         m_sel = std::clamp(i, 0, int(m_templates.size()) - 1);
+        // Keep the chosen row in view (arrow keys walk past the bottom of the box).
+        if (m_listH > 0.f) {
+            const float top = m_sel * kRowH, bot = top + kRowH;
+            if (top < m_listScroll)               m_listScroll = top;
+            if (bot > m_listScroll + m_listH)     m_listScroll = bot - m_listH;
+            m_listScroll = std::clamp(m_listScroll, 0.f, _listMaxScroll());
+        }
         const OutputTemplate& t = m_templates[m_sel];
         m_spin.clear();
         m_opt.clear();
@@ -420,8 +459,11 @@ private:
         // ---- the personalities ----
         buf.pushRectangle(kPad, listY, kListW, listH, Colors::Surface0, 4.f, 1.f, Colors::Border);
         buf.pushClip(kPad, listY, kListW, listH);
+        const auto thumb = _listThumb();
+        const float textW = kListW - 24.f - (thumb.second > 0.f ? kBarW + 4.f : 0.f);
         for (int i = 0; i < int(m_templates.size()); ++i) {
-            const float ry = listY + i * kRowH;
+            const float ry = listY + i * kRowH - m_listScroll;
+            if (ry + kRowH < listY) continue;
             if (ry > listY + listH) break;
             static const uint8_t kSelFg[4] = { 255, 255, 255, 255 };
             if (i == m_sel) buf.pushRectangle(kPad, ry, kListW, kRowH, Colors::Accent, 0.f);
@@ -429,9 +471,15 @@ private:
             if (JTextHelper::hasAtlas()) {
                 JTextHelper::pushText(buf, kPad + 10.f, ry + 6.f, m_templates[i].name, fg);
                 JTextHelper::pushText(buf, kPad + 10.f, ry + 6.f + lh,
-                                      _clip(m_templates[i].blurb, kListW - 24.f),
+                                      _clip(m_templates[i].blurb, textW),
                                       (i == m_sel) ? fg : Colors::TextSecondary);
             }
+        }
+        if (thumb.second > 0.f) {
+            const float bx = kPad + kListW - kBarW - 2.f;
+            buf.pushRectangle(bx, listY + 2.f, kBarW, listH - 4.f, Colors::Surface1, kBarW * 0.5f);
+            buf.pushRectangle(bx, listY + thumb.first, kBarW, thumb.second,
+                              m_barDrag ? Colors::Accent : Colors::Border, kBarW * 0.5f);
         }
         buf.popClip();
 
@@ -604,6 +652,11 @@ private:
     std::vector<OutputTemplate> m_templates;
     int   m_sel{0};
     bool  m_done{false}, m_drag{false};
+    // THE LIST SCROLLS. It is as long as the templates the firmware ships, and past the height of the
+    // dialog the rest were clipped with no way to reach them. Wheel over the list, drag its bar, or arrow
+    // down: the selection is kept in view.
+    float m_listScroll{0.f}, m_listH{0.f}, m_barGrab{0.f};
+    bool  m_barDrag{false};
     float m_ax{0}, m_ay{0};
     std::unique_ptr<PlatformWinType> m_window;
     jf::GpuSurfaceId m_surface{0};

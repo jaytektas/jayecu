@@ -25,6 +25,7 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 - Transient TPS Scaling's default rises with RPM, from 150 %/s at 500 rpm through 300 at 2000 to 700 at 6000 (was 100 everywhere): at speed the MAP sensor lags less, so it takes a faster stab to need prediction.
 - MAP prediction can also predict a fast throttle LIFT (Predict Tip-Out, off by default): the estimate moves down towards Predicted MAP, as a tip-in moves it up.
 - A throttle sensor that drops out no longer reads as the pedal snapping shut and then stabbing: MAP prediction is not triggered by a TPS dropout.
+- Output wizard: a Check Engine Light — on while any trouble code is active, with a bulb check at key-on; it fails lit if the ECU cannot read its count.
 - Closed-loop O2 holds its trim while MAP prediction is active; the new Closed-Loop Hold channel says why the trim is held (fuel cut, after cut, settling, cold, off range or transient).
 - Fuel Tuning ▸ MAP Prediction & Fuel Film holds the transient strategy's switches and all four of its tables. One button chooses it (and turns Classic Transient Fuel off); Transient Throttle has the matching button, and both pages warn while the two strategies are on together.
 - Fuel Tuning ▸ Corrections points to the fuel composition correction, which is per stage (Stage N ▸ Fuel).

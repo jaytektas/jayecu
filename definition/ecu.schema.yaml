@@ -7628,6 +7628,19 @@ output_templates:
   on_when:  'rpm > {on_rpm}'
   off_when: 'rpm < {off_rpm}'
 
+- id: check_engine_light
+  name: Check Engine Light
+  blurb: 'On while any trouble code is active; lit for a moment at key-on.'
+  detail: 'The key-on flash is the bulb check: a lamp that never lights at key-on is a dead bulb or an open circuit, not a healthy engine. After it, the lamp follows the active codes — on while any is active, off once they have all cleared. Which codes are active and why is on the Diagnostic Trouble Codes list. If the ECU cannot read its own count the lamp is ON: a warning light fails lit.'
+  kind: 1
+  value_source: 2
+  fixed_pct: 100
+  on_invalid: 1
+  params:
+  - {name: bulb_s, label: Bulb Check, units: s, default: 3, min: 0, max: 10, digits: 1, help: 'How long the lamp lights at key-on before it shows the codes. 0 skips the check.'}
+  on_when:  'uptime_s < {bulb_s} or dtc_active > 0'
+  off_when: 'uptime_s >= {bulb_s} and dtc_active < 1'
+
 - id: tachometer
   name: Tachometer
   blurb: 'The square wave an analog tacho reads: a frequency that follows engine speed.'
