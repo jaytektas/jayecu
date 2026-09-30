@@ -124,7 +124,7 @@
     "fuel_corr_generic4": 120,
     "fuel_corr_iat": 121,
     "fuel_corr_ltft": 122,
-    "fuel_corr_map": 123,
+    "lambda_cl_hold": 123,
     "fuel_corr_overall": 124,
     "fuel_corr_poststart": 125,
     "fuel_corr_protection": 126,
@@ -478,6 +478,22 @@
     "maf_failover": 474,
     "flex_ethanol": 475,
     "spark_below_map": 476,
-    "no_tune": 477
+    "no_tune": 477,
+    "stage1_ethanol": 478,
+    "stage2_ethanol": 479,
+    "stage3_ethanol": 480,
+    "stage4_ethanol": 481,
+    "fuel_corr_fuelcomp_2": 482,
+    "fuel_corr_fuelcomp_3": 483,
+    "fuel_corr_fuelcomp_4": 484,
+    "charge_load": 485,
+    "ve_alpha": 486,
+    "blend_alpha_share": 487,
+    "fuel_sg_2": 488,
+    "fuel_sg_3": 489,
+    "fuel_sg_4": 490,
+    "prot_level": 491,
+    "blink_slow": 492,
+    "blink_fast": 493
   }
 }

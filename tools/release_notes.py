@@ -83,6 +83,11 @@ def published_kit(board):
         urllib.request.Request(url, headers={'User-Agent': 'jayecu-release'}), timeout=15))
     best = (None, None)
     for rel in get(RELEASES):
+        # A RELEASE IS COMPARED WITH RELEASES. A published beta (0.4.4-beta.17, a pre-release) is not the
+        # last firmware anyone was given: counted, the next version was worked out from it as 0.4.4 + 1 and
+        # 0.4.4 — the release the betas were leading to — was skipped.
+        if rel.get('prerelease'):
+            continue
         for a in rel.get('assets', []):
             m = re.fullmatch(re.escape(board) + r'-(.+)-kit\.json', a.get('name', ''))
             if m and (best[0] is None or vkey(m.group(1)) > vkey(best[0])):
