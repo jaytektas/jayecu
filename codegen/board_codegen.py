@@ -16,6 +16,13 @@ import sys
 import yaml
 from pathlib import Path
 
+
+def write_if_changed(path: Path, text: str) -> None:
+    """Only when the text changed: an identical header rewritten still recompiles everything including it."""
+    if path.exists() and path.read_text() == text:
+        return
+    path.write_text(text)
+
 BANNER = "// AUTO-GENERATED — do not edit. Run codegen/board_codegen.py to regenerate.\n"
 
 
@@ -163,7 +170,7 @@ def emit_header(board: dict, out_path: Path) -> None:
     ]
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text("\n".join(lines))
+    write_if_changed(out_path, "\n".join(lines))
     print(f"  wrote {out_path}")
 
 
@@ -193,7 +200,7 @@ def emit_board_shim(board: dict, out_path: Path) -> None:
         "",
     ]
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text("\n".join(lines))
+    write_if_changed(out_path, "\n".join(lines))
     print(f"  wrote {out_path}")
 
 
@@ -340,7 +347,7 @@ def emit_pins_header(board: dict, out_path: Path) -> None:
 
     L += [f"#endif // {guard}", ""]
 
-    out_path.write_text("\n".join(L))
+    write_if_changed(out_path, "\n".join(L))
     print(f"  wrote {out_path}")
 
 

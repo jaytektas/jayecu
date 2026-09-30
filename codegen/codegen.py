@@ -26,6 +26,16 @@ import zlib
 import hashlib
 from pathlib import Path
 
+
+def write_if_changed(path, text):
+    """Write a generated file only when its text changed. Rewriting an identical header still bumps its
+    timestamp, and every object that includes it recompiles — so each firmware build was a full one
+    (~70 objects) even when nothing in the schema had moved."""
+    path = Path(path)
+    if path.exists() and path.read_text() == text:
+        return
+    path.write_text(text)
+
 # The on-flash config identity is a CONTENT HASH of the byte-layout contract, not a
 # hand-bumped integer — see compute_layout_hash(). It is field 0 of EcuConfig (and of
 # the default-tune image) and the firmware's boot gate accepts a stored tune only if its
@@ -5644,7 +5654,7 @@ def install_can_templates(sig_ids: set, out_dir) -> list:
                 if last_byte >= dlc:
                     raise SystemExit(f"can_templates/{path.name}: '{f['sig']}' runs past the end of "
                                      f"frame 0x{mid:X}")
-        (dst / path.name).write_text(json.dumps(t, indent=2) + "\n")
+        write_if_changed(dst / path.name, json.dumps(t, indent=2) + "\n")
         installed.append((t.get("id", path.stem), len(frames),
                           sum(len(m.get("fields", [])) for m in frames)))
     return installed
@@ -5862,25 +5872,25 @@ def main():
     # bus). Producers (sensors/modules/CAN/Lua) reference it; it is not derived.
     signals = schema["signals"]   # already in LOCK order — see apply_signal_id_lock() above
     sig_text = gen_signal_ids_h(signals)
-    (GEN_DIR / "signal_ids.h").write_text(sig_text)
+    write_if_changed(GEN_DIR / "signal_ids.h", sig_text)
     print("  generated/signal_ids.h")
-    (GEN_DIR / "hw_input_publish.inc").write_text(gen_hw_input_publish(active_board, schema))
-    (GEN_DIR / "hw_input_keygate.inc").write_text(gen_hw_input_keygate(active_board, schema))
+    write_if_changed(GEN_DIR / "hw_input_publish.inc", gen_hw_input_publish(active_board, schema))
+    write_if_changed(GEN_DIR / "hw_input_keygate.inc", gen_hw_input_keygate(active_board, schema))
     print("  generated/hw_input_publish.inc")
-    (GEN_DIR / "hw_input_map.h").write_text(gen_hw_input_map(active_board))
+    write_if_changed(GEN_DIR / "hw_input_map.h", gen_hw_input_map(active_board))
     print("  generated/hw_input_map.h")
     validate_firmware_signal_refs(signals, schema.get("well_known_signals", {}),
                                   schema.get("sensors", []))   # firmware↔schema contract
     validate_lua_api(schema)                                                       # lua_api ↔ ECU_API contract
     validate_trigger_wheels(schema)                                                # gap 0 == the sync tooth
 
-    (GEN_DIR / "signal_enums.h").write_text(gen_signal_enums_h(schema))
+    write_if_changed(GEN_DIR / "signal_enums.h", gen_signal_enums_h(schema))
     print("  generated/signal_enums.h")
 
     # Well-known signal ROLES — stable firmware vocabulary bound to signals by the schema, so a
     # signal rename never touches a .cpp (firmware uses wk::map, not the renameable SIG_MAP).
     wk_text = gen_well_known_signals_h(schema.get("well_known_signals", {}), signals)
-    (GEN_DIR / "well_known_signals.h").write_text(wk_text)
+    write_if_changed(GEN_DIR / "well_known_signals.h", wk_text)
     print("  generated/well_known_signals.h")
 
 
@@ -5895,9 +5905,9 @@ def main():
         cat_text = gen_sensors_catalog_h(schema.get("sensor_types", []),
                                          sensors_catalog, channel_ids,
                                          enum_ids(schema, "sensor_interface"), cal_pts, schema)
-        (GEN_DIR / "sensors_catalog.h").write_text(cat_text)
+        write_if_changed(GEN_DIR / "sensors_catalog.h", cat_text)
         doc = REPO_ROOT / "docs" / "dtc-codes.md"
-        doc.write_text(gen_dtc_reference_md(schema))
+        write_if_changed(doc, gen_dtc_reference_md(schema))
         print(f"  {doc}")
         print("  generated/sensors_catalog.h")
 
@@ -5912,18 +5922,18 @@ def main():
     # Output bindings — the static OUTPUTS[] table the OutputManager builds pipelines from.
     outputs = schema.get("outputs", [])
     if outputs:
-        (GEN_DIR / "outputs.h").write_text(gen_outputs_h(outputs))
+        write_if_changed(GEN_DIR / "outputs.h", gen_outputs_h(outputs))
         print("  generated/outputs.h")
 
     # DTC category matcher + a build-time audit that every sensor catalog P-code
     # falls in a category (the "use the right DTCs" guarantee — uncategorised codes
     # still surface via dtc_worst/OBD/LED, they just won't light a category indicator).
     dtc_cats = _dtc_categories(schema)
-    (GEN_DIR / "dtc_categories.h").write_text(gen_dtc_categories_h(dtc_cats))
+    write_if_changed(GEN_DIR / "dtc_categories.h", gen_dtc_categories_h(dtc_cats))
     print("  generated/dtc_categories.h")
 
     # Control-module signal-validity DTC constants (schema module_dtc) — firmware authority.
-    (GEN_DIR / "module_dtc.h").write_text(gen_module_dtc_h(_module_dtc_entries(schema)))
+    write_if_changed(GEN_DIR / "module_dtc.h", gen_module_dtc_h(_module_dtc_entries(schema)))
     print("  generated/module_dtc.h")
 
     # The SD datalogger's MLG v2 field table — the format MegaLogViewer reads, built from the SAME
@@ -5933,11 +5943,11 @@ def main():
     # SAME byte offset the packed frame uses, which is what lets a record be gathered from that frame.
     _mlg_prim = schema["primitive_types"]
     _mlg_telem, _a, _b, _c, _d, _e = collect_offsets(_mlg_prim, schema["modules"], telem)
-    (GEN_DIR / "mlg_log.h").write_text(gen_mlg_log_h(_mlg_telem, _mlg_prim))
+    write_if_changed(GEN_DIR / "mlg_log.h", gen_mlg_log_h(_mlg_telem, _mlg_prim))
     print("  generated/mlg_log.h")
 
     # Per-module scheduler cadence (firmware constant, NOT config) — see gen_module_cadence_h.
-    (GEN_DIR / "module_cadence.h").write_text(gen_module_cadence_h(schema))
+    write_if_changed(GEN_DIR / "module_cadence.h", gen_module_cadence_h(schema))
     print("  generated/module_cadence.h")
     if dtc_cats:
         # Check the codes the firmware will ACTUALLY raise (post-allocation), not the schema's declared
@@ -5965,34 +5975,34 @@ def main():
         arrays = mod.get("config_arrays", [])
         if cfg or tbls or arrays:
             out = gen_module_config_h(prim_types, mod_name, cfg, tbls, arrays)
-            (GEN_DIR / "modules" / f"{ms}_config.h").write_text(out)
+            write_if_changed(GEN_DIR / "modules" / f"{ms}_config.h", out)
             print(f"  generated/modules/{ms}_config.h")
 
     # Table descriptors — one tbl::TableDesc builder per configurable table (after the module config
     # headers it references). Modules call tbl::table_eval(<table>_desc(cfg_), bus) for every lookup.
-    (GEN_DIR / "table_descs.h").write_text(gen_table_descs_h(modules))
-    (GEN_DIR / "script_lookups.h").write_text(gen_script_lookups_h(modules))
+    write_if_changed(GEN_DIR / "table_descs.h", gen_table_descs_h(modules))
+    write_if_changed(GEN_DIR / "script_lookups.h", gen_script_lookups_h(modules))
     # …and the id-indexed view of the same tables, which is what an expression can name.
-    (GEN_DIR / "table_registry.h").write_text(gen_table_registry_h(modules))
+    write_if_changed(GEN_DIR / "table_registry.h", gen_table_registry_h(modules))
     print("  generated/table_descs.h")
 
     # Combined headers
-    (GEN_DIR / "ecu_telemetry.h").write_text(gen_ecu_telemetry_h(prim_types, telem))
+    write_if_changed(GEN_DIR / "ecu_telemetry.h", gen_ecu_telemetry_h(prim_types, telem))
     print("  generated/ecu_telemetry.h")
 
     # Well-known telemetry accessors (wkt::<role>(t)) — rename-safe member access for OBD/comms.
     telem_members = {f["name"] for f in telem}
-    (GEN_DIR / "well_known_telem.h").write_text(
+    write_if_changed(GEN_DIR / "well_known_telem.h", 
         gen_well_known_telem_h(schema.get("well_known_signals", {}), telem_members))
     print("  generated/well_known_telem.h")
 
-    (GEN_DIR / "ecu_config.h").write_text(gen_ecu_config_h(prim_types, modules))
+    write_if_changed(GEN_DIR / "ecu_config.h", gen_ecu_config_h(prim_types, modules))
     print("  generated/ecu_config.h")
 
-    (GEN_DIR / "learned_layout.h").write_text(gen_learned_layout_h(schema))
+    write_if_changed(GEN_DIR / "learned_layout.h", gen_learned_layout_h(schema))
     print("  generated/learned_layout.h")
 
-    (GEN_DIR / "sensor_telem_pack.inc").write_text(gen_sensor_telem_pack(schema, active_board))
+    write_if_changed(GEN_DIR / "sensor_telem_pack.inc", gen_sensor_telem_pack(schema, active_board))
     print("  generated/sensor_telem_pack.inc")
 
     total_telem = sum(field_size(prim_types, f) for f in telem)
@@ -6007,21 +6017,21 @@ def main():
     # firmware boot gate (schema_meta.h), the default-tune image, and the meta-match key.
     layout_hash = compute_layout_hash(prim_types, modules, schema.get("signals"), telem)
 
-    (GEN_DIR / "schema_meta.h").write_text(
+    write_if_changed(GEN_DIR / "schema_meta.h", 
         gen_schema_meta_h(schema, total_telem, total_cfg, layout_hash))
     print("  generated/schema_meta.h")
 
-    (GEN_DIR / "protocol.h").write_text(gen_protocol_h())
+    write_if_changed(GEN_DIR / "protocol.h", gen_protocol_h())
     print("  generated/protocol.h")
 
-    (GEN_DIR / "shadow_meta.h").write_text(
+    write_if_changed(GEN_DIR / "shadow_meta.h", 
         gen_shadow_meta_h(prim_types, compute_shadow_regions(prim_types, modules)))
     print("  generated/shadow_meta.h")
 
-    (GEN_DIR / "default_config.cpp").write_text(gen_default_config_cpp(prim_types, modules))
+    write_if_changed(GEN_DIR / "default_config.cpp", gen_default_config_cpp(prim_types, modules))
     print("  generated/default_config.cpp")
 
-    (GEN_DIR / "default_tune.cpp").write_text(
+    write_if_changed(GEN_DIR / "default_tune.cpp", 
         gen_default_tune_cpp(prim_types, modules, layout_hash))
     print("  generated/default_tune.cpp")
 
