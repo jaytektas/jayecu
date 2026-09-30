@@ -139,6 +139,13 @@ A tab that is all instruments, such as **Diagnostics**, does not take page windo
 in the tree while it is in front, the page opens on a tab that does take pages.
 <!-- src: apps/studio-jf/main.cpp (showTabTakingPages) -->
 
+**Diagnostics** shows every live channel the ECU sends, one subject at a time: pick the view (**Engine
+& Trigger**, **Fuel**, **Spark**, **Outputs & Bridges**, …) from the chooser at its top. On **Outputs &
+Bridges** each output pin reads what it is doing: a Generic output reads **HI** or **LOW** when it is
+digital and its duty in % when it is PWM, and a pin that is not a Generic output reads what it is
+instead: **Coil**, **Injector** or **Unused**.
+<!-- src: apps/studio-jf/tools/layout/diag_page.py (VIEWS); apps/studio-jf/src/surface/CanvasWidget.cpp (digitalOutState) -->
+
 The **Main** tab is always there. Other tabs can be closed with their **×**; a closed tab is kept and
 can be brought back with **View ▸ Reopen Surface…**. **View ▸ New Surface Tab** adds an empty one, and
 **View ▸ Delete Surface…** removes one for good. Double-click a tab's name (or press F2) to rename it.
