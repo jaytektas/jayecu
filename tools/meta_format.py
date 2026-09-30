@@ -76,8 +76,9 @@ def entries(doc):
 
 def load_meta(path):
     raw = pathlib.Path(path).read_bytes()
-    raw = raw[:raw.rfind(b'}') + 1]            # the file carries a CRC footer after the JSON
-    return json.loads(raw.decode('utf-8'))
+    # The file carries a CRC footer after the JSON. Parsed from the FRONT: cutting at the last '}' kept a
+    # CRC byte whenever one of them is 0x7D, and the parse failed on "Extra data".
+    return json.JSONDecoder().raw_decode(raw.decode('utf-8', 'surrogateescape'))[0]
 
 
 def read_lock():

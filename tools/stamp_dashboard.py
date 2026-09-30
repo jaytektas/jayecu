@@ -116,7 +116,10 @@ def stamp(gui_bytes, meta_doc):
 
 def load_meta(path):
     raw = pathlib.Path(path).read_bytes()
-    return json.loads(raw[:raw.rfind(b'}') + 1].decode('utf-8'))
+    # PARSED FROM THE FRONT, not cut at the last '}': the file ends in a 4-byte CRC, and when one of those
+    # bytes is 0x7D (a '}', about one build in 64) the cut kept it and every kit build failed on "Extra
+    # data". raw_decode reads exactly one JSON value and ignores what follows (ts_bench.Meta does the same).
+    return json.JSONDecoder().raw_decode(raw.decode('utf-8', 'surrogateescape'))[0]
 
 
 def stamp_file(src, dst, meta_path=REPO / 'shared' / 'tuneit-meta.json', strict=False):
