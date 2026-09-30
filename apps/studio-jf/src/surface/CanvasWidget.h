@@ -245,6 +245,8 @@ public:
     // where a path becomes a value (MathEvaluator::ElementScope), so every expression property gets it
     // — a condition, a row count, a data source — without any of them knowing about templates.
     bool enabledNow() const;
+    // An engine-stop setting (bound or written) while the engine turns — see Cache::lockedWhileRunning.
+    bool lockedWhileRunning() const;
 
     // A visibility condition, same treatment — a template page's "shown when" has to be about the element
     // the viewport is showing, not about the placeholder.
@@ -530,6 +532,10 @@ public:
         (void)prop; (void)el; (void)cache; return std::nan("");
     }
     virtual std::vector<std::string> sigilNames() const { return {}; }
+    // The settings this widget WRITES besides its own binding (an action button's targets), resolved to
+    // concrete paths. enabledNow() locks the widget if any of them applies only at an engine stop while
+    // the engine turns, as it does for the binding itself.
+    virtual std::vector<std::string> writesTo() const { return {}; }
 
     // ------------------------------------------------------------------
     // Frame — ONE background fill + ONE border, both virtual so a subclass can override its own frame.

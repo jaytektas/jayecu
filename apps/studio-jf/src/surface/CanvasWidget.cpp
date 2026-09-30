@@ -543,13 +543,21 @@ void CanvasWidget::narrowToControl(MetaModel::Location &L) const {
     if (lo <= hi) { L.minV = lo; L.maxV = hi; }   // an inverted pair says nothing; leave the field's own
 }
 
+bool CanvasWidget::lockedWhileRunning() const {
+    if (!m_cache) return false;
+    if (m_cache->lockedWhileRunning(bindPath())) return true;
+    for (const std::string& p : writesTo())
+        if (m_cache->lockedWhileRunning(p)) return true;
+    return false;
+}
+
 bool CanvasWidget::enabledNow() const {
     if (!m_el) return true;
     MathEvaluator::ElementScope scope(m_elemContext);   // "[*]" means THIS widget's element, everywhere
     // A SETTING THAT APPLIES ONLY AT AN ENGINE STOP is locked while the engine turns: the edit would sit in
     // the ECU's RAM doing nothing — a trigger stream switched off on a running engine kept its RPM — and
     // look exactly like one that had taken effect. Greyed out, and the tooltip says why (_syncTooltip).
-    if (m_cache && m_cache->lockedWhileRunning(bindPath())) return false;
+    if (m_cache && lockedWhileRunning()) return false;
     const std::string gate = m_el->prop("enableCondition");
     return gate.empty() || MathEvaluator::instance().evaluate(gate) != 0.0;
 }
@@ -627,8 +635,8 @@ void CanvasWidget::_syncTooltip() {
     if (m_cache && m_cache->meta()) {
         const std::string at = m_cache->meta()->appliesAt(bindPath());
         // Only while it EXPLAINS something: an engine-stop setting says so while it is locked, not on every
-        // trigger and engine control the rest of the time.
-        const std::string why = (at == "engine_stop" && m_cache->engineTurning())
+        // trigger and engine control the rest of the time. (An action button is locked by what it WRITES.)
+        const std::string why = lockedWhileRunning()
                                     ? "Applies when the engine stops \xE2\x80\x94 stop the engine to change it."
                               : at == "reboot" ? "Applies at the next restart." : std::string();
         if (!why.empty()) tip = tip.empty() ? why : why + "\n\n" + tip;

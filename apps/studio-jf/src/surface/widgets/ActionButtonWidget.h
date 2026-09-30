@@ -35,6 +35,7 @@ class ActionButtonWidget : public HostedControlWidget {
 public:
     explicit ActionButtonWidget(jf::JSceneGraph& g) : HostedControlWidget(g, "action") {}
     std::string elementType() const override { return "action"; }
+    std::vector<std::string> writesTo() const override;   // its targets: locked with them while running
     std::string paletteTitle() const override { return "Action Button (compute a setting)"; }
     float       defaultW()     const override { return 90.f; }
     float       defaultH()     const override { return 25.f; }

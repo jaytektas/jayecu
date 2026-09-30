@@ -21,6 +21,8 @@
 #include <j/core/SceneGraph.h>
 #include <cmath>
 #include <cstdio>
+#include <cstring>
+#include <vector>
 #include <string>
 
 static int fails = 0;
@@ -101,6 +103,34 @@ int main() {
     std::printf("[action] with no calibration speed, target reads %.0f\n", after);
     ck(after == 0.0, "with nothing to divide by, the click writes nothing at all",
        std::to_string(after));
+
+    // …and LOCKED BY WHAT IT WRITES. A button whose target applies only at an engine stop greys out while
+    // the engine turns, as the target's own control does; one writing an ordinary setting does not.
+    {
+        const int trig = page.add("action", 120.f, 10.f, 90.f, 25.f,
+                                  { { "labelText", "Trigger" }, { "writes", "trigger.streams[0].enabled = 1" },
+                                    { "writeZeros", "1" } });
+        Surface s2(graph, c, &page);
+        s2.setBounds({ 0.f, 0.f, 400.f, 200.f });
+        s2.setMode(Surface::Mode::Run);
+        s2.setFitToView(true);
+        s2.populateRenderPrimitives(buf);
+        CanvasWidget* tw = s2.widgetById(trig);
+        CanvasWidget* ow = s2.widgetById(id);
+        // A turning engine, connected: rpm 2000 in the one telemetry field that says so.
+        std::vector<uint8_t> frame(static_cast<size_t>(m.telemetrySize()), 0);
+        const MetaModel::TelemField& rf = m.telemetry().at("rpm");
+        const double raw = 2000.0 / (rf.scale != 0.0 ? rf.scale : 1.0);
+        if (rf.datatype == "F32") { const float v = 2000.f; std::memcpy(&frame[rf.offset], &v, 4); }
+        else if (rf.size == 2) { const uint16_t v = uint16_t(std::lround(raw)); std::memcpy(&frame[rf.offset], &v, 2); }
+        else { const uint32_t v = uint32_t(std::lround(raw)); std::memcpy(&frame[rf.offset], &v, 4); }
+        c.ingestTelemetry(frame);
+        c.setLinkOpen(true);
+        ck(tw && !tw->enabledNow(), "a button writing a trigger setting is locked while the engine turns");
+        ck(ow && ow->enabledNow(), "…a button writing an ordinary setting is not");
+        c.setLinkOpen(false);
+        ck(tw && tw->enabledNow(), "…and disconnected, nothing is locked");
+    }
 
     std::printf("[action] %s\n", fails ? "FAILURES" : "all good");
     return fails ? 1 : 0;

@@ -54,6 +54,31 @@ std::string ActionButtonWidget::cookExpr(const std::string& expr) {
     return out;
 }
 
+// THE TARGETS ONLY — no expression is evaluated here: this is asked every frame by enabledNow(), and a
+// button whose target is locked must say so whatever its values would come to.
+std::vector<std::string> ActionButtonWidget::writesTo() const {
+    std::vector<std::string> out;
+    const PanelElement* el = element();
+    if (!el) return out;
+    const std::string spec = el->prop("writes");
+    size_t i = 0;
+    while (i < spec.size()) {
+        size_t end = spec.find_first_of(";\n", i);
+        if (end == std::string::npos) end = spec.size();
+        const std::string line = spec.substr(i, end - i);
+        i = end + 1;
+        const size_t eq = line.find('=');
+        if (eq == std::string::npos) continue;
+        std::string path = line.substr(0, eq);
+        const size_t a = path.find_first_not_of(" \t\r"), b = path.find_last_not_of(" \t\r");
+        if (a == std::string::npos) continue;
+        path = MathEvaluator::instance().resolveIndexed(
+            MathEvaluator::resolveTemplate(path.substr(a, b - a + 1), elementContext()));
+        out.push_back(path);
+    }
+    return out;
+}
+
 std::vector<ActionButtonWidget::Write> ActionButtonWidget::pending() const {
     std::vector<Write> out;
     const PanelElement* el = element();
