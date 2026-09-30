@@ -54,7 +54,7 @@ void KnockScopeView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
                       event_.preFrac >= 0.0f ? "" : "");
         hy += wraptext::draw(buf, r.x + kPadX, hy, line, verdictColour(event_.verdict), tw);
         if (event_.preFrac >= 0.0f) {
-            std::snprintf(line, sizeof(line), "   pre-spark energy %.0f%%", event_.preFrac * 100.0f);
+            std::snprintf(line, sizeof(line), "pre-spark energy %.0f%%", event_.preFrac * 100.0f);   // under "cyl"
             const float ix = JTextHelper::measureWidth("LAST EVENT   ");
             hy += wraptext::draw(buf, r.x + kPadX + ix, hy, line, Colors::TextSecondary, tw - ix);
         } else hy += lh;
@@ -70,8 +70,11 @@ void KnockScopeView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
     }
     const float headerH = std::max(kHeaderH, hy - r.y + 4.f);
 
+    // TWO LINES UNDER THE PLOT: the angle ticks and the axis title. kAxisH was one line's room, so the
+    // title was drawn below the pane's bottom edge and clipped away.
+    const float axisH = std::max(kAxisH, 2.f * lh + 6.f);
     const JRect plot{ r.x + kPadX + kAxisW, r.y + headerH,
-                      r.width - kPadX * 2.f - kAxisW, r.height - headerH - kPadY - kAxisH };
+                      r.width - kPadX * 2.f - kAxisW, r.height - headerH - kPadY - axisH };
     if (plot.width <= 20.f || plot.height <= 20.f) return;
     buf.pushRectangle(plot.x, plot.y, plot.width, plot.height, Colors::Surface1, 2.f);
 
@@ -158,10 +161,16 @@ void KnockScopeView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
             const float deg  = ref.startDeg + span * frac;
             const float x    = plot.x + plot.width * frac;
             std::snprintf(lab, sizeof(lab), "%+.0f", deg);
-            JTextHelper::pushText(buf, x - 10.f, plot.y + plot.height + 3.f, lab, Colors::TextSecondary, 40.f);
+            // Centred on its mark by its MEASURED width, and kept inside the pane: the last label sits on
+            // the plot's right edge, and a fixed 10 px lead put half of "+50" past it.
+            const float w  = JTextHelper::measureWidth(lab);
+            const float lx = std::clamp(x - w * 0.5f, r.x + kPadX, r.x + r.width - kPadX - w);
+            JTextHelper::pushText(buf, lx, plot.y + plot.height + 3.f, lab, Colors::TextSecondary, w + 2.f);
         }
-        JTextHelper::pushText(buf, plot.x + plot.width * 0.5f - 40.f, plot.y + plot.height + 3.f + lh,
-                              "crank deg ATDC", Colors::TextSecondary, 120.f);
+        const char* title = "crank deg ATDC";
+        const float tw2   = JTextHelper::measureWidth(title);
+        JTextHelper::pushText(buf, plot.x + (plot.width - tw2) * 0.5f, plot.y + plot.height + 3.f + lh,
+                              title, Colors::TextSecondary, tw2 + 2.f);
     } else {
         wraptext::draw(buf, plot.x + 4.f, plot.y + 2.f,
                        "no phase stamp - bucket angles unknown", Colors::TextSecondary, plot.width - 8.f);
