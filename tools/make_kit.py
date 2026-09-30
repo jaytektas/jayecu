@@ -40,6 +40,14 @@ raw = meta.read_bytes()
 m = json.loads(raw[:-4])['meta']                      # strip the 4-byte CRC footer
 if m['board'] != a.board:
     sys.exit(f'shared/tuneit-meta.json is for {m["board"]}, not {a.board} — run `make firmware BOARD={a.board}`')
+# THE IMAGE MUST BE THE BUILD THE META NAMES. The kit's build comes from the meta (fw_build), and the
+# meta is rewritten by every codegen — so a codegen after the last firmware build left an image that
+# reports one build inside a kit labelled with another. The studio then flashed it, saw the ECU come back
+# as the old build, and refused to put the tune back ("came back running 43ab121, not 1efcde7").
+sig = re.search(rb'jayecu ' + a.board.encode() + rb' \S+ ([0-9a-f]{7,}(?:-dirty)?)', fw.read_bytes())
+if not sig or sig.group(1).decode() != m.get('fw_build', ''):
+    sys.exit(f'{fw} reports build {sig.group(1).decode() if sig else "?"}, the meta says {m.get("fw_build")} '
+             f'— rebuild the firmware (`make firmware BOARD={a.board}`) and make the kit again')
 compiled = re.search(r'JAYECU_LAYOUT_HASH_STR\s+"([0-9a-f]+)"', (REPO / 'generated' / 'schema_meta.h').read_text())
 if not compiled or compiled.group(1) != m['layout_hash']:
     sys.exit(f'the meta ({m["layout_hash"]}) is not the layout generated/ was built for — rebuild the firmware')
