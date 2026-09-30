@@ -371,8 +371,9 @@ const uint8_t* CanvasWidget::fgOf(const PanelElement& el, uint8_t buf[4]) { retu
 // reads, so the screen and the pin cannot disagree.
 //
 // Returns false when the binding is not a digital output slot, which is every other readout in the app.
-// NotAnOutput = every other readout in the app; Unavailable = this output cannot be driving anything.
-enum class DigOut { NotAnOutput, Unavailable, Low, High };
+// NotAnOutput = every other readout in the app; Unused / Coil / Injector = not a Generic output, so this
+// channel says nothing about it and the readout names what the pin IS instead.
+enum class DigOut { NotAnOutput, Unused, Coil, Injector, Low, High };
 
 static DigOut digitalOutState(const std::string& bind, double value) {
     // "[$out_7]" or a bare "out_7" — the telemetry channel one output slot publishes.
@@ -389,13 +390,23 @@ static DigOut digitalOutState(const std::string& bind, double value) {
     Cache& C = Cache::instance();
     const std::string base = "outputs.output[" + std::to_string(slot) + "]";
     if (!C.isConfig(base + ".kind")) return DigOut::NotAnOutput;
-    if (C.configValue(base + ".kind") != 1.0) return DigOut::NotAnOutput;   // 0 = PWM: show the duty
     // NOTHING TO REPORT. A row that is not a Generic output drives nothing this channel describes — so
     // LOW is not a reading of it, it is the absence of one, and the two look identical on screen. The
     // channel still carries a number (the expression is still evaluated), which is exactly why this
     // has to be decided from the CONFIG and not from the value.
-    if (C.isConfig(base + ".function") && C.configValue(base + ".function") != 3.0)   // 3 = Generic
-        return DigOut::Unavailable;
+    // FUNCTION FIRST, before Kind. Kind is a Generic output's setting and means nothing on a coil —
+    // but it stays in the row, so a pin that was a digital lamp once and a coil now read NA while its
+    // neighbours (left at PWM) read a duty of 0 %: two answers for the same thing, both about a
+    // setting the row no longer uses.
+    if (C.isConfig(base + ".function")) {
+        switch (int(C.configValue(base + ".function"))) {
+            case 3:  break;                              // Generic: the channel is its state
+            case 1:  return DigOut::Coil;
+            case 2:  return DigOut::Injector;
+            default: return DigOut::Unused;
+        }
+    }
+    if (C.configValue(base + ".kind") != 1.0) return DigOut::NotAnOutput;   // 0 = PWM: show the duty
     // THE CHANNEL IS ALREADY THE STATE. The firmware publishes the level a digital slot drove — 0 or
     // 100, decided by the sink's own threshold (OutputManager) — so this does not re-derive that
     // decision from the clamps. Re-deriving it would be a second copy of the rule that disagrees the
@@ -430,7 +441,9 @@ std::string CanvasWidget::autoFormat(const PanelElement& el) {
 std::string CanvasWidget::fmtVal(const PanelElement& el, const Cache&) {
     const std::string bind = boundPathOf(el);
     switch (digitalOutState(bind, evalSource(bind).v)) {
-        case DigOut::Unavailable: return "NA";
+        case DigOut::Unused:      return "Unused";
+        case DigOut::Coil:        return "Coil";
+        case DigOut::Injector:    return "Injector";
         case DigOut::Low:         return "LOW";
         case DigOut::High:        return "HI";
         case DigOut::NotAnOutput: break;

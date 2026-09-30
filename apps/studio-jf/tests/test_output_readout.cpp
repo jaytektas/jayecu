@@ -68,7 +68,8 @@ int main(int argc, char** argv) {
 
     std::puts("=== Output readout: a digital slot is a state ===");
 
-    C.setConfigValue(slot + ".kind", 0.0);                  // PWM: the number IS the duty
+    C.setConfigValue(slot + ".function", 3.0);              // a Generic output…
+    C.setConfigValue(slot + ".kind", 0.0);                  // …at PWM: the number IS the duty
     send(60.0);
     ck(shown().find("HI") == std::string::npos && shown().find("LOW") == std::string::npos,
        "a PWM slot still reads as a number", shown());
@@ -90,13 +91,23 @@ int main(int argc, char** argv) {
     // number, so this has to be decided from the config, never from the value.
     send(100.0);
     C.setConfigValue(slot + ".function", 0.0);
-    ck(shown() == "NA", "a row with no function reads NA, not LOW", shown());
+    ck(shown() == "Unused", "a row with no function reads Unused, not LOW", shown());
     C.setConfigValue(slot + ".function", 3.0);
     ck(shown() == "HI", "…and comes back when it is a generic output again", shown());
     C.setConfigValue(slot + ".function", 1.0);
-    ck(shown() == "NA", "a coil row reads NA on its output channel", shown());
+    ck(shown() == "Coil", "a coil row names itself on its output channel", shown());
+    C.setConfigValue(slot + ".function", 2.0);
+    ck(shown() == "Injector", "…and an injector row", shown());
     C.setConfigValue(slot + ".function", 3.0);
     ck(shown() == "HI", "…and comes back", shown());
+
+    // KIND IS A GENERIC OUTPUT'S SETTING. A coil row keeps whatever Kind it had as a lamp; it must read
+    // the same either way (it read NA left at Digital, and a duty of 0 % left at PWM).
+    C.setConfigValue(slot + ".function", 1.0);
+    C.setConfigValue(slot + ".kind", 0.0);
+    ck(shown() == "Coil", "a coil row left at PWM reads Coil too, not a duty", shown());
+    C.setConfigValue(slot + ".function", 0.0);
+    ck(shown() == "Unused", "…and an unused one", shown());
 
     std::printf("\n%s (%d failure%s)\n",
                 fails ? "FAILED" : "All output readout tests passed",
