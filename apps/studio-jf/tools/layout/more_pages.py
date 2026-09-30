@@ -17,6 +17,9 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import author as A
 import fuel_tree as FT
+
+# An output test can start only with the engine stopped (or offline, where there is nothing to test).
+TEST_ENABLED = '![%connected] || [$engine_state] == 0'
 from author import C_DIM
 
 ROOT = 'Configuration'
@@ -479,9 +482,16 @@ def page_output_setup(count=42):
     ty = p.field(test, 10, ty, 'Off Time', 'pc.test_off_ms', 'configedit', 90, unit='ms')
     # The three are HOST variables shared by every output's page: set the shape of the test once and it
     # applies to whichever pin you press next.
+    # THE TEST RUNS ONLY WITH THE ENGINE STOPPED — the firmware cancels it the moment the engine turns
+    # (OutputTest::step), so on a running engine (or a bench stim left spinning) the button did nothing and
+    # the scope showed nothing, which reads as a dead output. Greyed while connected and turning; Stop and
+    # Stop All stay live. Same condition the firing-order table uses (engine_pages.ORDER_EDITABLE).
     p.add(p._new('command', 10, ty + 8, 120, 30,
                  {'labelText': 'Test', 'command': 'test %ROW%',
-                  'arg0': '[#pc.test_count]', 'arg1': '[#pc.test_on_ms]', 'arg2': '[#pc.test_off_ms]'}),
+                  'arg0': '[#pc.test_count]', 'arg1': '[#pc.test_on_ms]', 'arg2': '[#pc.test_off_ms]',
+                  'enableCondition': TEST_ENABLED,
+                  'tooltip': 'Runs only with the engine stopped: a turning engine cancels a test the moment it '
+                             'starts. Stop the engine (or the stim) to test.'}),
           into=test)
     p.add(p._new('command', 138, ty + 8, 90, 30,
                  {'labelText': 'Stop', 'command': 'test %ROW% 0 0 0'}), into=test)
