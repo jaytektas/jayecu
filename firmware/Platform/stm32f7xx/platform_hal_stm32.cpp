@@ -317,6 +317,10 @@ static constexpr uint32_t RTC_INIT_MAGIC = 0x32F2u;   // marks "time already set
 static void platform_rtc_init(void) {
     HAL_PWR_EnableBkUpAccess();
     __HAL_RCC_RTC_ENABLE();
+    // The RTC's APB interface clock (APB1ENR.RTCAPBEN). It is on out of reset, so this line looks
+    // redundant — but the ROM DFU bootloader clears APB1ENR before it jumps here, and without it every
+    // RTC register reads 0: HAL_RTC_Init fails and the ECU reports "no clock" until the next reset.
+    __HAL_RCC_RTC_CLK_ENABLE();
 
     s_hrtc.Instance            = RTC;
     s_hrtc.Init.HourFormat     = RTC_HOURFORMAT_24;
