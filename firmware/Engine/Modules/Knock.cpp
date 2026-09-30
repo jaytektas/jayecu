@@ -415,7 +415,12 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
             if (in > 1) in = (g_config.engine.cyl[c].bank >= 2) ? 1 : 0;     // Auto: by bank
             used[in] = true;
         }
-        const bool judge = rpm >= static_cast<float>(cfg_->learn_min_rpm);
+        // …AND ONLY WITH COMBUSTION. The windows are armed from the spark schedule, so with fuel or spark
+        // cut — a protection level holding a cut after a trigger fault, a rev limiter, overrun — no
+        // window is sampled and the channel expires on a perfectly good sensor. Judged then, a cut
+        // caused by one fault reported a second one (P1750) that was nothing but its consequence.
+        const bool combustion = !bus.valid(wk::fuel_cut) && !bus.valid(wk::ign_cut);
+        const bool judge = combustion && rpm >= static_cast<float>(cfg_->learn_min_rpm);
         static constexpr SignalId SIG[2]  = { SIG_KNOCK_1, SIG_KNOCK_2 };
         static constexpr uint16_t CODE[2] = { ModuleDtc::KNOCK_1, ModuleDtc::KNOCK_2 };
         static constexpr uint8_t  SEV[2]  = { ModuleDtc::KNOCK_1_SEV, ModuleDtc::KNOCK_2_SEV };

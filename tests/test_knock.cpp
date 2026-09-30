@@ -536,6 +536,12 @@ int main() {
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) == 0);
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_2) == 0);       // no cylinder uses Knock 2: not a fault
         bus.invalidate(SIG_KNOCK_1);                              // the bursts stop (it expired)
+        // …BUT NOT WHILE SPARK IS CUT: no combustion, no windows armed, nothing for any sensor to hear. A
+        // protection cut after a trigger fault reported P1750 as well, a consequence posing as a fault.
+        bus.set(wk::ign_cut, 1.0f, true, g_stub_tick_ms, 1000u);
+        g_stub_tick_ms += 100; k.update(pos, bus, frame);
+        CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) == 0);
+        bus.invalidate(wk::ign_cut);                              // combustion again, still no bursts
         g_stub_tick_ms += 100; k.update(pos, bus, frame);
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) != 0);
 

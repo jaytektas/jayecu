@@ -31,6 +31,7 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 - The studio greys out settings that only apply when the engine stops (the trigger streams, the engine's shape, an output's coil or injector assignment) while it is connected and the engine is turning. Trigger Offset BTDC and the full-sync RPM band stay editable: the ECU reads them at once.
 - The bench output test needs the key on: with the key off it is refused and a running test stops (nothing is driven with the key off). On the output pages Test is greyed out unless the key is on and the engine stopped; Stop and Stop All always work.
 - Output wizard: the selected template's highlight no longer runs under the list's scrollbar.
+- Knock no longer reports its sensor missing (P1750) while fuel or spark is cut: with no combustion no knock window is sampled, so a protection cut after another fault raised P1750 as a false second fault.
 - Closed-loop O2 holds its trim while MAP prediction is active; the new Closed-Loop Hold channel says why the trim is held (fuel cut, after cut, settling, cold, off range or transient).
 - Fuel Tuning ▸ MAP Prediction & Fuel Film holds the transient strategy's switches and all four of its tables. One button chooses it (and turns Classic Transient Fuel off); Transient Throttle has the matching button, and both pages warn while the two strategies are on together.
 - Fuel Tuning ▸ Corrections points to the fuel composition correction, which is per stage (Stage N ▸ Fuel).
