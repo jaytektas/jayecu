@@ -82,7 +82,13 @@ static volatile bool     s_configured;   // SET_CONFIG opened EP3
 static StaticTask_t s_msc_tcb;
 static StackType_t  s_msc_stack[768];
 
-static cbw_t    s_cbw;
+// THE CBW IS RECEIVED INTO A WHOLE PACKET. The HAL arms a bulk OUT endpoint for at least one full packet
+// (MSC_FS_MPS) and its RXFLVL handler copies every byte the host sent, whatever length was asked for. Out of
+// step with the host — a WRITE(10) abandoned mid-data leaves the host still sending 64-byte data packets —
+// the next "31-byte" CBW receive took a 64-byte packet and wrote 33 bytes past a bare cbw_t: into the MSC
+// task's stack, which sits right after it, where FreeRTOS reported it as a stack overflow in 'MSC'.
+static union { cbw_t cbw; uint8_t packet[MSC_FS_MPS]; } s_cbw_rx;
+static cbw_t& s_cbw = s_cbw_rx.cbw;
 static csw_t    s_csw;
 static uint8_t  s_blkbuf[MSC_MEDIA_PACKET];
 static uint8_t  s_sense[3] = { SENSE_NONE };   // key, ASC, ASCQ for the next REQUEST_SENSE
@@ -331,7 +337,7 @@ static void msc_task(void* /*arg*/) {
         s_reset = false;
 
         uint32_t got = 0;
-        if (!ep_recv(&s_cbw, CBW_LEN, &got, portMAX_DELAY)) continue;   // reset/deconfig → resync
+        if (!ep_recv(s_cbw_rx.packet, CBW_LEN, &got, portMAX_DELAY)) continue;   // reset/deconfig → resync
         if (got != CBW_LEN || s_cbw.signature != CBW_SIGNATURE) {
             // Invalid/lost CBW → stall the data EP; the host recovers with a BOT reset.
             USBD_LL_StallEP(&hUsbDeviceFS, MSC_EP_IN);
