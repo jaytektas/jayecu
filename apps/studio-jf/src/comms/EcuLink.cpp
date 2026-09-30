@@ -786,6 +786,15 @@ void EcuLink::enqueueNextWriteChunk()
         fileWritten.emit(xferName_);
         return;
     }
+    // A NAME THAT LEAVES NO ROOM IS REFUSED, not sent. The name rides in every chunk, so one within 8
+    // bytes of a frame left a chunk of zero or less: zero re-sent the same empty chunk for ever, less
+    // than zero built the body from an end before its begin. And the firmware reads at most 127
+    // characters of name (CommsManager, WRITE_FILE) — past that it would take file data for the name.
+    if (fileWriteChunk() < 1 || xferName_.size() > 127) {
+        fileError.emit(xferName_, "the file name is too long to send (" + std::to_string(xferName_.size()) +
+                                  " characters)");
+        return;
+    }
     const int chunkLen = std::min(fileWriteChunk(), remaining);
     std::vector<uint8_t> body;
     appendLE32(body, static_cast<uint32_t>(xferOffset_));
@@ -1132,8 +1141,15 @@ void EcuLink::onResponse(uint16_t seq, uint8_t flag, const std::vector<uint8_t> 
                 fileError.emit(xferName_, "file not found or card unavailable (err=0x" + hex8(offset) + ")");
             } else {
                 if (xferTotal_ < 0) xferTotal_ = static_cast<int64_t>(fileSize);
-                const int take = std::min(static_cast<int>(actual), static_cast<int>(data.size()) - 10);
-                xferBuf_.insert(xferBuf_.end(), data.begin() + 10, data.begin() + 10 + take);
+                // A REPLY THAT SAYS MORE THAN IT CARRIES is a failed transfer. Copying what is there and
+                // advancing by what it claims left the file short of its own offset — assembled, handed
+                // on as whole, and wrong from that point.
+                if (static_cast<int>(actual) > static_cast<int>(data.size()) - 10) {
+                    fileError.emit(xferName_, "the ECU's reply was shorter than it said (" + std::to_string(actual) +
+                                              " bytes claimed at offset " + std::to_string(xferOffset_) + ")");
+                    break;
+                }
+                xferBuf_.insert(xferBuf_.end(), data.begin() + 10, data.begin() + 10 + actual);
                 xferOffset_ += actual;
                 fileTransferProgress.emit(xferName_, xferOffset_, xferTotal_);
                 if (actual == 0 || xferOffset_ >= xferTotal_)
@@ -1148,6 +1164,14 @@ void EcuLink::onResponse(uint16_t seq, uint8_t flag, const std::vector<uint8_t> 
     case Kind::WriteFile:
         if (flag == RSP_ACK && data.size() >= 6) {
             const uint16_t written = leU16(data.data() + 4);
+            // NOTHING WRITTEN IS A FAILURE. FatFs reports success with fewer bytes than asked when the
+            // card is full, and at zero the offset stood still: the same chunk went out again, and again,
+            // with the progress bar frozen and nothing ever said.
+            if (written == 0 && xferOffset_ < xferTotal_) {
+                fileError.emit(xferName_, "the SD card took nothing at offset " + std::to_string(xferOffset_) +
+                                          " \xE2\x80\x94 it may be full");
+                break;
+            }
             xferOffset_ += written;
             fileTransferProgress.emit(xferName_, xferOffset_, xferTotal_);
             if (xferOffset_ >= xferTotal_)
