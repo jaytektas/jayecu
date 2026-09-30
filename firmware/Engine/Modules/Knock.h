@@ -78,7 +78,7 @@ public:
     // ---- Introspection (tests, telemetry, the bench CLI) ----
     [[nodiscard]] float    current_retard() const { return retard_deg_; }
     [[nodiscard]] float    cylinder_retard(uint8_t c) const { return c < MAX_CYL ? cyl_retard_[c] : 0.0f; }
-    [[nodiscard]] uint16_t knock_count()    const { return count_; }
+    [[nodiscard]] uint32_t knock_count()    const { return count_; }
     [[nodiscard]] float    last_intensity() const { return last_intensity_; }   // dB over floor
     [[nodiscard]] uint32_t dropped()        const { return dropped_; }          // ring overflows
     // The learned floor a cylinder would be measured against right now, and how many clean samples
@@ -147,7 +147,9 @@ private:
     void     clear_retard() { retard_deg_ = 0.0f; for (float& r : cyl_retard_) r = 0.0f; }
     void     recover(float dt);           // decay every cylinder at the recovery rate, refresh retard_deg_
     float    level_db_   = -50.0f;   // peak knock level [dB] (decays) — telemetry
-    uint16_t count_      = 0;        // total knock events since boot
+    // Total knock events since boot. It STOPPED at 65535 (a 16-bit count that saturated), and a bench that
+    // had knocked that often read every later knock as none — "before/after" differences of zero.
+    uint32_t count_      = 0;
     uint32_t last_ms_    = 0;        // tick of the last update (decay dt)
     bool     suppressed_ = true;     // TPS light-load suppression (set by update())
 

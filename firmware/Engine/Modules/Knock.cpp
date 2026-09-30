@@ -274,7 +274,7 @@ void Knock::on_knock_sense(uint8_t cyl, float db, const KnockProfile* profile) {
         else if (cyl < MAX_CYL) cyl_retard_[cyl] = std::min(cyl_retard_[cyl] + step, max_retard_);
         retard_deg_ = 0.0f;
         for (float r : cyl_retard_) retard_deg_ = std::max(retard_deg_, r);
-        if (count_ < 0xFFFFu) count_++;
+        count_++;
         return;   // NEVER teach the floor from a knocking cycle — it would chase the knock and go deaf
     }
     // Anything at or below the floor is not knock by construction, so it lands here too — which is
@@ -392,7 +392,7 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
         level_db_ = std::max(kNoKnockDb, level_db_ - kLevelDecay * dt);   // keep the telemetry peak decaying
         head_ = tail_;                                                    // discard suppressed measurements
         bus.set(SIG_KNOCK_LEVEL, level_db_, true, now, ttl());
-        bus.set(SIG_KNOCK_COUNT, static_cast<float>(count_), true, now, ttl());
+        bus.set(SIG_KNOCK_COUNT, static_cast<float>(count_ & 0xFFFFu), true, now, ttl());   // the channel is 16-bit: it WRAPS, so differences stay right
         // The pre-ignition cut is published every tick (see below) — a suppressed tick included, or it
         // expires and the cut cylinder is fuelled the moment the fuel cut ends.
         bus.set(SIG_PREIGN_CUT_MASK, static_cast<float>(preign_cut_mask_), true, now, ttl());
@@ -482,7 +482,7 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
 
     apply(retard_deg_);
     bus.set(SIG_KNOCK_LEVEL, level_db_, true, now, ttl());
-    bus.set(SIG_KNOCK_COUNT, static_cast<float>(count_), true, now, ttl());
+    bus.set(SIG_KNOCK_COUNT, static_cast<float>(count_ & 0xFFFFu), true, now, ttl());   // the channel is 16-bit: it WRAPS, so differences stay right
     // The module DECIDES which cylinders are cut; EngineTask ACTUATES it, exactly as it does for
     // every other cut. Published every tick rather than on the transition so a reconfigure — which
     // can move a cylinder's output channels — cannot strand a cut on the wrong channel.

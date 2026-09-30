@@ -141,11 +141,24 @@ int main() {
         SignalBus bus{}; arm(k, bus, pos, frame);
         for (int i = 0; i < 30; ++i) k.on_knock_sense(0, -10.0f);   // teach the floor
         CHECK_NEAR(k.noise_floor(0), -10.0f, 0.5f);
-        const uint16_t before = k.knock_count();
+        const uint32_t before = k.knock_count();
         k.on_knock_sense(0, -10.0f);
         CHECK(k.knock_count() == before);          // same loud level, now correctly ignored
         k.on_knock_sense(0, -2.0f);                // 8 dB over ITS OWN floor -> knock
         CHECK(k.knock_count() == before + 1);
+    }
+
+    SECTION("the knock count keeps counting past 65535 (it stopped there, and every later knock read as none)");
+    {
+        reset_region();
+        auto cfg = make_cfg(true);
+        Ignition ign; Knock k; k.init(cfg, &ign);
+        SignalBus bus{}; arm(k, bus, pos, frame);
+        for (int i = 0; i < 30; ++i) k.on_knock_sense(0, -30.0f);   // a floor
+        for (uint32_t i = 0; i < 70000u; ++i) k.on_knock_sense(0, -20.0f);   // 10 dB over, every one
+        CHECK(k.knock_count() == 70000u);
+        g_stub_tick_ms += 10; k.update(pos, bus, frame);
+        CHECK_NEAR(bus.get(SIG_KNOCK_COUNT, -1.0f), float(70000u & 0xFFFFu), 0.5f);   // the 16-bit channel wraps
     }
 
     SECTION("a knocking cycle never teaches the floor");
@@ -173,7 +186,7 @@ int main() {
         CHECK_NEAR(k.noise_floor(0), -30.0f, 0.5f);
         CHECK_NEAR(k.noise_floor(4), -12.0f, 0.5f);
         // -20 dB is knock on the quiet cylinder and silence on the loud one — the same absolute level.
-        const uint16_t before = k.knock_count();
+        const uint32_t before = k.knock_count();
         k.on_knock_sense(0, -20.0f);   // 10 dB over its floor
         CHECK(k.knock_count() == before + 1);
         k.on_knock_sense(4, -20.0f);   // BELOW its floor
