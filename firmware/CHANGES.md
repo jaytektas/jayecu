@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.4
 - Fuel Tuning ▸ MAP Prediction & Fuel Film: the readouts under the Predicted MAP and Transient TPS Scaling tables no longer run off the bottom of the page.
 - The knock event count no longer stops at 65535. It keeps counting, and the Knock Event Count channel wraps back to 0 after 65535, so a count taken before and after still shows the knocks in between.
 - Turning the key off and on with the engine still turning no longer raises P0335 (sync lost) or P1750 (knock sensor missing). Key off counts as a stop, and a knock sensor is judged only after the engine has run over the knock learn floor for a second.
