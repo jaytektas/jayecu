@@ -1942,48 +1942,51 @@ int main(int argc, char** argv) {
         if (jf::JSettings::instance().get<std::string>(key, std::string()) == k.layoutHash) return;
         const std::string uid = e->uid(), board = e->board(), metaPath = k.meta, ver = k.version,
                           hash = k.layoutHash;
-        win.openModal<ChoiceDialog>(
-            std::string("Newer firmware settings"),
-            "This offline project was written for an older firmware's settings. Firmware " + ver +
-            " has newer ones, and its pages are drawn for them.\n\nMoving copies every tune in this project "
-            "into a new offline project for firmware " + ver + ": each value that still exists is kept, "
-            "settings that are new start at their defaults, and ones the firmware dropped are left behind. "
-            "This project is kept as it is. Keeping it means this is not asked again for firmware " + ver + ".",
-            std::vector<ChoiceDialog::Choice>{ { "Keep this one",               jf::JDialogButtonBox::Role::Action },
-                                               { "Move to firmware " + ver,     jf::JDialogButtonBox::Role::Accept } },
-            std::function<void(int)>([&win, uid, board, metaPath, ver, hash, have, key, name](int i) {
-                if (i == 0) { jf::JSettings::instance().set(key, jf::JVariant(hash)); return; }
-                if (i != 1) return;                                   // closed: ask again next time
-                MetaModel nm;
-                if (!nm.loadFile(metaPath)) { win.showStatus("Could not read firmware " + ver + "'s settings", 6000); return; }
-                Ecu* src = Ecu::openOrCreate(uid, board);
-                Ecu* dst = Ecu::openOrCreate("offline:" + nm.layoutHash(), board);
-                if (!src || !dst) return;
-                const std::vector<std::string> already = dst->tuneNames();
-                int moved = 0, kept = 0, defaulted = 0, dropped = 0;
-                std::string openName = name;
-                for (const std::string& t : src->tuneNames()) {
-                    const std::vector<uint8_t> raw = src->loadTune(t);
-                    if (!TuneFile::isDictFormat(raw)) continue;
-                    MigrationReport rep;
-                    std::vector<uint8_t> host;
-                    const std::vector<uint8_t> img = TuneFile::deserialise(raw, nm, rep, &host);
-                    if (img.empty()) continue;
-                    // Never over a tune the new project already has: that one is somebody's work too.
-                    std::string out = t;
-                    if (std::find(already.begin(), already.end(), out) != already.end()) out = t + " (" + have + ")";
-                    dst->saveTune(out, TuneFile::serialise(img, nm, host.empty() ? nullptr : &host));
-                    if (t == name) openName = out;
-                    ++moved; kept += rep.migrated; defaulted += rep.defaulted;
-                    dropped += static_cast<int>(rep.unmapped.size());
-                }
-                if (!moved) { win.showStatus("Nothing in this project could be moved", 6000); return; }
-                installKitMetas();                                    // the library holds its settings for the open
-                if (g_openProject) g_openProject(dst, openName);
-                win.showStatus("Moved " + std::to_string(moved) + " tune(s) to firmware " + ver + ": " +
-                               std::to_string(kept) + " setting(s) kept, " + std::to_string(defaulted) +
-                               " new at defaults, " + std::to_string(dropped) + " dropped", 10000);
-            }));
+        // Asked once the screen is clear (whenNoDialog): the project is opened from a picker still on screen.
+        win.whenNoDialog([&win, uid, board, metaPath, ver, hash, have, key, name] {
+            win.openModal<ChoiceDialog>(
+                std::string("Newer firmware settings"),
+                "This offline project was written for an older firmware's settings. Firmware " + ver +
+                " has newer ones, and its pages are drawn for them.\n\nMoving copies every tune in this project "
+                "into a new offline project for firmware " + ver + ": each value that still exists is kept, "
+                "settings that are new start at their defaults, and ones the firmware dropped are left behind. "
+                "This project is kept as it is. Keeping it means this is not asked again for firmware " + ver + ".",
+                std::vector<ChoiceDialog::Choice>{ { "Keep this one",               jf::JDialogButtonBox::Role::Action },
+                                                   { "Move to firmware " + ver,     jf::JDialogButtonBox::Role::Accept } },
+                std::function<void(int)>([&win, uid, board, metaPath, ver, hash, have, key, name](int i) {
+                    if (i == 0) { jf::JSettings::instance().set(key, jf::JVariant(hash)); return; }
+                    if (i != 1) return;                                   // closed: ask again next time
+                    MetaModel nm;
+                    if (!nm.loadFile(metaPath)) { win.showStatus("Could not read firmware " + ver + "'s settings", 6000); return; }
+                    Ecu* src = Ecu::openOrCreate(uid, board);
+                    Ecu* dst = Ecu::openOrCreate("offline:" + nm.layoutHash(), board);
+                    if (!src || !dst) return;
+                    const std::vector<std::string> already = dst->tuneNames();
+                    int moved = 0, kept = 0, defaulted = 0, dropped = 0;
+                    std::string openName = name;
+                    for (const std::string& t : src->tuneNames()) {
+                        const std::vector<uint8_t> raw = src->loadTune(t);
+                        if (!TuneFile::isDictFormat(raw)) continue;
+                        MigrationReport rep;
+                        std::vector<uint8_t> host;
+                        const std::vector<uint8_t> img = TuneFile::deserialise(raw, nm, rep, &host);
+                        if (img.empty()) continue;
+                        // Never over a tune the new project already has: that one is somebody's work too.
+                        std::string out = t;
+                        if (std::find(already.begin(), already.end(), out) != already.end()) out = t + " (" + have + ")";
+                        dst->saveTune(out, TuneFile::serialise(img, nm, host.empty() ? nullptr : &host));
+                        if (t == name) openName = out;
+                        ++moved; kept += rep.migrated; defaulted += rep.defaulted;
+                        dropped += static_cast<int>(rep.unmapped.size());
+                    }
+                    if (!moved) { win.showStatus("Nothing in this project could be moved", 6000); return; }
+                    installKitMetas();                                    // the library holds its settings for the open
+                    if (g_openProject) g_openProject(dst, openName);
+                    win.showStatus("Moved " + std::to_string(moved) + " tune(s) to firmware " + ver + ": " +
+                                   std::to_string(kept) + " setting(s) kept, " + std::to_string(defaulted) +
+                                   " new at defaults, " + std::to_string(dropped) + " dropped", 10000);
+                }));
+        });
     };
 
     g_openProject = [&win, openTune, tuneLayoutHash, metaForLayoutHash, offerNewerLayout](Ecu* e, const std::string& name) {
@@ -6658,7 +6661,23 @@ int main(int argc, char** argv) {
             s_metaFetchFallback();
         }
     };
-    link.identityReceived.connect([](const std::string& sig) { s_onIdentity(sig); });
+    // WHAT A CONNECT STARTS WAITS FOR A CLEAR SCREEN. The identity is where every app-started flow begins —
+    // the firmware update offer, the "ECU is at its defaults" question, the schema and dashboard fetches,
+    // newer pages — and each opened as a CHILD of whatever dialog happened to be up: a whole firmware update
+    // drawn on top of Preferences. So it is handled once no dialog is open (JAppWindow::whenNoDialog), over
+    // the main window. The ECU coming back DURING an update is the exception: that flow's own window is
+    // up, and it must carry on at once.
+    link.identityReceived.connect([&win](const std::string& sig) {
+        if (s_upgrade.onIdentity(sig)) return;
+        static std::string s_queued;                     // one queued handling per identity, however often it arrives
+        if (s_queued == sig) return;
+        if (win.hasDialog()) win.showStatus("Connected \xE2\x80\x94 continuing once the open dialog is closed", 0);
+        s_queued = sig;
+        win.whenNoDialog([sig] {
+            s_queued.clear();
+            if (link.isOpen()) s_onIdentity(sig);
+        });
+    });
     link.openedChanged.connect([&win, &connectBtn](bool open) {
         JLOGC("ui", jf::JLogLevel::Info) << "[link] " << (open ? "OPENED (connect)" : "CLOSED (disconnect)")
                                          << " | g_docDirty=" << g_docDirty;
