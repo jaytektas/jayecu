@@ -49,6 +49,18 @@ def script():
     return "function onTick()\n" + "\n".join(lines) + "\nend\nsetTickRate(200)\n"
 
 
+def window_db(l, n=8):
+    """Mean level (dB) of the next n classified windows — what the input is hearing NOW, unlike the
+    learned floor, which is built to refuse a sustained loud tone (section 3)."""
+    out, seen, t0 = [], set(), time.time()
+    while len(out) < n and time.time() - t0 < 8.0:
+        m = re.search(r"last#(\d+) .*? db_x10=(-?\d+)", l.execute("knk"))
+        if m and m.group(1) not in seen:
+            seen.add(m.group(1)); out.append(int(m.group(2)) / 10.0)
+        time.sleep(0.15)
+    return sum(out) / len(out) if out else float("nan")
+
+
 def knk(l):
     o = l.execute("knk")
     fl = re.findall(r"(-?\d+)/(\d+)/(\d+)", o)
@@ -109,14 +121,20 @@ def main():
     # This is the same discipline bench_dtr_noise applies to sync: refuse to measure when the thing
     # being measured cannot be present, and say which it is. A dead coax reads exactly like a knock
     # module that will not trigger, and the difference is worth one 12 s check.
+    #
+    # MEASURED ON THE WINDOWS, NOT THE FLOOR. This used to look for the learned floor rising under the
+    # tone — but the floor is built NOT to learn a sustained loud tone (section 3 asserts exactly that),
+    # so on firmware that does its job the floor barely moves (+0.4 dB on 2026-10-01) and this blocked the
+    # suite with a wiring diagnosis while the tone was arriving at +60 dB over quiet.
+    quiet_win = window_db(l)
     d.burst_off(); d.amp(1.0); d.output(True)
-    time.sleep(12)
-    driven = [f for f, _ in knk(l)["floors"]]
+    time.sleep(2)
+    driven_win = window_db(l)
     d.output(False)
-    rise = max(dv - qv for dv, qv in zip(driven, floors))
-    print(f"  1 Vpp continuous moves the floor by {rise:+.1f} dB  (quiet {floors} -> {driven})")
-    if rise < 6.0:
-        print("  THE GENERATOR IS NOT REACHING THE KNOCK INPUT. 1 Vpp should lift the floor by tens")
+    rise = driven_win - quiet_win
+    print(f"  1 Vpp continuous lifts the window level by {rise:+.1f} dB  ({quiet_win:.1f} -> {driven_win:.1f})")
+    if not rise >= 6.0:
+        print("  THE GENERATOR IS NOT REACHING THE KNOCK INPUT. 1 Vpp should lift the window level by tens")
         print("  of dB, not a couple. Check the coax from the generator to the ECU knock pin and the")
         print("  20:1 divider. Everything below would fail for that reason and prove nothing, so it")
         print("  is not run.")

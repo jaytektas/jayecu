@@ -87,7 +87,7 @@ def check(ok, what, detail=""):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--port", default="/dev/ttyACM0")
+    ap.add_argument("--port", default=None)
     ap.add_argument("--keep", action="store_true", help="leave the test tune in RAM on exit")
     args = ap.parse_args()
 

@@ -107,7 +107,7 @@ class Rig:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--port", default="/dev/ttyACM0")
+    ap.add_argument("--port", default=None)
     ap.add_argument("--monitor", action="store_true", help="print live values, assert nothing")
     a = ap.parse_args()
 

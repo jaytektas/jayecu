@@ -117,10 +117,18 @@ class Meta:
 ConfigDict = Meta
 
 
+def ecu_port() -> str:
+    """The ECU found by its USB serial number, not by ttyACM number: a reset or re-plug while anything
+    still has the old node open brings it back as ttyACM1, and every script aimed at ttyACM0 then fails."""
+    import glob
+    found = sorted(glob.glob("/dev/serial/by-id/usb-JayECU_*-if00"))
+    return found[0] if found else "/dev/ttyACM0"
+
+
 class TsLink:
-    def __init__(self, port="/dev/ttyACM0", baud=115200, timeout=1.0, verbose=False):
+    def __init__(self, port=None, baud=115200, timeout=1.0, verbose=False):
         import serial
-        self.s = serial.Serial(port, baud, timeout=timeout)
+        self.s = serial.Serial(port or ecu_port(), baud, timeout=timeout)
         self.meta = Meta()
         self.verbose = verbose
         time.sleep(0.2)
