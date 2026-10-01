@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 330" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Building a harness in eight steps, from plan to first power-up</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .call { fill: #3b82c4; }
+    .callt { fill: #ffffff; font-weight: 600; font-size: 13px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .line { stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="26" class="muted head">Plan and prepare</text>
+  <rect x="20"  y="40" width="230" height="100" rx="6" class="tgt"/>
+  <rect x="283" y="40" width="230" height="100" rx="6" class="tgt"/>
+  <rect x="546" y="40" width="230" height="100" rx="6" class="ff"/>
+  <rect x="809" y="40" width="230" height="100" rx="6" class="ff"/>
+  <path d="M250 90 H281" class="line" marker-end="url(#a)"/>
+  <path d="M513 90 H544" class="line" marker-end="url(#a)"/>
+  <path d="M776 90 H807" class="line" marker-end="url(#a)"/>
+
+  <circle cx="44" cy="64" r="12" class="call"/><text x="44" y="69" text-anchor="middle" class="callt">1</text>
+  <text x="64" y="69" class="fg head">Plan</text>
+  <text x="34" y="96" class="muted small">every function, its pin,</text>
+  <text x="34" y="114" class="muted small">wire size and route</text>
+
+  <circle cx="307" cy="64" r="12" class="call"/><text x="307" y="69" text-anchor="middle" class="callt">2</text>
+  <text x="327" y="69" class="fg head">Cut and label</text>
+  <text x="297" y="96" class="muted small">each wire to length plus</text>
+  <text x="297" y="114" class="muted small">spare; a label at both ends</text>
+
+  <circle cx="570" cy="64" r="12" class="call"/><text x="570" y="69" text-anchor="middle" class="callt">3</text>
+  <text x="590" y="69" class="fg head">Lay out</text>
+  <text x="560" y="96" class="muted small">on a board or in the car,</text>
+  <text x="560" y="114" class="muted small">bundle by bundle</text>
+
+  <circle cx="833" cy="64" r="12" class="call"/><text x="833" y="69" text-anchor="middle" class="callt">4</text>
+  <text x="853" y="69" class="fg head">Terminate</text>
+  <text x="823" y="96" class="muted small">crimp, inspect, pull-test,</text>
+  <text x="823" y="114" class="muted small">insert; plug empty cavities</text>
+
+  <path d="M924 140 V165 H135 V188" class="line" marker-end="url(#a)"/>
+
+  <text x="150" y="184" class="muted head">Finish and test</text>
+  <rect x="20"  y="190" width="230" height="100" rx="6" class="ff"/>
+  <rect x="283" y="190" width="230" height="100" rx="6" class="ff"/>
+  <rect x="546" y="190" width="230" height="100" rx="6" class="pid"/>
+  <rect x="809" y="190" width="230" height="100" rx="6" class="safe"/>
+  <path d="M250 240 H281" class="line" marker-end="url(#a)"/>
+  <path d="M513 240 H544" class="line" marker-end="url(#a)"/>
+  <path d="M776 240 H807" class="line" marker-end="url(#a)"/>
+
+  <circle cx="44" cy="214" r="12" class="call"/><text x="44" y="219" text-anchor="middle" class="callt">5</text>
+  <text x="64" y="219" class="fg head">Splice and shield</text>
+  <text x="34" y="246" class="muted small">staggered, sealed splices;</text>
+  <text x="34" y="264" class="muted small">shield drains at the ECU</text>
+
+  <circle cx="307" cy="214" r="12" class="call"/><text x="307" y="219" text-anchor="middle" class="callt">6</text>
+  <text x="327" y="219" class="fg head">Cover and support</text>
+  <text x="297" y="246" class="muted small">sleeve, grommets, clips,</text>
+  <text x="297" y="264" class="muted small">strain relief, drip loops</text>
+
+  <circle cx="570" cy="214" r="12" class="call"/><text x="570" y="219" text-anchor="middle" class="callt">7</text>
+  <text x="590" y="219" class="fg head">Test unpowered</text>
+  <text x="560" y="246" class="muted small">continuity end to end;</text>
+  <text x="560" y="264" class="muted small">no short to neighbours or ground</text>
+
+  <circle cx="833" cy="214" r="12" class="call"/><text x="833" y="219" text-anchor="middle" class="callt">8</text>
+  <text x="853" y="219" class="fg head">First power</text>
+  <text x="823" y="246" class="muted small">ECU unplugged: check feeds</text>
+  <text x="823" y="264" class="muted small">and grounds, then plug in</text>
+</svg>

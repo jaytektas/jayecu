@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 620" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>A jayecu test bench: supply, laptop, CAN adapter, trigger stimulator, scope and signal generator wired to the ECU connectors</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: #f4f5f7; stroke: #5f6670; stroke-width: 2; }
+    .band { fill: #ffffff; stroke: #9aa1ab; stroke-width: 1.5; stroke-dasharray: 4 3; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .term { fill: #ffffff; stroke: #1d1f23; stroke-width: 1.5; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    /* wires: a grey casing so a white or black wire reads on either background, the base colour, then the stripe */
+    .case { stroke: #5f6670; stroke-width: 7; fill: none; stroke-linecap: round; }
+    .wR  { stroke: #c83c37; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .wB  { stroke: #282828; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .wW  { stroke: #ebebeb; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .wO  { stroke: #e1912d; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .wLg { stroke: #87cd7d; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .wPk { stroke: #e67daf; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .sB  { stroke: #282828; stroke-width: 4; fill: none; stroke-dasharray: 6 8; }
+    .sW  { stroke: #ebebeb; stroke-width: 4; fill: none; stroke-dasharray: 6 8; }
+    .sR  { stroke: #c83c37; stroke-width: 4; fill: none; stroke-dasharray: 6 8; }
+    .usb { stroke: #3b82c4; stroke-width: 3; fill: none; stroke-dasharray: 8 5; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { fill: #1a1c21; stroke: #9aa1ab; } .band { fill: #20232a; stroke: #6b7280; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .safe { fill: #361512; }
+      .term { fill: #20232a; stroke: #e4e6ea; }
+      .case { stroke: #9aa1ab; }
+    }
+  </style>
+
+  <!-- ===== ECU ===== -->
+  <rect x="400" y="20" width="300" height="580" rx="8" class="ecu"/>
+  <text x="550" y="44" text-anchor="middle" class="fg head">jaytek_v1 ECU</text>
+
+  <rect x="410" y="60" width="280" height="200" rx="5" class="band"/>
+  <text x="550" y="80" text-anchor="middle" class="fg head">CN4 · black · 23-way</text>
+  <rect x="410" y="272" width="280" height="150" rx="5" class="band"/>
+  <text x="550" y="292" text-anchor="middle" class="fg head">CN3 · blue · 35-way</text>
+  <rect x="410" y="434" width="280" height="112" rx="5" class="band"/>
+  <text x="550" y="454" text-anchor="middle" class="fg head">CN2 · white · 35-way</text>
+
+  <!-- CN4 terminals, left edge -->
+  <rect x="394" y="104" width="12" height="12" class="term"/><text x="416" y="115" class="mono fg">9 · 12V_RAW</text>
+  <rect x="394" y="129" width="12" height="12" class="term"/><text x="416" y="140" class="mono fg">13 · 12V_MR</text>
+  <rect x="394" y="154" width="12" height="12" class="term"/><text x="416" y="165" class="mono fg">11 · GND</text>
+  <rect x="394" y="199" width="12" height="12" class="term"/><text x="416" y="210" class="mono fg">10 · CAN1 H</text>
+  <rect x="394" y="224" width="12" height="12" class="term"/><text x="416" y="235" class="mono fg">17 · CAN1 L</text>
+  <!-- CN4 terminal, right edge -->
+  <rect x="694" y="134" width="12" height="12" class="term"/><text x="684" y="145" text-anchor="end" class="mono fg">KNOCK1 · 23</text>
+
+  <!-- CN3 terminals, right edge -->
+  <rect x="694" y="314" width="12" height="12" class="term"/><text x="684" y="325" text-anchor="end" class="mono fg">DIG1 · 23</text>
+  <rect x="694" y="344" width="12" height="12" class="term"/><text x="684" y="355" text-anchor="end" class="mono fg">DIG3 · 21</text>
+  <rect x="694" y="374" width="12" height="12" class="term"/><text x="684" y="385" text-anchor="end" class="mono fg">GND · 10</text>
+
+  <!-- CN2 terminals, right edge -->
+  <rect x="694" y="474" width="12" height="12" class="term"/><text x="684" y="485" text-anchor="end" class="mono fg">IGN1 · 24</text>
+  <rect x="694" y="504" width="12" height="12" class="term"/><text x="684" y="515" text-anchor="end" class="mono fg">GND · 23</text>
+
+  <!-- USB socket -->
+  <rect x="394" y="560" width="60" height="26" rx="3" class="tgt"/>
+  <text x="424" y="578" text-anchor="middle" class="fg small">USB</text>
+
+  <!-- ===== LEFT: supply, CAN adapter, laptop ===== -->
+  <rect x="20" y="84" width="220" height="100" rx="6" class="safe"/>
+  <text x="130" y="108" text-anchor="middle" class="fg head">Bench power supply</text>
+  <text x="130" y="128" text-anchor="middle" class="muted">12–14 V, current-limited</text>
+  <text x="228" y="126" text-anchor="end" class="fg head">+</text>
+  <text x="228" y="170" text-anchor="end" class="fg head">−</text>
+
+  <path d="M240 122 H310 V110 H394" class="case"/><path d="M240 122 H310 V110 H394" class="wR"/>
+  <path d="M310 122 V135 H394" class="case"/><path d="M310 122 V135 H394" class="wR"/><path d="M310 135 H394" class="sW"/>
+  <path d="M240 166 H394" class="case"/><path d="M240 166 H394" class="wB"/>
+  <text x="330" y="102" class="muted small">R (red)</text>
+  <text x="250" y="152" class="muted small">R/W (red-white)</text>
+  <text x="330" y="186" class="muted small">B (black)</text>
+
+  <rect x="20" y="196" width="220" height="60" rx="6" class="box"/>
+  <text x="130" y="220" text-anchor="middle" class="fg head">USB–CAN adapter</text>
+  <text x="130" y="240" text-anchor="middle" class="muted">optional</text>
+  <path d="M240 205 H394" class="case"/><path d="M240 205 H394" class="wLg"/>
+  <path d="M240 230 H394" class="case"/><path d="M240 230 H394" class="wLg"/><path d="M240 230 H394" class="sB"/>
+  <text x="20" y="276" class="muted small">Lg · Lg/B (light green, light green-black), twisted</text>
+
+  <rect x="20" y="470" width="220" height="116" rx="6" class="tgt"/>
+  <text x="130" y="496" text-anchor="middle" class="fg head">Laptop</text>
+  <text x="130" y="516" text-anchor="middle" class="muted">jayecu Studio</text>
+  <text x="130" y="540" text-anchor="middle" class="muted small">USB to the ECU,</text>
+  <text x="130" y="558" text-anchor="middle" class="muted small">the stimulator and</text>
+  <text x="130" y="576" text-anchor="middle" class="muted small">the CAN adapter</text>
+  <path d="M240 573 H394" class="usb"/>
+  <text x="318" y="566" text-anchor="middle" class="muted small">USB</text>
+
+  <!-- ===== RIGHT: signal generator, stimulator, scope ===== -->
+  <rect x="860" y="84" width="220" height="80" rx="6" class="ff"/>
+  <text x="970" y="110" text-anchor="middle" class="fg head">Signal generator</text>
+  <text x="970" y="130" text-anchor="middle" class="muted">test tone for a knock</text>
+  <text x="970" y="148" text-anchor="middle" class="muted">input · optional</text>
+  <rect x="740" y="122" width="90" height="36" rx="4" class="box"/>
+  <text x="785" y="145" text-anchor="middle" class="fg small">attenuator</text>
+  <path d="M860 140 H830" class="line"/>
+  <path d="M740 140 H706" class="case"/><path d="M740 140 H706" class="wPk"/><path d="M740 140 H706" class="sB"/>
+  <text x="785" y="178" text-anchor="middle" class="muted small">Pk/B (pink-black)</text>
+
+  <rect x="860" y="290" width="220" height="112" rx="6" class="ff"/>
+  <text x="970" y="316" text-anchor="middle" class="fg head">Trigger stimulator</text>
+  <text x="970" y="336" text-anchor="middle" class="muted">Ardu-Stim on an Arduino</text>
+  <text x="872" y="362" class="mono fg">D8 crank</text>
+  <text x="872" y="378" class="mono fg">D9 cam</text>
+  <text x="872" y="394" class="mono fg">GND</text>
+  <path d="M860 358 H790 V320 H706" class="case"/><path d="M860 358 H790 V320 H706" class="wO"/><path d="M860 358 H790 V320 H706" class="sB"/>
+  <path d="M860 374 H770 V350 H706" class="case"/><path d="M860 374 H770 V350 H706" class="wO"/><path d="M860 374 H770 V350 H706" class="sR"/>
+  <path d="M860 390 H750 V380 H706" class="case"/><path d="M860 390 H750 V380 H706" class="wB"/>
+  <text x="970" y="422" text-anchor="middle" class="muted small">O/B orange-black · O/R orange-red</text><text x="970" y="438" text-anchor="middle" class="muted small">B black</text>
+
+  <rect x="860" y="460" width="220" height="80" rx="6" class="box"/>
+  <text x="970" y="486" text-anchor="middle" class="fg head">Oscilloscope</text>
+  <text x="970" y="506" text-anchor="middle" class="muted">probe on the output,</text>
+  <text x="970" y="524" text-anchor="middle" class="muted">ground clip on ECU ground</text>
+  <path d="M860 480 H706" class="case"/><path d="M860 480 H706" class="wW"/><path d="M860 480 H706" class="sB"/>
+  <path d="M860 510 H706" class="case"/><path d="M860 510 H706" class="wB"/>
+  <text x="783" y="472" text-anchor="middle" class="muted small">W/B (white-black)</text>
+</svg>

@@ -1,0 +1,4035 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/15-engine-vehicle.html">
+      
+      
+        <link rel="prev" href="index.html">
+      
+      
+        <link rel="next" href="16-trigger.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>15 Engine and vehicle basics - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#engine-and-vehicle-basics" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              15 Engine and vehicle basics
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="15-engine-vehicle.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-the-engine-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · The engine cycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-firing-order-and-tdc-angles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Firing order and TDC angles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-banks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Banks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-coils-ignition-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Coils: Ignition Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-injectors-injection-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · Injectors: injection stages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-size-displacement-and-bore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6 · Size: displacement and bore
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-the-run-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7 · The run state
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-when-a-change-takes-effect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8 · When a change takes effect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-the-output-gateways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9 · The output gateways
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting it up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-vehicle-identity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Vehicle Identity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-cylinders-firing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Cylinders &amp; Firing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-ignition-system-the-coil-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Ignition System (the coil settings)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-fuel-system-the-injector-arrangement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Fuel System (the injector arrangement)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tuning it">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-the-firing-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check the firing order
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#choose-the-cranking-threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose the Cranking Threshold
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#choose-the-injector-timing-method-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose the injector timing method first
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Settings reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vehicle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vehicle
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="engine-and-vehicle-basics">Engine and vehicle basics<a class="headerlink" href="#engine-and-vehicle-basics" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> the Engine settings tell the ECU what kind of engine it is running: how many
+cylinders, how big, which cycle, the order they fire in and how the coils and injectors are
+arranged. The Vehicle settings record which car the tune belongs to.</p>
+</blockquote>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>Before the ECU can fire a single spark it has to know some plain facts about the engine. The
+<strong>Engine</strong> settings hold them:</p>
+<ul>
+<li><strong>How many cylinders</strong> there are, and <strong>how big</strong> the engine is.</li>
+<li><strong>Which cycle</strong> it runs: four-stroke, two-stroke or rotary. This sets how many crank degrees one
+  full engine cycle takes.</li>
+<li><strong>The firing order</strong>: which cylinder fires first, second, third and so on.</li>
+<li><strong>Where each cylinder's top dead centre (TDC) falls</strong> in the cycle. On most engines the ECU works
+  this out for you.</li>
+<li><strong>How the coils are wired</strong> (distributor, wasted spark or coil-on-plug) and <strong>how the injectors
+  are grouped</strong> into injection stages.</li>
+<li><strong>When the engine counts as running</strong> rather than cranking.</li>
+<li>Two switches that <strong>stop all spark or all fuel</strong>, for fault-finding.
+  <!-- src: definition/ecu.schema.yaml -->
+</li>
+</ul>
+<p>Nothing here is optional, and there is no <strong>Enabled</strong> box: every engine has a cylinder count and a
+firing order. These are the first settings you fill in on a new installation. A wrong value here does
+not give you a slightly wrong tune. It gives you an engine that will not start, or one that fires the
+wrong cylinder.</p>
+<!-- src: apps/studio-jf/tools/layout/engine_pages.py -->
+
+<p>The <strong>Vehicle</strong> settings are different. They are labels: the car's name, make, model, engine, VIN
+and notes. Nothing in the firmware reads them. They travel with the tune so that a saved tune file
+says which car it belongs to.</p>
+<!-- src: definition/ecu.schema.yaml (Vehicle help: "Documentation only — nothing in the firmware reads any of these fields") -->
+
+<div class="admonition warning">
+<p class="admonition-title">A new tune has no firing order</p>
+<p>In a new tune every firing-order slot is empty (0). The ECU will not fire any coil or injector
+until you enter a valid firing order. It raises <strong>P1651</strong> instead. Setting the firing order is
+part of every installation, not an optional extra.
+<!-- src: generated/default_config.cpp (firing_order all 0); firmware/Scheduler/EventScheduler.cpp (firing_order_valid); firmware/Scheduler/EnginePositionHal.cpp (firing gate) --></p>
+</div>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<figure>
+<p><img alt="A grid showing which parts of the ECU read each engine setting, and when a change to each takes effect" src="../img/diagrams/engine-vehicle-readers.svg" />
+  </p>
+<figcaption>Figure 15.1 — Who reads each Engine setting, and when a change reaches it. The
+  scheduler (orange) only takes a change when the engine stops. The fuel model, knock and the output
+  gate take it at once. The Cranking Threshold waits for the ECU to restart.</figcaption>
+</figure>
+<h3 id="1-the-engine-cycle">1 · The engine cycle<a class="headerlink" href="#1-the-engine-cycle" title="Permanent link">&para;</a></h3>
+<p>Every angle in the tune, from spark advance to injection timing, is measured inside one <strong>engine
+cycle</strong>. <strong>Engine Cycle</strong> <code>engine.cycle_type</code> sets how long that cycle is:</p>
+<table>
+<thead>
+<tr>
+<th>Engine Cycle</th>
+<th>Cycle length</th>
+<th>Crank revolutions per cycle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Two-Stroke (360°)</td>
+<td>360°</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Four-Stroke (720°)</td>
+<td>720°</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Rotary (1080°)</td>
+<td>1080°</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<!-- src: firmware/Scheduler/SchedulerTypes.h (engine_cycle_angle) -->
+
+<p>The cycle length is also used by the trigger decoder. It sets the default repeat rate of a
+crank-mounted trigger pattern, so changing the cycle changes how the trigger is decoded as well as
+when things fire (chapter 16).</p>
+<!-- src: definition/ecu.schema.yaml (cycle_type help) -->
+
+<h3 id="2-firing-order-and-tdc-angles">2 · Firing order and TDC angles<a class="headerlink" href="#2-firing-order-and-tdc-angles" title="Permanent link">&para;</a></h3>
+<p>The <strong>Firing Order</strong> is a list of cylinder numbers, one per <strong>firing position</strong>. The first entry is
+the cylinder that fires first, the second entry fires second, and so on. A six-cylinder with firing
+order 1-5-3-6-2-4 stores 1, 5, 3, 6, 2, 4. Only the first <strong>Cylinders</strong> entries are read. The
+slots after them should be 0.</p>
+<!-- src: definition/ecu.schema.yaml -->
+
+<p>The ECU checks the order every time it applies it. It must name every cylinder from 1 to the
+cylinder count <strong>exactly once</strong>. A cylinder listed twice, a cylinder missing, or a number larger than
+the cylinder count all make the order invalid. With an invalid order the ECU <strong>will not fire at
+all</strong>: a duplicate would fire one cylinder twice and leave another dead, so it refuses both.</p>
+<!-- src: firmware/Scheduler/EventScheduler.cpp (firing_order_valid); firmware/Scheduler/EnginePositionHal.cpp -->
+
+<p>From the order, each cylinder gets a <strong>TDC Angle</strong>: where in the cycle that cylinder reaches top dead
+centre on its compression stroke, measured from the reference the trigger defines.</p>
+<ul>
+<li><strong>Even-fire engines</strong> (<strong>Odd-Fire Engine</strong> off, the default): the ECU <strong>computes</strong> every TDC angle
+  for you. Cylinders fire evenly, so the cylinder in firing position <em>i</em> (counting from 0) gets
+  <em>i</em> × cycle ÷ cylinders. On a four-stroke four-cylinder that is 0°, 180°, 360° and 540°. The ECU
+  writes the results back into the tune, and the studio reads them back after the engine stops.</li>
+<li><strong>Odd-fire engines</strong> (<strong>Odd-Fire Engine</strong> on): the gaps between firings are not equal, so the ECU
+  does not compute anything. You type each cylinder's TDC angle yourself, and the ECU uses exactly
+  what you typed.
+  <!-- src: firmware/Scheduler/EventScheduler.cpp (update_cylinder_angles); firmware/Scheduler/EnginePositionHal.cpp; definition/ecu.schema.yaml -->
+</li>
+</ul>
+<figure>
+<p><img alt="Three timelines of one engine cycle: an even-fire four-cylinder firing 1-3-4-2 with TDCs 180 degrees apart and its wasted-spark pairs; a 90-degree V-twin with TDCs at 0 and 270 degrees; a two-rotor rotary with six faces 180 degrees apart over 1080 degrees" src="../img/diagrams/engine-vehicle-firing.svg" />
+  </p>
+<figcaption>Figure 15.2 — Where each cylinder's TDC falls in the cycle. A: even-fire, computed by
+  the ECU. The orange arcs are the wasted-spark pairs. B: odd-fire, typed by you. C: a rotary, where
+  each rotor face counts as a cylinder.</figcaption>
+</figure>
+<div class="admonition info">
+<p class="admonition-title">Advanced — rounding on odd cylinder counts</p>
+<p>The ECU stores angles in tenths of a degree and divides the cycle by the cylinder count in whole
+tenths. On counts that do not divide 7200 evenly (7 or 11 cylinders on a four-stroke) the
+computed angles are rounded down to the nearest 0.1°.
+<!-- src: firmware/Scheduler/EventScheduler.cpp (interval = cyc / n, integer decidegrees) --></p>
+</div>
+<h3 id="3-banks">3 · Banks<a class="headerlink" href="#3-banks" title="Permanent link">&para;</a></h3>
+<p>Each cylinder has a <strong>Bank</strong>, 1 or 2. On an inline engine every cylinder stays on bank 1. On a V
+engine or a flat engine, put the cylinders of each exhaust side on their own bank. The bank is read by:</p>
+<ul>
+<li>the <strong>Bank</strong> injection mode, which fires each bank's injectors as one group;</li>
+<li>closed-loop lambda, whose per-bank corrections reach each cylinder through its bank (chapter 23);</li>
+<li>knock, whose <strong>Auto</strong> sensor choice picks the sensor by bank (chapter 30);</li>
+<li>output rows set to <strong>Bank 1</strong> or <strong>Bank 2</strong> (chapter 18).
+  <!-- src: definition/ecu.schema.yaml; firmware/Scheduler/EventScheduler.cpp; firmware/Engine/Modules/FuelCalculator.cpp; firmware/Engine/Modules/Knock.cpp; firmware/Scheduler/OutputMap.h -->
+</li>
+</ul>
+<h3 id="4-coils-ignition-mode">4 · Coils: Ignition Mode<a class="headerlink" href="#4-coils-ignition-mode" title="Permanent link">&para;</a></h3>
+<p><strong>Ignition Mode</strong> <code>engine.ign_mode</code> says how the coils are wired:</p>
+<ul>
+<li><strong>Single Coil (distributor):</strong> one coil serves every cylinder.</li>
+<li><strong>Wasted Spark:</strong> each coil output is assigned to one cylinder and also fires that cylinder's
+  <strong>companion</strong>, the cylinder whose TDC is exactly half a cycle away. The ECU finds the companion from
+  the firing order each time it applies the settings, so changing the firing order re-pairs the coils
+  without moving any output. Wasted spark needs only crank sync.</li>
+<li><strong>Coil-on-Plug:</strong> one coil per cylinder. It needs cam <strong>phase</strong> sync to fire sequentially. Until
+  the cam has been seen it fires companion pairs together.
+  <!-- src: definition/ecu.schema.yaml; firmware/Scheduler/EventScheduler.cpp; firmware/Scheduler/SchedulerTypes.h -->
+</li>
+</ul>
+<p>When you change Ignition Mode, Cylinders or Engine Cycle, <strong>the studio lays the coil outputs out
+again</strong> in the standard pattern: coil-on-plug IGN<em>n</em> = cylinder <em>n</em>; wasted spark one coil per pair,
+named by the lower cylinder of the pair; distributor IGN1 = all cylinders. You can then change any
+single output by hand on its own page (chapter 18). The firmware does not assign outputs. It fires
+exactly what the output rows say, and a cylinder with no coil gets no spark (P1653).</p>
+<!-- src: apps/studio-jf/src/model/EngineOutputLayout.h, EngineOutputLayout.cpp; firmware/Engine/EngineTask.cpp -->
+
+<h3 id="5-injectors-injection-stages">5 · Injectors: injection stages<a class="headerlink" href="#5-injectors-injection-stages" title="Permanent link">&para;</a></h3>
+<p>The injectors are organised in <strong>injection stages</strong>, up to four. A stage is a set of injectors that
+share one tune. Stage 1 is the primary. A second stage is a staged secondary set, and stages 3 and 4
+are further sets. <strong>Number of Injection Stages</strong> <code>engine.num_inj_stages</code> says how many are active.
+The settings of higher stages are kept but not used.</p>
+<!-- src: definition/ecu.schema.yaml -->
+
+<p>Each stage has its own row on the <strong>Fuel System</strong> page:</p>
+<ul>
+<li><strong>Injection Mode</strong>: how this stage fires its injectors.<ul>
+<li><strong>Sequential:</strong> each injector once per cycle, timed to its own cylinder. It needs cam phase
+  sync, and it is the only mode that can apply per-cylinder fuel trims. Until the cam has been
+  seen, it fires every revolution with half the fuel each time.</li>
+<li><strong>Semi-Sequential:</strong> each injector twice per four-stroke cycle, once per crank revolution. It
+  needs crank sync only.</li>
+<li><strong>Multi-Point:</strong> every injector of the stage at once, <strong>Injections Per Cycle</strong> times per cycle.
+  Only overall corrections apply.</li>
+<li><strong>Bank:</strong> the injectors grouped by cylinder bank, each bank fired together, <strong>Injections Per
+  Cycle</strong> times per cycle. Per-bank corrections apply.</li>
+<li><strong>Sequential-Any-Sync:</strong> once per cycle at <em>a</em> cylinder's TDC, not necessarily its own. Works
+  in any sync state.</li>
+</ul>
+</li>
+<li><strong>Injections Per Cycle</strong>: how many times each injector fires per cycle. Only Multi-Point and Bank
+  read it. The fuel for the cycle is split across the squirts, so raising it gives more, smaller
+  squirts, not more fuel.</li>
+<li><strong># of Injector Outputs</strong>: how many injectors a Bank or Multi-Point stage has. Only the studio reads
+  this, to lay out that many injector outputs. Per-cylinder modes always get one injector per
+  cylinder.
+  <!-- src: definition/ecu.schema.yaml; firmware/Scheduler/SchedulerTypes.h (injection_events_per_cycle, injection_deliveries_per_cycle) -->
+</li>
+</ul>
+<p><strong>Injector Timing Method</strong> <code>engine.injector_timing_method</code> says what the injection angle in the fuel
+tables means. With <strong>End of Injection</strong> (the default) the angle is where the squirt <strong>ends</strong>: the ECU
+opens the injector one pulse-width earlier, so the fuel always finishes at the same point however long
+the pulse is. With <strong>Start of Injection</strong> the angle is where it <strong>opens</strong>.</p>
+<!-- src: definition/ecu.schema.yaml; firmware/Scheduler/EventScheduler.h -->
+
+<p>Injector flow, dead time and the fuel tables themselves are not Engine settings. They belong to
+the fuel chapter (chapter 19).</p>
+<h3 id="6-size-displacement-and-bore">6 · Size: displacement and bore<a class="headerlink" href="#6-size-displacement-and-bore" title="Permanent link">&para;</a></h3>
+<p><strong>Displacement</strong> <code>engine.displacement</code> is the total swept volume in cc. The fuel model uses it to work
+out the air each cylinder takes in: displacement ÷ cylinders on a piston engine. On a rotary it divides
+by the number of <strong>rotors</strong>, because a rotary's quoted capacity counts one chamber per rotor. A
+1308 cc two-rotor is 654 cc per chamber.</p>
+<!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
+
+<p><strong>Bore</strong> <code>engine.bore_mm</code> is used for one thing: the knock filter. When <strong>Knock Frequency</strong> is 0, the
+knock band centre is worked out from the bore: 900 ÷ (π × bore ÷ 2) kHz, about 6.7 kHz for an 86 mm
+bore. A bore of 10 mm or less counts as "not entered", and the band then sits at 7 kHz (chapter 30).</p>
+<!-- src: firmware/main.cpp -->
+
+<h3 id="7-the-run-state">7 · The run state<a class="headerlink" href="#7-the-run-state" title="Permanent link">&para;</a></h3>
+<p>The ECU keeps a <strong>run state</strong>: STOPPED, CRANKING or RUNNING. It is published as <strong>Engine State</strong>
+<code>engine_state</code>, and many other modules act on it. Cranking fuel, flood clear and cranking advance only
+apply while CRANKING. Entering RUNNING starts the after-start timers.</p>
+<!-- src: firmware/Engine/EngineStateMachine.h; firmware/Engine/EngineTask.cpp; firmware/Engine/Modules/FuelCalculator.cpp; firmware/Engine/Modules/Ignition.cpp -->
+
+<figure>
+<p><img alt="State diagram: STOPPED to CRANKING when RPM rises above 0, CRANKING to RUNNING at the Cranking Threshold, RUNNING and CRANKING back to STOPPED only when RPM is 0" src="../img/diagrams/engine-vehicle-states.svg" />
+  </p>
+<figcaption>Figure 15.3 — The run state. The only setting in it is Cranking Threshold. Once
+  RUNNING, the engine stays RUNNING through any dip in RPM until it really stops.</figcaption>
+</figure>
+<ul>
+<li><strong>STOPPED:</strong> the ECU has no engine position and RPM is 0. RPM stays 0 until the trigger has sync.</li>
+<li><strong>CRANKING:</strong> RPM is above 0 but below <strong>Cranking Threshold</strong> <code>engine.cranking_rpm</code> (default 400).</li>
+<li><strong>RUNNING:</strong> RPM has reached the Cranking Threshold. The state then holds RUNNING however low RPM
+  dips, until RPM reaches 0 because the trigger has lost position or the teeth have stopped.</li>
+</ul>
+<p>There is no "stall RPM" setting. The trigger's own watchdog decides when teeth have stopped arriving.</p>
+<!-- src: firmware/Engine/EngineStateMachine.h; definition/ecu.schema.yaml -->
+
+<h3 id="8-when-a-change-takes-effect">8 · When a change takes effect<a class="headerlink" href="#8-when-a-change-takes-effect" title="Permanent link">&para;</a></h3>
+<p>Different parts of the ECU read these settings at different times (Figure 15.1):</p>
+<ul>
+<li><strong>The scheduler</strong> (firing order, TDC angles, cylinder count, cycle, ignition mode, injection
+  stages and modes, injector timing) keeps its own copy. A change reaches it <strong>the next time the engine
+  is STOPPED</strong>. Changing how many cylinders a spinning engine has cannot be done safely, so the ECU
+  waits. At that moment it also recomputes even-fire TDC angles and checks the firing order again.</li>
+<li><strong>The fuel model and knock</strong> read Cylinders, Engine Cycle, Displacement, Bore, the stage count and
+  modes <strong>straight away</strong>.</li>
+<li><strong>Ignition Outputs and Injector Outputs</strong> act <strong>straight away</strong>.</li>
+<li><strong>Cranking Threshold</strong> is read once, when the ECU starts. <strong>Burn</strong> it, then use <strong>Reset ECU</strong> (or
+  switch the ignition off and on) for a change to take effect. A reset throws away changes you have not
+  burned.
+  <!-- src: firmware/main.cpp; firmware/Comms/CommsManager.cpp; generated/shadow_meta.h; firmware/Engine/Modules/FuelCalculator.h; firmware/Engine/EngineTask.cpp; firmware/Engine/SystemComposer.cpp; apps/studio-jf/main.cpp -->
+</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Change the engine's shape with the engine stopped</p>
+<p>If you changed <strong>Cylinders</strong> or <strong>Engine Cycle</strong> while the engine ran, the fuel model would use the
+new value at once but the scheduler would keep the old one until the engine stopped. For that time
+the fuel would be worked out for one engine and delivered to another. So while the studio is
+connected and the engine is turning (speed above 0, or the trigger holding sync), every setting that
+waits for an engine stop is <strong>greyed out</strong>, and hovering it says <strong>Applies when the engine stops —
+stop the engine to change it</strong>. That covers every setting on these pages, the firing order table,
+and any button that writes one of them. Offline, or with the engine stopped, they are editable as
+usual.
+<!-- src: apps/studio-jf/src/surface/CanvasWidget.cpp (enabledNow); apps/studio-jf/src/model/Cache.cpp (engineTurning); definition/ecu.schema.yaml (Engine shadow) --></p>
+</div>
+<h3 id="9-the-output-gateways">9 · The output gateways<a class="headerlink" href="#9-the-output-gateways" title="Permanent link">&para;</a></h3>
+<p><strong>Ignition Outputs</strong> <code>engine.ign_enable</code> and <strong>Injector Outputs</strong> <code>engine.inj_enable</code> are two switches
+that stop the engine firing, on purpose. Set <strong>Ignition Outputs</strong> to <em>Off</em> and no coil fires. Set
+<strong>Injector Outputs</strong> to <em>Off</em> and no injector opens. They use the same cut path as the rev limiter and
+the other cuts, so nothing can fire while they are off.</p>
+<!-- src: definition/ecu.schema.yaml; firmware/Engine/EngineTask.cpp -->
+
+<p>Use them to split a no-start problem in half: crank with no fuel to check for spark, or with no
+spark to check fuel delivery and to clear a flooded engine. Injector Outputs off also lets you build
+oil pressure on a fresh engine.</p>
+<div class="admonition danger">
+<p class="admonition-title">These switches survive a reset</p>
+<p>Burn either switch <em>Off</em> and it stays off after the ignition is switched off and on. That is
+deliberate, so you can leave a job half done. It also means an engine that cranks and will not
+start may simply have one of these switched off. The Ignition System and Fuel System pages print
+a warning line while a switch is off. Check them first.
+<!-- src: definition/ecu.schema.yaml; apps/studio-jf/tools/layout/engine_pages.py --></p>
+</div>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>You need:</p>
+<ul>
+<li><strong>The engine's data</strong>: cylinder count, displacement, bore, and the firing order with the
+  manufacturer's cylinder numbering. Get the numbering from the workshop manual. Firing orders are
+  quoted against a numbering scheme, and the same engine family can number its cylinders differently
+  from one maker to the next.</li>
+<li><strong>For a V or flat engine</strong>, which cylinders are on which exhaust side, for the Bank column.</li>
+<li><strong>For an odd-fire engine</strong>, the crank angle of each cylinder's TDC from the engine's data.</li>
+<li><strong>The studio connected to the ECU</strong> (chapter 5), or a tune open offline. You can fill in every
+  setting offline. The computed TDC angles then only appear after you connect.</li>
+</ul>
+<p>Do this chapter <strong>before</strong> the trigger (chapter 16): the trigger decoder uses the engine cycle, and
+every TDC angle is measured from the reference the trigger defines. Outputs (chapter 18) come after
+this chapter, because the studio lays the coil and injector outputs out from these settings.</p>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>The pages are under <strong>Configuration ▸ Engine Configuration</strong>. The branch page itself summarises the
+engine and links to everything below it, in the order a new installation works through them.</p>
+<figure>
+<p><img alt="The Engine Configuration branch page: The Engine panel with Cylinders, Displacement, Bore, Engine Cycle, Odd-Fire Engine and Cranking Threshold, and the Sections list" src="../img/studio/engine-vehicle-branch.png" />
+  </p>
+<figcaption>Figure 15.4 — Configuration ▸ Engine Configuration, set up as Example 1. The Engine
+  panel is the same set of fields as on Cylinders &amp; Firing. Sections links to each page below.</figcaption>
+</figure>
+<p>Below these panels the page shows <strong>Right Now</strong>: RPM, crank angle, run time, trigger errors and lamps
+for STOPPED, CRANKING, RUNNING, CRANK SYNC, PHASE SYNC and TRIG ERROR. Then comes <strong>A New
+Installation, In Order</strong>, the five steps of this and the next chapters as links.</p>
+<!-- src: apps/studio-jf/tools/layout/engine_pages.py -->
+
+<h3 id="step-1-vehicle-identity">Step 1 — Vehicle Identity<a class="headerlink" href="#step-1-vehicle-identity" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Engine Configuration ▸ Vehicle Identity</strong> and fill in <strong>Name</strong>, <strong>Make</strong>, <strong>Model</strong>,
+<strong>Engine</strong>, <strong>VIN</strong> and <strong>Notes</strong>. Each is a short text field of up to 32 bytes. Name, Make, Model and
+Engine also appear in the <strong>This Car</strong> panel of the branch page.</p>
+<!-- src: definition/ecu.schema.yaml (length: 32); apps/studio-jf/tools/layout/engine_pages.py -->
+
+<figure>
+<p><img alt="The Vehicle Identity page with six text fields: Name, Make, Model, Engine, VIN, Notes" src="../img/studio/engine-vehicle-identity.png" />
+  </p>
+<figcaption>Figure 15.5 — Vehicle Identity, empty as in a new tune. Nothing here changes how the
+  engine runs.</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">Use Notes</p>
+<p><strong>Notes</strong> is the place for what a future reader would otherwise have to guess: what was changed
+last, what is known to be marginal, what was never tested.</p>
+</div>
+<h3 id="step-2-cylinders-firing">Step 2 — Cylinders &amp; Firing<a class="headerlink" href="#step-2-cylinders-firing" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Engine Configuration ▸ Cylinders &amp; Firing</strong>.</p>
+<figure>
+<p><img alt="The Cylinders and Firing page for a four-cylinder: Engine panel, Known Engines selector set to I4 1-3-4-2, and the Firing Order table with cylinders 1, 3, 4, 2, all on bank 1, TDC angles 0, 180, 360, 540" src="../img/studio/engine-vehicle-cylinders.png" />
+  </p>
+<figcaption>Figure 15.6 — Cylinders &amp; Firing, set up as Example 1. The Firing Order table has one
+  row per firing position: which cylinder fires there, its bank and its TDC angle.</figcaption>
+</figure>
+<ol>
+<li><strong>Cylinders</strong> <code>engine.cylinder_count</code>: the number of cylinders, 1 to 12 (default 4). On a rotary,
+   enter <strong>three per rotor</strong> (see Example 4). The Firing Order table shows one row per cylinder.</li>
+<li><strong>Displacement</strong> <code>engine.displacement</code>: total swept volume in cc (default 2000).</li>
+<li><strong>Bore</strong> <code>engine.bore_mm</code>: in mm (default 0, not entered). Only the knock filter uses it.</li>
+<li><strong>Engine Cycle</strong> <code>engine.cycle_type</code>: <em>Four-Stroke (720°)</em> (default), <em>Two-Stroke (360°)</em> or
+   <em>Rotary (1080°)</em>.</li>
+<li><strong>Odd-Fire Engine</strong> <code>engine.odd_fire</code>: leave it off unless your engine fires at uneven intervals.</li>
+<li><strong>Cranking Threshold</strong> <code>engine.cranking_rpm</code>: the RPM at which the engine counts as running,
+   100 to 2000 RPM (default 400). See <em>Tuning it</em>.</li>
+<li><strong>Firing order.</strong> The quick way is <strong>Known Engines</strong>: pick your engine's firing order from the
+   list. It writes the whole order <em>and</em> the cylinder count in one go, and clears every slot the
+   engine does not use. It holds 17 common orders from twins to V12s. To enter an order by hand,
+   type the cylinder number into the <strong>Cylinder</strong> column of each row, first to fire at the top.</li>
+<li><strong>Bank</strong>: for each row, 1 or 2. Leave every row on 1 for an inline engine.</li>
+<li><strong>TDC Angle</strong>: on an even-fire engine, leave it alone. The ECU computes it. On an odd-fire
+   engine, type each cylinder's TDC angle in crank degrees from 0.</li>
+<li><strong>Burn</strong> the changes.
+    <!-- src: apps/studio-jf/tools/layout/engine_pages.py; definition/ecu.schema.yaml --></li>
+</ol>
+<p>The <strong>Bank</strong> and <strong>TDC Angle</strong> in each row belong to the <strong>cylinder</strong> in that row, not to the
+position. If you change the order, each cylinder keeps its bank and TDC angle and moves with it.</p>
+<!-- src: apps/studio-jf/tools/layout/engine_pages.py -->
+
+<p>The <strong>Right Now</strong> panel shows <strong>SYNC</strong> / <strong>NO SYNC</strong> and <strong>ORDER OK</strong> / <strong>ORDER BAD</strong>. While the
+order is invalid, ORDER BAD lights and the Cylinder cells of the order turn red. Both come from the
+ECU (the <code>firing_order_fault</code> channel), so they only work while you are connected. ORDER BAD responds
+as you type, even with the engine running. The ECU applies the new order, and raises or clears P1651,
+only at the next stop.</p>
+<!-- src: apps/studio-jf/tools/layout/engine_pages.py; firmware/Engine/EngineTask.cpp -->
+
+<div class="admonition note">
+<p class="admonition-title">The TDC column updates after the engine stops</p>
+<p>On an even-fire engine the TDC angles you see are the ones the ECU last computed. After you
+change the order or the cylinder count, the ECU recomputes them the next time the engine is
+stopped. The studio then reads them back. Offline, the column keeps whatever the tune holds.
+<!-- src: firmware/Comms/CommsManager.cpp; firmware/Scheduler/EnginePositionHal.cpp; apps/studio-jf/src/model/Cache.cpp --></p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Changing Cylinders by hand does not change the order</p>
+<p>Only the Known Engines list writes the order and the count together. If you type a new
+<strong>Cylinders</strong> value, the order keeps its old entries. Going from 4 to 6 leaves positions 5 and 6
+at 0, which is an invalid order. Going from 6 to 4 leaves cylinders 5 and 6 out of the first four
+positions, which is also invalid. Check ORDER OK after every change.</p>
+</div>
+<h3 id="step-3-ignition-system-the-coil-settings">Step 3 — Ignition System (the coil settings)<a class="headerlink" href="#step-3-ignition-system-the-coil-settings" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Engine Configuration ▸ Ignition System</strong>. The <strong>Spark Hardware</strong> panel holds the two Engine
+settings for coils. The rest of the page (advance limits, fixed timing) is covered in chapter 20.</p>
+<figure>
+<p><img alt="The Spark Hardware panel of the Ignition System page: Ignition Mode Wasted Spark, Cylinders 4, Ignition Outputs On" src="../img/studio/engine-vehicle-ignition.png" />
+  </p>
+<figcaption>Figure 15.7 — Spark Hardware on Ignition System. Cylinders is the same setting as on
+  Cylinders &amp; Firing, shown here again for convenience.</figcaption>
+</figure>
+<ol>
+<li><strong>Ignition Mode</strong> <code>engine.ign_mode</code>: <em>Single Coil (distributor)</em>, <em>Wasted Spark</em> (default) or
+   <em>Coil-on-Plug</em>, to match how your coils are wired.</li>
+<li><strong>Ignition Outputs</strong> <code>engine.ign_enable</code>: leave it <em>On</em> (default).
+   <!-- src: apps/studio-jf/tools/layout/engine_pages.py -->
+</li>
+</ol>
+<p>Changing Ignition Mode lays the coil outputs out again. Check the result on the IGN output pages
+(chapter 18).</p>
+<h3 id="step-4-fuel-system-the-injector-arrangement">Step 4 — Fuel System (the injector arrangement)<a class="headerlink" href="#step-4-fuel-system-the-injector-arrangement" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Engine Configuration ▸ Fuel System</strong>.</p>
+<figure>
+<p><img alt="The Fuel System page: Injection System panel with Injection Stages 1, Injector Timing End of Injection, Cylinders 4, Injector Outputs On; Stages panel with Stage 1 in Sequential mode" src="../img/studio/engine-vehicle-fuel.png" />
+  </p>
+<figcaption>Figure 15.8 — Fuel System with one sequential stage. Rows for stages the Injection
+  Stages count does not include are greyed: their settings are kept but not used.</figcaption>
+</figure>
+<ol>
+<li><strong>Injection Stages</strong> <code>engine.num_inj_stages</code>: 1 to 4 (default 1).</li>
+<li><strong>Injector Timing</strong> <code>engine.injector_timing_method</code>: <em>End of Injection</em> (default) or <em>Start of
+   Injection</em>. Set this <strong>before</strong> you tune the injection angle table, because the same angle means two
+   different things.</li>
+<li><strong>Injector Outputs</strong> <code>engine.inj_enable</code>: leave it <em>On</em> (default).</li>
+<li>In <strong>Stages</strong>, for each active stage, choose the <strong>Mode</strong>, and for Bank or Multi-Point also
+   <strong>Outputs</strong> (the injector count) and <strong>Per Cycle</strong> (injections per cycle). Each stage name links to
+   that stage's tuning pages.
+   <!-- src: apps/studio-jf/tools/layout/engine_pages.py; definition/ecu.schema.yaml -->
+</li>
+</ol>
+<p>Changing the stage count, a stage's mode or its outputs lays the injector outputs out again: a
+block of LS outputs per stage from LS1. A pin already used as a generic output (a fan, say) is never
+taken. The injector moves to the next free pin instead.</p>
+<!-- src: apps/studio-jf/src/model/EngineOutputLayout.h -->
+
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — 2.0 L inline four, wasted spark, sequential injection</p>
+<p>A common four-cylinder with a crank wheel and a cam sensor.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cylinders</td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td>Displacement</td>
+<td>1998 cc</td>
+<td>from the engine's data</td>
+</tr>
+<tr>
+<td>Bore</td>
+<td>86.0 mm</td>
+<td>gives a knock band near 6.7 kHz</td>
+</tr>
+<tr>
+<td>Engine Cycle</td>
+<td>Four-Stroke (720°)</td>
+<td></td>
+</tr>
+<tr>
+<td>Odd-Fire Engine</td>
+<td>off</td>
+<td>a four fires every 180°</td>
+</tr>
+<tr>
+<td>Firing order</td>
+<td>1-3-4-2 (Known Engines: <em>I4 1-3-4-2</em>)</td>
+<td></td>
+</tr>
+<tr>
+<td>Bank</td>
+<td>1 on every row</td>
+<td>inline engine</td>
+</tr>
+<tr>
+<td>Ignition Mode</td>
+<td>Wasted Spark</td>
+<td>two coil packs, one per pair</td>
+</tr>
+<tr>
+<td>Injection Stages / Mode</td>
+<td>1 / Sequential</td>
+<td>one injector per cylinder, cam sensor fitted</td>
+</tr>
+<tr>
+<td>Injector Timing</td>
+<td>End of Injection</td>
+<td>the default</td>
+</tr>
+</tbody>
+</table>
+<p>The ECU computes TDC angles 0°, 180°, 360° and 540° for cylinders 1, 3, 4 and 2 (Figure 15.6).
+Wasted spark pairs cylinders 1 with 4 and 3 with 2, the cylinders 360° apart (Figure 15.2 A).</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — 5.7 L GM LS V8, coil-on-plug, two banks</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cylinders</td>
+<td>8</td>
+<td></td>
+</tr>
+<tr>
+<td>Displacement</td>
+<td>5665 cc</td>
+<td></td>
+</tr>
+<tr>
+<td>Bore</td>
+<td>99.0 mm</td>
+<td></td>
+</tr>
+<tr>
+<td>Engine Cycle</td>
+<td>Four-Stroke (720°)</td>
+<td></td>
+</tr>
+<tr>
+<td>Firing order</td>
+<td>1-8-7-2-6-5-4-3 (Known Engines: <em>V8 1-8-7-2-6-5-4-3 (GM LS)</em>)</td>
+<td></td>
+</tr>
+<tr>
+<td>Bank</td>
+<td>1 for cylinders 1, 3, 5, 7; 2 for 2, 4, 6, 8</td>
+<td>the engine's odd cylinders share one exhaust side</td>
+</tr>
+<tr>
+<td>Ignition Mode</td>
+<td>Coil-on-Plug</td>
+<td>one coil per cylinder</td>
+</tr>
+<tr>
+<td>Injection Stages / Mode</td>
+<td>1 / Sequential</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>TDC angles come out 90° apart, in firing order. With the banks set, closed-loop lambda can
+correct each bank separately once a second wideband is fitted (chapter 23).</p>
+</div>
+<figure>
+<p><img alt="The Firing Order table for the V8: eight rows, cylinders 1, 8, 7, 2, 6, 5, 4, 3, banks alternating 1 and 2, TDC angles 0 to 630 in 90-degree steps" src="../img/studio/engine-vehicle-v8.png" />
+  </p>
+<figcaption>Figure 15.9 — Example 2. The Bank column follows the cylinder, not the position, so the
+  banks alternate down the firing order.</figcaption>
+</figure>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — 90° V-twin, odd-fire</p>
+<p>A twin that fires 270° and then 450° apart.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cylinders</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>Engine Cycle</td>
+<td>Four-Stroke (720°)</td>
+<td></td>
+</tr>
+<tr>
+<td>Odd-Fire Engine</td>
+<td>on</td>
+<td>the gaps are not equal</td>
+</tr>
+<tr>
+<td>Firing order</td>
+<td>1-2</td>
+<td></td>
+</tr>
+<tr>
+<td>TDC Angle</td>
+<td>cylinder 1: 0°, cylinder 2: 270°</td>
+<td>typed by hand</td>
+</tr>
+<tr>
+<td>Ignition Mode</td>
+<td>Coil-on-Plug</td>
+<td>one coil per cylinder</td>
+</tr>
+</tbody>
+</table>
+<p>Check the angle for your engine: which cylinder follows by 270° and which by 450° depends on
+how the engine numbers its cylinders.</p>
+</div>
+<figure>
+<p><img alt="The Cylinders and Firing page for the V-twin: Odd-Fire Engine ticked, two rows, TDC angles 0 and 270" src="../img/studio/engine-vehicle-vtwin.png" />
+  </p>
+<figcaption>Figure 15.10 — Example 3. With Odd-Fire Engine ticked, the TDC Angle column holds what
+  you type.</figcaption>
+</figure>
+<div class="admonition example">
+<p class="admonition-title">Example 4 — two-rotor rotary</p>
+<p>On a rotary each <strong>rotor face</strong> counts as one cylinder: three per rotor. A two-rotor engine has
+six. Faces 1 to 3 belong to rotor 1, faces 4 to 6 to rotor 2.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engine Cycle</td>
+<td>Rotary (1080°)</td>
+<td>three shaft revolutions per cycle</td>
+</tr>
+<tr>
+<td>Cylinders</td>
+<td>6</td>
+<td>2 rotors × 3 faces</td>
+</tr>
+<tr>
+<td>Displacement</td>
+<td>1308 cc</td>
+<td>the quoted capacity; the fuel model divides it by the 2 rotors</td>
+</tr>
+<tr>
+<td>Bore</td>
+<td>0</td>
+<td>no bore on a rotary; set Knock Frequency directly if you use knock (chapter 30)</td>
+</tr>
+<tr>
+<td>Firing order</td>
+<td>1-4-2-5-3-6</td>
+<td>the rotors fire alternately, 180° apart</td>
+</tr>
+</tbody>
+</table>
+<p>The TDC angles come out 180° apart (Figure 15.2 C). Output rows name the <strong>rotor</strong>, not the
+face. The studio lays out leading coils on IGN1 and IGN2 and trailing coils on IGN5 and IGN6.
+With the 12-cylinder limit, the most rotors you can have is four.
+<!-- src: firmware/Scheduler/SchedulerTypes.h; firmware/Scheduler/OutputMap.h; firmware/Engine/Modules/FuelCalculator.cpp; tests/test_injection_modes.cpp; apps/studio-jf/src/model/EngineOutputLayout.h --></p>
+</div>
+<figure>
+<p><img alt="The Cylinders and Firing page for a two-rotor rotary: Engine Cycle Rotary 1080, Cylinders 6, faces 1, 4, 2, 5, 3, 6 at 0 to 900 degrees" src="../img/studio/engine-vehicle-rotary.png" />
+  </p>
+<figcaption>Figure 15.11 — Example 4. The Known Engines box names a V6 order here because the
+  numbers happen to match. It has no rotary entry. Leave it as it is.</figcaption>
+</figure>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<p>There is little to tune here, but three things are worth checking on a running engine.</p>
+<p><strong>Log these channels:</strong> <code>engine_state</code>, <code>rpm</code>, <code>sync_level</code>, <code>firing_order_fault</code>, and while
+fault-finding <code>ign_exec_mask</code> and <code>inj_exec_mask</code> (chapter 42).</p>
+<h3 id="check-the-firing-order">Check the firing order<a class="headerlink" href="#check-the-firing-order" title="Permanent link">&para;</a></h3>
+<p>A wrong firing order still passes the ECU's check if it names every cylinder once. The engine then
+runs badly or not at all, because sparks and squirts go to cylinders that are not ready for them.
+To check what the ECU is actually doing, open <strong>Tools ▸ Engine Cycle</strong> while connected. It draws one
+captured cycle against crank angle, one lane per coil and injector. A coil's span is its dwell and its
+right-hand edge is the spark (chapter 20).</p>
+<!-- src: apps/studio-jf/src/ui/EngineCycleView.h; apps/studio-jf/main.cpp -->
+
+<p>Confirm that TDC for cylinder 1 is where the ECU thinks it is with a timing light and <strong>Fixed Timing</strong>
+(chapter 16). Every other cylinder's TDC is measured from that reference.</p>
+<h3 id="choose-the-cranking-threshold">Choose the Cranking Threshold<a class="headerlink" href="#choose-the-cranking-threshold" title="Permanent link">&para;</a></h3>
+<p>Cranking fuel, flood clear and cranking advance apply only while the state is CRANKING. The switch to
+RUNNING starts the after-start enrichment. So the threshold must sit:</p>
+<ul>
+<li><strong>above</strong> the fastest your starter ever spins the engine, cold battery or warm. If it sits below
+  that, the engine counts as running on the starter and loses its cranking fuel;</li>
+<li><strong>below</strong> the lowest speed at which the engine runs on its own just after it catches.</li>
+</ul>
+<p>The default 400 RPM suits most engines. Log <code>rpm</code> and <code>engine_state</code> through a few starts, hot and
+cold. The state should change once, when the engine catches, and never while it is only on the
+starter. Remember that a new value only takes effect after you burn it and restart the ECU.</p>
+<!-- src: firmware/Engine/Modules/FuelCalculator.cpp; firmware/Engine/Modules/Ignition.cpp; firmware/Engine/EngineStateMachine.h; firmware/Engine/SystemComposer.cpp -->
+
+<h3 id="choose-the-injector-timing-method-first">Choose the injector timing method first<a class="headerlink" href="#choose-the-injector-timing-method-first" title="Permanent link">&para;</a></h3>
+<p>Decide <strong>End of Injection</strong> or <strong>Start of Injection</strong> before you tune the injection angle table
+(chapter 38), and do not change it afterwards. The same table would then place every squirt
+somewhere else.</p>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>What sets it</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1651</strong></td>
+<td>Config: invalid firing order (duplicate or missing cylinder)</td>
+<td>The firing order the ECU has applied does not name each cylinder from 1 to Cylinders exactly once. The ECU will not fire while it is set.</td>
+<td>The Firing Order table; ORDER OK on Cylinders &amp; Firing; a Cylinders value changed by hand. Clears when a valid order is applied at the next stop.</td>
+</tr>
+<tr>
+<td><strong>P1653</strong></td>
+<td>Config: a cylinder in the firing order has no coil output</td>
+<td>A cylinder in the order has no IGN output row serving it</td>
+<td>The IGN output pages (chapter 18). Change Ignition Mode or Cylinders to have the studio lay the coils out again.</td>
+</tr>
+<tr>
+<td><strong>P1654</strong></td>
+<td>Config: a cylinder in the firing order has no stage 1 injector output</td>
+<td>A cylinder in the order has no stage 1 injector row</td>
+<td>The LS output pages (chapter 18); the Fuel System stages</td>
+</tr>
+</tbody>
+</table>
+<p>All three are raised at severity <strong>level 3</strong> and are judged against the settings the ECU has applied,
+not the ones you are typing. What level 3 does is set in Engine Protection (chapter 29). P1653 and
+P1654 are not checked while the order itself is invalid.</p>
+<!-- src: definition/ecu.schema.yaml; firmware/Engine/EngineTask.cpp -->
+
+<p><strong>Output channels</strong> worth watching:</p>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Label</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine_state</code></td>
+<td>Engine State</td>
+<td>0 STOPPED, 1 CRANKING, 2 RUNNING</td>
+</tr>
+<tr>
+<td><code>firing_order_fault</code></td>
+<td>Firing Order Invalid</td>
+<td>1 while the order as typed is invalid, even before it is applied</td>
+</tr>
+<tr>
+<td><code>sync_level</code></td>
+<td>Sync Level</td>
+<td>0 none, 1 crank, 2 phase (chapter 16)</td>
+</tr>
+<tr>
+<td><code>ign_exec_mask</code></td>
+<td>Ign Execution Mask</td>
+<td>0 while spark is cut, including by Ignition Outputs <em>Off</em></td>
+</tr>
+<tr>
+<td><code>inj_exec_mask</code></td>
+<td>Inj Execution Mask</td>
+<td>0 while fuel is cut, including by Injector Outputs <em>Off</em></td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/ecu.schema.yaml; firmware/Engine/EngineTask.cpp -->
+
+<figure>
+<p><img alt="The Spark Hardware panel with Ignition Outputs set to Off and an orange warning line: OFF, no coil will fire, and this survives a reset" src="../img/studio/engine-vehicle-ign-off.png" />
+  </p>
+<figcaption>Figure 15.12 — With Ignition Outputs off, the page says so in orange. Fuel System shows
+  the same line for Injector Outputs.</figcaption>
+</figure>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cranks, syncs, no spark and no fuel at all</td>
+<td>Firing order empty or invalid (P1651)</td>
+<td>ORDER OK on Cylinders &amp; Firing; the DTC list</td>
+</tr>
+<tr>
+<td>Cranks, no spark, fuel is fine</td>
+<td><strong>Ignition Outputs</strong> off; a cylinder with no coil (P1653)</td>
+<td>The orange warning on Ignition System; <code>ign_exec_mask</code>; the IGN output pages</td>
+</tr>
+<tr>
+<td>Cranks, no fuel, spark is fine</td>
+<td><strong>Injector Outputs</strong> off; no stage 1 injector (P1654)</td>
+<td>The orange warning on Fuel System; <code>inj_exec_mask</code>; the LS output pages</td>
+</tr>
+<tr>
+<td>Runs, but rough and pops, one or more cylinders dead</td>
+<td>Firing order wrong but valid; the engine numbers its cylinders differently from the source you used</td>
+<td>The engine's own numbering; <strong>Tools ▸ Engine Cycle</strong></td>
+</tr>
+<tr>
+<td>ORDER BAD after changing Cylinders</td>
+<td>The order still holds the old count's entries</td>
+<td>Pick the order from Known Engines, or fill in every row</td>
+</tr>
+<tr>
+<td>New firing order or cylinder count seems ignored</td>
+<td>The engine has not stopped since the change (possible from Lua or another tool; the studio greys these settings out while the engine turns)</td>
+<td>Stop the engine; the scheduler applies the change at the next stop</td>
+</tr>
+<tr>
+<td>TDC Angle column shows old or zero values</td>
+<td>Offline, or the engine has not stopped since the change</td>
+<td>Connect and stop the engine; the ECU recomputes and the studio reads them back</td>
+</tr>
+<tr>
+<td>TDC angles typed by hand keep changing back</td>
+<td><strong>Odd-Fire Engine</strong> is off, so the ECU overwrites them</td>
+<td>Tick Odd-Fire Engine if the engine really is odd-fire</td>
+</tr>
+<tr>
+<td><code>engine_state</code> shows RUNNING while the engine is still only on the starter</td>
+<td>Cranking Threshold below cranking speed</td>
+<td>Log <code>rpm</code> while cranking; raise the threshold, burn, reset</td>
+</tr>
+<tr>
+<td>Changed Cranking Threshold has no effect</td>
+<td>It is only read when the ECU starts</td>
+<td>Burn, then <strong>Reset ECU</strong></td>
+</tr>
+<tr>
+<td>Knock band wrong for the engine</td>
+<td>Bore not entered (0 or 10 mm or less)</td>
+<td><strong>Bore</strong>, or set Knock Frequency directly (chapter 30)</td>
+</tr>
+<tr>
+<td>Rotary fuelling far off, or faces firing in the wrong place</td>
+<td>Cylinders set to the rotor count instead of the face count, or Engine Cycle not Rotary</td>
+<td>Cylinders = 3 × rotors; Engine Cycle = Rotary; firing order as in Example 4</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<p>Every Engine and Vehicle setting, generated from the definition the studio loads. The per-cylinder
+tables (<strong>Firing Order</strong>, <strong>Bank</strong>, <strong>TDC Angle</strong>) and the <strong>Injection Stages</strong> rows are explained
+in <em>How it works</em> and <em>Setting it up</em> above.</p>
+<h3 id="engine">Engine<a class="headerlink" href="#engine" title="Permanent link">&para;</a></h3>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cylinders</strong><br><code>engine.cylinder_count</code><br>Range: 1 to 12<br>Default: 4</td>
+<td>How many cylinders the engine has. It sizes almost everything downstream — the per-cylinder tables, the trim scopes, the misfire codes — so it is one of the first things to get right and one of the worst to get wrong quietly.</td>
+</tr>
+<tr>
+<td><strong>Bore</strong><br><code>engine.bore_mm</code><br>Range: 0.0 to 200.0<br>Default: 0.0<br>Units: mm</td>
+<td>Cylinder bore. Used for the knock band: with Knock Frequency at 0 the band centre is derived from it (900 / (pi x bore/2) kHz — about 6.7 kHz for an 86 mm bore), because the ringing frequency of a knocking cylinder follows its bore. 0 = not entered, and the knock band then sits at a generic 7 kHz.</td>
+</tr>
+<tr>
+<td><strong>Displacement</strong><br><code>engine.displacement</code><br>Range: 1 to 30000<br>Default: 2000<br>Units: cc</td>
+<td>Total engine swept volume. The speed-density air model uses it — per-cylinder swept volume = displacement / cylinders.</td>
+</tr>
+<tr>
+<td><strong>Engine Cycle</strong><br><code>engine.cycle_type</code><br>Range: one of: Two-Stroke (360°), Four-Stroke (720°), Rotary (1080°)<br>Default: Four-Stroke (720°)</td>
+<td>How many crank degrees one complete engine cycle takes, which is the span every angle in the tune is expressed in. FOUR-STROKE is 720°, TWO-STROKE 360°, ROTARY 1080°. It also sets the default repeat rate for a crank-mounted trigger stream, so changing it moves the trigger decode as well as the scheduling.</td>
+</tr>
+<tr>
+<td><strong>Ignition Mode</strong><br><code>engine.ign_mode</code><br>Range: one of: Single Coil (distributor), Wasted Spark, Coil-on-Plug<br>Default: Wasted Spark</td>
+<td>How the COILS are wired. The studio lays out the coil outputs from it (IGN1 = cylinder 1 and so on) whenever it changes; the pin pages are where they are then read or changed. WASTED SPARK: each coil output names ONE cylinder and also fires that cylinder's companion — the cylinder half an engine cycle away, taken from the firing order at run time, so a changed firing order never moves an output. It needs only crank sync. COIL-ON-PLUG needs cam PHASE sync to fire sequentially (before phase it fires companion pairs together). DISTRIBUTOR is one coil for every cylinder. A rotary's trailing plug comes from the engine cycle, not from here.</td>
+</tr>
+<tr>
+<td><strong>Odd-Fire Engine</strong><br><code>engine.odd_fire</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>Even-fire (0): every cylinder's TDC is COMPUTED from the firing order — position × cycle / cylinders — and the ECU writes it back into each cylinder's tdc_angle (studio shows the computed angle greyed out). Odd-fire (1): the engine does NOT fire at even intervals, so each cylinder's tdc_angle is directly editable instead. Injection mode and squirt count are NOT here — they are per injection stage (see inj_stage).</td>
+</tr>
+<tr>
+<td><strong>Number of Injection Stages</strong><br><code>engine.num_inj_stages</code><br>Range: 1 to 4<br>Default: 1</td>
+<td>How many injection stages are active. Only inj_stage[0 .. num_inj_stages-1] are built and claimed; higher entries are ignored whatever they hold. Stage 1 is the primary; a second stage is the staged secondary; 3 and 4 are further stages.</td>
+</tr>
+<tr>
+<td><strong>Injector Timing Method</strong><br><code>engine.injector_timing_method</code><br>Range: one of: End of Injection, Start of Injection<br>Default: End of Injection</td>
+<td>What the injection firing angle refers to (injector timing method). END OF INJECTION (default): the angle is where the pulse CLOSES, so the firmware opens the injector a pulse-width of angle earlier so it finishes on the set angle — the fuel lands at a fixed point regardless of how long the pulse is. START OF INJECTION: the angle is where the pulse OPENS, and it closes a pulse-width later. End is the common choice because it keeps the delivered charge's end point steady as pulse width grows with load.</td>
+</tr>
+<tr>
+<td><strong>Cranking Threshold</strong><br><code>engine.cranking_rpm</code><br>Range: 100 to 2000<br>Default: 400<br>Units: RPM</td>
+<td>CRANKING-&gt;RUNNING. Above this RPM the engine has caught and is running (anchors post-start).</td>
+</tr>
+<tr>
+<td><strong>Ignition Outputs</strong><br><code>engine.ign_enable</code><br>Range: one of: Off, On<br>Default: On</td>
+<td>Off stops every coil firing, the same way a rev limiter's spark cut does. For cranking with no spark — checking fuel delivery, or clearing a flooded engine. It SURVIVES A RESET, so an engine that cranks and will not start is worth checking here first.</td>
+</tr>
+<tr>
+<td><strong>Injector Outputs</strong><br><code>engine.inj_enable</code><br>Range: one of: Off, On<br>Default: On</td>
+<td>Off stops every injector opening, the same way an overrun fuel cut does. For cranking with no fuel — checking for spark, or building oil pressure on a fresh engine. It SURVIVES A RESET, so an engine that cranks and will not start is worth checking here first.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vehicle">Vehicle<a class="headerlink" href="#vehicle" title="Permanent link">&para;</a></h3>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Make</strong><br><code>vehicle.Make</code><br>Range: 0 to 255<br>Default: 0</td>
+<td>Vehicle manufacturer. Documentation only — nothing in the firmware reads any of these fields. They travel with the tune so a saved file identifies the car it belongs to, which matters as soon as there is more than one.</td>
+</tr>
+<tr>
+<td><strong>Model</strong><br><code>vehicle.Model</code><br>Range: 0 to 255<br>Default: 0</td>
+<td>Vehicle model. Documentation only; see Make.</td>
+</tr>
+<tr>
+<td><strong>Engine</strong><br><code>vehicle.Engine</code><br>Range: 0 to 255<br>Default: 0</td>
+<td>Engine designation — the thing most worth recording, since a tune is far more specific to the engine than to the body it sits in. Documentation only.</td>
+</tr>
+<tr>
+<td><strong>Notes</strong><br><code>vehicle.Notes</code><br>Range: 0 to 255<br>Default: 0</td>
+<td>Free text about this vehicle or tune. Documentation only, and the right place for what a future reader would otherwise have to guess: what was changed, what is known-marginal, what was never tested.</td>
+</tr>
+<tr>
+<td><strong>VIN</strong><br><code>vehicle.VIN</code><br>Range: 0 to 255<br>Default: 0</td>
+<td>Vehicle identification number. Documentation only — it is not checked against anything and does not gate any function.</td>
+</tr>
+<tr>
+<td><strong>Name</strong><br><code>vehicle.Name</code><br>Range: 0 to 255<br>Default: 0</td>
+<td>A short name for this vehicle, for telling saved tunes apart at a glance. Documentation only.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../part1/05-first-connection.html">Chapter 5 — First connection</a></li>
+<li><a href="16-trigger.html">Chapter 16 — The trigger system</a>: the reference every TDC angle is measured from</li>
+<li><a href="18-outputs.html">Chapter 18 — Outputs and the pin system</a>: the coil and injector outputs these settings lay out</li>
+<li><a href="19-fuel.html">Chapter 19 — Fuel</a>: injector data and the fuel tables for each stage</li>
+<li><a href="20-ignition.html">Chapter 20 — Ignition</a>: advance, dwell and fixed timing</li>
+<li><a href="23-lambda.html">Chapter 23 — Closed-loop lambda</a>: per-bank correction</li>
+<li><a href="29-protection.html">Chapter 29 — Engine protection</a>: what a level 3 fault does</li>
+<li><a href="30-knock.html">Chapter 30 — Knock</a>: the knock band and the bore</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="index.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Index">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Index
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="16-trigger.html" class="md-footer__link md-footer__link--next" aria-label="Next: 16 The trigger system">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                16 The trigger system
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

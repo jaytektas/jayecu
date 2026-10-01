@@ -1,0 +1,3939 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part1/04-studio-tour.html">
+      
+      
+        <link rel="prev" href="03-installing-studio.html">
+      
+      
+        <link rel="next" href="05-first-connection.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>4 A tour of the studio - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#a-tour-of-the-studio" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              4 A tour of the studio
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="04-studio-tour.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Concepts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-landing-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The landing page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projects-tunes-and-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Projects, tunes and definitions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-navigation-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The navigation tree
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pages-surfaces-and-tabs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pages, surfaces and tabs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#locked-and-editing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Locked and Editing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-an-edit-goes-ram-flash-and-the-file-on-your-pc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where an edit goes: RAM, flash, and the file on your PC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-toolbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The toolbar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-notice-strip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The notice strip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-status-bar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The status bar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#procedure-a-first-walk-round-the-studio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procedure: a first walk round the studio
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls-and-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls and troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#menu-and-toolbar-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Menu and toolbar reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Menu and toolbar reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#view" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Help
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#toolbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Toolbar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part3/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="a-tour-of-the-studio">A tour of the studio<a class="headerlink" href="#a-tour-of-the-studio" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<blockquote>
+<p><strong>In one sentence:</strong> jayecu Studio is the program on your PC that shows what the ECU is doing and
+changes its tune. This chapter names every part of its window and says what each menu item and
+button does, and when it is available.</p>
+</blockquote>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>The studio does three jobs:</p>
+<ul>
+<li><strong>It shows the engine.</strong> While it is connected, gauges, tables and readouts update as the ECU sends
+  new readings.</li>
+<li><strong>It changes the tune.</strong> The <strong>tune</strong> is the set of settings the ECU runs on: fuel tables, ignition
+  tables, sensor calibrations and so on. You change them on <strong>pages</strong>, and each change is sent to the
+  ECU straight away.</li>
+<li><strong>It keeps your files.</strong> Every ECU the studio has met gets a folder on your PC with its tune, its
+  pages and a history of what was on the ECU each time you connected.</li>
+</ul>
+<p>You do not need an ECU to use the studio. You can open a saved tune, or start a new one, and work on
+it at a desk. Chapter 5 covers connecting.</p>
+<figure>
+<p><img alt="The studio window with ten parts numbered: menu bar, notice strip, toolbar, navigation tree, dock tabs, surface tabs, readout strip, page window, bottom docks and status bar" src="../img/studio/studio-tour-anatomy.svg" />
+  </p>
+<figcaption>Figure 4.1 — The studio window, offline, with the <b>Cylinders &amp; Firing</b> page open.
+  The numbers match the list below.</figcaption>
+</figure>
+<ol>
+<li><strong>Menu bar:</strong> File, Edit, View, Library, Tools, Logging, Help. Every item is listed in
+   <a href="#menu-and-toolbar-reference">Menu and toolbar reference</a>.</li>
+<li><strong>Notice strip:</strong> a red or amber line that stays up for as long as something important is true,
+   such as <strong>NOT CONNECTED</strong>, <strong>KEY OFF</strong> or <strong>NO TUNE ON THE ECU</strong>.</li>
+<li><strong>Toolbar:</strong> <strong>Locked</strong>/<strong>Editing</strong>, the connection chip, <strong>Burn</strong>, <strong>Reset ECU</strong>, <strong>Record</strong> and
+   <strong>Verify ↔ ECU</strong>.</li>
+<li><strong>Navigation tree:</strong> every page of the tune, in folders. Click a name to open its page.</li>
+<li><strong>Dock tabs:</strong> the side strip that switches between the panels sharing that side of the window
+   (here <strong>Navigation</strong> and <strong>Trigger Library</strong>).</li>
+<li><strong>Surface tabs:</strong> your workspaces. Each tab has its own instruments and remembers which page it had
+   open.</li>
+<li><strong>Readout strip:</strong> live values across the top of the <strong>Main</strong> tab.</li>
+<li><strong>Page window:</strong> the page you opened from the tree. It has its own title bar, with maximise and
+   close buttons.</li>
+<li><strong>Bottom docks:</strong> <strong>Status Lamps</strong> and <strong>Diagnostics</strong> (the ECU's own text console and Lua errors).</li>
+<li><strong>Status bar:</strong> messages on the left. While connected, a live summary of the link on the right.</li>
+</ol>
+<!-- src: apps/studio-jf/main.cpp (menu order) (toolbar order) (dock areas) (page windows over the surface tabs); definition/boards/jaytek_v1.dashboard.gui (tabs Main, Idle Control, Boost Control, Diagnostics) -->
+
+<h2 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="the-landing-page">The landing page<a class="headerlink" href="#the-landing-page" title="Permanent link">&para;</a></h3>
+<p>When no ECU project is open, the centre of the window shows three choices:</p>
+<ul>
+<li><strong>Connect to an ECU:</strong> look for an ECU on the USB ports and open its project (chapter 5).</li>
+<li><strong>Create a new tune:</strong> start a tune offline, from a definition (the same as <strong>File ▸ New Tune…</strong>).</li>
+<li><strong>Open an existing ECU:</strong> pick one of the ECUs the studio already knows (the same as
+  <strong>File ▸ Open ECU…</strong>).</li>
+</ul>
+<p>The landing stays up until a project has actually opened. If you cancel a picker, you are back where
+you started. <strong>File ▸ Close ECU</strong> brings the landing back.</p>
+<!-- src: apps/studio-jf/src/ui/LandingView.h; apps/studio-jf/main.cpp (landing stays until a project opens) (Close ECU returns to it) -->
+
+<figure>
+<p><img alt="The landing page: the jaytek logo above three cards, Connect to an ECU, Create a new tune and Open an existing ECU" src="../img/studio/studio-tour-landing.png" />
+  </p>
+<figcaption>Figure 4.2 — The landing page, shown whenever no project is open.</figcaption>
+</figure>
+<h3 id="projects-tunes-and-definitions">Projects, tunes and definitions<a class="headerlink" href="#projects-tunes-and-definitions" title="Permanent link">&para;</a></h3>
+<p>Three words come up throughout the studio:</p>
+<ul>
+<li><strong>ECU project:</strong> everything the studio keeps for one ECU, in a folder named after the ECU's serial
+  number (its <strong>uid</strong>): its tunes, its pages and navigation tree, and its connect points. A tune started
+  offline gets a project of its own too.</li>
+<li><strong>Tune:</strong> one named set of settings for that ECU, stored as a <code>.tune</code> file. An ECU project can hold
+  several; the studio remembers which one you had open.</li>
+<li><strong>Definition</strong> (the studio also calls it a <strong>schema</strong> or <strong>meta</strong>): the file that describes a firmware
+  version: every setting's name, units, range and position, and every live channel. The studio needs
+  the right definition to read a tune at all. It matches them by the <strong>layout hash</strong>, a short code that
+  changes whenever the firmware's settings layout changes.</li>
+</ul>
+<p>The folders live in your user data folder: <code>~/.local/share/jayecu/jayecu Studio/</code> on Linux,
+<code>%APPDATA%\jayecu\jayecu Studio\</code> on Windows. ECU projects are under <code>ecus/</code>, definitions under
+<code>meta/</code> and studio recordings under <code>datalogs/</code>. Chapter 48 covers the files in detail.</p>
+<!-- src: apps/studio-jf/src/model/StudioPaths.cpp; apps/studio-jf/src/model/Ecu.cpp (ecus/<uid>, tunes/, restore/, dashboard.gui); apps/studio-jf/main.cpp (definition found by layout_hash); apps/studio-jf/src/model/DatalogRecorder.cpp -->
+
+<h3 id="the-navigation-tree">The navigation tree<a class="headerlink" href="#the-navigation-tree" title="Permanent link">&para;</a></h3>
+<p>The tree on the left lists every page, grouped in folders: <strong>Configuration ▸ Fuel Tuning ▸ VE Table</strong>,
+and so on. A name that underlines when you point at it has a page behind it; click it and the page
+opens. A folder with no page of its own only expands.</p>
+<!-- src: apps/studio-jf/main.cpp (selection opens the page; hyperlink when the node owns a non-empty page) -->
+
+<p><strong>The tree shows only what this tune uses.</strong> A page that belongs to a feature is listed only while that
+feature is switched on. <strong>Boost Control</strong> appears under <strong>Engine Functions</strong> once boost control is
+enabled, <strong>Launch Control</strong> once launch is enabled, and so on. A node shown because its feature is on
+carries a small orange grid icon. The tree updates the moment the setting changes.</p>
+<!-- src: apps/studio-jf/main.cpp (applyNodeConditions: a failing condition hides the node and its subtree) (re-filtered on every config load and value change); apps/studio-jf/src/ui/NavTree.cpp (a node with a condition gets icon 1); definition/boards/jaytek_v1.dashboard.gui (tree conditions, e.g. Boost Control => boost.enabled) -->
+
+<p><strong>To reach a page that is hidden, type in the Filter box</strong> above the tree. A search also finds hidden
+pages and shows them dimmed. Open the page, switch the feature on, and the page joins the tree.</p>
+<!-- src: apps/studio-jf/main.cpp (JTreeView's search reveals a hidden match, drawn dim, still selectable) (Filter… box) -->
+
+<p>Right-click the tree for <strong>Expand All</strong>, <strong>Collapse All</strong>, <strong>Expand</strong> and <strong>Collapse</strong>. In Editing mode
+the same menu also changes the tree itself (chapter 49).</p>
+<!-- src: apps/studio-jf/main.cpp -->
+
+<figure>
+<p><img alt="The navigation tree with Configuration expanded and Cylinders &amp; Firing selected" src="../img/studio/studio-tour-navtree.png" />
+  </p>
+<figcaption>Figure 4.3 — The navigation tree. <b>Stage 1</b>, <b>Transient Throttle</b> and
+  <b>Lua Scripting</b> carry the orange icon: they are listed because their feature is on in this tune.
+  Pages for features that are off, such as <b>O2 Control</b>, are not listed.</figcaption>
+</figure>
+<h3 id="pages-surfaces-and-tabs">Pages, surfaces and tabs<a class="headerlink" href="#pages-surfaces-and-tabs" title="Permanent link">&para;</a></h3>
+<p>A <strong>page</strong> is one screen of settings and readouts, such as <strong>Cylinders &amp; Firing</strong> or <strong>VE Table</strong>. It
+opens in a <strong>page window</strong> in the middle of the studio, with its name in the window's title bar. The
+window can be maximised, or closed with its <strong>×</strong>.</p>
+<!-- src: apps/studio-jf/main.cpp (openPage: one page window, titled with the node name) -->
+
+<p>Behind the page window is a <strong>surface</strong>: a workspace with its own live instruments. The shipped layout
+for the jaytek_v1 board has four surfaces open as tabs: <strong>Main</strong>, <strong>Idle Control</strong>, <strong>Boost Control</strong>
+and <strong>Diagnostics</strong>.</p>
+<!-- src: definition/boards/jaytek_v1.dashboard.gui (surfaces.pool, open = [0, 3, 4, 5]) -->
+
+<p><strong>Each tab remembers its own page.</strong> Open the VE table on <strong>Main</strong>, switch to <strong>Idle Control</strong>, and the
+idle tab shows its own page. Switch back and <strong>Main</strong> shows the VE table again. The first time you
+visit a tab it opens on the page it was made for. Closing a tab's page window makes that tab forget
+it, so the tab comes back empty until you open another page on it.</p>
+<!-- src: apps/studio-jf/main.cpp (g_tabPage; closing forgets) (tabChanged: the tab's own page, or its default page) -->
+
+<p>A tab that is all instruments, such as <strong>Diagnostics</strong>, does not take page windows. If you pick a page
+in the tree while it is in front, the page opens on a tab that does take pages.</p>
+<!-- src: apps/studio-jf/main.cpp (showTabTakingPages) -->
+
+<p><strong>Diagnostics</strong> shows every live channel the ECU sends, one subject at a time: pick the view (<strong>Engine
+&amp; Trigger</strong>, <strong>Fuel</strong>, <strong>Spark</strong>, <strong>Outputs &amp; Bridges</strong>, …) from the chooser at its top. On <strong>Outputs &amp;
+Bridges</strong> each output pin reads what it is doing: a Generic output reads <strong>HI</strong> or <strong>LOW</strong> when it is
+digital and its duty in % when it is PWM, and a pin that is not a Generic output reads what it is
+instead: <strong>Coil</strong>, <strong>Injector</strong> or <strong>Unused</strong>.</p>
+<!-- src: apps/studio-jf/tools/layout/diag_page.py (VIEWS); apps/studio-jf/src/surface/CanvasWidget.cpp (digitalOutState) -->
+
+<p>The <strong>Main</strong> tab is always there. Other tabs can be closed with their <strong>×</strong>; a closed tab is kept and
+can be brought back with <strong>View ▸ Reopen Surface…</strong>. <strong>View ▸ New Surface Tab</strong> adds an empty one, and
+<strong>View ▸ Delete Surface…</strong> removes one for good. Double-click a tab's name (or press F2) to rename it.
+Building your own surfaces is chapter 49.</p>
+<!-- src: apps/studio-jf/src/surface/SurfaceTabs.cpp; apps/studio-jf/main.cpp -->
+
+<p>The tools in the <strong>Tools</strong> menu (Trigger Designer, Engine Cycle, Trigger Log, Knock Scope, Auto Tune)
+open as tabs of their own in the same strip.</p>
+<!-- src: apps/studio-jf/main.cpp (openToolTab) -->
+
+<h3 id="docks">Docks<a class="headerlink" href="#docks" title="Permanent link">&para;</a></h3>
+<p>The panels round the edge of the window are <strong>docks</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Dock</th>
+<th>Where it starts</th>
+<th>What it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Navigation</strong></td>
+<td>left</td>
+<td>the navigation tree</td>
+</tr>
+<tr>
+<td><strong>Trigger Library</strong></td>
+<td>left</td>
+<td>the trigger wheels you can pick from (chapter 16)</td>
+</tr>
+<tr>
+<td><strong>Diagnostic Trouble Codes</strong></td>
+<td>right</td>
+<td>active and stored fault codes, refreshed once a second while connected (chapter 44)</td>
+</tr>
+<tr>
+<td><strong>Status Lamps</strong></td>
+<td>bottom</td>
+<td>a grid of on/off lamps from the layout</td>
+</tr>
+<tr>
+<td><strong>Diagnostics</strong></td>
+<td>bottom</td>
+<td><strong>ECU Console</strong> (the ECU's own text output) and <strong>Lua Errors</strong></td>
+</tr>
+<tr>
+<td><strong>Dictionary</strong>, <strong>Controls</strong></td>
+<td>left, Editing mode only</td>
+<td>every setting and channel; the widgets you can place on a page</td>
+</tr>
+<tr>
+<td><strong>Properties</strong></td>
+<td>right, Editing mode only</td>
+<td>the settings of the selected widget</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (areas) (DTC dock; 1 Hz poll) (status lamps, diagnostics) (edit-only panels) -->
+
+<p>Docks that share a side of the window sit on tabs; click the side strip to switch between them. Close
+a dock with its <strong>×</strong>, or tick and untick it in the <strong>View</strong> menu. The <strong>View</strong> ticks always match what
+is on screen, and a dock you show again returns to where you last had it. Which edge each side's tab
+strip sits on, and whether a side is used at all, are set in <strong>Edit ▸ Preferences… ▸ Appearance</strong>.</p>
+<!-- src: apps/studio-jf/main.cpp (dock homes, View toggles) (ticks follow placement) (Appearance ▸ Docks) -->
+
+<h3 id="locked-and-editing">Locked and Editing<a class="headerlink" href="#locked-and-editing" title="Permanent link">&para;</a></h3>
+<p>The first button on the toolbar switches the studio between two modes. The studio always starts in
+<strong>Locked</strong>.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Locked</strong> (the button reads <em>Locked</em>)</th>
+<th><strong>Editing</strong> (the button is orange and reads <em>Editing</em>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What you are doing</td>
+<td>using the pages: reading values, changing the tune</td>
+<td>changing the pages themselves: moving and adding widgets, reorganising the tree</td>
+</tr>
+<tr>
+<td>The tune</td>
+<td>you can change it; changes go to the ECU</td>
+<td>locked: values cannot be changed</td>
+</tr>
+<tr>
+<td>The tree</td>
+<td>only the pages this tune uses</td>
+<td>every node, plus <strong>New node…</strong> rows to add more</td>
+</tr>
+<tr>
+<td>Docks</td>
+<td>Navigation, Trigger Library, DTCs, Status Lamps, Diagnostics</td>
+<td>the same, plus Dictionary, Controls and Properties</td>
+</tr>
+<tr>
+<td>Notice strip</td>
+<td>shown</td>
+<td>hidden</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (lockBtn: Cache::setReadOnly(editing)) (onSetEditMode: tree editable, placeholders, docks, run/edit layouts) (starts in run mode); apps/studio-jf/main.cpp (notice strip is run mode only) -->
+
+<p>Each mode remembers its own arrangement of docks, so the extra panels you open for editing do not
+clutter the screen you tune from.</p>
+<!-- src: apps/studio-jf/main.cpp (runLayout / editLayout captured and restored) -->
+
+<figure>
+<p><img alt="The studio in Editing mode: the Controls dock on the left lists widget types, the Properties dock on the right shows the surface canvas settings, and the Locked button reads Editing" src="../img/studio/studio-tour-editing.png" />
+  </p>
+<figcaption>Figure 4.4 — Editing mode. The toolbar button is orange and reads <b>Editing</b>; the
+  <b>Controls</b> dock (left) and <b>Properties</b> dock (right) have appeared.</figcaption>
+</figure>
+<div class="admonition warning">
+<p class="admonition-title">Editing locks the tune</p>
+<p>If a value will not change when you type in it, look at the first toolbar button. In <strong>Editing</strong>
+mode the tune is read-only. Click the button to go back to <strong>Locked</strong>.</p>
+</div>
+<h3 id="where-an-edit-goes-ram-flash-and-the-file-on-your-pc">Where an edit goes: RAM, flash, and the file on your PC<a class="headerlink" href="#where-an-edit-goes-ram-flash-and-the-file-on-your-pc" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>This is the most important idea in the studio. When you change a value on a page while connected:</p>
+<ol>
+<li>The studio's copy of the tune changes.</li>
+<li>The change is sent to the ECU <strong>straight away</strong> and lands in the ECU's <strong>RAM</strong>. The engine runs on
+   it from that moment.</li>
+<li>It is <strong>not</strong> in the ECU's <strong>flash</strong> memory yet. If the ECU loses power or is reset now, it starts
+   up on the tune that is in flash, and the change is gone from the ECU.</li>
+<li><strong>Burn</strong> copies the tune from RAM into flash. Only then does it survive a power cycle.</li>
+</ol>
+<!-- src: apps/studio-jf/main.cpp (edits reach RAM at once, flash only on burn; tuneburn::pending reads config_dirty); firmware/Comms/CommsManager.cpp (config_dirty = generation != saved generation) -->
+
+<p>Separately, the studio saves its copy to the <strong>tune file</strong> on your PC when you choose
+<strong>File ▸ Save Tune</strong>, when you disconnect, when you switch to another ECU and when you quit. So the
+file on your PC and the ECU's flash are two different things: a burn does not save the file, and
+saving the file does not burn.</p>
+<!-- src: apps/studio-jf/main.cpp (switching ECU) (Save Tune) (disconnect) (switching project) (close) -->
+
+<figure>
+<p><img alt="Diagram: an edit goes to the studio's copy, then at once to ECU RAM, and to ECU flash only on Burn. The studio's copy is written to the tune file on the PC. Verify compares ECU RAM with the studio's copy. The ECU's tune at connect is kept as a connect point." src="../img/diagrams/studio-tour-edit-path.svg" />
+  </p>
+<figcaption>Figure 4.5 — Where an edit goes. Orange is the ECU; the red path is what a power cycle
+  does to changes that were never burned; green is the check <b>Verify ↔ ECU</b> makes.</figcaption>
+</figure>
+<p>Two more copies appear in Figure 4.5:</p>
+<ul>
+<li><strong>Verify ↔ ECU</strong> reads the whole tune back from the ECU, compares it byte for byte with the
+  studio's copy, and sends again any part that differs. The status bar reports either
+  <em>Verify: ECU matches the project tune</em> or <em>Verify: re-pushed N byte(s) to the ECU</em>. On a jayecu ECU
+  a re-push goes to RAM, so burn afterwards.</li>
+<li>A <strong>connect point</strong> is the ECU's tune exactly as it was read when you connected. It is kept on your
+  PC, and <strong>Edit ▸ Restore Tune to Connect Point</strong> sends it back to the ECU. Chapter 5 explains
+  connect points.</li>
+</ul>
+<!-- src: apps/studio-jf/main.cpp (Verify button) (native verify: read, diff, writeConfig of divergent runs, no burn) (connect point restore file) (Restore Tune to Connect Point) -->
+
+<h3 id="the-toolbar">The toolbar<a class="headerlink" href="#the-toolbar" title="Permanent link">&para;</a></h3>
+<figure>
+<p><img alt="The toolbar under the red NOT CONNECTED notice: Locked, the grey connection chip, Burn, Reset ECU, Record and Verify ↔ ECU, with the last four greyed out" src="../img/studio/studio-tour-toolbar.png" />
+  </p>
+<figcaption>Figure 4.6 — The notice strip and toolbar, offline. With no ECU connected, Burn, Reset ECU,
+  Record and Verify are greyed out.</figcaption>
+</figure>
+<ul>
+<li><strong>Locked / Editing:</strong> switches mode (above).</li>
+<li><strong>The connection chip:</strong> click it to connect; click it again to disconnect. Its ring shows the state
+  of the link (Figure 4.7).</li>
+<li><strong>Burn:</strong> writes the tune in the ECU's RAM to its flash. It is only enabled when there is something
+  to burn. The ECU itself reports whether RAM and flash differ, so the button also lights for changes
+  the studio did not make (an autotune run on the ECU, for example). Before burning, the studio sends
+  any edit it is still holding back. The button turns green only once the ECU reports that flash has
+  the tune; if that has not happened within 8 seconds, the dot stays amber.</li>
+<li><strong>Reset ECU:</strong> restarts the ECU through its own <code>reset</code> command. The ECU first waits, for up to 4
+  seconds, for a burn in progress to reach flash. Changes that were never burned are lost, and the
+  status bar says so.</li>
+<li><strong>Record:</strong> starts and stops a recording of every live channel to a file on your PC (the same as
+  <strong>Logging ▸ Start/Stop Recording</strong>). The button reads <strong>Stop</strong> while recording.</li>
+<li><strong>Verify ↔ ECU:</strong> the check described above.</li>
+</ul>
+<!-- src: apps/studio-jf/main.cpp (Burn: flushWrites, awaiting config_dirty, 8 s give-up, 250 ms poll) (pending = config_dirty) (Reset ECU) (reset message) (Record); firmware/Cli/CliCommands.cpp (reset waits up to 4 s); apps/studio-jf/src/ui/BurnButton.h -->
+
+<figure>
+<p><img alt="Diagram: the connection chip in four states, grey, amber turning, green and red with a broken ring; and the Burn button in four states, hollow grey, amber dot and edge, hollow green ring and solid green" src="../img/diagrams/studio-tour-indicators.svg" />
+  </p>
+<figcaption>Figure 4.7 — The two indicators on the toolbar. The chip says whether the studio is talking
+  to an ECU; the Burn button says whether the ECU's flash has your changes.</figcaption>
+</figure>
+<!-- src: apps/studio-jf/src/ui/ConnectButton.h (grey idle, amber spinner, green, red with a break); apps/studio-jf/src/ui/BurnButton.h (dot states, amber edge, green for 2.2 s) -->
+
+<h3 id="the-notice-strip">The notice strip<a class="headerlink" href="#the-notice-strip" title="Permanent link">&para;</a></h3>
+<p>Between the menu bar and the toolbar, a strip stays up while one of these is true. It shows in
+Locked mode only.</p>
+<table>
+<thead>
+<tr>
+<th>Notice</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NOT CONNECTED</strong> (red)</td>
+<td>No ECU is on the link. Any readings on screen are the last values received, not live ones.</td>
+</tr>
+<tr>
+<td><strong>NO TUNE ON THE ECU</strong> (red)</td>
+<td>The ECU started without a valid tune, so it is not running and every reading but the battery is 0. Put a tune on it, burn, and press <strong>Reset ECU</strong> (chapter 47).</td>
+</tr>
+<tr>
+<td><strong>KEY OFF</strong> (amber)</td>
+<td>The ECU is powered from USB alone, with the ignition off. Only the battery voltage is read; other sensor readings and calibrations wait for 12 V.</td>
+</tr>
+<tr>
+<td><strong>IGNITION DISABLED</strong>, <strong>INJECTORS DISABLED</strong>, or both (amber)</td>
+<td>The ignition or injector outputs are switched off in the engine configuration. The engine will crank but not start until they are switched back on (chapter 15).</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (refreshLinkOverlay: NOT CONNECTED, NO TUNE from no_tune, KEY OFF from key_on, outputGateNotice: engine.ign_enable / engine.inj_enable) -->
+
+<h3 id="the-status-bar">The status bar<a class="headerlink" href="#the-status-bar" title="Permanent link">&para;</a></h3>
+<p>The left of the status bar shows the latest message: <em>Ready</em> at start-up, <em>Connected: jaytek_v1 · …</em>
+once an ECU has identified itself, <em>Disconnected</em>, and short reports from whatever you just did.</p>
+<p>While readings are arriving, the right-hand side shows a live summary of the link:</p>
+<ul>
+<li><strong>● N frames · R Hz:</strong> how many readings have arrived and how many per second. If none arrives for
+  more than 1.5 seconds it changes to <strong>○ no telemetry for T s</strong>, so a frozen link cannot pass for a
+  steady engine.</li>
+<li>On a jayecu ECU it adds the definition's layout hash, engine speed (<strong>rpm</strong>), coolant temperature
+  (<strong>clt</strong>), and the state of the Lua script: <strong>Lua OK</strong>, <strong>Lua Disabled</strong>, or <strong>Lua Load Err</strong> /
+  <strong>Lua Run Err</strong> with the script line number (chapter 35).</li>
+</ul>
+<!-- src: apps/studio-jf/main.cpp (setLiveStatus: frames, Hz, stale > 1500 ms, layout hash, rpm, clt, lua_state 0-3) (Connected: board · uid) -->
+
+<h2 id="procedure-a-first-walk-round-the-studio">Procedure: a first walk round the studio<a class="headerlink" href="#procedure-a-first-walk-round-the-studio" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>You can do all of this without an ECU. It uses a new tune started offline.</p>
+<ol>
+<li><strong>Start the studio.</strong> It opens on the landing page (Figure 4.2), in Locked mode, with <strong>NOT
+   CONNECTED</strong> in the notice strip.</li>
+<li>
+<p><strong>Click Create a new tune.</strong> The <strong>New Tune</strong> dialog asks for a <strong>Tune Name</strong> and a <strong>Schema (ECU
+   firmware layout)</strong>: pick the definition for your ECU's firmware and click <strong>Create</strong>. The studio
+   builds the tune from that definition's defaults and opens it. The window now looks like
+   Figure 4.1.
+   <!-- src: apps/studio-jf/main.cpp (New Tune: offline project keyed by layout hash, seeded with defaults); apps/studio-jf/src/ui/NewTuneDialog.h --></p>
+</li>
+<li>
+<p><strong>Open a page.</strong> In the tree, expand <strong>Configuration ▸ Engine Configuration</strong> and click
+   <strong>Cylinders &amp; Firing</strong>. The page opens in a window over the <strong>Main</strong> tab.</p>
+</li>
+<li><strong>Find a page that is switched off.</strong> Type <code>boost</code> in the <strong>Filter</strong> box. <strong>Boost Control</strong> appears,
+   dimmed. Click it, tick <strong>Enabled</strong> on its page, and clear the filter: <strong>Boost Control</strong> is now in the
+   tree under <strong>Engine Functions</strong>, with the orange icon (Figure 4.8). Untick <strong>Enabled</strong> again if you
+   do not have a turbocharger.</li>
+<li><strong>Change tab.</strong> Click <strong>Idle Control</strong> in the tab strip. It opens on its own page. Click <strong>Main</strong>,
+   and your last page comes back.</li>
+<li><strong>Hide and show a dock.</strong> Untick <strong>View ▸ Diagnostics</strong>; the bottom panel goes. Tick it again and
+   it comes back where it was.</li>
+<li><strong>Try Editing mode.</strong> Click <strong>Locked</strong>. It turns orange and reads <strong>Editing</strong>, and the Controls
+   and Properties docks appear (Figure 4.4). Click it again to return to <strong>Locked</strong>.</li>
+<li><strong>Close the project.</strong> <strong>File ▸ Close ECU</strong> takes you back to the landing page. Your tune was saved
+   as you went; if you changed the layout, the studio asks whether to save it.</li>
+</ol>
+<figure>
+<p><img alt="The navigation tree with Engine Functions expanded and Boost Control selected, marked with the orange icon" src="../img/studio/studio-tour-tree-module.png" />
+  </p>
+<figcaption>Figure 4.8 — With boost control enabled, <b>Boost Control</b> is listed under
+  <b>Engine Functions</b>, carrying the orange icon of a page shown because its feature is on.</figcaption>
+</figure>
+<!-- src: apps/studio-jf/main.cpp (Close ECU) (maybeSaveThen: layout prompt; tune auto-saves) -->
+
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1: checking a customer's tune at a desk</p>
+<p>You have a customer's ECU project on your laptop and no car.</p>
+<ol>
+<li><strong>File ▸ Open ECU…</strong> and pick the ECU from the list. If it has more than one tune, pick one.</li>
+<li>Walk the tree. Only the features this tune uses are listed, so the tree is a quick summary of
+   how the car is set up.</li>
+<li>Any change you make is kept in the studio's copy and written to the tune file when you save,
+   close or quit. It reaches the ECU at the next connection, when the studio shows you the
+   differences and asks which tune to keep (chapter 5).</li>
+</ol>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2: a tuning session at the car</p>
+<ol>
+<li>Connect (chapter 5). Wait for the chip to turn green.</li>
+<li>Press <strong>Record</strong> before you start the engine, so the session is logged.</li>
+<li>Tune. Each change reaches the engine at once, and <strong>Burn</strong> turns amber.</li>
+<li>When you are happy with a set of changes, press <strong>Burn</strong> and wait for the green dot.</li>
+<li>Press <strong>Verify ↔ ECU</strong> before you leave. <em>Verify: ECU matches the project tune</em> means the ECU
+   holds exactly what the studio shows.</li>
+<li>Press <strong>Stop</strong>, then click the chip to disconnect. The tune file is saved as the link closes.</li>
+</ol>
+</div>
+<!-- src: apps/studio-jf/main.cpp (Open ECU list) (tune picker; offline project) (disconnect saves, ends recording) (Burn) (Verify) -->
+
+<h2 id="pitfalls-and-troubleshooting">Pitfalls and troubleshooting<a class="headerlink" href="#pitfalls-and-troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A value will not change when you type in it</td>
+<td>Editing mode</td>
+<td>The first toolbar button: click <strong>Editing</strong> to go back to <strong>Locked</strong></td>
+</tr>
+<tr>
+<td>A menu item is greyed out</td>
+<td>It needs something the studio does not have yet</td>
+<td>See the <em>Available</em> column in the reference below: most need a project open, or a connected ECU</td>
+</tr>
+<tr>
+<td>A menu item you expected is missing</td>
+<td>It does not apply to this kind of ECU</td>
+<td>Tools such as <strong>Knock Scope</strong>, <strong>Trigger Log</strong> and <strong>Reset ECU</strong> are only offered for a jayecu definition, not for an imported TunerStudio one</td>
+</tr>
+<tr>
+<td><strong>File ▸ Close ECU</strong>, <strong>New Tune…</strong> or <strong>Open ECU…</strong> is greyed out</td>
+<td>An ECU is connected, or a connection is starting</td>
+<td>Disconnect first (click the chip)</td>
+</tr>
+<tr>
+<td>A page you know exists is not in the tree</td>
+<td>Its feature is switched off</td>
+<td>Type its name in <strong>Filter</strong>, open it, and switch the feature on</td>
+</tr>
+<tr>
+<td>Changes are gone after the ignition was cycled</td>
+<td>They were never burned</td>
+<td>Watch the <strong>Burn</strong> button: amber means flash does not have your changes</td>
+</tr>
+<tr>
+<td>A tab shows no page</td>
+<td>You closed its page window, so the tab forgot it</td>
+<td>Pick a page in the tree</td>
+</tr>
+<tr>
+<td>A dock has disappeared</td>
+<td>It was closed with its <strong>×</strong></td>
+<td>Tick it in the <strong>View</strong> menu</td>
+</tr>
+<tr>
+<td>The status bar says <strong>○ no telemetry</strong></td>
+<td>The link has stopped delivering readings</td>
+<td>The USB cable and the ECU's power; see chapter 5</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (MenuGate rules) (Editing locks the tune) (tree conditions) (tab forgets a closed page) (stale telemetry) -->
+
+<h2 id="menu-and-toolbar-reference">Menu and toolbar reference<a class="headerlink" href="#menu-and-toolbar-reference" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>The studio offers only what the ECU in front of it can do. An item that does not apply to this kind of
+ECU is not shown at all. An item that applies but cannot be done yet is shown greyed out, and its
+keyboard shortcut does nothing either. The menus are re-checked four times a second, so an item comes
+alive the moment it can be used.</p>
+<!-- src: apps/studio-jf/src/ui/MenuGate.h; apps/studio-jf/main.cpp (shortcuts honour the gate) (rules, applied on the 250 ms housekeeping tick) -->
+
+<p>In the tables, <strong>a project</strong> means an ECU project or tune is open; <strong>connected</strong> means the chip is
+green (the ECU has identified itself and its tune has been read); <strong>offline</strong> means no link is open
+or opening.</p>
+<h3 id="file">File<a class="headerlink" href="#file" title="Permanent link">&para;</a></h3>
+<p>The open ECU's documents: its tunes and its layout.</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Shortcut</th>
+<th>What it does</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>New Tune…</strong></td>
+<td>Ctrl+N</td>
+<td>Starts a tune offline from a definition in the studio's library, with that definition's default values.</td>
+<td>offline</td>
+</tr>
+<tr>
+<td><strong>Open ECU…</strong></td>
+<td>Ctrl+O</td>
+<td>Lists every ECU project the studio knows; pick one, then one of its tunes. An ECU with no saved tune opens on its definition's defaults, named <em>defaults</em>.</td>
+<td>offline</td>
+</tr>
+<tr>
+<td><strong>Open Tune…</strong></td>
+<td>Ctrl+Shift+O</td>
+<td>Lists this ECU's tunes, its connect points (marked <em>(connect point)</em>) and the tunes saved before firmware updates (marked <em>(firmware backup)</em>), newest first. <strong>File…</strong> picks a <code>.tune</code> file from anywhere instead: it is copied into this ECU's tunes under its own name (numbered if that name is taken) and opened. Saves the open tune first. If connected, asks whether to send the chosen tune to the ECU.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Recent ECUs</strong></td>
+<td></td>
+<td>The last eight ECU projects opened. The list is read when the studio starts.</td>
+<td>offline</td>
+</tr>
+<tr>
+<td><strong>Save Tune</strong></td>
+<td>Ctrl+S</td>
+<td>Writes the studio's copy of the tune to its file. Does not burn.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Save Tune As…</strong></td>
+<td></td>
+<td>Saves the open tune under a new name, which becomes the open tune.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Open Layout…</strong></td>
+<td></td>
+<td>Replaces this project's pages, tree and surfaces with a layout file (<code>.gui</code> or <code>.json</code>). Asks first if the current layout has unsaved changes.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Save Layout</strong></td>
+<td>Ctrl+Shift+S</td>
+<td>Saves this project's pages, tree and surfaces.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Save Layout As…</strong></td>
+<td></td>
+<td>Saves them to a file you choose, to use on another ECU.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Close ECU</strong></td>
+<td></td>
+<td>Closes the project and returns to the landing page. The tune is saved; unsaved layout changes are asked about.</td>
+<td>a project, offline</td>
+</tr>
+<tr>
+<td><strong>Quit</strong></td>
+<td>Ctrl+Q</td>
+<td>Closes the studio, with the same save rules. Refused while a firmware update is writing.</td>
+<td>always</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (File menu) (Open ECU; defaults) (Open Tune; connect points; Send it to the ECU?) (Recent ECUs, eight, built at start-up) (recent list) (layout save/open) (Close ECU) (close guard; firmware update) (gates) -->
+
+<p>Unsaved <strong>layout</strong> changes are the only thing the studio asks about when closing: the tune saves
+itself. The question can be answered once and remembered (<strong>Don't ask again</strong>); change the answer in
+<strong>Edit ▸ Preferences… ▸ Editor ▸ Surface ▸ On exit with unsaved changes</strong>.</p>
+<!-- src: apps/studio-jf/src/ui/SaveChangesDialog.h; apps/studio-jf/src/ui/PreferencesDialog.h -->
+
+<h3 id="edit">Edit<a class="headerlink" href="#edit" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Shortcut</th>
+<th>What it does</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Undo</strong> / <strong>Redo</strong></td>
+<td>Ctrl+Z / Ctrl+Y</td>
+<td>With a page focused in Locked mode, steps back or forward through your tune edits and sends the restored values to the ECU. In Editing mode, steps through layout changes.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Cut</strong> / <strong>Copy</strong> / <strong>Paste</strong></td>
+<td>Ctrl+X / Ctrl+C / Ctrl+V</td>
+<td>Act on the selected widgets while Editing. Tables have their own copy and paste on their right-click menu (<strong>Clipboard</strong>).</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Restore Tune to Connect Point</strong></td>
+<td></td>
+<td>Puts the tune back to what the ECU held when you connected, on screen and on the ECU. Burn afterwards to keep it.</td>
+<td>jayecu ECU, connected</td>
+</tr>
+<tr>
+<td><strong>Preferences…</strong></td>
+<td></td>
+<td>Units, appearance, connection, editor, datalog, diagnostics, keyboard and update settings.</td>
+<td>always</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (Edit menu) (gates); apps/studio-jf/src/surface/Surface.cpp (run mode Ctrl+Z drives the tune stack); apps/studio-jf/src/model/Cache.h (undo pushes reverted bytes to the ECU); apps/studio-jf/src/surface/Surface.cpp (table Clipboard menu); apps/studio-jf/src/ui/PreferencesDialog.h -->
+
+<h3 id="view">View<a class="headerlink" href="#view" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What it does</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Navigation</strong>, <strong>Properties</strong>, <strong>Dictionary</strong>, <strong>Controls</strong></td>
+<td>Show or hide these docks.</td>
+<td>always</td>
+</tr>
+<tr>
+<td><strong>Status Lamps</strong>, <strong>Diagnostics</strong>, <strong>Diagnostic Trouble Codes</strong>, <strong>Trigger Library</strong></td>
+<td>Show or hide these docks.</td>
+<td>always</td>
+</tr>
+<tr>
+<td><strong>Show Hidden Widgets</strong></td>
+<td>While Editing, also draws the widgets a page hides under its conditions, outlined, so you can reach them.</td>
+<td>Editing mode</td>
+</tr>
+<tr>
+<td><strong>New Surface Tab</strong></td>
+<td>Adds an empty surface.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Delete Surface…</strong></td>
+<td>Removes a surface and its contents. The last surface cannot be deleted.</td>
+<td>a project</td>
+</tr>
+<tr>
+<td><strong>Reopen Surface…</strong></td>
+<td>Brings back a surface tab you closed.</td>
+<td>a project</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (View menu) (gates) -->
+
+<h3 id="library">Library<a class="headerlink" href="#library" title="Permanent link">&para;</a></h3>
+<p>What the studio keeps, as opposed to what it does.</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What it does</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Trigger Library</strong></td>
+<td>Shows the Trigger Library dock (chapter 16).</td>
+<td>always</td>
+</tr>
+<tr>
+<td><strong>Import Trigger Wheels…</strong> / <strong>Export Trigger Wheels…</strong></td>
+<td>Moves trigger wheel designs between PCs as a <code>.json</code> file.</td>
+<td>always</td>
+</tr>
+<tr>
+<td><strong>Load ECU Definition…</strong></td>
+<td>Loads a definition file (<code>.meta</code> or <code>.json</code>) without opening a tune.</td>
+<td>offline</td>
+</tr>
+<tr>
+<td><strong>Import TunerStudio .ini…</strong></td>
+<td>Turns a TunerStudio <code>.ini</code> into a definition and a project, so the studio can work with an ECU that speaks that protocol.</td>
+<td>offline</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (Library menu) (openSchemaFn) (import) (gates) -->
+
+<h3 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h3>
+<p>Instruments that measure something. Each opens as a tab.</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What it does</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Trigger Designer</strong></td>
+<td>Design and test trigger wheels (chapter 16).</td>
+<td>jayecu definitions</td>
+</tr>
+<tr>
+<td><strong>Engine Cycle</strong></td>
+<td>One engine cycle of events, captured by the ECU (chapter 43).</td>
+<td>connected</td>
+</tr>
+<tr>
+<td><strong>Trigger Log</strong></td>
+<td>The raw trigger edges the ECU saw (chapter 43).</td>
+<td>jayecu ECU, connected</td>
+</tr>
+<tr>
+<td><strong>Knock Scope</strong></td>
+<td>The knock system's last capture (chapter 41).</td>
+<td>jayecu ECU, connected</td>
+</tr>
+<tr>
+<td><strong>Auto Tune</strong></td>
+<td>The VE autotuner (chapter 40).</td>
+<td>definitions with an autotuner; connected</td>
+</tr>
+<tr>
+<td><strong>Reset ECU</strong></td>
+<td>Same as the toolbar button.</td>
+<td>jayecu ECU, connected</td>
+</tr>
+<tr>
+<td><strong>Install Firmware Kit…</strong></td>
+<td>Adds a firmware kit someone has sent you (its <code>kit.json</code>), to be offered like a downloaded one (chapter 46).</td>
+<td>always</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (Tools menu) (gates) (tool tabs) -->
+
+<h3 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What it does</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Start Recording</strong> / <strong>Stop Recording</strong></td>
+<td>Records live channels to a file on this PC, one row per reading received, named <code>jayecu_&lt;date&gt;_&lt;time&gt;.msl</code>. Same as the <strong>Record</strong> button. A recording also stops when you disconnect.</td>
+<td>a definition loaded and a link open, or while recording</td>
+</tr>
+<tr>
+<td><strong>Recording Channels…</strong></td>
+<td>Chooses which channels a PC recording carries. Leave it empty to record every channel.</td>
+<td>a definition loaded</td>
+</tr>
+<tr>
+<td><strong>Onboard Logging…</strong></td>
+<td>Sets up the ECU's own logger, which writes to its SD card (chapter 42).</td>
+<td>jayecu definitions, a project</td>
+</tr>
+<tr>
+<td><strong>Logs on Card…</strong></td>
+<td>Lists and copies the logs on the ECU's SD card when your PC can see the card.</td>
+<td>jayecu definitions</td>
+</tr>
+<tr>
+<td><strong>Open Logs Folder</strong></td>
+<td>Opens the folder PC recordings are written to.</td>
+<td>always</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (Logging menu) (gates) (one row per frame) (recording ends on disconnect); apps/studio-jf/src/model/DatalogRecorder.cpp -->
+
+<p>A recording can also start by itself each time you connect: <strong>Edit ▸ Preferences… ▸ Datalog ▸ Record
+every session</strong>. It is off by default.</p>
+<!-- src: apps/studio-jf/src/model/DatalogRecorder.cpp; apps/studio-jf/src/ui/PreferencesDialog.h; apps/studio-jf/main.cpp -->
+
+<h3 id="help">Help<a class="headerlink" href="#help" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Shortcut</th>
+<th>What it does</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>User Manual</strong></td>
+<td>F1</td>
+<td>Opens this manual, installed with the studio, in your web browser.</td>
+<td>always</td>
+</tr>
+<tr>
+<td><strong>Lua API Reference</strong></td>
+<td></td>
+<td>Opens the Lua reference for the loaded definition in your web browser (chapter 35).</td>
+<td>definitions that declare Lua functions</td>
+</tr>
+<tr>
+<td><strong>Check for Updates…</strong></td>
+<td></td>
+<td>Looks online for a newer studio and newer ECU firmware — the same check as <strong>Check now</strong> in Preferences.</td>
+<td>always</td>
+</tr>
+<tr>
+<td><strong>Add Missing Navigation Entries…</strong></td>
+<td></td>
+<td>Offers the navigation entries the definition has that your tree does not, and adds the ones you pick. Nothing is changed or removed (chapter 49).</td>
+<td>Editing mode, with a project open, when the definition has a navigation tree</td>
+</tr>
+<tr>
+<td><strong>About jayecu Studio…</strong></td>
+<td></td>
+<td>The studio's version.</td>
+<td>always</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (Help menu) (gate) -->
+
+<h3 id="toolbar">Toolbar<a class="headerlink" href="#toolbar" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Locked / Editing</strong></td>
+<td>always</td>
+</tr>
+<tr>
+<td><strong>Connection chip</strong></td>
+<td>always (click to connect or disconnect)</td>
+</tr>
+<tr>
+<td><strong>Burn</strong></td>
+<td>when the ECU has changes its flash does not</td>
+</tr>
+<tr>
+<td><strong>Reset ECU</strong></td>
+<td>jayecu ECU, connected</td>
+</tr>
+<tr>
+<td><strong>Record</strong> / <strong>Stop</strong></td>
+<td>a definition loaded and a link open, or while recording</td>
+</tr>
+<tr>
+<td><strong>Verify ↔ ECU</strong></td>
+<td>connected, with the tune read</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/main.cpp (toolbar gates); apps/studio-jf/src/ui/BurnButton.h (enabled only when dirty) -->
+
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Chapter 3 — Installing jayecu Studio</li>
+<li>Chapter 5 — First connection</li>
+<li>Chapter 42 — Datalogging and analysis</li>
+<li>Chapter 44 — Diagnostics and trouble codes</li>
+<li>Chapter 48 — Tunes, layouts and backups</li>
+<li>Chapter 49 — Customising the studio (Editing mode, surfaces, widgets)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="03-installing-studio.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 3 Installing jayecu Studio">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                3 Installing jayecu Studio
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="05-first-connection.html" class="md-footer__link md-footer__link--next" aria-label="Next: 5 First connection">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                5 First connection
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

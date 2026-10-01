@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Wiring a SENT sensor and a frequency sensor</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1.5; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: none; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 8 5; }
+    .ecufill { fill: #f4f5f7; }
+    .part { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pin  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2.5; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2.5; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2.5; fill: none; }
+    .wout { stroke: #5f6670; stroke-width: 7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .shield { stroke: #8d939b; stroke-width: 2; fill: none; stroke-dasharray: 3 3; }
+    .node { fill: #5f6670; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .part { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { stroke: #9aa1ab; } .ecufill { fill: #1c1f25; }
+      .tgt, .pin { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .wout { stroke: #9aa1ab; } .node { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+  <text x="20" y="30" text-anchor="start" class="fg head">A · SENT sensor, three wires</text>
+  <text x="20" y="50" text-anchor="start" class="muted small">one digital wire carries the reading</text>
+  <rect x="30" y="80" width="130" height="190" rx="8" class="box"/>
+  <text x="95" y="106" text-anchor="middle" class="fg head">SENT sensor</text>
+  <rect x="320" y="64" width="170" height="226" rx="8" class="ecufill"/>
+  <rect x="320" y="64" width="170" height="226" rx="8" class="ecu"/>
+  <text x="480" y="284" text-anchor="end" class="muted small">ECU</text>
+  <text x="150" y="130" text-anchor="end" class="muted small">5 V</text>
+  <path d="M160 125 H335" class="wout"/>
+  <path d="M160 125 H335" stroke="#ec8a24" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M160 125 H335" stroke="#f2f2f2" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="248" y="113" text-anchor="middle" class="muted small mono">O/W orange/white</text>
+  <rect x="335" y="103" width="140" height="44" rx="4" class="pin"/>
+  <text x="405.0" y="122" text-anchor="middle" class="fg head mono">CN4-14</text>
+  <text x="405.0" y="139" text-anchor="middle" class="muted mono">5V Sensor 1</text>
+  <text x="150" y="190" text-anchor="end" class="muted small">Signal</text>
+  <path d="M160 185 H335" class="wout"/>
+  <path d="M160 185 H335" stroke="#ec8a24" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M160 185 H335" stroke="#2e9d4f" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="248" y="173" text-anchor="middle" class="muted small mono">O/G orange/green</text>
+  <rect x="335" y="163" width="140" height="44" rx="4" class="pin"/>
+  <text x="405.0" y="182" text-anchor="middle" class="fg head mono">CN3-19</text>
+  <text x="405.0" y="199" text-anchor="middle" class="muted mono">DIG5</text>
+  <text x="150" y="250" text-anchor="end" class="muted small">Ground</text>
+  <path d="M160 245 H335" class="wout"/>
+  <path d="M160 245 H335" stroke="#1b1b1b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="248" y="233" text-anchor="middle" class="muted small mono">B black</text>
+  <rect x="335" y="223" width="140" height="44" rx="4" class="pin"/>
+  <text x="405.0" y="242" text-anchor="middle" class="fg head mono">CN3-10</text>
+  <text x="405.0" y="259" text-anchor="middle" class="muted mono">Ground</text>
+  <text x="20" y="365" text-anchor="start" class="fg small">The reading arrives as timed pulses. The ECU checks</text>
+  <text x="20" y="383" text-anchor="start" class="fg small">every frame's CRC and ignores a frame that fails.</text>
+  <text x="520" y="30" text-anchor="start" class="fg head">B · Frequency sensor (flex fuel)</text>
+  <text x="520" y="50" text-anchor="start" class="muted small">the reading is a frequency and a pulse width</text>
+  <rect x="530" y="80" width="130" height="190" rx="8" class="box"/>
+  <text x="595" y="106" text-anchor="middle" class="fg head">Flex sensor</text>
+  <rect x="820" y="64" width="170" height="226" rx="8" class="ecufill"/>
+  <rect x="820" y="64" width="170" height="226" rx="8" class="ecu"/>
+  <text x="980" y="284" text-anchor="end" class="muted small">ECU</text>
+  <text x="650" y="130" text-anchor="end" class="muted small">Signal</text>
+  <path d="M660 125 H835" class="wout"/>
+  <path d="M660 125 H835" stroke="#ec8a24" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M660 125 H835" stroke="#d6332a" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="748" y="113" text-anchor="middle" class="muted small mono">O/R orange/red</text>
+  <rect x="835" y="103" width="140" height="44" rx="4" class="pin"/>
+  <text x="905.0" y="122" text-anchor="middle" class="fg head mono">CN3-21</text>
+  <text x="905.0" y="139" text-anchor="middle" class="muted mono">DIG3</text>
+  <text x="650" y="190" text-anchor="end" class="muted small">Ground</text>
+  <path d="M660 185 H835" class="wout"/>
+  <path d="M660 185 H835" stroke="#1b1b1b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="748" y="173" text-anchor="middle" class="muted small mono">B black</text>
+  <rect x="835" y="163" width="140" height="44" rx="4" class="pin"/>
+  <text x="905.0" y="182" text-anchor="middle" class="fg head mono">CN3-11</text>
+  <text x="905.0" y="199" text-anchor="middle" class="muted mono">Ground</text>
+  <text x="650" y="245" text-anchor="end" class="muted small">Supply</text>
+  <path d="M660 241 H750 V300" class="thin"/>
+  <rect x="670" y="300" width="160" height="40" rx="6" class="ff"/>
+  <text x="750" y="325" text-anchor="middle" class="fg small">as its maker specifies</text>
+  <text x="520" y="365" text-anchor="start" class="fg small">If its output is open-collector, the board's 2.7 kΩ pull-up</text>
+  <text x="520" y="383" text-anchor="start" class="fg small">serves it. One pin gives ethanol (frequency) and fuel</text>
+  <text x="520" y="401" text-anchor="start" class="fg small">temperature (pulse width).</text>
+</svg>

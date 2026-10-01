@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 500" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>From an edit to a stored tune: RAM, burn and the next power-up</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <!-- ===== ROW 1 · edit reaches RAM, then burn ===== -->
+  <rect x="20" y="20" width="220" height="62" rx="6" class="box"/>
+  <text x="130" y="45" text-anchor="middle" class="fg head">You change a value</text>
+  <text x="130" y="67" text-anchor="middle" class="muted">on a studio page</text>
+  <path d="M240 51 H298" class="line" marker-end="url(#a)"/>
+  <rect x="300" y="20" width="330" height="62" rx="6" class="tgt"/>
+  <text x="465" y="45" text-anchor="middle" class="fg head">Tune in the ECU's RAM</text>
+  <text x="465" y="67" text-anchor="middle" class="muted">the engine uses it at once</text>
+  <text x="465" y="106" text-anchor="middle" class="muted">trigger, cylinder and output-map changes</text>
+  <text x="465" y="124" text-anchor="middle" class="muted">wait until the engine has stopped</text>
+  <path d="M630 51 H718" class="line" marker-end="url(#a)"/>
+  <text x="674" y="42" text-anchor="middle" class="muted">Burn</text>
+  <rect x="720" y="20" width="360" height="62" rx="6" class="box"/>
+  <text x="900" y="45" text-anchor="middle" class="fg head">The ECU stores the whole tune</text>
+  <text x="900" y="67" text-anchor="middle" class="muted">where depends on the engine</text>
+
+  <!-- fan-out -->
+  <path d="M900 82 V150 H185 V188" class="line" marker-end="url(#a)"/>
+  <path d="M550 150 V188" class="line" marker-end="url(#a)"/>
+  <path d="M915 150 V188" class="line" marker-end="url(#a)"/>
+  <path d="M900 150 H915" class="line"/>
+
+  <!-- ===== ROW 2 · where it goes ===== -->
+  <text x="20" y="180" class="muted head">engine stopped</text>
+  <rect x="20" y="190" width="330" height="72" rx="6" class="tgt"/>
+  <text x="185" y="217" text-anchor="middle" class="fg head">Flash</text>
+  <text x="185" y="240" text-anchor="middle" class="muted">spare bank written, checked, swapped in</text>
+  <text x="385" y="180" class="muted head">running, card fitted</text>
+  <rect x="385" y="190" width="330" height="72" rx="6" class="box"/>
+  <text x="550" y="217" text-anchor="middle" class="fg head">SD card</text>
+  <text x="550" y="240" text-anchor="middle" class="muted">copied into flash at the next power-up</text>
+  <text x="750" y="180" class="muted head">running, no card</text>
+  <rect x="750" y="190" width="330" height="72" rx="6" class="safe"/>
+  <text x="915" y="217" text-anchor="middle" class="fg head">Engine stopped, then flash</text>
+  <text x="915" y="240" text-anchor="middle" class="muted">coils and injectors parked for the 1–2 s write</text>
+
+  <!-- ===== ROW 3 · next power-up ===== -->
+  <path d="M185 262 V318" class="line" marker-end="url(#a)"/>
+  <path d="M550 262 V318" class="line" marker-end="url(#a)"/>
+  <path d="M915 262 V318" class="line" marker-end="url(#a)"/>
+  <rect x="20" y="320" width="1060" height="62" rx="6" class="box"/>
+  <text x="550" y="345" text-anchor="middle" class="fg head">Next power-up</text>
+  <text x="550" y="367" text-anchor="middle" class="muted">the newest stored tune whose <tspan class="mono">layout_hash</tspan> and size match this firmware is loaded</text>
+
+  <!-- ===== ROW 4 · nothing matches ===== -->
+  <path d="M550 382 V418" class="safeline" marker-end="url(#r)"/>
+  <text x="560" y="405" class="muted">none matches</text>
+  <rect x="20" y="420" width="1060" height="62" rx="6" class="safe"/>
+  <text x="550" y="445" text-anchor="middle" class="fg head">No tune: the engine functions stay off</text>
+  <text x="550" y="467" text-anchor="middle" class="muted">the studio can still connect, send a tune and burn it; after a reset the ECU runs normally</text>
+</svg>

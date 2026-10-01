@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Trigger Offset BTDC</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .tooth { fill: #5f6670; }
+    .ref  { fill: #d9822b; }
+    .reds { stroke: #c8412d; stroke-width: 2; fill: none; }
+    .redf { fill: #c8412d; }
+    .band { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 1.5; }
+    .blueline { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .grnline { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .orgline { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .band { fill: #13291a; } .tooth { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d9822b"/>
+    </marker>
+  </defs>
+  <circle cx="260" cy="270" r="152" class="line"/>
+  <polygon points="254.0,118.1 253.3,100.1 266.7,100.1 266.0,118.1" class="ref"/>
+  <polygon points="227.7,121.5 223.9,103.9 237.1,101.6 239.5,119.4" class="tooth"/>
+  <polygon points="202.4,129.3 195.6,112.7 208.2,108.1 213.7,125.2" class="tooth"/>
+  <polygon points="178.9,141.4 169.3,126.2 180.8,119.6 189.2,135.5" class="tooth"/>
+  <polygon points="157.8,157.5 145.7,144.2 155.9,135.6 166.9,149.8" class="tooth"/>
+  <polygon points="139.8,176.9 125.6,165.9 134.2,155.7 147.5,167.8" class="tooth"/>
+  <polygon points="125.5,199.2 109.6,190.8 116.2,179.3 131.4,188.9" class="tooth"/>
+  <polygon points="115.2,223.7 98.1,218.2 102.7,205.6 119.3,212.4" class="tooth"/>
+  <polygon points="109.4,249.5 91.6,247.1 93.9,233.9 111.5,237.7" class="tooth"/>
+  <polygon points="108.1,276.0 90.1,276.7 90.1,263.3 108.1,264.0" class="tooth"/>
+  <polygon points="111.5,302.3 93.9,306.1 91.6,292.9 109.4,290.5" class="tooth"/>
+  <polygon points="119.3,327.6 102.7,334.4 98.1,321.8 115.2,316.3" class="tooth"/>
+  <polygon points="131.4,351.1 116.2,360.7 109.6,349.2 125.5,340.8" class="tooth"/>
+  <polygon points="147.5,372.2 134.2,384.3 125.6,374.1 139.8,363.1" class="tooth"/>
+  <polygon points="166.9,390.2 155.9,404.4 145.7,395.8 157.8,382.5" class="tooth"/>
+  <polygon points="189.2,404.5 180.8,420.4 169.3,413.8 178.9,398.6" class="tooth"/>
+  <polygon points="213.7,414.8 208.2,431.9 195.6,427.3 202.4,410.7" class="tooth"/>
+  <polygon points="239.5,420.6 237.1,438.4 223.9,436.1 227.7,418.5" class="tooth"/>
+  <polygon points="266.0,421.9 266.7,439.9 253.3,439.9 254.0,421.9" class="tooth"/>
+  <polygon points="292.3,418.5 296.1,436.1 282.9,438.4 280.5,420.6" class="tooth"/>
+  <polygon points="317.6,410.7 324.4,427.3 311.8,431.9 306.3,414.8" class="tooth"/>
+  <polygon points="341.1,398.6 350.7,413.8 339.2,420.4 330.8,404.5" class="tooth"/>
+  <polygon points="362.2,382.5 374.3,395.8 364.1,404.4 353.1,390.2" class="tooth"/>
+  <polygon points="380.2,363.1 394.4,374.1 385.8,384.3 372.5,372.2" class="tooth"/>
+  <polygon points="394.5,340.8 410.4,349.2 403.8,360.7 388.6,351.1" class="tooth"/>
+  <polygon points="404.8,316.3 421.9,321.8 417.3,334.4 400.7,327.6" class="tooth"/>
+  <polygon points="410.6,290.5 428.4,292.9 426.1,306.1 408.5,302.3" class="tooth"/>
+  <polygon points="411.9,264.0 429.9,263.3 429.9,276.7 411.9,276.0" class="tooth"/>
+  <polygon points="408.5,237.7 426.1,233.9 428.4,247.1 410.6,249.5" class="tooth"/>
+  <polygon points="400.7,212.4 417.3,205.6 421.9,218.2 404.8,223.7" class="tooth"/>
+  <polygon points="388.6,188.9 403.8,179.3 410.4,190.8 394.5,199.2" class="tooth"/>
+  <polygon points="372.5,167.8 385.8,155.7 394.4,165.9 380.2,176.9" class="tooth"/>
+  <polygon points="353.1,149.8 364.1,135.6 374.3,144.2 362.2,157.5" class="tooth"/>
+  <polygon points="330.8,135.5 339.2,119.6 350.7,126.2 341.1,141.4" class="tooth"/>
+  <polygon points="306.3,125.2 311.8,108.1 324.4,112.7 317.6,129.3" class="tooth"/>
+  <rect x="246" y="42" width="28" height="34" rx="4" class="box"/>
+  <text x="284.0" y="62.0" class="muted">pickup</text>
+  <path d="M260 270 L114.0 270.0" class="grnline"/>
+  <text x="165.0" y="290.0" text-anchor="middle" class="fg small head">TDC #1 mark</text>
+  <path d="M260 270 L260 124" class="orgline"/>
+  <path d="M190.0 270.0 A 70 70 0 0 1 260.0 200.0" class="orgline" marker-end="url(#o)"/>
+  <text x="202.0" y="212.0" text-anchor="middle" class="fg head">90°</text>
+  <text x="270.0" y="340.0" text-anchor="middle" class="muted small">at this instant the reference</text>
+  <text x="270.0" y="358.0" text-anchor="middle" class="muted small">tooth is under the pickup</text>
+  <path d="M433.2 370.0 A 200 200 0 0 1 360.0 443.2" class="line" marker-end="url(#a)"/>
+  <text x="370.0" y="447.2" class="muted small">turns clockwise</text>
+  <text x="520.0" y="70.0" class="fg head">Trigger Offset BTDC</text>
+  <text x="520.0" y="96.0" class="fg">How far before TDC #1 the reference passes the pickup.</text>
+  <text x="520.0" y="118.0" class="muted">Here the TDC #1 mark still has 90° to turn: the offset is 90.</text>
+  <rect x="520" y="150" width="500" height="120" rx="6" class="tgt"/>
+  <text x="536.0" y="178.0" class="mono fg">engine angle = decoder angle − Trigger Offset BTDC</text>
+  <text x="536.0" y="206.0" class="mono fg">reference tooth: decoder 0°  →  engine −90° = 630° (90° BTDC)</text>
+  <text x="536.0" y="232.0" class="mono fg">TDC #1:          decoder 90° →  engine 0°</text>
+  <text x="536.0" y="256.0" class="muted small">(on a four-stroke, engine angles run 0 … 720°)</text>
+  <text x="520.0" y="310.0" class="fg">Positive = the reference comes BEFORE TDC #1.</text>
+  <text x="520.0" y="332.0" class="muted">Negative = it comes after. Raising the number tells the ECU</text>
+  <text x="520.0" y="352.0" class="muted">TDC is further away, so every event moves later.</text>
+  <text x="520.0" y="392.0" class="muted">Pickup Angle only turns the studio's drawing to match the</text>
+  <text x="520.0" y="412.0" class="muted">engine. The ECU never uses it.</text>
+</svg>

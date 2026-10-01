@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 380" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Reading the Knock Scope</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .bar  { fill: #b9cfe6; }
+    .hot  { fill: #d9822b; }
+    .floor{ stroke: #2e9d4f; stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+    .thr  { stroke: #c8412d; stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+    .spark{ stroke: #3b82c4; stroke-width: 2.5; fill: none; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; }
+      .bar { fill: #2d4a66; }
+    }
+  </style>
+
+  <!-- plot: x 80..760, baseline y 320; floor y 260; threshold y 170 -->
+  <path d="M80 30 V320 H760" class="axis"/>
+  <text x="420" y="352" text-anchor="middle" class="fg">crank angle through the listening window →</text>
+  <text x="40" y="175" text-anchor="middle" class="fg" transform="rotate(-90 40 175)">band level, dB →</text>
+
+  <!-- bars: 17 buckets of 40 wide -->
+  <g>
+    <rect x="84"  y="268" width="34" height="52" class="bar"/>
+    <rect x="124" y="262" width="34" height="58" class="bar"/>
+    <rect x="164" y="270" width="34" height="50" class="bar"/>
+    <rect x="204" y="264" width="34" height="56" class="bar"/>
+    <rect x="244" y="258" width="34" height="62" class="bar"/>
+    <rect x="284" y="250" width="34" height="70" class="bar"/>
+    <rect x="324" y="200" width="34" height="120" class="bar"/>
+    <rect x="364" y="130" width="34" height="190" class="hot"/>
+    <rect x="404" y="96"  width="34" height="224" class="hot"/>
+    <rect x="444" y="140" width="34" height="180" class="hot"/>
+    <rect x="484" y="196" width="34" height="124" class="bar"/>
+    <rect x="524" y="232" width="34" height="88" class="bar"/>
+    <rect x="564" y="252" width="34" height="68" class="bar"/>
+    <rect x="604" y="262" width="34" height="58" class="bar"/>
+    <rect x="644" y="266" width="34" height="54" class="bar"/>
+    <rect x="684" y="268" width="34" height="52" class="bar"/>
+    <rect x="724" y="270" width="34" height="50" class="bar"/>
+  </g>
+  <path d="M80 260 H760" class="floor"/>
+  <path d="M80 170 H760" class="thr"/>
+  <path d="M300 30 V320" class="spark"/>
+
+  <text x="304" y="48" class="fg head">spark</text>
+  <text x="88" y="252" class="fg">learned floor</text>
+  <text x="88" y="162" class="fg">floor + Knock Threshold</text>
+
+  <!-- side explanation -->
+  <text x="790" y="60" class="fg head">Tinted bars</text>
+  <text x="790" y="82" class="fg">cleared the threshold:</text>
+  <text x="790" y="104" class="fg">a knock event for this cylinder.</text>
+  <text x="790" y="140" class="fg head">After the spark</text>
+  <text x="790" y="162" class="fg">knock — answered with retard.</text>
+  <text x="790" y="198" class="fg head">Before or at the spark</text>
+  <text x="790" y="220" class="fg">pre-ignition — answered with</text>
+  <text x="790" y="242" class="fg">a cut (chapter 30).</text>
+  <text x="790" y="300" class="muted">The header gives the cylinder,</text>
+  <text x="790" y="320" class="muted">the verdict and how far over.</text>
+</svg>

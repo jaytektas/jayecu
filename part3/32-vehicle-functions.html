@@ -1,0 +1,3469 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/32-vehicle-functions.html">
+      
+      
+        <link rel="prev" href="31-misfire.html">
+      
+      
+        <link rel="next" href="33-can-config.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>32 Vehicle functions - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vehicle-functions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              32 Vehicle functions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="32-vehicle-functions.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-road-speed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Road speed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-gear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Gear
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-alternator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Alternator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-torque-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Torque model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting it up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#road-speed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Road speed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gear
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alternator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alternator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#torque-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Torque model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="vehicle-functions">Vehicle functions<a class="headerlink" href="#vehicle-functions" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<blockquote>
+<p><strong>In one sentence:</strong> the ECU turns speed-sensor pulses into a road speed, works out the gear from
+engine speed and road speed, can regulate the alternator's charge voltage, and can estimate the
+torque the engine is making.</p>
+</blockquote>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Page</th>
+<th>Publishes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Vehicle Speed</strong> (<code>vehicle_speed</code>)</td>
+<td>Configuration ▸ Vehicle Functions ▸ Vehicle Speed</td>
+<td><strong>Vehicle Speed</strong> <code>vehicle_spd</code>, and a speed for every pickup</td>
+</tr>
+<tr>
+<td><strong>Gear Detection</strong> (<code>gear_detect</code>)</td>
+<td>Configuration ▸ Vehicle Functions ▸ Gear Detection</td>
+<td><strong>Gear</strong> <code>gear</code> (0 = unknown)</td>
+</tr>
+<tr>
+<td><strong>Alternator Control</strong> (<code>alternator</code>)</td>
+<td>Configuration ▸ Electrical ▸ Alternator Control</td>
+<td><strong>Alternator Field Duty</strong> <code>alternator_duty</code></td>
+</tr>
+<tr>
+<td><strong>Torque Model</strong> (<code>torque_model</code>)</td>
+<td>Configuration ▸ Engine Functions ▸ Torque Model</td>
+<td><strong>Engine Torque</strong> <code>engine_torque_nm</code>, <strong>Engine Power</strong> <code>engine_power_kw</code></td>
+</tr>
+</tbody>
+</table>
+<p>Road speed is used by launch and traction control (chapter 26), the pit limiter and cruise control
+(chapter 27) and idle (chapter 21). Gear is a table axis for fuel, ignition, boost and launch, and
+is used by boost and cruise.</p>
+<p>All four are off by default. Vehicle Speed and Gear Detection publish <strong>nothing</strong> while they are off,
+so a speed or gear that comes from CAN (chapter 33) or a Lua script (chapter 35) is left alone.</p>
+<figure>
+<p><img alt="Six pickups each turned into km/h, one chosen as the road speed, and the gear worked out from it" src="../img/diagrams/vehicle-speed-flow.svg" />
+  </p>
+<figcaption>Figure 32.1 — From pickup pulses to road speed and gear.</figcaption>
+</figure>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="1-road-speed">1 · Road speed<a class="headerlink" href="#1-road-speed" title="Permanent link">&para;</a></h3>
+<p>A speed sensor counts teeth, so what it gives the ECU is a frequency. There are six pickups, each a
+sensor you set up in chapter 17: <strong>Wheel Speed Front Left</strong>, <strong>Front Right</strong>, <strong>Rear Left</strong>, <strong>Rear
+Right</strong>, <strong>Drive Shaft Speed</strong> and <strong>GPS Speed</strong> (a GPS speedometer module with a pulse output).</p>
+<ul>
+<li>Each pickup has one calibration number, <strong>pulses per kilometre</strong>. Its speed is
+  Hz × 3600 ÷ pulses/km.</li>
+<li>A pickup with <strong>0</strong> pulses/km, or with no reading, has no speed. It is left out; it is not
+  counted as 0 km/h.</li>
+<li>A reading above <strong>Implausible Above</strong> (400 km/h) is dropped. A floating frequency input can read
+  enormous numbers.</li>
+<li>Every calibrated pickup publishes its own speed: <code>wheel_fl</code>, <code>wheel_fr</code>, <code>wheel_rl</code>, <code>wheel_rr</code>,
+  <code>shaft_spd</code>, <code>gps_spd</code>.
+  <!-- src: firmware/Engine/Modules/VehicleSpeed.cpp -->
+</li>
+</ul>
+<p><strong>Main Source</strong> chooses which of them is the road speed <code>vehicle_spd</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Main Source</th>
+<th>Road speed is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Drive Train</strong>, <strong>Front Left</strong> … <strong>Rear Right</strong>, <strong>GPS</strong></td>
+<td>that one pickup</td>
+</tr>
+<tr>
+<td><strong>Front Axle</strong>, <strong>Rear Axle</strong></td>
+<td>the average of that axle's two wheels (one wheel, if only one reads)</td>
+</tr>
+<tr>
+<td><strong>All Wheels</strong></td>
+<td>the average of the middle two of the four wheels — the fastest and slowest are ignored</td>
+</tr>
+</tbody>
+</table>
+<p>Taking the middle values ignores a wheel spinning under power and a wheel locking under braking at the
+same time. A drive shaft pickup reads the average of the driven wheels, so it includes their
+wheelspin. For traction control, the road speed has to come from wheels the engine does not drive
+(chapter 26).</p>
+<!-- src: firmware/Engine/Modules/VehicleSpeed.cpp -->
+
+<p><strong>Drive Shaft Pulses per Rev</strong> is only for the <strong>Drive Shaft RPM</strong> channel <code>driveshaft_rpm</code>; road speed
+does not use it. 0 leaves that channel unpublished.</p>
+<h3 id="2-gear">2 · Gear<a class="headerlink" href="#2-gear" title="Permanent link">&para;</a></h3>
+<p>Gear Detection divides engine RPM by road speed and compares it with each gear's <strong>Ratio</strong> (RPM per
+km/h). The closest ratio within <strong>Ratio Tolerance</strong> (12 %) wins. Nothing within tolerance gives 0.</p>
+<ul>
+<li>Below <strong>Detect Above RPM</strong> (500) or <strong>Detect Above Speed</strong> (3 km/h) the gear is 0 (unknown).</li>
+<li>With the clutch in or in neutral, the ratio usually matches no gear and the gear is 0.</li>
+<li>Only the first <strong>Number of Gears</strong> (5) ratios are tried. A ratio of 0 is an unused gear.</li>
+<li>The ratios are all 0 by default, so the gear is always 0 until you fill them in.
+  <!-- src: firmware/Engine/Modules/GearDetect.cpp -->
+</li>
+</ul>
+<h3 id="3-alternator">3 · Alternator<a class="headerlink" href="#3-alternator" title="Permanent link">&para;</a></h3>
+<p>For an alternator whose field you can drive yourself (no internal regulator, or one bypassed), the
+ECU regulates the charge voltage:</p>
+<ul>
+<li>A PI loop compares the battery voltage with <strong>Target Voltage</strong> (14.40 V) and sets the field duty
+  <code>alternator_duty</code>, up to <strong>Max Field Duty</strong> (100 %).</li>
+<li>It only runs while the engine is <strong>running</strong> (not cranking) and above <strong>Enable Above RPM</strong> (400).</li>
+<li>When it starts, the duty ceiling ramps up from 0 over <strong>Soft-Start Ramp</strong> (3 s), so the load comes
+  on gently.</li>
+<li>Above <strong>Disable Above TPS</strong> it stops charging, freeing a little power (0, the default = never).</li>
+<li>More than 1.5 V above target, the field is switched off at once.</li>
+<li>With no battery reading, the field is released.</li>
+</ul>
+<p>While it is not charging it publishes nothing, so the output falls back to its <strong>Failsafe</strong> value
+(chapter 18). The module drives no pin by itself: give a PWM output the <strong>Value From</strong> candidate
+<code>alternator_duty</code>.</p>
+<!-- src: firmware/Engine/Modules/Alternator.cpp -->
+
+<h3 id="4-torque-model">4 · Torque model<a class="headerlink" href="#4-torque-model" title="Permanent link">&para;</a></h3>
+<p>An <strong>estimate</strong>: nothing is measured, and nothing in the firmware acts on it yet. It is for logging
+and the dash.</p>
+<ul>
+<li><strong>Engine Torque (rpm x load)</strong> gives the torque at best timing and best-torque mixture, by RPM and
+  manifold pressure.</li>
+<li><strong>Torque vs Timing Retard</strong> takes some away when the timing is below the main advance map
+  (knock, protection or idle retard).</li>
+<li><strong>Torque vs Lambda Ratio</strong> takes some away when the mixture is away from <strong>Best-Torque Lambda</strong>
+  (λ 0.880). Its axis is the ratio of the actual lambda to best-torque lambda.</li>
+<li>Power is torque × engine speed: <code>engine_power_kw</code>.
+  <!-- src: firmware/Engine/Modules/TorqueModel.cpp -->
+</li>
+</ul>
+<p>The default torque map is a placeholder (a typical 2-litre engine, scaled with manifold pressure).
+Replace it with your engine's dyno figures.</p>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<ul>
+<li><strong>Speed sensors</strong> wired to DIG inputs, or VR inputs (chapter 11), and set up as the pickup sensors
+  above (chapter 17). Or a road speed arriving over CAN (chapter 33).</li>
+<li><strong>Alternator:</strong> an alternator with an externally driven field, and a PWM output that can carry the
+  field current (chapter 12).</li>
+<li><strong>Torque model:</strong> your engine's torque curve.</li>
+</ul>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="road-speed">Road speed<a class="headerlink" href="#road-speed" title="Permanent link">&para;</a></h3>
+<ol>
+<li>On <strong>Vehicle Speed</strong>, tick <strong>Enabled</strong> and pick the <strong>Main Source</strong>.</li>
+<li>Calibrate each pickup, one of two ways:<ul>
+<li><strong>Drive:</strong> hold a steady speed, read from a GPS (not the car's speedometer), type it into <strong>Known
+  Vehicle Speed</strong> and press <strong>Capture All</strong>. Every pickup's pulses/km is set from its reading.</li>
+<li><strong>Work it out:</strong> pulses/km = teeth per wheel turn × 1000 ÷ tyre circumference in metres. For a
+  drive shaft pickup, multiply by the final drive ratio as well.</li>
+</ul>
+</li>
+<li>Check each pickup's <strong>Speed</strong> column against the GPS at a few speeds.</li>
+</ol>
+<p><img alt="The Vehicle Speed page" src="../img/studio/vss-page.png" /></p>
+<p>Capture All sets every pickup at once. A pickup that reads nothing at the time gets 0 (not used).</p>
+<h3 id="gear">Gear<a class="headerlink" href="#gear" title="Permanent link">&para;</a></h3>
+<ol>
+<li>On <strong>Gear Detection</strong>, tick <strong>Enabled</strong> and set <strong>Number of Gears</strong>.</li>
+<li>For each gear, drive at a steady speed in that gear and divide engine RPM by road speed (both on the
+   dash). Type it as that gear's <strong>Ratio</strong>.</li>
+<li>Watch <code>gear</code> while driving through the gears.</li>
+</ol>
+<p><img alt="The Gear Detection page" src="../img/studio/gear-page.png" /></p>
+<p>You can also work a ratio out: RPM per km/h = gear ratio × final drive × 1000 ÷ (60 × tyre
+circumference in metres). Measuring is better: it includes the tyres actually fitted.</p>
+<h3 id="alternator">Alternator<a class="headerlink" href="#alternator" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Give a PWM output the <strong>Value From</strong> candidate <code>alternator_duty</code>, with a <strong>Failsafe</strong> suited to
+   your alternator (chapter 18).</li>
+<li>On <strong>Alternator Control</strong>, tick <strong>Enabled</strong> and set <strong>Target Voltage</strong>.</li>
+<li>Start the engine and watch <code>battery</code> and <code>alternator_duty</code> while switching loads on and off
+   (headlights, fan).</li>
+</ol>
+<p><img alt="The Alternator Control page" src="../img/studio/alternator-page.png" /></p>
+<h3 id="torque-model">Torque model<a class="headerlink" href="#torque-model" title="Permanent link">&para;</a></h3>
+<ol>
+<li>On <strong>Torque Model</strong>, tick <strong>Enabled</strong> and set <strong>Best-Torque Lambda</strong>.</li>
+<li>Enter your engine's torque in <strong>Engine Torque (rpm x load)</strong>: the dyno curve at full load, and less
+   at lower manifold pressures.</li>
+</ol>
+<p><img alt="The Torque Model page" src="../img/studio/torque-page.png" /></p>
+<p><img alt="The default torque map" src="../img/studio/torque-table.png" /></p>
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — a rear-drive car with a gearbox speed sensor</p>
+<p>Main Source <strong>Drive Train</strong>. Captured at 60 km/h by GPS: the sensor read 139 Hz, so pulses/km =
+139 × 3600 ÷ 60 = 8340.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — front-wheel drive with four ABS sensors</p>
+<p>Main Source <strong>Rear Axle</strong> (the undriven wheels), so wheelspin does not show in the road speed.
+48-tooth rings and 1.94 m tyres: 48 × 1000 ÷ 1.94 = 24742 pulses/km for each wheel.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — gear ratios for a five-speed</p>
+<p>In 1st at a steady 30 km/h the engine turns 3450 RPM: 3450 ÷ 30 = 115.0. The others, measured the
+same way: 2nd 63.5, 3rd 45.8, 4th 34.2, 5th 27.9.</p>
+</div>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<ul>
+<li><strong>Wrong gear shown:</strong> a ratio typed wrongly, or measured with the clutch slipping. Measure it again
+  at a steady speed. When a reading is within tolerance of two gears, the closer one wins.</li>
+<li><strong>Gear drops to 0 while driving:</strong> tolerance too tight for tyre wear or torque-converter slip. Raise
+  it a little.</li>
+<li><strong>Alternator voltage rings:</strong> lower <strong>Kp</strong>. <strong>Settles below target:</strong> raise <strong>Ki</strong>.</li>
+</ul>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>These modules set no trouble codes. The speed sensors have their own sensor codes (chapter 17).</p>
+<p>Live channels: <code>vehicle_spd</code>, <code>wheel_fl</code>, <code>wheel_fr</code>, <code>wheel_rl</code>, <code>wheel_rr</code>, <code>shaft_spd</code>, <code>gps_spd</code>,
+<code>driveshaft_rpm</code>, the raw frequencies <code>wheel_hz_fl</code> … <code>gps_hz</code>, <code>gear</code>, <code>alternator_duty</code>,
+<code>engine_torque_nm</code>, <code>engine_power_kw</code>, <code>lambda_torque_ratio</code>.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No road speed</td>
+<td>Module off; pickup not calibrated (0 pulses/km); sensor not set up or not reading</td>
+<td>Enabled; the pulses/km; the pickup's Hz on the page</td>
+</tr>
+<tr>
+<td>Road speed wrong by a fixed factor</td>
+<td>Calibration wrong</td>
+<td>Capture again against a GPS</td>
+</tr>
+<tr>
+<td>Road speed jumps to nothing at high speed</td>
+<td>Above Implausible Above</td>
+<td>Raise it, or look for a noisy input</td>
+</tr>
+<tr>
+<td>Road speed rises with wheelspin</td>
+<td>Main Source is a driven wheel or the drive shaft</td>
+<td>Use the undriven axle</td>
+</tr>
+<tr>
+<td>Gear always 0</td>
+<td>Ratios not set; below Detect Above RPM or Speed; no road speed</td>
+<td>The Ratios; <code>vehicle_spd</code></td>
+</tr>
+<tr>
+<td>Alternator never charges</td>
+<td>Engine not reported running; below Enable Above RPM; no output with <code>alternator_duty</code></td>
+<td><code>engine_state</code>; the output</td>
+</tr>
+<tr>
+<td>Torque reads 0</td>
+<td>Module off</td>
+<td>Enabled</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<p>Vehicle Speed:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Vehicle Speed Enabled</strong><br><code>vehicle_speed.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Publish a road speed from the wheel or driveshaft pickups. Off, the module publishes NOTHING rather than zero, so a speed arriving over CAN or set by Lua is left alone — a disabled producer must not stomp another source.</td>
+</tr>
+<tr>
+<td><strong>Main Source</strong><br><code>vehicle_speed.main_source</code><br>Range: one of: Drive Train, Front Left, Front Right, Rear Left, Rear Right, GPS, Front Axle, Rear Axle, All Wheels<br>Default: Drive Train</td>
+<td>Which sensors the road speed comes from — that is the only question here, because how they combine is not a matter of taste. A set takes the MIDDLE value of whichever of its wheels are calibrated and reading, which rejects a wheel spinning under power and one locking under braking at the same time. A drive train sensor reads the average of the driven wheels through the diff, so it inherits their wheelspin. A GPS speedometer module is a pulse train like any other pickup, calibrated in pulses/km the same way — and on a four-wheel-drive car it is the only road speed in the system that the engine does not turn.</td>
+</tr>
+<tr>
+<td><strong>Calibration Speed</strong><br><code>vehicle_speed.calibration_speed</code><br>Range: 0.0 to 400.0<br>Default: 60.0<br>Units: km/h</td>
+<td>The speed to hold while calibrating. Drive at exactly this — by a GPS, not by the car's own speedometer, which is the thing being calibrated — and Calibrate divides the live pulse rate by it to get pulses/km.</td>
+</tr>
+<tr>
+<td><strong>Drive Shaft Pulses per Rev</strong><br><code>vehicle_speed.shaft_ppr</code><br>Range: 0 to 60<br>Default: 0</td>
+<td>Pulses the drive shaft pickup produces per SHAFT revolution — teeth on the tone ring, or magnets on the yoke. Only needed to report shaft RPM; road speed uses the pulses/km calibration below and does not care. 0 leaves the RPM channel unpublished.</td>
+</tr>
+<tr>
+<td><strong>Implausible Above</strong><br><code>vehicle_speed.max_kph</code><br>Range: 0.0 to 600.0<br>Default: 400.0<br>Units: km/h</td>
+<td>A reading above this is treated as noise and dropped rather than published. A frequency input with a floating wire reads megahertz, and a road speed of nine thousand is worse than no road speed for anything acting on it.</td>
+</tr>
+</tbody>
+</table>
+<p>Gear Detection:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Gear Detection Enabled</strong><br><code>gear_detect.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Work out the gear from the RPM-to-road-speed ratio and publish <code>gear</code>. Off, the module publishes NOTHING rather than zero, so a gear set by Lua or arriving over CAN is left alone — a disabled detector must not stomp on another source.</td>
+</tr>
+<tr>
+<td><strong>Number of Gears</strong><br><code>gear_detect.gear_count</code><br>Range: 1 to 8<br>Default: 5</td>
+<td>How many forward ratios to test. Only this many of the ratio entries are considered, so a shorter gearbox does not accidentally match a leftover ratio from a longer one still sitting in the table.</td>
+</tr>
+<tr>
+<td><strong>Ratio Tolerance</strong><br><code>gear_detect.tol_pct</code><br>Range: 1 to 50<br>Default: 12<br>Units: %</td>
+<td>A gear matches when the measured ratio is within this % of its configured ratio.</td>
+</tr>
+<tr>
+<td><strong>Detect Above RPM</strong><br><code>gear_detect.min_rpm</code><br>Range: 0 to 12000<br>Default: 500<br>Units: RPM</td>
+<td>Below this RPM the ratio is not believed and the gear reports unknown (0). RPM divided by road speed is meaningless when the clutch is slipping or the car is coasting to a stop, and a wrong gear is worse than no gear for anything downstream that acts on it.</td>
+</tr>
+<tr>
+<td><strong>Detect Above Speed</strong><br><code>gear_detect.min_vss</code><br>Range: 0 to 255<br>Default: 3<br>Units: km/h</td>
+<td>Below this speed gear is reported as 0 (unknown/neutral).</td>
+</tr>
+</tbody>
+</table>
+<p>Alternator Control:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Alternator Control Enabled</strong><br><code>alternator.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Regulate the alternator field directly instead of leaving it to the alternator's internal regulator, so charge voltage becomes a tunable. Requires an alternator whose field is externally accessible; on a self-regulating unit this has nothing to act on.</td>
+</tr>
+<tr>
+<td><strong>Target Voltage</strong><br><code>alternator.target_voltage</code><br>Range: 10.00 to 16.00<br>Default: 14.40<br>Units: V</td>
+<td>The battery voltage being regulated to. The controller trims the field to hold it, so this is the single number that decides charge rate — too low undercharges, too high boils the battery and shortens the life of everything else on the rail.</td>
+</tr>
+<tr>
+<td><strong>Enable Above RPM</strong><br><code>alternator.min_rpm</code><br>Range: 0 to 3000<br>Default: 400<br>Units: RPM</td>
+<td>Do not drive the field below this RPM, and only once the engine is RUNNING rather than merely turning. At cranking speed the alternator cannot make its target anyway, and loading the field there just makes the engine harder to start.</td>
+</tr>
+<tr>
+<td><strong>Kp</strong><br><code>alternator.kp</code><br>Range: 0.000 to 60.000<br>Default: 30.000<br>Units: %/V</td>
+<td>Proportional gain: field duty per volt of error, applied immediately. It sets the response to a load stepping on. Too high and the voltage rings as the controller chases each change.</td>
+</tr>
+<tr>
+<td><strong>Ki</strong><br><code>alternator.ki</code><br>Range: 0.000 to 60.000<br>Default: 15.000<br>Units: %/V/s</td>
+<td>Integral gain: field duty per volt of error per second. It is what removes a standing offset, so the rail settles on target rather than near it. The integrator is reset whenever charging disengages, so re-engaging always starts clean instead of slamming in a wound-up duty.</td>
+</tr>
+<tr>
+<td><strong>Max Field Duty</strong><br><code>alternator.max_duty_pct</code><br>Range: 0.0 to 100.0<br>Default: 100.0<br>Units: %</td>
+<td>Ceiling on field duty. It is also what the soft-start ramps UP TO after engaging, so the field is never applied as a step — this is the protection against a full-field slam into a cold alternator or a weak belt.</td>
+</tr>
+<tr>
+<td><strong>Disable Above TPS</strong><br><code>alternator.off_above_tps</code><br>Range: 0.0 to 100.0<br>Default: 0.0<br>Units: %</td>
+<td>Back off charging above this throttle (0 = always on). Frees a little power at WOT.</td>
+</tr>
+<tr>
+<td><strong>Soft-Start Ramp</strong><br><code>alternator.soft_start_s</code><br>Range: 0.0 to 25.0<br>Default: 3.0<br>Units: s</td>
+<td>After engaging, ramp the field-duty ceiling from 0 to max over this time so the load comes on gently (0 = instant).</td>
+</tr>
+</tbody>
+</table>
+<p>Torque Model:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Torque Model Enabled</strong><br><code>torque_model.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Estimate engine brake torque from a calibrated map and publish it, with power following as torque times angular velocity. It is an ESTIMATE for logging and for anything downstream that wants to think in torque; nothing is measured. Disabled, it publishes zeros rather than nothing.</td>
+</tr>
+<tr>
+<td><strong>Best-Torque Lambda</strong><br><code>torque_model.best_torque_lambda</code><br>Range: 0.700 to 1.050<br>Default: 0.880</td>
+<td>The lambda at which this engine makes its best torque — richer than stoichiometric on a petrol engine, typically around 0.88. It is the reference the lambda-ratio trim is measured against, so the trim's axis is "how far from best-torque mixture" rather than an absolute lambda, and the map stays valid across fuels.</td>
+</tr>
+<tr>
+<td><strong>Torque vs Timing Retard X Channel</strong><br><code>torque_model.torque_spark_trim_x_src</code><br>Range: -1 to 32767<br>Default: 498</td>
+<td>WHICH SIGNAL the X axis of 'Torque vs Timing Retard' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Torque vs Timing Retard Y Channel</strong><br><code>torque_model.torque_spark_trim_y_src</code><br>Range: -1 to 32767<br>Default: 301</td>
+<td>WHICH SIGNAL the Y axis of 'Torque vs Timing Retard' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Torque vs Timing Retard Y Axis Enabled</strong><br><code>torque_model.torque_spark_trim_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Torque vs Timing Retard' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Torque vs Lambda Ratio X Channel</strong><br><code>torque_model.torque_lambda_trim_x_src</code><br>Range: -1 to 32767<br>Default: 46</td>
+<td>WHICH SIGNAL the X axis of 'Torque vs Lambda Ratio' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Torque vs Lambda Ratio Y Channel</strong><br><code>torque_model.torque_lambda_trim_y_src</code><br>Range: -1 to 32767<br>Default: 46</td>
+<td>WHICH SIGNAL the Y axis of 'Torque vs Lambda Ratio' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Torque vs Lambda Ratio Y Axis Enabled</strong><br><code>torque_model.torque_lambda_trim_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Torque vs Lambda Ratio' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Engine Torque (rpm x load) X Channel</strong><br><code>torque_model.torque_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Engine Torque (rpm x load)' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Engine Torque (rpm x load) Y Channel</strong><br><code>torque_model.torque_table_y_src</code><br>Range: -1 to 32767<br>Default: 273</td>
+<td>WHICH SIGNAL the Y axis of 'Engine Torque (rpm x load)' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Timing Retard Axis bins</strong><br><code>torque_model.torque_spark_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Timing Retard Axis' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Torque Spark Y (reserved) bins</strong><br><code>torque_model.torque_spark_yaxis_n</code><br>Range: 1 to 1<br>Default: 1</td>
+<td>How many breakpoints of 'Torque Spark Y (reserved)' are LIVE, out of 1 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Lambda Ratio Axis (lambda/best-torque) bins</strong><br><code>torque_model.torque_lambda_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Lambda Ratio Axis (lambda/best-torque)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Torque Lambda Y (reserved) bins</strong><br><code>torque_model.torque_lambda_yaxis_n</code><br>Range: 1 to 1<br>Default: 1</td>
+<td>How many breakpoints of 'Torque Lambda Y (reserved)' are LIVE, out of 1 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Torque RPM Axis bins</strong><br><code>torque_model.torque_rpm_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Torque RPM Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Torque Load Axis (MAP) bins</strong><br><code>torque_model.torque_load_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Torque Load Axis (MAP)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Torque vs Timing Retard</strong><br><code>torque_model.torque_spark_trim</code><br>Range: 0 to 100<br>Default: 8-point curve<br>Units: %</td>
+<td>How much of the reference torque survives at a given timing retard from optimum. Pulling timing costs torque, steeply at first; this curve is what lets the estimate follow knock retard, protection retard and idle timing rather than assuming the engine is always at its best timing.</td>
+</tr>
+<tr>
+<td><strong>Timing Retard Axis</strong><br><code>torque_model.torque_spark_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: deg</td>
+<td>Retard-from-optimum breakpoints, in degrees, for the spark trim curve. 0 is best timing; the curve should read 100% there by definition.</td>
+</tr>
+<tr>
+<td><strong>Torque Spark Y (reserved)</strong><br><code>torque_model.torque_spark_yaxis</code><br>Range: 0 to 0<br>Default: 1-point curve</td>
+<td>Reserved — the spark trim is a one-dimensional curve and this second axis is not used. Left in place so the table can gain a second dimension without moving in the layout.</td>
+</tr>
+<tr>
+<td><strong>Torque vs Lambda Ratio</strong><br><code>torque_model.torque_lambda_trim</code><br>Range: 0 to 100<br>Default: 8-point curve<br>Units: %</td>
+<td>How much of the reference torque survives at a given distance from best-torque lambda. Both leaner and richer than best-torque cost torque, so this curve normally peaks in the middle at 100%.</td>
+</tr>
+<tr>
+<td><strong>Lambda Ratio Axis (lambda/best-torque)</strong><br><code>torque_model.torque_lambda_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: x</td>
+<td>Breakpoints for the lambda trim, expressed as a RATIO of actual lambda to best-torque lambda. A ratio rather than an absolute lambda so the curve does not have to be redrawn when the fuel changes; 1.0 is best-torque and should read 100%.</td>
+</tr>
+<tr>
+<td><strong>Torque Lambda Y (reserved)</strong><br><code>torque_model.torque_lambda_yaxis</code><br>Range: 0 to 0<br>Default: 1-point curve</td>
+<td>Reserved — the lambda trim is a one-dimensional curve and this second axis is not used.</td>
+</tr>
+<tr>
+<td><strong>Engine Torque (rpm x load)</strong><br><code>torque_model.torque_table</code><br>Range: 0 to 1500<br>Default: 8 × 8 table<br>Units: Nm</td>
+<td>Reference brake torque at each RPM and load, with the engine at best timing and best-torque lambda. Everything else in this module trims DOWN from here, so this map defines the engine's ceiling — it comes from a dyno sheet or a published curve, not from a guess.</td>
+</tr>
+<tr>
+<td><strong>Torque RPM Axis</strong><br><code>torque_model.torque_rpm_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: RPM</td>
+<td>RPM breakpoints for the torque map. Worth concentrating around the torque peak, where the curve has the most shape to capture.</td>
+</tr>
+<tr>
+<td><strong>Torque Load Axis (MAP)</strong><br><code>torque_model.torque_load_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: kPa</td>
+<td>Load (MAP) breakpoints for the torque map. Torque tracks manifold pressure closely, so this is the axis that carries most of the map's range.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../part2/11-wiring-sensors.html">Chapter 11 — Wiring sensors</a> (speed sensors)</li>
+<li><a href="17-sensors.html">Chapter 17 — Sensors and calibration</a> (the pickup sensors)</li>
+<li><a href="18-outputs.html">Chapter 18 — Outputs and the pin system</a> (the alternator output)</li>
+<li><a href="26-launch-shift-traction.html">Chapter 26 — Launch, shift and traction</a></li>
+<li><a href="27-speed-limiting.html">Chapter 27 — Speed limiting</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="31-misfire.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 31 Misfire detection">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                31 Misfire detection
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="33-can-config.html" class="md-footer__link md-footer__link--next" aria-label="Next: 33 CAN configuration">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                33 CAN configuration
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

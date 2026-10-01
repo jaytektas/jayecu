@@ -1,0 +1,3767 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/17-sensors.html">
+      
+      
+        <link rel="prev" href="16-trigger.html">
+      
+      
+        <link rel="next" href="18-outputs.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>17 Sensors and calibration - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sensors-and-calibration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              17 Sensors and calibration
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="17-sensors.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-sensor-types-and-the-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Sensor types and the pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-interfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Interfaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-calibration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Calibration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-diagnostics-and-trouble-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Diagnostics and trouble codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-key-off-and-the-5-v-supplies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · Key off and the 5 V supplies
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting it up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-switch-the-sensors-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Switch the sensors on
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-set-up-one-sensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Set up one sensor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-manifold-pressure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Manifold pressure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-switches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Switches
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-frequency-flex-fuel-wideband" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Frequency, flex fuel, wideband
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="sensors-and-calibration">Sensors and calibration<a class="headerlink" href="#sensors-and-calibration" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> every input the ECU reads — pressure, temperature, throttle, lambda, switch or
+speed — is one entry in a catalogue, set up the same way: switch it on, say how it is wired, give
+it a calibration, and choose which faults it should report.</p>
+</blockquote>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>The ECU can read <strong>135 inputs</strong>, listed by name under <strong>Configuration ▸ Sensors</strong>: Coolant
+Temperature, Manifold Pressure, Throttle Position, Clutch Pedal Switch, Wideband O2 and so on. Each
+is a <strong>sensor</strong> in the catalogue. You switch on the ones your car has, and for each one you say:</p>
+<ol>
+<li><strong>How it is read</strong> (the <strong>interface</strong>): an analogue voltage, a frequency, a switch level, a CAN
+   message, and so on.</li>
+<li><strong>Where it is wired</strong>: which ECU input pin.</li>
+<li><strong>What the reading means</strong> (the <strong>calibration</strong>): a curve from the raw reading (volts, hertz) to
+   the real value (°C, kPa, %).</li>
+<li><strong>What counts as a fault</strong> (the <strong>diagnostics</strong>): which checks to run, their limits, and how
+   serious each fault is.</li>
+</ol>
+<p>The result is published as a <strong>channel</strong>, such as <code>clt</code> or <code>map</code>, which every other module reads. A
+sensor you have not switched on publishes nothing at all, which is different from publishing zero:
+the modules that need it see it as missing and use their own fallback.</p>
+<!-- src: definition/ecu.schema.yaml (Sensors) (catalogue); firmware/Sensors/Sensors.h -->
+
+<p>Every engine needs this chapter. At minimum you need manifold pressure (for Speed-Density), coolant
+and air temperature, throttle position, and battery voltage.</p>
+<div class="admonition warning">
+<p class="admonition-title">The default calibrations are placeholders</p>
+<p>A new tune's calibration for most sensors is a straight line across the whole input range, such
+as 0–5 V = 0–100 °C. That is not your sensor. Enter the real curve for every sensor you use
+before you trust any reading from it.
+<!-- src: definition/ecu.schema.yaml (cal default [[0,0],[5000,1000]]) --></p>
+</div>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<figure>
+<p><img alt="The sensor pipeline: acquire, raw checks, calibration, reading checks, behaviour checks, publish; what a tripped check becomes (DTC delay, trouble code, engine protection); and the key-off and 5 V supply gates" src="../img/diagrams/sensors-pipeline.svg" />
+  </p>
+<figcaption>Figure 17.1 — What happens to every enabled input. Red is diagnostics, blue is the
+  calibration.</figcaption>
+</figure>
+<h3 id="1-sensor-types-and-the-pipeline">1 · Sensor types and the pipeline<a class="headerlink" href="#1-sensor-types-and-the-pipeline" title="Permanent link">&para;</a></h3>
+<p>Every sensor has a <strong>type</strong>, which sets its units, precision, value range and update rate:</p>
+<!-- src: definition/ecu.schema.yaml (sensor_types); generated/sensors_catalog.h -->
+
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Units</th>
+<th>Updates</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>temperature</td>
+<td>°C</td>
+<td>5 Hz</td>
+<td>coolant, air, oil</td>
+</tr>
+<tr>
+<td>exhaust temperature</td>
+<td>°C (to 1500)</td>
+<td>5 Hz</td>
+<td>EGT</td>
+</tr>
+<tr>
+<td>pressure</td>
+<td>kPa</td>
+<td>100 Hz</td>
+<td>MAP, oil, fuel</td>
+</tr>
+<tr>
+<td>percent</td>
+<td>%</td>
+<td>200 Hz</td>
+<td>throttle, pedal</td>
+</tr>
+<tr>
+<td>position</td>
+<td>°</td>
+<td>100 Hz</td>
+<td>steering angle</td>
+</tr>
+<tr>
+<td>level</td>
+<td>%</td>
+<td>2 Hz</td>
+<td>fuel level</td>
+</tr>
+<tr>
+<td>lambda</td>
+<td>λ</td>
+<td>20 Hz</td>
+<td>wideband O2</td>
+</tr>
+<tr>
+<td>flow</td>
+<td>g/s</td>
+<td>50 Hz</td>
+<td>MAF</td>
+</tr>
+<tr>
+<td>composition</td>
+<td>%</td>
+<td>5 Hz</td>
+<td>flex fuel</td>
+</tr>
+<tr>
+<td>frequency</td>
+<td>Hz</td>
+<td>50 Hz</td>
+<td>wheel speed, turbo speed</td>
+</tr>
+<tr>
+<td>switch</td>
+<td>on/off</td>
+<td>50 Hz</td>
+<td>clutch, brake, start button</td>
+</tr>
+<tr>
+<td>narrowband</td>
+<td>V</td>
+<td>50 Hz</td>
+<td>narrowband O2</td>
+</tr>
+<tr>
+<td>voltage</td>
+<td>V</td>
+<td>20 Hz</td>
+<td>battery</td>
+</tr>
+<tr>
+<td>multi-position switch</td>
+<td>position number</td>
+<td>50 Hz</td>
+<td>cruise stalk, steering-wheel buttons</td>
+</tr>
+<tr>
+<td>high pressure</td>
+<td>kPa (whole kPa, to 32767)</td>
+<td>20 Hz</td>
+<td>nitrous and CO2 bottle pressure</td>
+</tr>
+</tbody>
+</table>
+<p>A catalogued sensor already has its type. Only the <strong>Auxiliary Input</strong> and <strong>Generic</strong> entries let you
+choose one (<strong>Sensor Type</strong>).</p>
+<p>Each enabled sensor runs the same steps, in order:</p>
+<ol>
+<li><strong>Acquire</strong> the raw reading from its input.</li>
+<li><strong>Raw checks</strong>: is the raw reading electrically plausible? A trip makes the reading <strong>invalid</strong>.</li>
+<li><strong>Calibration</strong>: turn the raw reading into the real value.</li>
+<li><strong>Reading checks</strong>: is the value plausible for this engine? A trip raises a code, but the reading
+   stays valid.</li>
+<li><strong>Behaviour checks</strong>: a switch stuck in one state, or a value changing impossibly fast. A trip
+   makes the reading invalid.</li>
+<li><strong>Publish</strong> the value, with a valid flag and a time stamp.
+   <!-- src: firmware/Integration/PipelineBuilder.h (locked interface); firmware/Pipeline/Stages.h -->
+</li>
+</ol>
+<p>There is <strong>no smoothing</strong> in the sensor. It publishes what it measured, and each module that reads it
+decides how much to filter, because only the module knows whether it is fuelling from the value or
+running a fast control loop on it.</p>
+<!-- src: firmware/Pipeline/Stages.h -->
+
+<h3 id="2-interfaces">2 · Interfaces<a class="headerlink" href="#2-interfaces" title="Permanent link">&para;</a></h3>
+<p><strong>Interface</strong> says how the sensor is physically read, and so which settings apply and which pins the
+picker offers:</p>
+<!-- src: definition/ecu.schema.yaml enums.sensor_interface; firmware/Integration/PipelineBuilder.h -->
+
+<table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Reads</th>
+<th>Pins</th>
+<th>Raw units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Analogue Voltage</strong></td>
+<td>a 0–5 V signal</td>
+<td>AV1–AV16, AT1–AT4</td>
+<td>volts</td>
+</tr>
+<tr>
+<td><strong>Engine Sync Voltage</strong></td>
+<td>a 0–5 V signal averaged over a crank-angle window (below)</td>
+<td>AV/AT</td>
+<td>volts</td>
+</tr>
+<tr>
+<td><strong>On-board</strong></td>
+<td>a sensor on the ECU board itself (barometric pressure, board temperature)</td>
+<td>none</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Frequency</strong></td>
+<td>pulses per second</td>
+<td>DIG1–DIG8</td>
+<td>Hz</td>
+</tr>
+<tr>
+<td><strong>Digital</strong></td>
+<td>a switch level, on or off</td>
+<td>DIG1–DIG8</td>
+<td>on/off</td>
+</tr>
+<tr>
+<td><strong>CAN Bus</strong></td>
+<td>a field of a CAN message (chapter 33)</td>
+<td>none</td>
+<td>the field's value</td>
+</tr>
+<tr>
+<td><strong>SENT</strong></td>
+<td>a SENT digital sensor</td>
+<td>DIG1–DIG8</td>
+<td>the sensor's counts</td>
+</tr>
+<tr>
+<td><strong>Pulse Width</strong></td>
+<td>the length of a pulse</td>
+<td>DIG1–DIG8</td>
+<td>µs</td>
+</tr>
+</tbody>
+</table>
+<p>Each sensor offers only the interfaces that make sense for it. <strong>Manifold Pressure</strong> is always read
+as Engine Sync Voltage; <strong>Coolant Temperature</strong> only reads as Analogue Voltage.</p>
+<p><strong>Engine Sync Voltage</strong> exists for manifold pressure. Sampled at a random moment, MAP catches whatever
+the intake pulses are doing, so the reading swings with engine speed. Averaged over a crank-angle
+window it follows load instead. The window is one setting for all engine-sync inputs,
+<strong>Engine-Sync Sampling ▸ Averaging Window</strong> <code>sensors.engine_sync_window_deg</code> (default 360°), on the
+Trigger System page. An <strong>instant</strong> MAP channel, <code>imap</code>, is also published every millisecond,
+unaveraged, for transient fuel (chapter 19).</p>
+<!-- src: definition/ecu.schema.yaml; firmware/Sensors/Sensors.cpp -->
+
+<h3 id="3-calibration">3 · Calibration<a class="headerlink" href="#3-calibration" title="Permanent link">&para;</a></h3>
+<p>The calibration is a curve of up to <strong>16 points</strong>: raw reading on one axis, real value on the other.
+Between points the ECU draws a straight line. Beyond the first and last points the reading holds the
+end value. The raw axis must go upwards from point to point.</p>
+<!-- src: definition/ecu.schema.yaml -->
+
+<figure>
+<p><img alt="A two-point MAP calibration: 0.5 V is 10 kPa, 4.5 V is 300 kPa, the reading held flat outside the points, and the raw checks at 0.25 V and 4.75 V shaded" src="../img/plots/sensors-map-clamp.svg" />
+  </p>
+<figcaption>Figure 17.2 — A linear sensor needs just two points from its data sheet. The raw checks
+  catch the readings the curve cannot tell from real ones.</figcaption>
+</figure>
+<p>A <strong>switch on an analogue pin</strong> does not use a curve. The first two calibration points become two
+trip points: the reading turns <strong>on</strong> when the voltage rises past the higher one and <strong>off</strong> when it
+falls below the lower one. Between them it keeps its last state, so a noisy pin cannot chatter.
+<strong>Invert Signal</strong> flips the result.</p>
+<!-- src: firmware/Integration/PipelineBuilder.h -->
+
+<p>A <strong>multi-position switch</strong> (several buttons on one wire through resistors) uses a voltage <strong>band</strong>
+per position instead: up to 8 bands, each a low and high voltage with a position number. A reading in
+no band makes the channel invalid and raises the sensor's own "no calibrated band" code.</p>
+<!-- src: definition/ecu.schema.yaml; firmware/Integration/PipelineBuilder.h -->
+
+<figure>
+<p><img alt="Left: a switch on an analogue pin with On and Off points and the reading changing only past each; right: a multi-position switch with one voltage band per position" src="../img/diagrams/sensors-switch-decode.svg" />
+  </p>
+<figcaption>Figure 17.3 — The two ways a switch can be read from a voltage.</figcaption>
+</figure>
+<h3 id="4-diagnostics-and-trouble-codes">4 · Diagnostics and trouble codes<a class="headerlink" href="#4-diagnostics-and-trouble-codes" title="Permanent link">&para;</a></h3>
+<p>Each sensor can run up to six checks. You tick the ones your wiring can actually tell apart:</p>
+<!-- src: definition/ecu.schema.yaml -->
+
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Tests</th>
+<th>In</th>
+<th>Makes the reading</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Detect Raw Low</strong></td>
+<td>raw reading below <strong>Raw Low Threshold</strong> (default 250 mV)</td>
+<td>the input's own units</td>
+<td>invalid</td>
+</tr>
+<tr>
+<td><strong>Detect Raw High</strong></td>
+<td>raw reading above <strong>Raw High Threshold</strong> (default 4750 mV)</td>
+<td>the input's own units</td>
+<td>invalid</td>
+</tr>
+<tr>
+<td><strong>Detect Reading Low</strong></td>
+<td>value below <strong>Reading Low Threshold</strong></td>
+<td>the sensor's units</td>
+<td>still valid</td>
+</tr>
+<tr>
+<td><strong>Detect Reading High</strong></td>
+<td>value above <strong>Reading High Threshold</strong></td>
+<td>the sensor's units</td>
+<td>still valid</td>
+</tr>
+<tr>
+<td><strong>Detect Stuck</strong></td>
+<td>a switch that holds one state longer than <strong>Stuck Timeout</strong></td>
+<td>ms</td>
+<td>invalid</td>
+</tr>
+<tr>
+<td><strong>Detect Rate Spike</strong></td>
+<td>a value changing faster than <strong>Max Rate of Change</strong> per second</td>
+<td>units/s</td>
+<td>invalid</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The raw pair is an <strong>electrical</strong> test before calibration: a short to ground or an open circuit
+  usually reads near 0 V, a short to 5 V near 5 V. On a frequency input the threshold is in Hz, on a
+  pulse-width input in µs.</li>
+<li>The reading pair is a <strong>plausibility</strong> test after calibration. It only runs while the
+  <strong>Precondition</strong> expression is true. For example, oil pressure of zero is a fault at 3000 rpm and
+  the truth with the engine stopped, so give Reading Low a precondition such as <code>rpm &gt; 1500</code>. The
+  expression reads channels and settings (chapter 34). A missing or stale channel counts as false,
+  so a dead sensor cannot arm a fault.</li>
+<li><strong>Detect Rate Spike</strong> only exists for types that change fast (pressure, percent, frequency).</li>
+<li>A check must fail continuously for <strong>DTC Delay</strong> (default 250 ms) before it becomes a fault. The
+  timer restarts the moment the check passes. The fault clears as soon as the check passes again.
+  <!-- src: definition/ecu.schema.yaml -->
+</li>
+</ul>
+<p>Each check has a <strong>Severity</strong>: None, Level 1, 2 or 3. It is stored with the trouble code, and the
+worst active severity selects the engine protection level that reacts (chapter 29).</p>
+<p>Each check raises its own <strong>trouble code</strong>, shown on the sensor's Diagnostics page. Where a standard
+OBD-II code exists, it is used: coolant Raw Low is <strong>P0117</strong>, Raw High <strong>P0118</strong>. Where two checks
+would share one standard code, the second gets a code of its own from the manufacturer range that
+starts at <strong>P1000</strong>, so every code names exactly one fault.</p>
+<!-- src: codegen/codegen.py (sensor_diag_dtcs) -->
+
+<p>Two more codes per sensor:</p>
+<ul>
+<li><strong>Input not assigned</strong> (<strong>P1800</strong> + the sensor's number): the sensor is enabled with an interface
+  that needs a pin, and no pin is assigned. Level 1, shown even with the key off, so the bench shows
+  what still needs wiring.</li>
+<li><strong>Precondition invalid</strong>: the Precondition expression does not compile.
+  <!-- src: firmware/Sensors/Sensors.cpp; codegen/codegen.py -->
+</li>
+</ul>
+<p>Two sensors on one pin is a configuration fault: the second one is not read, and the pin conflict code
+<strong>P1650</strong> is raised (chapter 18).</p>
+<!-- src: firmware/Sensors/Sensors.cpp -->
+
+<h3 id="5-key-off-and-the-5-v-supplies">5 · Key off and the 5 V supplies<a class="headerlink" href="#5-key-off-and-the-5-v-supplies" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Key off:</strong> only <strong>Battery Voltage</strong> runs. The key counts as on above 8.0 V and off again below
+  7.0 V. Every other sensor waits for key-on, because on USB power alone the 5 V rail is fed from USB
+  and the readings would be real but wrong.</li>
+<li><strong>5 V sensor supply down:</strong> each 5 V sensor supply has a power-good line. If either goes low, every
+  input read from an ECU pin is marked invalid at once, and its own checks stand down, so one fault is
+  reported instead of dozens. After 100 ms the supply raises <strong>P0641</strong> (supply 1) or <strong>P0651</strong>
+  (supply 2) at Level 2. Battery voltage, on-board and CAN sensors are not affected.
+  <!-- src: firmware/Sensors/Sensors.h; firmware/Sensors/Sensors.cpp -->
+</li>
+</ul>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<ul>
+<li><strong>The sensors wired</strong> (chapter 11): which pin each one is on, and the 5 V supply and ground for
+  each.</li>
+<li><strong>Each sensor's data sheet</strong>: its output against the thing it measures. For a thermistor
+  (two-wire temperature sensor), its resistance against temperature.</li>
+<li>The ECU connected, if you want to see live raw readings while you calibrate. Everything else can be
+  set up offline.</li>
+</ul>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>The walk-through wires the car used for the screenshots: MAP on AV1, coolant on AT1, air temperature
+on AT2, throttle on AV2, oil pressure on AV3, and the clutch switch on DIG3.</p>
+<figure>
+<p><img alt="Wiring from the ECU connectors to a three-wire MAP sensor, a two-wire coolant sensor and a clutch switch, with what each sensor's page says" src="../img/diagrams/sensors-wiring.svg" />
+  </p>
+<figcaption>Figure 17.4 — The example car's wiring, and how each wire appears on the sensor's page.</figcaption>
+</figure>
+<h3 id="step-1-switch-the-sensors-on">Step 1 — Switch the sensors on<a class="headerlink" href="#step-1-switch-the-sensors-on" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Configuration ▸ Sensors</strong>. The page lists all 135 inputs by group. Tick the ones the car has.
+A name in grey is switched off. Clicking a name opens that sensor's page.</p>
+<figure>
+<p><img alt="The Sensors switchboard: every input by group with a tick box; Air Temperature, Coolant Temperature, Throttle Position, Manifold Pressure, Battery Voltage and ECU Temperature ticked" src="../img/studio/sensors-switchboard.png" />
+  </p>
+<figcaption>Figure 17.5 — Configuration ▸ Sensors.</figcaption>
+</figure>
+<p>Each group also has its own page, showing the live reading beside each enabled sensor:</p>
+<figure>
+<p><img alt="The Engine Sync group page: three inputs, Manifold Pressure enabled with its reading" src="../img/studio/sensors-group-sync.png" />
+  </p>
+<figcaption>Figure 17.6 — A group page. A blank reading means the input publishes nothing.</figcaption>
+</figure>
+<h3 id="step-2-set-up-one-sensor">Step 2 — Set up one sensor<a class="headerlink" href="#step-2-set-up-one-sensor" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Sensors ▸ Engine ▸ Coolant Temperature</strong>. Every sensor page has the same layout.</p>
+<figure>
+<p><img alt="The Coolant Temperature page with numbered markers: 1 Enabled, 2 Interface, 3 Assign, 4 the pin and wire colour, 5 the raw reading, 6 the calibration table, 7 the calibration curve" src="../img/studio/sensors-clt-annotated.svg" />
+  </p>
+<figcaption>Figure 17.7 — A sensor page. The numbers match the steps below.</figcaption>
+</figure>
+<ol>
+<li><strong>Enabled</strong>: on.</li>
+<li><strong>Interface</strong>: how it is read (Analogue Voltage for coolant).</li>
+<li><strong>Assign</strong> picks the input pin; <strong>Clear</strong> removes it. The list only shows pins that suit the
+   interface.</li>
+<li>The page then shows the pin, the wire colour and the connector pin number: here <strong>AT1</strong>, grey/black,
+   <strong>CN3 pin 14</strong>.</li>
+<li><strong>Raw input</strong> shows what the pin reads now, in volts (or Hz, µs…), when the ECU is connected.</li>
+<li><strong>Calibration</strong>: the table of points. Raw values are shown in volts for a voltage input.</li>
+<li>The curve of the same points. Right-click it for <strong>Insert Point</strong>, <strong>Delete Point</strong>,
+   <strong>Linearise</strong>, <strong>Save to File…</strong>, <strong>Load from File…</strong>, <strong>Apply Preset</strong> and <strong>Axis Setup…</strong>.
+   <!-- src: apps/studio-jf/src/surface/Surface.cpp -->
+</li>
+</ol>
+<p><strong>Apply Preset</strong> lists the calibration files whose units match this sensor: the presets that ship
+with the studio (four common wideband controller mappings, for example) and your own, in the
+<code>calibrations</code> folder of the studio's data folder (chapter 3). <strong>Save to File…</strong> puts a calibration
+there, so a sensor you calibrate once can be applied to the next car in one click. Your own file wins
+if it has the same name as a shipped one.</p>
+<!-- src: apps/studio-jf/src/surface/Surface.cpp (calibrationDir, shippedCalibrationDir, rebuildPresetMenu); apps/studio-jf/calibrations/ -->
+
+<p><strong>Calibrating a thermistor.</strong> The temperature inputs AT1–AT4 each have a <strong>2.7 kΩ pull-up</strong> to 5 V
+sensor supply 1. So a thermistor of resistance <em>R</em> reads:</p>
+<p><strong>volts = 5 × R ÷ (R + 2700)</strong></p>
+<p>Take the resistance at several temperatures from the sensor's data sheet, work out the volts for each,
+and enter them as points: for example, 2500 Ω at 20 °C reads 5 × 2500 ÷ 5200 = <strong>2.40 V</strong>. A
+thermistor's curve is far from straight, so use as many points as you can, closer together where the
+engine spends its time (60–110 °C).</p>
+<!-- src: hardware/PDF_JAYTEK_2026-04-29/Temperature (R13-R16 2.7 kΩ to CON_5V_SENSOR1) -->
+
+<h3 id="step-3-diagnostics">Step 3 — Diagnostics<a class="headerlink" href="#step-3-diagnostics" title="Permanent link">&para;</a></h3>
+<p>Open the sensor's <strong>Diagnostics</strong> page (under the sensor in the navigation).</p>
+<figure>
+<p><img alt="Coolant Temperature Diagnostics: Detect Raw Low at Level 1 with P0117, Detect Raw High at Level 1 with P0118, Detect Reading Low off, Detect Reading High at Level 2 with P13F3; DTC Delay 250 ms; Precondition" src="../img/studio/sensors-clt-diag.png" />
+  </p>
+<figcaption>Figure 17.8 — Coolant Temperature ▸ Diagnostics, set up as in Example 2.</figcaption>
+</figure>
+<p>For each check: tick it, set where it trips, choose its severity. The code it raises is shown on the
+right. Then set the <strong>DTC Delay</strong> and, for the reading checks, a <strong>Precondition</strong> if the check only
+makes sense in some conditions.</p>
+<p>Each threshold is shown and entered in the sensor's own units and precision: °C to 0.1 for a
+temperature, kPa to 0.1 for a pressure, λ to 0.01 for lambda. The raw thresholds are shown in volts for
+a voltage input (Hz for a frequency input, µs for a pulse width).</p>
+<!-- src: apps/studio-jf/src/model/Cache.cpp (typeScaledField); firmware/Integration/PipelineBuilder.h -->
+
+<h3 id="step-4-manifold-pressure">Step 4 — Manifold pressure<a class="headerlink" href="#step-4-manifold-pressure" title="Permanent link">&para;</a></h3>
+<figure>
+<p><img alt="The Manifold Pressure page: Engine Sync Voltage on AV1, CN3 pin 27, and the calibration" src="../img/studio/sensors-map-page.png" />
+  </p>
+<figcaption>Figure 17.9 — Manifold Pressure, read engine-synchronously.</figcaption>
+</figure>
+<p>MAP is set up like any other sensor, but its Interface is <strong>Engine Sync Voltage</strong>. Enter the two points
+from the sensor's data sheet (Example 1). Then check <strong>Averaging Window</strong> on <strong>Engine Configuration ▸
+Trigger System</strong>:</p>
+<figure>
+<p><img alt="Engine-Sync Sampling: Averaging Window 360°" src="../img/studio/sensors-sync-window.png" width="400" />
+  </p>
+<figcaption>Figure 17.10 — The window every engine-sync input is averaged over.</figcaption>
+</figure>
+<p>A window of one cylinder's firing interval (720 ÷ cylinders on a four-stroke) or a whole number of
+them averages out the intake pulses. The default is 360°.</p>
+<h3 id="step-5-switches">Step 5 — Switches<a class="headerlink" href="#step-5-switches" title="Permanent link">&para;</a></h3>
+<p>A switch on a <strong>digital</strong> pin needs only its pin, and <strong>Invert</strong> if it pulls the line low when active.
+A switch on an <strong>analogue</strong> pin shows <strong>Switch On (V)</strong> and <strong>Switch Off (V)</strong>: set On a little below
+the voltage when the switch is active, and Off a little above the voltage when it is not.</p>
+<figure>
+<p><img alt="Left: Clutch Pedal Switch on a digital pin DIG3 with Invert; right: Start Button on an analogue pin AV5 with Switch On and Switch Off voltages" src="../img/studio/sensors-clutch-input.png" />
+  </p>
+<figcaption>Figure 17.11 — A switch on a digital pin.</figcaption>
+</figure>
+<figure>
+<p><img alt="Start Button on analogue pin AV5, with Switch On (V) 5.000 and Switch Off (V) 0.000" src="../img/studio/sensors-start-input.png" />
+  </p>
+<figcaption>Figure 17.12 — A switch on an analogue pin. The defaults (5 V and 0 V) must be set to
+  your switch.</figcaption>
+</figure>
+<p>A <strong>multi-position switch</strong>, such as the <strong>Cruise Control Switch</strong>, gets a band per position. With the
+ECU connected, hold a button and press <strong>Capture</strong> on its row: the band is centred on what the ECU
+reads. <strong>+ Band</strong> adds a position. Position 0 is rest, the one position that may be held indefinitely.</p>
+<figure>
+<p><img alt="Cruise Control Switch calibration: a Position row with Low, High and Capture, and + Band" src="../img/studio/sensors-cruise-bands.png" />
+  </p>
+<figcaption>Figure 17.13 — Capturing the bands of a multi-position switch.</figcaption>
+</figure>
+<h3 id="step-6-frequency-flex-fuel-wideband">Step 6 — Frequency, flex fuel, wideband<a class="headerlink" href="#step-6-frequency-flex-fuel-wideband" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p>A <strong>Frequency</strong> sensor's default calibration is 1:1 (Hz in, Hz out). Turning wheel pulses into road
+  speed is the vehicle speed module's job (chapter 32).
+  <!-- src: definition/ecu.schema.yaml --></p>
+</li>
+<li>
+<p><strong>Flex Fuel Composition &amp; Temperature</strong> reads a flex-fuel sensor on a digital pin as a frequency.
+  The frequency gives the ethanol content: enter your sensor's figures in the calibration (most read
+  50 Hz for 0 % and 150 Hz for 100 %; check yours). The <strong>pulse width</strong> of the same signal gives the
+  fuel temperature, fixed at 1.000 ms = −40 °C to 5.000 ms = 125 °C, published as <code>fuel_temp_flex</code>.
+  A temperature outside −40…125 °C raises <strong>P0182</strong> or <strong>P0183</strong>.
+  <!-- src: definition/ecu.schema.yaml (composition outputs) -->
+</p>
+</li>
+</ul>
+<figure>
+<p><img alt="Flex Fuel Composition &amp; Temperature: Frequency interface on DIG5, and the calibration from Hz to %" src="../img/studio/sensors-flex-page.png" />
+  </p>
+<figcaption>Figure 17.14 — Flex fuel. The default calibration shown is a placeholder.</figcaption>
+</figure>
+<ul>
+<li>A <strong>Wideband O2</strong> read as an analogue voltage needs the controller's mapping: its manual gives the
+  lambda at 0 V and at 5 V. The default is 0.50–1.50. Different controllers disagree by a lot at the
+  same voltage (Figure 17.15), so never guess it. A controller on CAN avoids the question entirely.
+  There are 15 wideband inputs: one per cylinder, two per bank and one overall. Which one closed loop
+  uses is chosen on O2 Control (chapter 23).
+  <!-- src: definition/ecu.schema.yaml (lambda default_cal, per_cylinder, extra: 3) -->
+</li>
+</ul>
+<figure>
+<p><img alt="Four wideband controller mappings: at 2.5 V they read λ 1.00, 1.01, 0.91 and 1.02" src="../img/plots/sensors-wideband-presets.svg" />
+  </p>
+<figcaption>Figure 17.15 — The same voltage, four different lambdas. The calibration must match the
+  controller.</figcaption>
+</figure>
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — a 3-bar MAP sensor on AV1</p>
+<p>The sensor's data sheet says 0.5 V at 10 kPa and 4.5 V at 300 kPa, linear.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manifold Pressure ▸ Interface</td>
+<td>Engine Sync Voltage</td>
+</tr>
+<tr>
+<td>Source</td>
+<td>AV1 (CN3 pin 27)</td>
+</tr>
+<tr>
+<td>Calibration</td>
+<td>two points: 0.500 V → 10.0 kPa, 4.500 V → 300.0 kPa</td>
+</tr>
+<tr>
+<td>Detect Raw Low / High</td>
+<td>on, 0.25 V / 4.75 V (the defaults), Level 2</td>
+</tr>
+</tbody>
+</table>
+<p>Below 0.5 V the curve would hold 10 kPa, so a shorted signal would look like a real (if odd)
+reading. Raw Low catches it and marks MAP invalid, so fuelling falls back (chapter 19) instead of
+trusting it (Figure 17.2).</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — coolant temperature on AT1</p>
+<p>A two-wire thermistor to ground, calibrated from its resistance table (Step 2).</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Setting</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detect Raw Low</td>
+<td>on, Level 1</td>
+<td>a short to ground reads near 0 V</td>
+</tr>
+<tr>
+<td>Detect Raw High</td>
+<td>on, Level 1</td>
+<td>an open circuit reads near 5 V through the pull-up</td>
+</tr>
+<tr>
+<td>Detect Reading High</td>
+<td>on, Level 2, 115 °C</td>
+<td>an overheating engine</td>
+</tr>
+</tbody>
+</table>
+<p>Engine protection (chapter 29) decides what a Level 2 fault does, such as limiting engine speed.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — oil pressure only checked while running</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Oil Pressure ▸ Detect Reading Low</td>
+<td>on, Level 3, 100 kPa</td>
+</tr>
+<tr>
+<td>Precondition</td>
+<td><code>rpm &gt; 1500</code></td>
+</tr>
+<tr>
+<td>DTC Delay</td>
+<td>1000 ms</td>
+</tr>
+</tbody>
+</table>
+<p>With the engine stopped, zero oil pressure is normal, so the precondition keeps the check quiet.
+Above 1500 rpm, less than 100 kPa for a full second is a fault at Level 3.</p>
+</div>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<p>Sensors are calibrated, not tuned. Check each one against a known reference:</p>
+<ul>
+<li><strong>MAP</strong> with the engine off should read your barometric pressure (about 100 kPa at sea level).</li>
+<li><strong>Temperatures</strong> should agree with each other on a cold engine that has stood overnight, and with a
+  thermometer in hot water for a loose sensor.</li>
+<li><strong>Throttle</strong> should read 0 % closed and 100 % wide open (the electronic throttle has its own
+  calibration, chapter 22).</li>
+<li><strong>Wideband</strong> should read about λ 1.00 at a steady cruise in closed loop, and the controller's own
+  display (if it has one) should agree with the ECU.</li>
+</ul>
+<p>Set diagnostics from what the sensor and wiring can really do. A check that trips on a healthy engine
+teaches everyone to ignore it.</p>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The sensor's Raw Low / Raw High code (e.g. <strong>P0107/P0108</strong> MAP, <strong>P0117/P0118</strong> coolant, <strong>P0122/P0123</strong> throttle)</td>
+<td>Electrical fault on the input</td>
+<td>Wiring, connector, the 5 V supply, a short or open circuit</td>
+</tr>
+<tr>
+<td>The sensor's Reading Low / High code (e.g. <strong>P0105/P0106</strong> MAP, <strong>P0116</strong> coolant)</td>
+<td>Reading implausible</td>
+<td>The calibration; the sensor; the thresholds</td>
+</tr>
+<tr>
+<td><strong>P1800</strong>–<strong>P18xx</strong></td>
+<td>Sensor enabled but no pin assigned</td>
+<td>Assign the pin, or switch the sensor off</td>
+</tr>
+<tr>
+<td><strong>P1650</strong></td>
+<td>One pin claimed by two functions</td>
+<td>Chapter 18</td>
+</tr>
+<tr>
+<td><strong>P0641</strong> / <strong>P0651</strong></td>
+<td>5 V sensor supply 1 / 2 down</td>
+<td>A sensor or harness shorting its 5 V to ground (chapter 10)</td>
+</tr>
+<tr>
+<td><strong>P0562</strong> / <strong>P0563</strong></td>
+<td>Battery voltage low / high</td>
+<td>Charging system, battery</td>
+</tr>
+<tr>
+<td><strong>P0182</strong> / <strong>P0183</strong></td>
+<td>Flex fuel temperature out of range</td>
+<td>Flex sensor wiring</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/ecu.schema.yaml (dtc per sensor); firmware/Sensors/Sensors.cpp -->
+
+<p>Every sensor publishes its channel with a <strong>valid</strong> flag. A channel that is invalid or missing shows
+blank on the group pages and on gauges, which is the first sign something is wrong.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reading is blank</td>
+<td>Sensor off; no pin assigned (P18xx); key off; 5 V supply down; pin conflict</td>
+<td>Enabled; Assign; battery voltage above 8 V; P0641/P0651; P1650</td>
+</tr>
+<tr>
+<td>Reading is wrong by a constant ratio</td>
+<td>Calibration wrong</td>
+<td>The data sheet points; the raw input against the curve</td>
+</tr>
+<tr>
+<td>Temperature wrong only when hot or only when cold</td>
+<td>Too few calibration points for a thermistor</td>
+<td>Add points across the range</td>
+</tr>
+<tr>
+<td>All sensors on one connector read wrong together</td>
+<td>Shared ground or 5 V supply fault</td>
+<td>Grounds and supply (chapter 10)</td>
+</tr>
+<tr>
+<td>MAP swings with engine speed at steady load</td>
+<td>Averaging window too short</td>
+<td>Averaging Window on the Trigger System page</td>
+</tr>
+<tr>
+<td>A reading-high fault on a healthy sensor</td>
+<td>Threshold set too close to normal readings</td>
+<td>The threshold against logged readings</td>
+</tr>
+<tr>
+<td>A switch never changes</td>
+<td>Wrong pin; needs Invert; analogue trip points not set</td>
+<td>Raw input while you press it; Switch On/Off voltages</td>
+</tr>
+<tr>
+<td>Wideband reads a steady wrong lambda</td>
+<td>Controller mapping wrong</td>
+<td>The controller's manual; Figure 17.15</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<p>Every Sensors setting, generated from the definition the studio loads:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Engine-Sync Window (deg)</strong><br><code>sensors.engine_sync_window_deg</code><br>Range: 0 to 720<br>Default: 360<br>Units: deg</td>
+<td>The crank-angle window over which engine-synchronous sensors are averaged. It exists for MAP: sampling manifold pressure at an arbitrary moment catches whatever the intake pulse is doing, and the reading swings with RPM rather than with load. Averaging the ADC across a defined window of crank rotation instead gives a figure that means the same thing at every engine speed. Only sensors marked engine-sync use it; everything else is read directly.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../part2/10-power-grounds.html">Chapter 10 — Power, grounds and protection</a> (5 V supplies, key states)</li>
+<li><a href="../part2/11-wiring-sensors.html">Chapter 11 — Wiring sensors</a></li>
+<li><a href="18-outputs.html">Chapter 18 — Outputs and the pin system</a> (pin conflicts)</li>
+<li><a href="19-fuel.html">Chapter 19 — Fuel</a> (what happens when MAP, TPS or a temperature is missing)</li>
+<li><a href="29-protection.html">Chapter 29 — Engine protection</a> (what each severity level does)</li>
+<li><a href="33-can-config.html">Chapter 33 — CAN configuration</a> (sensors read from CAN)</li>
+<li><a href="34-tables-expressions.html">Chapter 34 — Generic tables and expressions</a> (precondition expressions)</li>
+<li><a href="../reference/sensor-types.html">Sensor types reference</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="16-trigger.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 16 The trigger system">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                16 The trigger system
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="18-outputs.html" class="md-footer__link md-footer__link--next" aria-label="Next: 18 Outputs and the pin system">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                18 Outputs and the pin system
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

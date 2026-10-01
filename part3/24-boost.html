@@ -1,0 +1,3946 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/24-boost.html">
+      
+      
+        <link rel="prev" href="23-lambda.html">
+      
+      
+        <link rel="next" href="25-vvt-vvl.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>24 Boost - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#boost" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              24 Boost
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="24-boost.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-the-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · The target
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-activation-when-the-module-acts-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Activation: when the module acts at all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-the-feed-forward-duty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · The feed-forward duty
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-closed-loop-and-the-handover" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Closed loop, and the handover
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-long-term-trim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · Long-term trim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-the-actuator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6 · The actuator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-the-overboost-backstop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7 · The overboost backstop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting it up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-driver-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional driver controls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corrections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Corrections
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tuning it">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-base-duty-in-open-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Base duty in open loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-close-the-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Close the loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-let-it-learn-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Let it learn (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="boost">Boost<a class="headerlink" href="#boost" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> the Boost module decides how much boost to ask for, drives the wastegate to
+get it, and cuts the engine if manifold pressure ever goes where it must not.</p>
+</blockquote>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>A turbocharger makes boost until its <strong>wastegate</strong> opens and lets exhaust bypass the turbine. On its
+own, the wastegate opens at its <strong>spring pressure</strong>, so an engine with no boost control runs "spring
+boost" everywhere. Boost control holds the wastegate shut harder, so boost can rise above spring
+pressure, and it can ask for different boost at different engine speeds, in different gears, or when
+the driver presses a button.</p>
+<p>The module does four jobs:</p>
+<ol>
+<li><strong>Chooses a target:</strong> how much manifold pressure to ask for right now, from the <strong>Boost Target</strong>
+   table and any adjustments (a trim knob, a scramble button, correction curves, engine protection).</li>
+<li><strong>Drives the wastegate:</strong> either a <strong>solenoid</strong>, given a duty cycle, or a <strong>motorised
+   (electronic) wastegate</strong>, given a position.</li>
+<li><strong>Closes the loop</strong> (optional): measures manifold pressure and trims the wastegate until boost
+   matches the target, whatever the weather.</li>
+<li><strong>Guards against overboost:</strong> cuts fuel, ignition or both if manifold pressure passes a hard limit
+   or runs too far over target. This guard works even when boost control is switched off.
+   <!-- src: firmware/Engine/Modules/Boost.cpp -->
+</li>
+</ol>
+<p>You need this module if your engine has a turbocharger (or supercharger with a bypass valve) and you
+want more than spring pressure, or different boost in different conditions. On a naturally aspirated
+engine, leave it off.</p>
+<div class="admonition danger">
+<p class="admonition-title">Boost is the fastest way to break an engine</p>
+<p>Every setting in this chapter can raise cylinder pressure. Before you raise the target, make sure
+the fuel system can keep up (chapter 19), timing is safe for the boost you are asking for
+(chapter 39), and the overboost cut (below) is set. Raise boost in small steps and log every pull.</p>
+</div>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<figure>
+<p><img alt="Signal flow of the boost controller: the target chain, the feed-forward duty chain, the PID trim, the actuator and the MAP feedback, with the overboost backstop" src="../img/diagrams/boost-signal-flow.svg" />
+  </p>
+<figcaption>Figure 24.1 — Everything the module does on every engine cycle. Blue boxes decide the
+  target, orange boxes decide the duty, green is the closed loop, red is safety.</figcaption>
+</figure>
+<h3 id="1-the-target">1 · The target<a class="headerlink" href="#1-the-target" title="Permanent link">&para;</a></h3>
+<p>The target starts in the <strong>Boost Target</strong> table, read against engine speed (and, if you switch the
+second axis on, gear). Then, in this order:</p>
+<ul>
+<li><strong>Trim knob</strong> (if assigned): adds up to <strong>Trim Authority</strong> kPa at full knob travel. The default
+  authority is <strong>−100 kPa</strong>, so the knob can only ever <em>take boost away</em>.</li>
+<li><strong>Scramble</strong> (if assigned): adds <strong>Scramble Boost Bump</strong> kPa while scramble is active.</li>
+<li><strong>Target corrections</strong>: any of the four correction slots set to <em>Target</em> scale the boost part of
+  the target by their summed per cent.</li>
+<li><strong>Engine protection</strong>: when the protection system asks for less boost, the target is scaled down
+  the same way. At −100 % the target becomes atmospheric pressure: no boost at all.
+  <!-- src: firmware/Engine/Modules/Boost.cpp -->
+</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Advanced — per cent of <em>boost</em>, not of pressure</p>
+<p>Corrections and protection scale only the part of the target <strong>above barometric pressure</strong>. A
+−10 % correction on a 200 kPa target at sea level (about 100 kPa of boost) removes 10 kPa, not
+20 kPa, and a −50 % correction leaves half the boost, not none.
+<!-- src: firmware/Engine/Modules/Boost.cpp --></p>
+</div>
+<p>The final target is published as the output channel <strong>Boost Target</strong> <code>boost_target</code>, and the
+difference between it and measured manifold pressure as <strong>Boost Error</strong> <code>boost_error</code>. Both are
+published whenever the module is enabled and armed, even before boost control becomes active, so you
+can always log them.</p>
+<h3 id="2-activation-when-the-module-acts-at-all">2 · Activation: when the module acts at all<a class="headerlink" href="#2-activation-when-the-module-acts-at-all" title="Permanent link">&para;</a></h3>
+<p>The module only drives the wastegate when <strong>both</strong> of these are true:</p>
+<ul>
+<li>engine speed is at or above <strong>Activation RPM</strong>, and</li>
+<li>manifold pressure is at or above <strong>Activation MAP</strong>.</li>
+</ul>
+<p>Below that, nothing is sent to the wastegate output, so it falls back to its failsafe: the wastegate
+on its spring. The closed-loop state is reset each time the engine drops out of activation.</p>
+<!-- src: firmware/Engine/Modules/Boost.cpp -->
+
+<h3 id="3-the-feed-forward-duty">3 · The feed-forward duty<a class="headerlink" href="#3-the-feed-forward-duty" title="Permanent link">&para;</a></h3>
+<p>Once active, the module works out a <strong>base duty</strong> from the <strong>Wastegate Base Duty</strong> table. This
+table is read against the <strong>boost target</strong>, not against engine speed: each cell answers the question
+"what duty does this much boost take?". An optional RPM axis covers the part the target cannot
+explain: the same boost can take more duty where there is less exhaust energy.</p>
+<p>To the base duty it adds the learned <strong>long-term trim</strong> for the current cell, any correction slots set
+to <em>Duty</em>, and the <strong>Scramble Duty Bump</strong> while scramble is active. The whole sum is then scaled by
+the same protection factor as the target, so a protection pull-back also reduces duty in open loop.</p>
+<!-- src: firmware/Engine/Modules/Boost.cpp -->
+
+<p>In <strong>Open Loop</strong> mode that is the whole answer, clamped between <strong>Min Wastegate Duty</strong> and
+<strong>Max Wastegate Duty</strong>.</p>
+<h3 id="4-closed-loop-and-the-handover">4 · Closed loop, and the handover<a class="headerlink" href="#4-closed-loop-and-the-handover" title="Permanent link">&para;</a></h3>
+<p>In <strong>Closed Loop</strong> mode a PID controller trims the base duty to remove the boost error. It does not
+start the moment the module activates. During the spool the error is large, and a loop that
+integrated it would still be winding up when boost arrived. So the loop takes over only when <strong>all</strong>
+of these pass:</p>
+<ol>
+<li>manifold pressure has reached the <strong>control point</strong>: the target minus <strong>Control Point Offset</strong>;</li>
+<li>throttle is at or above <strong>Closed Loop Min TPS</strong> (if that is not 0);</li>
+<li>the <strong>Controller Start Delay</strong> has elapsed since activation (if <strong>Use Controller Start Delay</strong> is
+   on). The delay is a curve against RPM.
+   <!-- src: firmware/Engine/Modules/Boost.cpp -->
+</li>
+</ol>
+<figure>
+<p><img alt="Three phases of a spool: spring only below activation, feed-forward (or spool assist) until MAP reaches the control point, then closed loop" src="../img/diagrams/boost-handover.svg" />
+  </p>
+<figcaption>Figure 24.2 — A spool from low boost to target. The loop takes over at the control
+  point (green dashed line), not at activation, so it arrives fresh instead of wound up.</figcaption>
+</figure>
+<p>Before the handover, the output rests on the base duty, or on <strong>Max Wastegate Duty</strong> if <strong>Spool
+Assist</strong> is on. Spool assist holds the gate fully shut for the fastest possible spool, and then
+depends entirely on the control point being far enough below target for the loop to catch it.</p>
+<!-- src: firmware/Engine/Modules/Boost.cpp -->
+
+<p>While the loop is held off, its integrator is <strong>frozen, not reset</strong>. Boost falling back under the
+control point (a gear change on boost, say) keeps what the loop had learned, and nothing accumulates
+during the spool. Dropping out of activation altogether (below Activation RPM or MAP, as a real lift
+usually does) <strong>resets</strong> it, so each spool from off-boost starts fresh.</p>
+<!-- src: firmware/Engine/Modules/Boost.cpp (reset below activation) (frozen before handover) -->
+
+<p>After the handover:</p>
+<ul>
+<li><strong>Kp</strong> adds duty in proportion to the boost error, straight away.</li>
+<li><strong>Ki</strong> accumulates the error over time to remove a steady offset. With <strong>Schedule Ki On Error</strong>
+  on, Ki comes from the <strong>Integral Gain vs Error</strong> curve instead: gentle near target, firmer far
+  from it.</li>
+<li><strong>Kd</strong> reacts to how fast the error is changing, which damps overshoot. The rate it reacts to is
+  limited by <strong>Derivative Ceiling</strong>, so one noisy MAP sample cannot spike the duty.</li>
+<li>The integrator is limited twice. It can never ask for more than the output can deliver
+  (anti-windup to the min/max duty), and <strong>Integrator Ceiling</strong> can limit it further.
+  <!-- src: firmware/Engine/Modules/Boost.cpp -->
+</li>
+</ul>
+<h3 id="5-long-term-trim">5 · Long-term trim<a class="headerlink" href="#5-long-term-trim" title="Permanent link">&para;</a></h3>
+<p>With <strong>Long-Term Trim Enabled</strong>, the module learns what the loop keeps having to correct. While the
+loop is in control and the engine sits in one base-duty cell for <strong>Learn Dwell</strong>, it moves <strong>Learn
+Rate</strong> per cent of the integrator into that cell's trim, and takes the same amount back out of the
+integrator. The total duty does not change at that moment; next time, the feed-forward already knows.</p>
+<!-- src: firmware/Engine/Modules/Boost.cpp -->
+
+<p>Learning only happens inside the gates you set: RPM between <strong>Learn Above RPM</strong> and <strong>Learn Below
+RPM</strong>, throttle at or above <strong>Learn Above TPS</strong>, and gear at or above <strong>Learn Above Gear</strong>. The gear
+test passes when the gear cannot be read, so a car without gear detection still learns. No cell may
+hold more than <strong>Trim Authority</strong> per cent either way. The trim is stored in the ECU's learned memory,
+not in the tune, so it survives reflashing the tune.</p>
+<!-- src: firmware/Engine/Modules/Boost.h, Boost.cpp -->
+
+<h3 id="6-the-actuator">6 · The actuator<a class="headerlink" href="#6-the-actuator" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Solenoid:</strong> the final duty goes out as <strong>Wastegate Duty</strong> <code>wastegate_duty</code>, and an output
+  assigned to that channel drives the solenoid (chapter 18).</li>
+<li><strong>Motorised Gate:</strong> the duty is read as "per cent held shut", so the position asked for is
+  100 % minus the duty. It is clamped to <strong>Gate Minimum/Maximum Position</strong>, limited to <strong>Gate Slew
+  Limit</strong> per second, and an inner PID (<strong>Gate Position Kp/Ki/Kd</strong>) drives an H-bridge until the
+  position sensor agrees. This needs <strong>Gate Position Signal</strong> set. With no position signal the
+  module falls back to sending solenoid duty on <code>wastegate_duty</code>, and the motor is not driven. The position asked for is published as <code>wastegate_pos_target</code> and the motor drive
+  as <code>wastegate_pos_duty</code>.
+  <!-- src: firmware/Engine/Modules/Boost.cpp -->
+</li>
+</ul>
+<div class="admonition danger">
+<p class="admonition-title">A motorised gate must be spring-open</p>
+<p>When the module is off, unarmed or below activation, it stops driving the gate. A gate whose
+spring holds it <strong>open</strong> then gives spring boost. A gate that stays wherever it was, or is held
+shut, gives uncontrolled boost. That is the one failure the pressure loop cannot see coming.</p>
+</div>
+<h3 id="7-the-overboost-backstop">7 · The overboost backstop<a class="headerlink" href="#7-the-overboost-backstop" title="Permanent link">&para;</a></h3>
+<p>Two independent limits, checked on every engine cycle, <strong>even with boost control off or unarmed</strong>:</p>
+<ul>
+<li><strong>Overboost Cut Limit:</strong> an absolute manifold pressure the engine must never see. It does not move
+  with the target.</li>
+<li><strong>Overboost Offset:</strong> how far over the <em>current target</em> manifold pressure may go. This one follows
+  the target down, so it still protects in low gears or under a protection pull-back, where the
+  absolute limit is far away. It only applies while the target is at or above Activation MAP.</li>
+</ul>
+<p>When either trips, the module asks for a fuel cut, an ignition cut or both (<strong>Overboost Cut</strong>). The
+cut holds until pressure falls <strong>Overboost Release Margin</strong> below the limit that tripped it, so it
+does not chatter. Either limit set to 0 is off.</p>
+<!-- src: firmware/Engine/Modules/Boost.cpp -->
+
+<p>This backstop is separate from the engine-protection overboost fault (P0234, chapter 29). Set both.</p>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>You need:</p>
+<ul>
+<li><strong>A MAP sensor that reads above atmospheric pressure</strong>, configured and calibrated (chapter 17). The
+  module cannot run without manifold pressure. If it goes missing while boost control is enabled, it
+  raises <strong>P1710 Boost: MAP signal missing</strong>.</li>
+<li><strong>A boost control actuator</strong>, wired and assigned to an output (chapters 12 and 18):<ul>
+<li>a wastegate <strong>solenoid</strong> on an output assigned to <strong>Wastegate Duty</strong>, or</li>
+<li>a <strong>motorised wastegate</strong> on an H-bridge output, plus a position sensor configured as a sensor.</li>
+</ul>
+</li>
+<li><strong>Safe fuel and timing at the boost you intend to run.</strong> Configure the fuel and ignition chapters
+  first.</li>
+<li>Optional inputs, each configured as a signal before you can select it: an <strong>arm switch</strong>, a
+  <strong>trim knob</strong> (an analog input read 0–100 %) and a <strong>scramble button</strong>.</li>
+</ul>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>The Boost pages are under <strong>Configuration ▸ Engine Functions ▸ Boost Control</strong>. Some pages only appear
+in the navigation tree when their feature is switched on. For example, <strong>Trim Learning</strong> appears once
+long-term trim is enabled, and <strong>Correction 1</strong> once that slot is enabled.</p>
+<figure>
+<p><img alt="The Boost Control page with boost control enabled in Closed Loop" src="../img/studio/boost-page.png" />
+  </p>
+<figcaption>Figure 24.3 — The Boost Control page, set up as in Example 1 below. Control, Handover,
+  Closed Loop and Limits are grouped as they are explained here.</figcaption>
+</figure>
+<ol>
+<li><strong>Set the overboost limits first</strong>, before anything can make boost. In <strong>Limits</strong>, set <strong>Overboost
+   Cut Limit</strong> a safe margin above the most boost you will ever ask for. Set <strong>Overboost Offset</strong> to
+   the overshoot you will tolerate over target (Example 1 uses 25 kPa). Choose <strong>Overboost Cut</strong>.
+   <em>Fuel</em> is the default; <em>Ignition</em> is gentler on a lean-sensitive engine; <em>Both</em> is the hardest cut.</li>
+<li><strong>Tick Enabled.</strong></li>
+<li><strong>Choose the actuator</strong> in <strong>Actuator</strong>: <em>Solenoid</em> or <em>Motorised Gate</em>.</li>
+<li><strong>Set activation.</strong> <strong>Activation RPM</strong> (default 2000) and <strong>Activation MAP</strong> (default 110 kPa)
+   define "on boost". Below both, the wastegate is left on its spring.</li>
+<li><strong>Start in Open Loop.</strong> Leave <strong>Mode</strong> on <em>Open Loop</em> until the base duty table is roughly right
+   (see <em>Tuning it</em>).</li>
+<li><strong>Fill in the Boost Target table</strong> (Figure 24.4). The default is a single row against RPM. To make
+   it different in each gear, switch its gear axis on.</li>
+<li><strong>Fill in the Wastegate Base Duty table</strong> (Figure 24.5). Leave it at its defaults until you tune
+   it.</li>
+<li><strong>Set Min Wastegate Duty and Max Wastegate Duty.</strong> Leave Min at 0 unless your valve does nothing
+   below some duty. Max (default 90 %) is the most any combination of table and trim can command.</li>
+<li><strong>When the base table is close, switch Mode to Closed Loop</strong> and set the <strong>Handover</strong> and
+   <strong>Closed Loop</strong> groups as described in <em>Tuning it</em>.</li>
+</ol>
+<figure>
+<p><img alt="The Boost Target table as a curve against RPM" src="../img/studio/boost-target-table.png" />
+  </p>
+<figcaption>Figure 24.4 — Boost Target, as shipped: a curve against engine speed in kPa absolute
+  (100 kPa is atmospheric).</figcaption>
+</figure>
+<figure>
+<p><img alt="The Wastegate Base Duty table read against boost target" src="../img/studio/boost-base-duty.png" />
+  </p>
+<figcaption>Figure 24.5 — Wastegate Base Duty, read against the boost target: each cell is "the duty
+  this much boost takes".</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">kPa is absolute</p>
+<p>All pressures here are <strong>absolute</strong>: atmospheric is about 100 kPa at sea level, so 200 kPa is
+about 1 bar (14.5 psi) of boost. Subtract barometric pressure to get gauge boost.</p>
+</div>
+<h3 id="optional-driver-controls">Optional driver controls<a class="headerlink" href="#optional-driver-controls" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Arm Switch Signal:</strong> while this signal is not asserted, boost control does nothing and the turbo
+  runs on spring pressure. The tune behind it is unchanged. The overboost backstop still works.</li>
+<li><strong>Boost Trim Signal</strong> and <strong>Trim Authority:</strong> a dash knob that moves the target. The default
+  authority of −100 kPa means the knob can only reduce boost, so a knob left turned up, or an input
+  that fails high, cannot ask for more than the map allows.</li>
+<li><strong>Scramble Input Signal:</strong> a button that adds <strong>Scramble Boost Bump</strong> kPa (and optionally
+  <strong>Scramble Duty Bump</strong>). A tap runs for at least <strong>Scramble Hold Time</strong>. Holding the button cannot
+  keep it on longer than <strong>Scramble Maximum Time</strong>, after which it is locked out for <strong>Scramble Rest
+  Time</strong>. The rest only follows a run that hit the maximum, so normal taps re-arm straight away.
+  <!-- src: firmware/Engine/Modules/Boost.cpp -->
+</li>
+</ul>
+<h3 id="corrections">Corrections<a class="headerlink" href="#corrections" title="Permanent link">&para;</a></h3>
+<p>Four correction slots each read a channel through a curve (for example intake air temperature) and
+apply the result either to the <strong>Target</strong> (per cent of boost) or to the <strong>Duty</strong> (points of duty). Set
+<strong>Correction N Applies To</strong> accordingly. A slot that is not enabled is not evaluated at all.</p>
+<!-- src: firmware/Engine/Modules/Boost.cpp -->
+
+<figure>
+<p><img alt="A correction slot reading intake air temperature and applying to the target" src="../img/studio/boost-correction.png" />
+  </p>
+<figcaption>Figure 24.6 — Correction 1: pick the channel it reads, what it applies to, and fill in
+  the curve.</figcaption>
+</figure>
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>These are <strong>starting points</strong>, not finished tunes. Every engine and turbo is different. Log, check
+and adjust.</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — single turbo, internal wastegate, 3-port solenoid, closed loop</p>
+<p>A street engine with about 70 kPa (10 psi) of spring pressure, aiming for about 100 kPa
+(15 psi) of boost.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Actuator</td>
+<td>Solenoid</td>
+<td>a 3-port wastegate solenoid on a low-side output</td>
+</tr>
+<tr>
+<td>Mode</td>
+<td>Closed Loop</td>
+<td>once the base table is close</td>
+</tr>
+<tr>
+<td>Activation RPM / MAP</td>
+<td>2500 / 110 kPa</td>
+<td>ignore light-load driving</td>
+</tr>
+<tr>
+<td>Control Point Offset</td>
+<td>30 kPa</td>
+<td>the loop takes over 30 kPa below target</td>
+</tr>
+<tr>
+<td>Kp / Ki / Kd</td>
+<td>0.8 %/kPa / 2.0 %/kPa/s / 0</td>
+<td>gentle; the base table does the heavy work</td>
+</tr>
+<tr>
+<td>Max Wastegate Duty</td>
+<td>90 %</td>
+<td>the default ceiling</td>
+</tr>
+<tr>
+<td>Overboost Cut Limit</td>
+<td>230 kPa</td>
+<td>well above the 200 kPa target</td>
+</tr>
+<tr>
+<td>Overboost Offset</td>
+<td>25 kPa</td>
+<td>catches a stuck gate or split hose at any target</td>
+</tr>
+<tr>
+<td>Overboost Cut</td>
+<td>Fuel</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Boost Target: 200 kPa from 3500 rpm up, tapering in below that. This is the example shown in
+Figure 24.3.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — motorised (electronic) wastegate</p>
+<p>A spring-open electronic wastegate on an H-bridge, with its position sensor configured as a
+0–100 % signal.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Actuator</td>
+<td>Motorised Gate</td>
+<td>position control instead of duty</td>
+</tr>
+<tr>
+<td>Gate Position Signal</td>
+<td>the valve position sensor</td>
+<td>without it the motor is not driven at all</td>
+</tr>
+<tr>
+<td>Gate Minimum / Maximum Position</td>
+<td>0 / 100 %</td>
+<td>full travel; narrow it if the valve binds at an end</td>
+</tr>
+<tr>
+<td>Gate Slew Limit</td>
+<td>200 %/s</td>
+<td>the valve ramps rather than slams</td>
+</tr>
+<tr>
+<td>Gate Position Kp / Ki / Kd</td>
+<td>start low and tune on the bench</td>
+<td>step the target and watch the position trace</td>
+</tr>
+</tbody>
+</table>
+<p>Tune the inner position loop first, with the engine off: the gate should follow a stepped target
+quickly without overshoot. Then tune the boost loop exactly as for a solenoid.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — track car with arm switch and scramble</p>
+<ul>
+<li><strong>Arm Switch Signal</strong>: a dash switch, so boost control is only active on the track.</li>
+<li><strong>Scramble Input Signal</strong>: a steering-wheel button; <strong>Scramble Boost Bump</strong> 20 kPa, <strong>Hold</strong> 5 s,
+  <strong>Maximum</strong> 10 s, <strong>Rest</strong> 30 s: a short overtake boost that cannot be left on.</li>
+<li><strong>Correction 1</strong> on intake air temperature, applying to <em>Target</em>: −5 % at 50 °C, −15 % at 70 °C,
+  to protect a hot charge.</li>
+</ul>
+</div>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<p><strong>Log these channels</strong> for every pull: <code>map</code>, <code>boost_target</code>, <code>boost_error</code>, <code>wastegate_duty</code>, <code>rpm</code>,
+<code>tps</code>, and when used, <code>boost_ltt_pct</code> or <code>wastegate_pos_target</code>/<code>wastegate_pos_duty</code> (chapter 42).</p>
+<h3 id="step-1-base-duty-in-open-loop">Step 1 — Base duty in open loop<a class="headerlink" href="#step-1-base-duty-in-open-loop" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Set <strong>Mode</strong> to <em>Open Loop</em>, the Boost Target to your first goal, and the whole base duty table to
+   0 %. You now have spring boost everywhere.</li>
+<li>Do a full-throttle pull in a middle gear. Note the spring boost.</li>
+<li>For the target cell you are working on, raise the base duty a few per cent at a time until boost
+   on a pull settles at the target. Work up the table, one target cell at a time.</li>
+<li>If boost at the same target differs between low and high RPM, switch the base table's RPM axis on
+   and tune each row.</li>
+</ol>
+<p>A good base table is the most important part of boost tuning. With it, the closed loop only corrects
+for the day's weather and can run gentle gains.</p>
+<h3 id="step-2-close-the-loop">Step 2 — Close the loop<a class="headerlink" href="#step-2-close-the-loop" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Switch <strong>Mode</strong> to <em>Closed Loop</em> with <strong>Ki</strong> at 0 and <strong>Kd</strong> at 0.</li>
+<li>Set <strong>Control Point Offset</strong> to where you want the loop to take over. Start around 20–40 kPa.
+   Too large and the loop fights the end of the spool; too small (especially with Spool Assist) and
+   boost overshoots before the loop can catch it.</li>
+<li>Raise <strong>Kp</strong> until boost holds close to target, then back it off if it starts to oscillate.</li>
+<li>Add <strong>Ki</strong> slowly to remove the remaining steady error. If boost hunts around the target, lower Ki,
+   or turn on <strong>Schedule Ki On Error</strong> and use a smaller Ki near zero error.</li>
+<li>Add <strong>Kd</strong> only if boost overshoots on a fast spool.</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">If the loop is doing all the work, the base table is wrong</p>
+<p>A large, steady <code>boost_error</code> that the integrator keeps correcting means the base duty table needs
+more work. <strong>Integrator Ceiling</strong> can force the issue by limiting how much the integrator alone may
+add.</p>
+</div>
+<h3 id="step-3-let-it-learn-optional">Step 3 — Let it learn (optional)<a class="headerlink" href="#step-3-let-it-learn-optional" title="Permanent link">&para;</a></h3>
+<p>Once the loop is stable, enable <strong>Long-Term Trim</strong> to migrate the loop's standing corrections into the
+base table cell by cell. Keep <strong>Trim Authority</strong> small (default 15 %). A cell that hits the limit is
+telling you to fix the base table by hand.</p>
+<figure>
+<p><img alt="The Long Term Trim table: one learned cell per base duty cell" src="../img/studio/boost-ltt.png" />
+  </p>
+<figcaption>Figure 24.7 — Long Term Trim: one learned value per base-duty cell. Zero everywhere means
+  nothing has been learned yet.</figcaption>
+</figure>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>What sets it</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1710</strong></td>
+<td>Boost: MAP signal missing</td>
+<td>Boost control is enabled and armed but manifold pressure is not valid</td>
+<td>MAP sensor wiring and configuration (chapter 17); the module cannot run without it. It clears when MAP returns, or when boost control is switched off.</td>
+</tr>
+<tr>
+<td><strong>P0234</strong></td>
+<td>Protection: overboost</td>
+<td>Raised by engine protection, not by this module</td>
+<td>Chapter 29. The Boost backstop cut is separate and does not set a code of its own.</td>
+</tr>
+</tbody>
+</table>
+<!-- src: firmware/Engine/Modules/Boost.cpp; definition/ecu.schema.yaml module_dtc BOOST_MAP = P1710 -->
+
+<p><strong>Output channels</strong> worth watching: <strong>Boost Target</strong> <code>boost_target</code>, <strong>Boost Error</strong> <code>boost_error</code>,
+<strong>Wastegate Duty</strong> <code>wastegate_duty</code>, <strong>Boost Long-Term Trim</strong> <code>boost_ltt_pct</code>, <strong>Wastegate Position
+Target</strong> <code>wastegate_pos_target</code>, <strong>Wastegate Motor Duty</strong> <code>wastegate_pos_duty</code>, and <strong>Protection
+Boost Corr</strong> <code>prot_boost_corr</code> (what engine protection is asking for).</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Only spring boost, <code>wastegate_duty</code> stays at 0</td>
+<td>Module off; not armed; below activation; output not assigned</td>
+<td><strong>Enabled</strong>; the arm switch signal; <code>rpm</code> and <code>map</code> against Activation RPM/MAP; the output assigned to Wastegate Duty (chapter 18)</td>
+</tr>
+<tr>
+<td><code>wastegate_duty</code> moves but boost does not change</td>
+<td>Solenoid plumbed wrongly or not powered; wrong solenoid type</td>
+<td>Solenoid wiring and power; hose routing for your solenoid (chapter 12); listen for it clicking</td>
+</tr>
+<tr>
+<td>Boost overshoots on every spool</td>
+<td>Spool Assist on with the control point too close; base duty too high; Ki too high</td>
+<td>Turn Spool Assist off; raise Control Point Offset; lower base duty for that target</td>
+</tr>
+<tr>
+<td>Boost oscillates around target</td>
+<td>Kp or Ki too high</td>
+<td>Lower Kp first, then Ki; consider Schedule Ki On Error</td>
+</tr>
+<tr>
+<td>Boost sits below target in closed loop</td>
+<td>Max Wastegate Duty reached; Integrator Ceiling too low; turbo out of breath</td>
+<td><code>wastegate_duty</code> against Max Wastegate Duty; the ceiling; whether the turbo can make the target at that RPM</td>
+</tr>
+<tr>
+<td>Engine cuts on a good pull</td>
+<td>Overboost Offset too tight for normal overshoot</td>
+<td>Log <code>map</code> against <code>boost_target</code>; allow more offset or reduce overshoot</td>
+</tr>
+<tr>
+<td>Boost drops for no reason</td>
+<td>Engine protection pulling the target</td>
+<td><code>prot_boost_corr</code> and the active protection conditions (chapter 29)</td>
+</tr>
+<tr>
+<td>P1710</td>
+<td>MAP signal missing</td>
+<td>MAP sensor (chapter 17)</td>
+</tr>
+<tr>
+<td>Motorised gate does not move</td>
+<td>No position sensor selected; H-bridge output not assigned; gate PID too weak</td>
+<td><strong>Gate Position Signal</strong> must be set, or the module sends solenoid duty instead; the H-bridge output; Gate Position Kp</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<p>Every Boost setting, generated from the definition the studio loads:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Boost Control Enabled</strong><br><code>boost.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Control boost by modulating the wastegate. Off, nothing is published for the wastegate at all, so the output falls to its failsafe and the turbo runs on spring pressure alone — which is the safe state, not a broken one.</td>
+</tr>
+<tr>
+<td><strong>Mode</strong><br><code>boost.mode</code><br>Range: one of: Open Loop, Closed Loop<br>Default: Open Loop</td>
+<td>OPEN LOOP applies the base duty table and nothing else: predictable, entirely dependent on the table being right, and it drifts with air temperature and altitude. CLOSED LOOP adds a PID trim on the error between target and measured MAP, so it holds the target through conditions the table never saw. The base table still matters in closed loop — it is the feed-forward the trim works around, and a good one means the trim barely has to act.</td>
+</tr>
+<tr>
+<td><strong>Activation RPM</strong><br><code>boost.activation_rpm</code><br>Range: 0 to 12000<br>Default: 2000<br>Units: RPM</td>
+<td>Below this RPM the controller does not act and the loop is held reset. There is nothing to control down there — the turbo is not making boost and driving the wastegate solenoid just fights the spring.</td>
+</tr>
+<tr>
+<td><strong>Activation MAP</strong><br><code>boost.activation_kpa</code><br>Range: 0.0 to 600.0<br>Default: 110.0<br>Units: kPa</td>
+<td>Manifold pressure floor for acting. Together with the RPM gate it defines "actually on boost": below it the wastegate is already shut by its spring, so any duty is wasted and the integrator would wind up against a limit it cannot move.</td>
+</tr>
+<tr>
+<td><strong>Control Point Offset</strong><br><code>boost.control_point_kpa</code><br>Range: 0.0 to 400.0<br>Default: 50.0<br>Units: kPa</td>
+<td>How far below target the closed loop stays out of it. While manifold pressure is more than this under target, the PID does not act and the output rests on the base duty alone — the spool is the feed-forward table's job, and a loop that tries to help during it can only wind up. Set too high the loop grabs control early and fights the last of the spool; set too low, and with Spool Assist on especially, the gate is still held hard shut when boost arrives and it sails past target.</td>
+</tr>
+<tr>
+<td><strong>Spool Assist</strong><br><code>boost.spool_assist</code><br>Range: Off or On<br>Default: Off</td>
+<td>Below the control point, hold the wastegate fully shut instead of resting on the base duty. It is the fastest way to the target and the least forgiving: the gate is at 100 % right up to the handover, so everything then depends on the control point being far enough out for the loop to catch it. Start with it off and a good base table.</td>
+</tr>
+<tr>
+<td><strong>Use Controller Start Delay</strong><br><code>boost.start_delay_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Hold the closed loop off for a time after activation, on top of the control point. The delay is a curve against RPM because it stands in for spool time, which is not one number — a gate that comes alive at 2000 rpm has seconds to wait, at 7000 rpm almost none.</td>
+</tr>
+<tr>
+<td><strong>Kp</strong><br><code>boost.kp</code><br>Range: 0.000 to 60.000<br>Default: 0.500<br>Units: %/kPa</td>
+<td>Proportional gain: wastegate duty per kPa of boost error, applied immediately. The first thing to raise if boost sits below target, the first thing to lower if it oscillates around it.</td>
+</tr>
+<tr>
+<td><strong>Ki</strong><br><code>boost.ki</code><br>Range: 0.000 to 60.000<br>Default: 2.000<br>Units: %/kPa/s</td>
+<td>Integral gain: duty per kPa of error per second. It removes the steady offset the feed-forward table leaves behind, so boost settles ON target instead of near it. Its authority is deliberately the headroom around the base duty, so anti-windup matches the final clamp and the integrator cannot store demand it will never be allowed to apply.</td>
+</tr>
+<tr>
+<td><strong>Schedule Ki On Error</strong><br><code>boost.ki_sched_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Take the integral gain from a curve against boost error instead of the single Ki above. It is the one gain worth scheduling: near target you want the integrator gentle, or it hunts around a setpoint it has already reached, and far from target you want it decisive, because that is a real offset the feed-forward failed to cover. One number cannot be both. Kp and Kd stay scalars until something proves otherwise.</td>
+</tr>
+<tr>
+<td><strong>Kd</strong><br><code>boost.kd</code><br>Range: 0.000 to 60.000<br>Default: 0.000<br>Units: %*s/kPa</td>
+<td>Derivative gain: duty per kPa-per-second of error. It damps the approach to target, which is what tames a spike on a fast-spooling turbo. It amplifies MAP noise, so it is the term to leave at zero unless overshoot is the actual problem.</td>
+</tr>
+<tr>
+<td><strong>Max Wastegate Duty</strong><br><code>boost.max_duty_pct</code><br>Range: 0.0 to 100.0<br>Default: 90.0<br>Units: %</td>
+<td>Ceiling on wastegate duty, and also the top of the PID's authority. It is the mechanical safety on this loop: no combination of table and trim can command more than this, so a wound-up or mistuned controller cannot hold the gate shut indefinitely.</td>
+</tr>
+<tr>
+<td><strong>Min Wastegate Duty</strong><br><code>boost.min_duty_pct</code><br>Range: 0.0 to 100.0<br>Default: 0.0<br>Units: %</td>
+<td>Floor on wastegate duty while the module is active. Most setups want 0 — the gate should be free to open completely. It earns its keep on a valve that needs some duty before it does anything at all, where a floor keeps the controller out of the dead band at the bottom of its range. Protection scales it down with everything else, so it can never hold the gate shut against a correction asking for less boost.</td>
+</tr>
+<tr>
+<td><strong>Integrator Ceiling</strong><br><code>boost.iterm_max_pct</code><br>Range: 0.0 to 100.0<br>Default: 100.0<br>Units: %</td>
+<td>How much duty the integral term alone may ask for (0 = only the loop's own authority limits it). The anti-windup already stops the integrator exceeding what the output can deliver; this is the tighter, separate question of how much of the answer should come from accumulated error rather than from the base table. Winding it down forces the feed-forward to be right — a loop leaning on a large integrator is one that is correcting for a base table nobody finished.</td>
+</tr>
+<tr>
+<td><strong>Derivative Ceiling</strong><br><code>boost.max_deriv_kpa_s</code><br>Range: 0.0 to 2000.0<br>Default: 100.0<br>Units: kPa/s</td>
+<td>The fastest rate of change the derivative term is allowed to believe (0 = no limit). D amplifies noise by definition — it differentiates — and a single ragged MAP sample on a fast-spooling turbo can otherwise produce a duty spike out of nothing. Clamping the RATE rather than the term means the limit is in units you can reason about from a log.</td>
+</tr>
+<tr>
+<td><strong>Closed Loop Min TPS</strong><br><code>boost.min_tps_pct</code><br>Range: 0.0 to 100.0<br>Default: 0.0<br>Units: %</td>
+<td>Throttle floor for closing the loop (0 = no throttle gate). Below it the output rests on the base duty, exactly as it does below the control point. It is for the part-throttle cruise where manifold pressure is nowhere near target through no fault of the wastegate — the loop would read that as a large standing error and wind up against it. A gate that is set but cannot be read (no throttle signal) keeps the loop OUT, which is the same safe state.</td>
+</tr>
+<tr>
+<td><strong>Overboost Cut Limit</strong><br><code>boost.overboost_limit_kpa</code><br>Range: 0.0 to 600.0<br>Default: 250.0<br>Units: kPa</td>
+<td>MAP above which a hard fuel/ign cut is requested (0 = disabled). An ABSOLUTE ceiling: it is the number the engine cannot survive, so it does not move with the target and a low-gear or protection-reduced target does not lower it.</td>
+</tr>
+<tr>
+<td><strong>Overboost Offset</strong><br><code>boost.overboost_offset_kpa</code><br>Range: 0.0 to 200.0<br>Default: 0.0<br>Units: kPa</td>
+<td>How far OVER the target manifold pressure may go before a cut is requested (0 = disabled). Unlike the absolute limit this tracks the target down, so it still protects in the low gears and under a protection pull-back where a fixed ceiling is miles away. Leave enough room for the overshoot a healthy loop makes on a fast spool, or it will cut on a good pull.</td>
+</tr>
+<tr>
+<td><strong>Overboost Release Margin</strong><br><code>boost.overboost_hyst_kpa</code><br>Range: 0.0 to 50.0<br>Default: 5.0<br>Units: kPa</td>
+<td>Once the overboost cut has tripped it holds until manifold pressure is this far BELOW the limit. Without a margin the cut chatters on and off at the limit every frame, which is harder on the engine than either state.</td>
+</tr>
+<tr>
+<td><strong>Overboost Cut</strong><br><code>boost.overboost_cut_method</code><br>Range: one of: Fuel, Ignition, Both<br>Default: Fuel</td>
+<td>What gets cut when the hard overboost limit is exceeded. This is a LAST RESORT backstop, in addition to the DTC path — by the time it acts the boost control has already failed, so choose the cut that stops boost fastest for the hardware rather than the one that is kindest.</td>
+</tr>
+<tr>
+<td><strong>Arm Switch Signal</strong><br><code>boost.arm_sig</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>A signal that must be asserted for boost control to act at all (-1 = always armed). Unarmed, nothing is published for the wastegate and the turbo runs on spring pressure — the same safe state as switching the module off, but on a switch the driver can reach. It is a gate, not a mode: everything else about the tune is unchanged while it is open.</td>
+</tr>
+<tr>
+<td><strong>Boost Trim Signal</strong><br><code>boost.trim_sig</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>An analog input, read as 0-100 %, that moves the boost target by up to Trim Authority (-1 = no trim). A dashboard knob, in other words. At 0 % it does nothing, so the knob's off position is its own bottom stop rather than some midpoint nobody can find by feel.</td>
+</tr>
+<tr>
+<td><strong>Trim Authority</strong><br><code>boost.trim_max_kpa</code><br>Range: -200.0 to 200.0<br>Default: -100.0<br>Units: kPa</td>
+<td>How far the trim knob may move the target at full travel. NEGATIVE is the sensible direction and the shipped one: the knob then only ever takes boost away, so a knob that has been left somewhere, or an input that has failed high, cannot ask the engine for more than the tune says. A positive value means the driver can add boost the map never authorised, which is a decision rather than a default.</td>
+</tr>
+<tr>
+<td><strong>Scramble Input Signal</strong><br><code>boost.scramble_sig</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>A momentary 0/1 signal that bumps boost while it is active (-1 = none). The bump is not simply "while held" — see the hold, maximum and rest times, which together make a button that can be tapped and cannot be leant on.</td>
+</tr>
+<tr>
+<td><strong>Scramble Boost Bump</strong><br><code>boost.scramble_kpa</code><br>Range: 0.0 to 200.0<br>Default: 30.0<br>Units: kPa</td>
+<td>How much the boost target is raised while scramble is active. It adds to whatever the target table gives, so the shape of the map is preserved and only the level moves.</td>
+</tr>
+<tr>
+<td><strong>Scramble Duty Bump</strong><br><code>boost.scramble_base_pct</code><br>Range: 0.0 to 100.0<br>Default: 0.0<br>Units: %</td>
+<td>Extra wastegate duty while scramble is active, on top of the target bump. The target bump says what to aim for and the loop takes time to get there; this puts duty in immediately, which is what makes the button feel like it did something. Useless in open loop, where the target bump does nothing and this is the whole effect.</td>
+</tr>
+<tr>
+<td><strong>Scramble Hold Time</strong><br><code>boost.scramble_hold_s</code><br>Range: 0.0 to 60.0<br>Default: 5.0<br>Units: s</td>
+<td>The shortest a scramble lasts once it starts, however briefly the button was pressed. It is what turns a momentary switch into a TAP: press and let go, and the bump still runs its course instead of ending with your thumb.</td>
+</tr>
+<tr>
+<td><strong>Scramble Maximum Time</strong><br><code>boost.scramble_max_s</code><br>Range: 0.0 to 60.0<br>Default: 10.0<br>Units: s</td>
+<td>The longest one scramble may last, however long the button is held (0 = no limit). This is the half that stops the button being a permanent boost switch — hold it down and the bump ends anyway, and cannot start again until the rest time has passed.</td>
+</tr>
+<tr>
+<td><strong>Scramble Rest Time</strong><br><code>boost.scramble_rest_s</code><br>Range: 0.0 to 60.0<br>Default: 0.0<br>Units: s</td>
+<td>How long scramble is locked out after it has run its maximum time. It only applies to a bump that was ENDED by the maximum — a normal press that finishes on its own re-arms immediately — so this is the cool-down between sustained uses, not a delay between taps.</td>
+</tr>
+<tr>
+<td><strong>Actuator</strong><br><code>boost.output_mode</code><br>Range: one of: Solenoid, Motorised Gate<br>Default: Solenoid</td>
+<td>What is on the end of the wiring. A SOLENOID is given a duty and the wastegate spring does the rest, which is what the whole of the rest of this module is expressed in. A MOTORISED GATE is given a position instead, and an inner loop drives the motor until the valve reaches it — that needs a position sensor and an H-bridge, and the gate must be spring-OPEN, because an unpowered motor holding a shut valve is the one failure this cannot protect you from.</td>
+</tr>
+<tr>
+<td><strong>Gate Position Signal</strong><br><code>boost.gate_pos_sig</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>The sensor the inner loop closes on, reading 0-100 % of valve travel (-1 = none, and a motorised gate without one does not run at all). It is the difference between a servo and an open-loop guess: without feedback nothing knows whether the valve moved, and a gate jammed shut looks exactly like a gate doing its job.</td>
+</tr>
+<tr>
+<td><strong>Gate Minimum Position</strong><br><code>boost.gate_min_pos_pct</code><br>Range: 0.0 to 100.0<br>Default: 0.0<br>Units: %</td>
+<td>The most SHUT the valve may be commanded. Above zero it keeps the motor off its hard closed stop, which is where a position loop stalls against something it cannot move and winds up trying.</td>
+</tr>
+<tr>
+<td><strong>Gate Maximum Position</strong><br><code>boost.gate_max_pos_pct</code><br>Range: 0.0 to 100.0<br>Default: 100.0<br>Units: %</td>
+<td>The most OPEN the valve may be commanded. Reducing it is not a safety measure — less opening is more boost — so it is only for keeping the motor off its other hard stop.</td>
+</tr>
+<tr>
+<td><strong>Gate Slew Limit</strong><br><code>boost.gate_rate_pct_s</code><br>Range: 0 to 10000<br>Default: 0<br>Units: %/s</td>
+<td>How fast the commanded position may move (0 = no limit). It damps a step demand so the valve ramps rather than slamming, which matters more here than on a throttle: the gate is in the exhaust stream and the loop above it can change its mind quickly.</td>
+</tr>
+<tr>
+<td><strong>Gate Position Kp</strong><br><code>boost.gate_kp</code><br>Range: 0.000 to 60.000<br>Default: 2.000<br>Units: %/%</td>
+<td>Proportional gain of the inner position loop: motor duty per per cent of position error. The first thing to raise if the valve is slow to arrive, the first to lower if it buzzes around its target.</td>
+</tr>
+<tr>
+<td><strong>Gate Position Ki</strong><br><code>boost.gate_ki</code><br>Range: 0.000 to 60.000<br>Default: 4.000<br>Units: %/%/s</td>
+<td>Integral gain of the inner position loop. It is what gets the valve the last per cent against its spring, which proportional gain alone will always leave short.</td>
+</tr>
+<tr>
+<td><strong>Gate Position Kd</strong><br><code>boost.gate_kd</code><br>Range: 0.000 to 60.000<br>Default: 0.000<br>Units: %*s/%</td>
+<td>Derivative gain of the inner position loop, damping the approach. Leave it at zero unless the valve overshoots its target — position feedback is noisy and this differentiates it.</td>
+</tr>
+<tr>
+<td><strong>Gate Integral Clamp</strong><br><code>boost.gate_iterm_max_pct</code><br>Range: 0.0 to 100.0<br>Default: 50.0<br>Units: %</td>
+<td>Anti-windup for the inner loop: the integral term is held to this much motor duty. It is what stops a valve jammed by carbon from accumulating full drive against something it is never going to move.</td>
+</tr>
+<tr>
+<td><strong>Long-Term Trim Enabled</strong><br><code>boost.ltt_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Learn the standing part of the closed-loop correction into a table, so the feed-forward improves instead of the loop re-discovering the same offset on every pull. Off, the learned table is still applied — switching learning off freezes what it knows rather than discarding it.</td>
+</tr>
+<tr>
+<td><strong>Learn Above TPS</strong><br><code>boost.ltt_min_tps_pct</code><br>Range: 0.0 to 100.0<br>Default: 80.0<br>Units: %</td>
+<td>Throttle floor for learning. Below it the manifold is nowhere near target for reasons that have nothing to do with the wastegate, and anything learned there is a correction for the driver's right foot.</td>
+</tr>
+<tr>
+<td><strong>Learn Above RPM</strong><br><code>boost.ltt_min_rpm</code><br>Range: 0 to 12000<br>Default: 2500<br>Units: RPM</td>
+<td>Bottom of the rpm window in which learning is allowed. Below it the turbo is still coming up and the loop is correcting for spool, which is not a persistent property of anything.</td>
+</tr>
+<tr>
+<td><strong>Learn Below RPM</strong><br><code>boost.ltt_max_rpm</code><br>Range: 0 to 12000<br>Default: 7000<br>Units: RPM</td>
+<td>Top of the rpm window. Near the limiter the picture is contaminated by cuts and by whatever protection is doing, so a reading there is not the wastegate's fault either.</td>
+</tr>
+<tr>
+<td><strong>Learn Above Gear</strong><br><code>boost.ltt_min_gear</code><br>Range: 0 to 10<br>Default: 0</td>
+<td>Lowest gear in which learning is allowed (0 = any, and any is right on a car with no gear signal). The low gears are where the target is deliberately reduced and where the tyres are doing something other than holding the car straight, so they are the worst place to be drawing conclusions about the turbo.</td>
+</tr>
+<tr>
+<td><strong>Learn Dwell</strong><br><code>boost.ltt_dwell_ms</code><br>Range: 0 to 60000<br>Default: 1500<br>Units: ms</td>
+<td>How long the operating point must sit in one cell before anything is written to it. It is what stops a sweep through the map smearing one cell's correction across all of them — the loop needs time to settle before its integrator means what it says.</td>
+</tr>
+<tr>
+<td><strong>Learn Rate</strong><br><code>boost.ltt_learn_pct</code><br>Range: 0.0 to 100.0<br>Default: 25.0<br>Units: %</td>
+<td>How much of the integrator migrates into the cell each time the dwell completes. Not all of it: the integrator is a noisy estimate of a steady offset, so a fraction at a time averages several visits and a full transfer would let one bad pull rewrite the cell.</td>
+</tr>
+<tr>
+<td><strong>Trim Authority</strong><br><code>boost.ltt_authority_pct</code><br>Range: 0.0 to 100.0<br>Default: 15.0<br>Units: %</td>
+<td>The most any one learned cell may hold, either way. It is the limit on how wrong the base table is allowed to be before somebody has to go and fix it properly — a trim quietly carrying 30 points of duty is not a trim, it is the tune.</td>
+</tr>
+<tr>
+<td><strong>Correction 1 Enabled</strong><br><code>boost.corr1_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Read correction slot 1 and apply it. Off, the curve is not evaluated at all — which is a different thing from a curve of zeroes, and the page says so rather than leaving you to infer it from the cells.</td>
+</tr>
+<tr>
+<td><strong>Correction 1 Applies To</strong><br><code>boost.corr1_applies</code><br>Range: one of: Target, Duty<br>Default: Target</td>
+<td>Whether slot 1 trims the boost TARGET or the wastegate DUTY. Target is the closed-loop answer: it changes what the engine is asked for and the loop then goes and gets it. Duty is the open-loop answer: it changes what the valve is driven with. In closed loop a duty correction is unwound by the integrator within a second or two, so it shapes the approach and not the boost — if you want less boost when it is hot, correct the target.</td>
+</tr>
+<tr>
+<td><strong>Correction 2 Enabled</strong><br><code>boost.corr2_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Read correction slot 2 and apply it. Off, the curve is not evaluated at all — which is a different thing from a curve of zeroes, and the page says so rather than leaving you to infer it from the cells.</td>
+</tr>
+<tr>
+<td><strong>Correction 2 Applies To</strong><br><code>boost.corr2_applies</code><br>Range: one of: Target, Duty<br>Default: Target</td>
+<td>Whether slot 2 trims the boost TARGET or the wastegate DUTY. Target is the closed-loop answer: it changes what the engine is asked for and the loop then goes and gets it. Duty is the open-loop answer: it changes what the valve is driven with. In closed loop a duty correction is unwound by the integrator within a second or two, so it shapes the approach and not the boost — if you want less boost when it is hot, correct the target.</td>
+</tr>
+<tr>
+<td><strong>Correction 3 Enabled</strong><br><code>boost.corr3_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Read correction slot 3 and apply it. Off, the curve is not evaluated at all — which is a different thing from a curve of zeroes, and the page says so rather than leaving you to infer it from the cells.</td>
+</tr>
+<tr>
+<td><strong>Correction 3 Applies To</strong><br><code>boost.corr3_applies</code><br>Range: one of: Target, Duty<br>Default: Target</td>
+<td>Whether slot 3 trims the boost TARGET or the wastegate DUTY. Target is the closed-loop answer: it changes what the engine is asked for and the loop then goes and gets it. Duty is the open-loop answer: it changes what the valve is driven with. In closed loop a duty correction is unwound by the integrator within a second or two, so it shapes the approach and not the boost — if you want less boost when it is hot, correct the target.</td>
+</tr>
+<tr>
+<td><strong>Correction 4 Enabled</strong><br><code>boost.corr4_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Read correction slot 4 and apply it. Off, the curve is not evaluated at all — which is a different thing from a curve of zeroes, and the page says so rather than leaving you to infer it from the cells.</td>
+</tr>
+<tr>
+<td><strong>Correction 4 Applies To</strong><br><code>boost.corr4_applies</code><br>Range: one of: Target, Duty<br>Default: Target</td>
+<td>Whether slot 4 trims the boost TARGET or the wastegate DUTY. Target is the closed-loop answer: it changes what the engine is asked for and the loop then goes and gets it. Duty is the open-loop answer: it changes what the valve is driven with. In closed loop a duty correction is unwound by the integrator within a second or two, so it shapes the approach and not the boost — if you want less boost when it is hot, correct the target.</td>
+</tr>
+<tr>
+<td><strong>Boost Target X Channel</strong><br><code>boost.boost_target_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Boost Target' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Boost Target Y Channel</strong><br><code>boost.boost_target_table_y_src</code><br>Range: -1 to 32767<br>Default: 131</td>
+<td>WHICH SIGNAL the Y axis of 'Boost Target' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Boost Target Y Axis Enabled</strong><br><code>boost.boost_target_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Boost Target' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Wastegate Base Duty X Channel</strong><br><code>boost.base_boost_duty_table_x_src</code><br>Range: -1 to 32767<br>Default: 13</td>
+<td>WHICH SIGNAL the X axis of 'Wastegate Base Duty' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Wastegate Base Duty Y Channel</strong><br><code>boost.base_boost_duty_table_y_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the Y axis of 'Wastegate Base Duty' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Wastegate Base Duty Y Axis Enabled</strong><br><code>boost.base_boost_duty_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Wastegate Base Duty' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Controller Start Delay X Channel</strong><br><code>boost.start_delay_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Controller Start Delay' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Integral Gain vs Error X Channel</strong><br><code>boost.ki_table_x_src</code><br>Range: -1 to 32767<br>Default: 455</td>
+<td>WHICH SIGNAL the X axis of 'Integral Gain vs Error' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Correction 1 X Channel</strong><br><code>boost.corr1_table_x_src</code><br>Range: -1 to 32767<br>Default: 134</td>
+<td>WHICH SIGNAL the X axis of 'Correction 1' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Correction 2 X Channel</strong><br><code>boost.corr2_table_x_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the X axis of 'Correction 2' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Correction 3 X Channel</strong><br><code>boost.corr3_table_x_src</code><br>Range: -1 to 32767<br>Default: 131</td>
+<td>WHICH SIGNAL the X axis of 'Correction 3' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Correction 4 X Channel</strong><br><code>boost.corr4_table_x_src</code><br>Range: -1 to 32767<br>Default: 337</td>
+<td>WHICH SIGNAL the X axis of 'Correction 4' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Boost Long-Term Trim X Channel</strong><br><code>boost.boost_ltt_x_src</code><br>Range: -1 to 32767<br>Default: 13</td>
+<td>WHICH SIGNAL the X axis of 'Boost Long-Term Trim' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Boost Long-Term Trim Y Channel</strong><br><code>boost.boost_ltt_y_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the Y axis of 'Boost Long-Term Trim' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Start Delay RPM Axis bins</strong><br><code>boost.delay_rpm_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Start Delay RPM Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Boost RPM Axis bins</strong><br><code>boost.boost_rpm_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Boost RPM Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Boost 2nd Axis (Gear — off by default) bins</strong><br><code>boost.boost_gear_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Boost 2nd Axis (Gear — off by default)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Base Duty Target Axis bins</strong><br><code>boost.base_targ_axis_n</code><br>Range: 2 to 16<br>Default: 16</td>
+<td>How many breakpoints of 'Base Duty Target Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Base Duty RPM Axis bins</strong><br><code>boost.base_rpm_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Base Duty RPM Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Ki Error Axis bins</strong><br><code>boost.ki_err_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Ki Error Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Correction 1 Axis bins</strong><br><code>boost.corr1_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Correction 1 Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Correction 2 Axis bins</strong><br><code>boost.corr2_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Correction 2 Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Correction 3 Axis bins</strong><br><code>boost.corr3_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Correction 3 Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Correction 4 Axis bins</strong><br><code>boost.corr4_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Correction 4 Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Boost Target</strong><br><code>boost.boost_target_table</code><br>Range: 0.0 to 1000.0<br>Default: 8 × 8 table<br>Units: kPa</td>
+<td>The boost being asked for at each operating point. Everything else in this module serves this table: closed loop drives the error against it, and the protection correction scales it down. It is a TARGET, not a limit — the overboost cut is what enforces a ceiling.</td>
+</tr>
+<tr>
+<td><strong>Wastegate Base Duty</strong><br><code>boost.base_boost_duty_table</code><br>Range: 0.0 to 100.0<br>Default: 8 × 16 table<br>Units: %</td>
+<td>The wastegate duty that gets close to target on its own, before any closed-loop trim. In open loop this IS the control. In closed loop it is the feed-forward, and getting it approximately right is what lets the PID run gentle gains and still respond quickly — a good base table means the trim only ever corrects for the day's weather. It is read against the TARGET, so every cell answers one question: what duty does this much boost take. The RPM axis is there for the part the target cannot explain — the same boost costs more duty where there is less exhaust energy — and is off by default, because a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Controller Start Delay</strong><br><code>boost.start_delay_table</code><br>Range: 0.00 to 3.00<br>Default: 8-point curve<br>Units: s</td>
+<td>How long after activation the closed loop stays out of it, against the RPM the gate came alive at. It is measured from activation, runs alongside the control point rather than instead of it, and whichever is still unsatisfied keeps the loop out — so a gate that reaches the control point early still waits, and one that never reaches it is never handed over however long the delay was.</td>
+</tr>
+<tr>
+<td><strong>Start Delay RPM Axis</strong><br><code>boost.delay_rpm_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: RPM</td>
+<td>RPM breakpoints for the start delay. Worth concentrating where the turbo actually comes alive, since that is the only region where the delay differs from its floor.</td>
+</tr>
+<tr>
+<td><strong>Boost RPM Axis</strong><br><code>boost.boost_rpm_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: RPM</td>
+<td>RPM breakpoints for the boost target table. Worth concentrating through the spool-up region, where the achievable target changes fastest.</td>
+</tr>
+<tr>
+<td><strong>Boost 2nd Axis (Gear — off by default)</strong><br><code>boost.boost_gear_axis</code><br>Range: 0 to 0<br>Default: 8-point curve</td>
+<td>Optional second axis for the boost target — gear by default, and off by default. Enabling it is how boost is limited in the low gears where the tyres cannot take full torque, without touching the target anywhere else.</td>
+</tr>
+<tr>
+<td><strong>Base Duty Target Axis</strong><br><code>boost.base_targ_axis</code><br>Range: 0 to 0<br>Default: 16-point curve<br>Units: kPa</td>
+<td>Target-pressure breakpoints for the base duty table, absolute. The bottom wants to sit at or just under atmospheric so the table has somewhere to say "asking for nothing, drive nothing"; the top wants to reach past the most this engine will ever be asked for, because a table cannot extrapolate — it holds its end cell, and an end cell short of the target is a feed-forward that quietly stops growing.</td>
+</tr>
+<tr>
+<td><strong>Base Duty RPM Axis</strong><br><code>boost.base_rpm_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: RPM</td>
+<td>RPM breakpoints for the base duty table. It is a separate axis from the target table's on purpose: what the wastegate needs is shaped by the turbo and the gate, not by what is being asked for.</td>
+</tr>
+<tr>
+<td><strong>Integral Gain vs Error</strong><br><code>boost.ki_table</code><br>Range: 0.000 to 60.000<br>Default: 8-point curve<br>Units: %/kPa/s</td>
+<td>Integral gain against how far boost is from target, used in place of the Ki scalar while scheduling is on. Gentle in the middle and firmer at the ends is the shape that matters: close to target a large Ki hunts, because it keeps integrating a difference that is mostly noise, while a long way from target the same difference is a real offset the feed-forward did not cover and there is nothing to be gained by creeping up on it. The shipped curve is that shape around the scalar default, not a measured tune.</td>
+</tr>
+<tr>
+<td><strong>Ki Error Axis</strong><br><code>boost.ki_err_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: kPa</td>
+<td>Boost error breakpoints for the integral gain curve — target minus manifold pressure, so NEGATIVE is over target. Worth keeping a pair of bins close either side of zero: that gap is what decides how near the setpoint the loop stops pushing, and it is where hunting is either designed out or designed in.</td>
+</tr>
+<tr>
+<td><strong>Correction 1</strong><br><code>boost.corr1_table</code><br>Range: -100.0 to 100.0<br>Default: 8-point curve<br>Units: %</td>
+<td>Correction slot 1, shipped pointed at air temperature and correcting nothing. Per cent: on the target it multiplies (-10 % asks for a tenth less boost, whatever the target was), on the duty it adds (+5 % is five more points of duty). Re-point its channel and it is a correction on something else entirely — the curve does not care what it is reading.</td>
+</tr>
+<tr>
+<td><strong>Correction 1 Axis</strong><br><code>boost.corr1_axis</code><br>Range: 0 to 0<br>Default: 8-point curve</td>
+<td>Breakpoints for correction slot 1, in whatever units its channel publishes — the axis carries none of its own, because the slot is whatever it is pointed at. Shipped for air temperature; re-point the channel and these want redrawing for the new one's range.</td>
+</tr>
+<tr>
+<td><strong>Correction 2</strong><br><code>boost.corr2_table</code><br>Range: -100.0 to 100.0<br>Default: 8-point curve<br>Units: %</td>
+<td>Correction slot 2, shipped pointed at coolant temperature and correcting nothing. Per cent: on the target it multiplies (-10 % asks for a tenth less boost, whatever the target was), on the duty it adds (+5 % is five more points of duty). Re-point its channel and it is a correction on something else entirely — the curve does not care what it is reading.</td>
+</tr>
+<tr>
+<td><strong>Correction 2 Axis</strong><br><code>boost.corr2_axis</code><br>Range: 0 to 0<br>Default: 8-point curve</td>
+<td>Breakpoints for correction slot 2, in whatever units its channel publishes — the axis carries none of its own, because the slot is whatever it is pointed at. Shipped for coolant temperature; re-point the channel and these want redrawing for the new one's range.</td>
+</tr>
+<tr>
+<td><strong>Correction 3</strong><br><code>boost.corr3_table</code><br>Range: -100.0 to 100.0<br>Default: 8-point curve<br>Units: %</td>
+<td>Correction slot 3, shipped pointed at gear and correcting nothing. Per cent: on the target it multiplies (-10 % asks for a tenth less boost, whatever the target was), on the duty it adds (+5 % is five more points of duty). Re-point its channel and it is a correction on something else entirely — the curve does not care what it is reading.</td>
+</tr>
+<tr>
+<td><strong>Correction 3 Axis</strong><br><code>boost.corr3_axis</code><br>Range: 0 to 0<br>Default: 8-point curve</td>
+<td>Breakpoints for correction slot 3, in whatever units its channel publishes — the axis carries none of its own, because the slot is whatever it is pointed at. Shipped for gear; re-point the channel and these want redrawing for the new one's range.</td>
+</tr>
+<tr>
+<td><strong>Correction 4</strong><br><code>boost.corr4_table</code><br>Range: -100.0 to 100.0<br>Default: 8-point curve<br>Units: %</td>
+<td>Correction slot 4, shipped pointed at throttle position and correcting nothing. Per cent: on the target it multiplies (-10 % asks for a tenth less boost, whatever the target was), on the duty it adds (+5 % is five more points of duty). Re-point its channel and it is a correction on something else entirely — the curve does not care what it is reading.</td>
+</tr>
+<tr>
+<td><strong>Correction 4 Axis</strong><br><code>boost.corr4_axis</code><br>Range: 0 to 0<br>Default: 8-point curve</td>
+<td>Breakpoints for correction slot 4, in whatever units its channel publishes — the axis carries none of its own, because the slot is whatever it is pointed at. Shipped for throttle position; re-point the channel and these want redrawing for the new one's range.</td>
+</tr>
+<tr>
+<td><strong>Boost Long-Term Trim</strong><br><code>boost.boost_ltt</code><br>Range: -100.0 to 100.0<br>Default: 16 × 16 table<br>Units: %</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Chapter 17 — Sensors and calibration (the MAP sensor)</li>
+<li>Chapter 18 — Outputs and the pin system (assigning the wastegate output)</li>
+<li>Chapter 12 — Wiring outputs (solenoids and H-bridges)</li>
+<li>Chapter 29 — Engine protection (P0234 and the boost pull-back)</li>
+<li>Chapter 39 — Tuning ignition (timing under boost)</li>
+<li>Chapter 42 — Datalogging and analysis</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="23-lambda.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 23 Closed-loop lambda">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                23 Closed-loop lambda
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="25-vvt-vvl.html" class="md-footer__link md-footer__link--next" aria-label="Next: 25 Cam and valve control">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                25 Cam and valve control
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

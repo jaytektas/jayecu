@@ -1,0 +1,7344 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/reference/channels.html">
+      
+      
+        <link rel="prev" href="settings/index.html">
+      
+      
+        <link rel="next" href="dtc.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Output channels - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#output-channels" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Output channels
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part3/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="channels.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#actuators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actuators
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alternator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alternator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boostturbo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boost/Turbo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#can" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAN
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#electronicthrottle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ElectronicThrottle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#engine-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine Sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#engineprotection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EngineProtection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fuel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuelcalculator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FuelCalculator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hbridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HBridge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#idle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Idle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ignition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ignition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#knock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Knock
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lambda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lambda
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Launch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lua
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#misfire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Misfire
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#revlimiter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RevLimiter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-air-con" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Air Con
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-atmospheric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Atmospheric
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-boostturbo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Boost/Turbo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-chassis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Chassis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-derived" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Derived
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Engine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-engine-synchronous" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Engine Synchronous
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-nitrous" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Nitrous
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-o2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - O2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-other" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Other
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-raw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Raw
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-transmission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Transmission
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sensors-vehicle-speed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensors - Vehicle Speed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stepper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stepper
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transientthrottle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TransientThrottle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trigger
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vehicle-traction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vehicle - Traction
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<!-- GENERATED by manual/tools/gen_reference.py from shared/tuneit-meta.json — do not edit. -->
+
+<h1 id="output-channels">Output channels<a class="headerlink" href="#output-channels" title="Permanent link">&para;</a></h1>
+<p>Every channel the ECU sends to the studio, grouped as the studio groups them. The <strong>name</strong> is
+what you type in an expression (chapter 34), a Lua script (chapter 35), a CAN field (chapter 33)
+or a log. <strong>Logged</strong> marks the channels in the ECU's default onboard-log set (chapter 42).</p>
+<p>516 channels.</p>
+<h2 id="actuators">Actuators<a class="headerlink" href="#actuators" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cruise Active</td>
+<td><code>cruise_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Cruise Inhibit Flags</td>
+<td><code>cruise_inhibit</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Cruise Set Speed</td>
+<td><code>cruise_target</code></td>
+<td>km/h</td>
+<td>0.0 to 400.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Cruise Speed Error</td>
+<td><code>cruise_error_kph</code></td>
+<td>km/h</td>
+<td>-400.0 to 400.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Cruise State</td>
+<td><code>cruise_state</code></td>
+<td></td>
+<td>0 to 4</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Cruise Throttle Demand</td>
+<td><code>cruise_demand</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVL Engaged</td>
+<td><code>vvl_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alternator">Alternator<a class="headerlink" href="#alternator" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alternator Field Duty</td>
+<td><code>alternator_duty</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="boost">Boost<a class="headerlink" href="#boost" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boost Error</td>
+<td><code>boost_error</code></td>
+<td>kPa</td>
+<td>-600.0 to 600.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Boost Long-Term Trim</td>
+<td><code>boost_ltt_pct</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Boost Target</td>
+<td><code>boost_target</code></td>
+<td>kPa</td>
+<td>0.0 to 600.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wastegate Duty</td>
+<td><code>wastegate_duty</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wastegate Motor Duty</td>
+<td><code>wastegate_pos_duty</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wastegate Position Target</td>
+<td><code>wastegate_pos_target</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="boostturbo">Boost/Turbo<a class="headerlink" href="#boostturbo" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WMI Active</td>
+<td><code>wmi_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>WMI Pump Duty</td>
+<td><code>wmi_duty</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="can">CAN<a class="headerlink" href="#can" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CAN1 Bus Load</td>
+<td><code>can1_load_pct</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN1 Bus State</td>
+<td><code>can1_state</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN1 Bus-Off Events</td>
+<td><code>can1_bus_off</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN1 Frames Received</td>
+<td><code>can1_rx_fps</code></td>
+<td>Hz</td>
+<td>0 to 20000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN1 Frames Sent</td>
+<td><code>can1_tx_fps</code></td>
+<td>Hz</td>
+<td>0 to 20000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN1 Last Error</td>
+<td><code>can1_last_err</code></td>
+<td></td>
+<td>0 to 7</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN1 RX Error Count</td>
+<td><code>can1_rec</code></td>
+<td></td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN1 TX Error Count</td>
+<td><code>can1_tec</code></td>
+<td></td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN1 TX Refused</td>
+<td><code>can1_tx_fail</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 Bus Load</td>
+<td><code>can2_load_pct</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 Bus State</td>
+<td><code>can2_state</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 Bus-Off Events</td>
+<td><code>can2_bus_off</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 Frames Received</td>
+<td><code>can2_rx_fps</code></td>
+<td>Hz</td>
+<td>0 to 20000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 Frames Sent</td>
+<td><code>can2_tx_fps</code></td>
+<td>Hz</td>
+<td>0 to 20000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 Last Error</td>
+<td><code>can2_last_err</code></td>
+<td></td>
+<td>0 to 7</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 RX Error Count</td>
+<td><code>can2_rec</code></td>
+<td></td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 TX Error Count</td>
+<td><code>can2_tec</code></td>
+<td></td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CAN2 TX Refused</td>
+<td><code>can2_tx_fail</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5V Sensor 1 Supply</td>
+<td><code>sensor_supply_1</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>5V Sensor 2 Supply</td>
+<td><code>sensor_supply_2</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Active DTC Count</td>
+<td><code>dtc_active</code></td>
+<td></td>
+<td>0 to 64</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Command State</td>
+<td><code>command_state</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Config Generation</td>
+<td><code>config_gen</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>DTC Category Indicators</td>
+<td><code>dtc_indicators</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Input Pin Conflict</td>
+<td><code>pin_conflict_fault</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Key On</td>
+<td><code>key_on</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>No Tune</td>
+<td><code>no_tune</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>OBD Clear Strobe</td>
+<td><code>obd_clear_cmd</code></td>
+<td></td>
+<td>0 to 1</td>
+<td></td>
+</tr>
+<tr>
+<td>SD Card On USB</td>
+<td><code>sd_msc_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>SD Card Present</td>
+<td><code>sd_present</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>SD Logging</td>
+<td><code>sd_logging</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Stored DTC Count</td>
+<td><code>dtc_stored</code></td>
+<td></td>
+<td>0 to 64</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Unburned Changes</td>
+<td><code>config_dirty</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Worst Active DTC</td>
+<td><code>dtc_worst_code</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Worst DTC Severity</td>
+<td><code>dtc_worst_sev</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="electronicthrottle">ElectronicThrottle<a class="headerlink" href="#electronicthrottle" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETB1 Duty</td>
+<td><code>etb_duty_1</code></td>
+<td>%</td>
+<td>-100.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB1 Enabled</td>
+<td><code>etb_en_1</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB1 I-term</td>
+<td><code>etb_iterm_1</code></td>
+<td>%</td>
+<td>-100.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB1 Position</td>
+<td><code>etb_position_1</code></td>
+<td>%</td>
+<td>0.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB1 State</td>
+<td><code>etb_state_1</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB1 Target</td>
+<td><code>etb_target_1</code></td>
+<td>%</td>
+<td>0.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB2 Duty</td>
+<td><code>etb_duty_2</code></td>
+<td>%</td>
+<td>-100.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB2 Enabled</td>
+<td><code>etb_en_2</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB2 I-term</td>
+<td><code>etb_iterm_2</code></td>
+<td>%</td>
+<td>-100.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB2 Position</td>
+<td><code>etb_position_2</code></td>
+<td>%</td>
+<td>0.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB2 State</td>
+<td><code>etb_state_2</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ETB2 Target</td>
+<td><code>etb_target_2</code></td>
+<td>%</td>
+<td>0.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Pedal Demand</td>
+<td><code>pedal_demand</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Pedal State</td>
+<td><code>app_state</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Throttle Demand</td>
+<td><code>throttle_demand</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Traction Throttle Cap</td>
+<td><code>traction_cap</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="engine">Engine<a class="headerlink" href="#engine" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ECU Uptime</td>
+<td><code>uptime_s</code></td>
+<td>s</td>
+<td>0 to 4000000</td>
+<td></td>
+</tr>
+<tr>
+<td>Engine Frame Load</td>
+<td><code>frame_load_pct</code></td>
+<td>%</td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Engine Frame Load Peak</td>
+<td><code>frame_load_max_pct</code></td>
+<td>%</td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Engine Power (est)</td>
+<td><code>engine_power_kw</code></td>
+<td>kW</td>
+<td>0.0 to 2000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Engine State</td>
+<td><code>engine_state</code></td>
+<td></td>
+<td>0 to 2</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Engine Torque (est)</td>
+<td><code>engine_torque_nm</code></td>
+<td>Nm</td>
+<td>-200 to 1500</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Firing Order Invalid</td>
+<td><code>firing_order_fault</code></td>
+<td></td>
+<td>0 to 1</td>
+<td></td>
+</tr>
+<tr>
+<td>Heartbeat</td>
+<td><code>secl</code></td>
+<td></td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Lambda / Best-Torque</td>
+<td><code>lambda_torque_ratio</code></td>
+<td>x</td>
+<td>0.000 to 3.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>MCU Load</td>
+<td><code>cpu_load_pct</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="engine-sync">Engine Sync<a class="headerlink" href="#engine-sync" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1kHz Frame Count</td>
+<td><code>frame_count</code></td>
+<td></td>
+<td>0 to 4000000000</td>
+<td></td>
+</tr>
+<tr>
+<td>Per-Cycle Task Wakes</td>
+<td><code>per_cycle_count</code></td>
+<td></td>
+<td>0 to 4000000000</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="engineprotection">EngineProtection<a class="headerlink" href="#engineprotection" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flasher (fast, 4 Hz)</td>
+<td><code>blink_fast</code></td>
+<td></td>
+<td>0 to 1</td>
+<td></td>
+</tr>
+<tr>
+<td>Flasher (slow, 1 Hz)</td>
+<td><code>blink_slow</code></td>
+<td></td>
+<td>0 to 1</td>
+<td></td>
+</tr>
+<tr>
+<td>Ign Execution Mask</td>
+<td><code>ign_exec_mask</code></td>
+<td></td>
+<td>0 to 4095</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Inj Execution Mask</td>
+<td><code>inj_exec_mask</code></td>
+<td></td>
+<td>0 to 4194303</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Protection Boost Corr</td>
+<td><code>prot_boost_corr</code></td>
+<td>%</td>
+<td>-100 to 100</td>
+<td></td>
+</tr>
+<tr>
+<td>Protection Ign Retard</td>
+<td><code>prot_ign_retard</code></td>
+<td>deg</td>
+<td>0.0 to 60.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Protection Level</td>
+<td><code>prot_level</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Protection Rev Cut Fuel</td>
+<td><code>prot_rev_cut_fuel</code></td>
+<td></td>
+<td>0 to 1</td>
+<td></td>
+</tr>
+<tr>
+<td>Protection Rev Limit</td>
+<td><code>prot_rev_limit</code></td>
+<td>RPM</td>
+<td>0 to 12000</td>
+<td></td>
+</tr>
+<tr>
+<td>Protection Status Bits</td>
+<td><code>prot_status</code></td>
+<td></td>
+<td>0 to 255</td>
+<td></td>
+</tr>
+<tr>
+<td>Threshold Monitor Bitmask</td>
+<td><code>monitor_flags</code></td>
+<td></td>
+<td>0 to 255</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="fuel">Fuel<a class="headerlink" href="#fuel" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Charge Ethanol</td>
+<td><code>flex_ethanol</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ethanol Content (Stage 1)</td>
+<td><code>stage1_ethanol</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ethanol Content (Stage 2)</td>
+<td><code>stage2_ethanol</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ethanol Content (Stage 3)</td>
+<td><code>stage3_ethanol</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ethanol Content (Stage 4)</td>
+<td><code>stage4_ethanol</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>MAF Failed - Using MAP</td>
+<td><code>maf_failover</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="fuelcalculator">FuelCalculator<a class="headerlink" href="#fuelcalculator" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alpha-N VE (Blend)</td>
+<td><code>ve_alpha</code></td>
+<td>%</td>
+<td>0.0 to 200.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Base Fuel PW</td>
+<td><code>base_pw</code></td>
+<td>us</td>
+<td>0 to 20000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Blend: Alpha-N Share</td>
+<td><code>blend_alpha_share</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Charge Air Mass</td>
+<td><code>air_mass</code></td>
+<td>mg</td>
+<td>0.00 to 650.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Charge Load</td>
+<td><code>charge_load</code></td>
+<td>%</td>
+<td>0.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Charge Temperature</td>
+<td><code>charge_temp</code></td>
+<td>C</td>
+<td>-40.0 to 200.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CLT Correction</td>
+<td><code>clt_corr</code></td>
+<td>%</td>
+<td>-50.0 to 50.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Engine Run Time</td>
+<td><code>run_time</code></td>
+<td>s</td>
+<td>0.00 to 650.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Flood Clear Active</td>
+<td><code>flood_clear</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Accel Enrich</td>
+<td><code>fuel_corr_accel</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Air Temp</td>
+<td><code>fuel_corr_iat</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Barometric</td>
+<td><code>fuel_corr_baro</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Cranking</td>
+<td><code>fuel_corr_cranking</code></td>
+<td>x</td>
+<td>0.000 to 6.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: EGT Protect</td>
+<td><code>fuel_corr_egt</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Fuel Comp</td>
+<td><code>fuel_corr_fuelcomp</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Fuel Comp (Stage 2)</td>
+<td><code>fuel_corr_fuelcomp_2</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Fuel Comp (Stage 3)</td>
+<td><code>fuel_corr_fuelcomp_3</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Fuel Comp (Stage 4)</td>
+<td><code>fuel_corr_fuelcomp_4</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Fuel Film</td>
+<td><code>fuel_corr_film</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Gear</td>
+<td><code>fuel_corr_gear</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Generic 1</td>
+<td><code>fuel_corr_generic1</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Generic 2</td>
+<td><code>fuel_corr_generic2</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Generic 3</td>
+<td><code>fuel_corr_generic3</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Generic 4</td>
+<td><code>fuel_corr_generic4</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Overall</td>
+<td><code>fuel_corr_overall</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Post-Start</td>
+<td><code>fuel_corr_poststart</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Protection</td>
+<td><code>fuel_corr_protection</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Rev Limit</td>
+<td><code>fuel_corr_revlimit</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: Warmup</td>
+<td><code>fuel_corr_warmup</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Flow (Volume)</td>
+<td><code>fuel_flow_vol</code></td>
+<td>cc/min</td>
+<td>0.0 to 6000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Load</td>
+<td><code>fuel_load</code></td>
+<td>kPa</td>
+<td>0.0 to 400.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Specific Gravity (Stage 1)</td>
+<td><code>fuel_sg</code></td>
+<td></td>
+<td>0.500 to 2.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Specific Gravity (Stage 2)</td>
+<td><code>fuel_sg_2</code></td>
+<td></td>
+<td>0.500 to 2.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Specific Gravity (Stage 3)</td>
+<td><code>fuel_sg_3</code></td>
+<td></td>
+<td>0.500 to 2.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Specific Gravity (Stage 4)</td>
+<td><code>fuel_sg_4</code></td>
+<td></td>
+<td>0.500 to 2.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Duty Cycle</td>
+<td><code>inj_duty</code></td>
+<td>%</td>
+<td>0.0 to 200.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Duty Cycle (Stage 2)</td>
+<td><code>inj_duty_2</code></td>
+<td>%</td>
+<td>0.0 to 200.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Duty Cycle (Stage 3)</td>
+<td><code>inj_duty_3</code></td>
+<td>%</td>
+<td>0.0 to 200.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Duty Cycle (Stage 4)</td>
+<td><code>inj_duty_4</code></td>
+<td>%</td>
+<td>0.0 to 200.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Pressure Diff</td>
+<td><code>inj_press_diff</code></td>
+<td>kPa</td>
+<td>0.0 to 1000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Pressure Diff (Stage 2)</td>
+<td><code>inj_press_diff_2</code></td>
+<td>kPa</td>
+<td>0.0 to 1000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Pressure Diff (Stage 3)</td>
+<td><code>inj_press_diff_3</code></td>
+<td>kPa</td>
+<td>0.0 to 1000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Pressure Diff (Stage 4)</td>
+<td><code>inj_press_diff_4</code></td>
+<td>kPa</td>
+<td>0.0 to 1000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Injector Pulse Width</td>
+<td><code>inj_pw</code></td>
+<td>ms</td>
+<td>0.000 to 60.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Manifold Pressure (est)</td>
+<td><code>map_est</code></td>
+<td>kPa</td>
+<td>0.0 to 600.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>MAP Source</td>
+<td><code>map_source</code></td>
+<td></td>
+<td>0 to 2</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Predicted MAP</td>
+<td><code>map_predicted</code></td>
+<td>kPa</td>
+<td>0.0 to 600.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Prime Pulse Width</td>
+<td><code>prime_pw</code></td>
+<td>us</td>
+<td>0 to 100000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>PW Add: Dead Time</td>
+<td><code>pw_add_deadtime</code></td>
+<td>us</td>
+<td>0 to 65000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Target Lambda</td>
+<td><code>lambda_target</code></td>
+<td>λ</td>
+<td>0.500 to 2.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Throttle Rate</td>
+<td><code>tps_rate</code></td>
+<td>%/s</td>
+<td>-3000.0 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Volumetric Efficiency</td>
+<td><code>ve</code></td>
+<td>%</td>
+<td>0.0 to 200.0</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="hbridge">HBridge<a class="headerlink" href="#hbridge" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Half Bridge A Duty</td>
+<td><code>hbridge_duty_1</code></td>
+<td>%</td>
+<td>-100.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Half Bridge A Enabled</td>
+<td><code>hbridge_en_1</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Half Bridge B Duty</td>
+<td><code>hbridge_duty_2</code></td>
+<td>%</td>
+<td>-100.00 to 100.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Half Bridge B Enabled</td>
+<td><code>hbridge_en_2</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="idle">Idle<a class="headerlink" href="#idle" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Idle Active</td>
+<td><code>idle_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Idle Duty</td>
+<td><code>idle_duty</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Idle Ign Correction</td>
+<td><code>idle_ign_corr</code></td>
+<td>deg</td>
+<td>-20.0 to 20.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Idle Long-Term Trim</td>
+<td><code>idle_ltt_pct</code></td>
+<td>%</td>
+<td>-50.00 to 50.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Idle RPM Error</td>
+<td><code>idle_rpm_error</code></td>
+<td>RPM</td>
+<td>-3000 to 3000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Idle State</td>
+<td><code>idle_state</code></td>
+<td></td>
+<td>0 to 5</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Idle Target RPM</td>
+<td><code>idle_target_rpm</code></td>
+<td>RPM</td>
+<td>0 to 5000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Idle Throttle Follower</td>
+<td><code>idle_follower</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ignition">Ignition<a class="headerlink" href="#ignition" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Anti-Lag Active</td>
+<td><code>antilag_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Anti-Lag Retard</td>
+<td><code>antilag_retard</code></td>
+<td>deg</td>
+<td>0.0 to 50.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Coil Dwell</td>
+<td><code>dwell</code></td>
+<td>us</td>
+<td>0 to 10000</td>
+<td></td>
+</tr>
+<tr>
+<td>Flat-Shift Cut</td>
+<td><code>shift_cut_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Advance Trim</td>
+<td><code>ign_advance_trim</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Base Advance</td>
+<td><code>ign_base_adv</code></td>
+<td>deg</td>
+<td>-30.0 to 70.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Base Table</td>
+<td><code>ign_base_kind</code></td>
+<td></td>
+<td>0 to 2</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Air Temp</td>
+<td><code>ign_corr_iat</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Coolant</td>
+<td><code>ign_corr_clt</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Fuel Comp</td>
+<td><code>ign_corr_fuelcomp</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Gear</td>
+<td><code>ign_corr_gear</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Generic 1</td>
+<td><code>ign_corr_generic1</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Generic 2</td>
+<td><code>ign_corr_generic2</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Generic 3</td>
+<td><code>ign_corr_generic3</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Generic 4</td>
+<td><code>ign_corr_generic4</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Post-Start</td>
+<td><code>ign_corr_poststart</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ign Corr: Rev Limit</td>
+<td><code>ign_corr_revlimit</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ignition Advance</td>
+<td><code>advance</code></td>
+<td>deg</td>
+<td>-30.0 to 70.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Knock Retard</td>
+<td><code>knock_retard</code></td>
+<td>deg</td>
+<td>0.0 to 30.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Nitrous Active</td>
+<td><code>nitrous_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Nitrous Timing Retard</td>
+<td><code>nitrous_retard</code></td>
+<td>deg</td>
+<td>0.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Timing Below Main Map</td>
+<td><code>spark_below_map</code></td>
+<td>deg</td>
+<td>0.0 to 80.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Total Timing Retard</td>
+<td><code>spark_retard_total</code></td>
+<td>deg</td>
+<td>0.0 to 80.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="knock">Knock<a class="headerlink" href="#knock" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Knock Event Count</td>
+<td><code>knock_count</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Knock Level (peak)</td>
+<td><code>knock_level</code></td>
+<td>dB</td>
+<td>-50.0 to 50.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Knock Level (sensor 1)</td>
+<td><code>knock_1</code></td>
+<td>dB</td>
+<td>-60.0 to 60.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Knock Level (sensor 2)</td>
+<td><code>knock_2</code></td>
+<td>dB</td>
+<td>-60.0 to 60.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Pre-Ignition Cut Mask</td>
+<td><code>preign_cut_mask</code></td>
+<td></td>
+<td>0 to 4095</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lambda">Lambda<a class="headerlink" href="#lambda" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Closed-Loop Hold</td>
+<td><code>lambda_cl_hold</code></td>
+<td></td>
+<td>0 to 6</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Closed-Loop State</td>
+<td><code>lambda_cl_state</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: LTFT</td>
+<td><code>fuel_corr_ltft</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Corr: STFT</td>
+<td><code>fuel_corr_stft</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Lambda Protection Cut</td>
+<td><code>lambda_protect_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Long-Term Fuel Trim</td>
+<td><code>ltft_pct</code></td>
+<td>%</td>
+<td>-50.00 to 50.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LTFT Bank 1</td>
+<td><code>ltft_bank_1_pct</code></td>
+<td>%</td>
+<td>-50.00 to 50.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LTFT Bank 2</td>
+<td><code>ltft_bank_2_pct</code></td>
+<td>%</td>
+<td>-50.00 to 50.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>O2 Role Assigned Twice</td>
+<td><code>o2_assign_fault</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>O2 Source Invalid</td>
+<td><code>o2_src_fault</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Short-Term Fuel Trim</td>
+<td><code>stft_pct</code></td>
+<td>%</td>
+<td>-50.00 to 50.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>STFT Bank 1</td>
+<td><code>stft_bank_1_pct</code></td>
+<td>%</td>
+<td>-50.00 to 50.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>STFT Bank 2</td>
+<td><code>stft_bank_2_pct</code></td>
+<td>%</td>
+<td>-50.00 to 50.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband Bank 1</td>
+<td><code>lambda_bank_1</code></td>
+<td>λ</td>
+<td>0.500 to 2.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband Bank 2</td>
+<td><code>lambda_bank_2</code></td>
+<td>λ</td>
+<td>0.500 to 2.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband Overall</td>
+<td><code>lambda_overall</code></td>
+<td>λ</td>
+<td>0.500 to 2.000</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="launch">Launch<a class="headerlink" href="#launch" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fuel Corr: Launch</td>
+<td><code>fuel_corr_launch</code></td>
+<td>x</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Launch Active</td>
+<td><code>launch_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Launch Cut</td>
+<td><code>launch_cut_pct</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Launch End RPM</td>
+<td><code>launch_end_rpm</code></td>
+<td>RPM</td>
+<td>0 to 20000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Launch Ignition Advance</td>
+<td><code>launch_ign_adv</code></td>
+<td>deg</td>
+<td>-50.0 to 50.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lua">Lua<a class="headerlink" href="#lua" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lua Error Count</td>
+<td><code>lua_error_count</code></td>
+<td></td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Lua Error Line</td>
+<td><code>lua_error_line</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Lua Exec Time</td>
+<td><code>lua_exec_us</code></td>
+<td>us</td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Lua Gauge 1</td>
+<td><code>lua_gauge_1</code></td>
+<td></td>
+<td>0.000 to 100.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Lua Gauge 2</td>
+<td><code>lua_gauge_2</code></td>
+<td></td>
+<td>0.000 to 100.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Lua Gauge 3</td>
+<td><code>lua_gauge_3</code></td>
+<td></td>
+<td>0.000 to 100.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Lua Gauge 4</td>
+<td><code>lua_gauge_4</code></td>
+<td></td>
+<td>0.000 to 100.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Lua Gauge 5</td>
+<td><code>lua_gauge_5</code></td>
+<td></td>
+<td>0.000 to 100.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Lua Gauge 6</td>
+<td><code>lua_gauge_6</code></td>
+<td></td>
+<td>0.000 to 100.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Lua Gauge 7</td>
+<td><code>lua_gauge_7</code></td>
+<td></td>
+<td>0.000 to 100.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Lua Gauge 8</td>
+<td><code>lua_gauge_8</code></td>
+<td></td>
+<td>0.000 to 100.000</td>
+<td></td>
+</tr>
+<tr>
+<td>Lua Script State</td>
+<td><code>lua_state</code></td>
+<td></td>
+<td>0 to 3</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="misfire">Misfire<a class="headerlink" href="#misfire" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Misfire Count</td>
+<td><code>misfire_count</code></td>
+<td></td>
+<td>0 to 65535</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Misfire Cut Mask</td>
+<td><code>misfire_cut_mask</code></td>
+<td></td>
+<td>0 to 4095</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Misfire Roughness</td>
+<td><code>misfire_rough</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="outputs">Outputs<a class="headerlink" href="#outputs" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HS1</td>
+<td><code>out_35</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>HS2</td>
+<td><code>out_36</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>HS3</td>
+<td><code>out_37</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>HS4</td>
+<td><code>out_38</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>HS5</td>
+<td><code>out_39</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>HS6</td>
+<td><code>out_40</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>HS7</td>
+<td><code>out_41</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>HS8</td>
+<td><code>out_42</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN1</td>
+<td><code>out_1</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN10</td>
+<td><code>out_10</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN11</td>
+<td><code>out_11</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN12</td>
+<td><code>out_12</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN2</td>
+<td><code>out_2</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN3</td>
+<td><code>out_3</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN4</td>
+<td><code>out_4</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN5</td>
+<td><code>out_5</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN6</td>
+<td><code>out_6</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN7</td>
+<td><code>out_7</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN8</td>
+<td><code>out_8</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>IGN9</td>
+<td><code>out_9</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS1</td>
+<td><code>out_13</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS10</td>
+<td><code>out_22</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS11</td>
+<td><code>out_23</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS12</td>
+<td><code>out_24</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS13</td>
+<td><code>out_25</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS14</td>
+<td><code>out_26</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS15</td>
+<td><code>out_27</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS16</td>
+<td><code>out_28</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS17</td>
+<td><code>out_29</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS18</td>
+<td><code>out_30</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS19</td>
+<td><code>out_31</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS2</td>
+<td><code>out_14</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS20</td>
+<td><code>out_32</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS21</td>
+<td><code>out_33</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS22</td>
+<td><code>out_34</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS3</td>
+<td><code>out_15</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS4</td>
+<td><code>out_16</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS5</td>
+<td><code>out_17</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS6</td>
+<td><code>out_18</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS7</td>
+<td><code>out_19</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS8</td>
+<td><code>out_20</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>LS9</td>
+<td><code>out_21</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="revlimiter">RevLimiter<a class="headerlink" href="#revlimiter" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DFCO Active</td>
+<td><code>dfco_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Cut Active</td>
+<td><code>fuel_cut</code></td>
+<td></td>
+<td>0 to 1</td>
+<td></td>
+</tr>
+<tr>
+<td>Ign Cut Active</td>
+<td><code>ign_cut</code></td>
+<td></td>
+<td>0 to 1</td>
+<td></td>
+</tr>
+<tr>
+<td>Pit/Speed Limiter Active</td>
+<td><code>pit_limit_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>RPM Before Cut</td>
+<td><code>rpm_to_limit</code></td>
+<td>RPM</td>
+<td>0 to 30000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Soft-Cut Duty</td>
+<td><code>soft_cut_pct</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-air-con">Sensors - Air Con<a class="headerlink" href="#sensors-air-con" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Air Conditioner Pressure</td>
+<td><code>ac_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Air Conditioner Request</td>
+<td><code>ac_request</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Air Conditioner Temperature</td>
+<td><code>ac_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-atmospheric">Sensors - Atmospheric<a class="headerlink" href="#sensors-atmospheric" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ambient Air Temperature</td>
+<td><code>ambient_air_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Barometric Pressure</td>
+<td><code>baro_kpa</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Humidity</td>
+<td><code>humidity</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-boostturbo">Sensors - Boost/Turbo<a class="headerlink" href="#sensors-boostturbo" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boost Pressure</td>
+<td><code>boost_kpa</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Boost Pressure Pre Intercooler</td>
+<td><code>boost_pressure_pre_ic</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>CO2 Bottle Pressure</td>
+<td><code>co2_bottle_pressure</code></td>
+<td>kPa</td>
+<td>0 to 30000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Turbo Speed 1</td>
+<td><code>turbo_speed_1</code></td>
+<td>Hz</td>
+<td>0 to 100000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Turbo Speed 2</td>
+<td><code>turbo_speed_2</code></td>
+<td>Hz</td>
+<td>0 to 100000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wastegate 1 Temperature</td>
+<td><code>wastegate_1_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wastegate 2 Temperature</td>
+<td><code>wastegate_2_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wastegate Pressure</td>
+<td><code>wastegate_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wastegate Valve Pos 1</td>
+<td><code>wastegate_valve_pos_1</code></td>
+<td>deg</td>
+<td>-720.0 to 720.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wastegate Valve Pos 2</td>
+<td><code>wastegate_valve_pos_2</code></td>
+<td>deg</td>
+<td>-720.0 to 720.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-chassis">Sensors - Chassis<a class="headerlink" href="#sensors-chassis" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Brake Fluid Level Switch</td>
+<td><code>brake_fluid_level_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Brake Pedal Switch</td>
+<td><code>brake_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Brake Pressure Front</td>
+<td><code>brake_pressure_f</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Brake Pressure Rear</td>
+<td><code>brake_pressure_r</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Cruise Control Switch</td>
+<td><code>cruise_sw</code></td>
+<td></td>
+<td>0 to 15</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Handbrake Switch</td>
+<td><code>handbrake_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Power Steering Pressure</td>
+<td><code>power_steering_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Power Steering Switch</td>
+<td><code>power_steering_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ride Height Sensor Front</td>
+<td><code>ride_height_f</code></td>
+<td>deg</td>
+<td>-720.0 to 720.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Ride Height Sensor Rear</td>
+<td><code>ride_height_r</code></td>
+<td>deg</td>
+<td>-720.0 to 720.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Shock Travel Sensors</td>
+<td><code>shock_travel</code></td>
+<td>deg</td>
+<td>-720.0 to 720.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Start Button</td>
+<td><code>start_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Steering Angle</td>
+<td><code>steering_angle</code></td>
+<td>deg</td>
+<td>-720.0 to 720.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Vehicle Dynamics</td>
+<td><code>vehicle_dynamics</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheelie Bar Pressure</td>
+<td><code>wheelie_bar_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheelie Bar Pressure Left</td>
+<td><code>wheelie_bar_pressure_l</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheelie Bar Pressure Right</td>
+<td><code>wheelie_bar_pressure_r</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-derived">Sensors - Derived<a class="headerlink" href="#sensors-derived" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boost Estimate</td>
+<td><code>boost_est</code></td>
+<td>kPa</td>
+<td>0.0 to 100.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Gear</td>
+<td><code>gear</code></td>
+<td></td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Launch Switch</td>
+<td><code>launch_sw</code></td>
+<td>bool</td>
+<td>0 to 100</td>
+<td></td>
+</tr>
+<tr>
+<td>Wheel Speed FL</td>
+<td><code>wheel_fl</code></td>
+<td>km/h</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheel Speed FR</td>
+<td><code>wheel_fr</code></td>
+<td>km/h</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheel Speed RL</td>
+<td><code>wheel_rl</code></td>
+<td>km/h</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheel Speed RR</td>
+<td><code>wheel_rr</code></td>
+<td>km/h</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-engine">Sensors - Engine<a class="headerlink" href="#sensors-engine" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accelerator Pedal</td>
+<td><code>app_1</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Accelerator Pedal 2</td>
+<td><code>app_2</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Air Temperature</td>
+<td><code>iat</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Air Temperature Pre Intercooler</td>
+<td><code>iat_pre_ic</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Coolant Flow Switch</td>
+<td><code>coolant_flow_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Coolant Level</td>
+<td><code>coolant_level</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Coolant Pressure</td>
+<td><code>coolant_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Coolant Temperature</td>
+<td><code>clt</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Coolant Temperature Return</td>
+<td><code>clt_return</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Crank Case Pressure</td>
+<td><code>crankcase_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>EGT Protect Active</td>
+<td><code>egt_protect_active</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 1</td>
+<td><code>egt_1</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 10</td>
+<td><code>egt_10</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 11</td>
+<td><code>egt_11</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 12</td>
+<td><code>egt_12</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 2</td>
+<td><code>egt_2</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 3</td>
+<td><code>egt_3</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 4</td>
+<td><code>egt_4</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 5</td>
+<td><code>egt_5</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 6</td>
+<td><code>egt_6</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 7</td>
+<td><code>egt_7</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 8</td>
+<td><code>egt_8</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Exhaust Gas Temperature 9</td>
+<td><code>egt_9</code></td>
+<td>C</td>
+<td>-40.0 to 1500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Flex Fuel Composition</td>
+<td><code>ethanol_2</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Flex Fuel Composition &amp; Temperature (ethanol)</td>
+<td><code>ethanol</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Flex Fuel Composition &amp; Temperature (fuel_temp_flex)</td>
+<td><code>fuel_temp_flex</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Flow</td>
+<td><code>fuel_flow</code></td>
+<td>g/s</td>
+<td>0.0 to 1000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Pressure Pre Filter</td>
+<td><code>fuel_pressure_pre</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Temperature</td>
+<td><code>fuel_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Mass Air Flow</td>
+<td><code>maf</code></td>
+<td>g/s</td>
+<td>0.0 to 1000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Oil Level</td>
+<td><code>oil_level</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Oil Pressure</td>
+<td><code>oil_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Oil Pressure Switch</td>
+<td><code>oil_pressure_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Oil Temperature</td>
+<td><code>oil_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Oil Temperature Return</td>
+<td><code>oil_temp_return</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Throttle Position</td>
+<td><code>tps</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Throttle Position 2</td>
+<td><code>tps_2</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Learned Trim 1</td>
+<td><code>vvt_ltt_1</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Learned Trim 2</td>
+<td><code>vvt_ltt_2</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Learned Trim 3</td>
+<td><code>vvt_ltt_3</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Learned Trim 4</td>
+<td><code>vvt_ltt_4</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Solenoid Duty 1</td>
+<td><code>vvt_duty_1</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Solenoid Duty 2</td>
+<td><code>vvt_duty_2</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Solenoid Duty 3</td>
+<td><code>vvt_duty_3</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Solenoid Duty 4</td>
+<td><code>vvt_duty_4</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-engine-synchronous">Sensors - Engine Synchronous<a class="headerlink" href="#sensors-engine-synchronous" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exhaust Manifold Pressure</td>
+<td><code>exh_manifold_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Pressure</td>
+<td><code>fuel_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Instant Manifold Pressure</td>
+<td><code>imap</code></td>
+<td>kPa</td>
+<td>0.0 to 400.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Manifold Pressure</td>
+<td><code>map</code></td>
+<td>kPa</td>
+<td>-101.3 to 1000.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-nitrous">Sensors - Nitrous<a class="headerlink" href="#sensors-nitrous" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nitrous Pressure 1</td>
+<td><code>nitrous_pressure_1</code></td>
+<td>kPa</td>
+<td>0 to 30000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Nitrous Pressure 2</td>
+<td><code>nitrous_pressure_2</code></td>
+<td>kPa</td>
+<td>0 to 30000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Nitrous Pressure 3</td>
+<td><code>nitrous_pressure_3</code></td>
+<td>kPa</td>
+<td>0 to 30000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Nitrous Pressure 4</td>
+<td><code>nitrous_pressure_4</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-o2">Sensors - O2<a class="headerlink" href="#sensors-o2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Narrowband 1</td>
+<td><code>narrowband_1</code></td>
+<td>V</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Narrowband 2</td>
+<td><code>narrowband_2</code></td>
+<td>V</td>
+<td>0.000 to 5.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 1</td>
+<td><code>lambda_1</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 10</td>
+<td><code>lambda_10</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 11</td>
+<td><code>lambda_11</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 12</td>
+<td><code>lambda_12</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 13</td>
+<td><code>lambda_13</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 14</td>
+<td><code>lambda_14</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 15</td>
+<td><code>lambda_15</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 2</td>
+<td><code>lambda_2</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 3</td>
+<td><code>lambda_3</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 4</td>
+<td><code>lambda_4</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 5</td>
+<td><code>lambda_5</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 6</td>
+<td><code>lambda_6</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 7</td>
+<td><code>lambda_7</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 8</td>
+<td><code>lambda_8</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wideband O2 9</td>
+<td><code>lambda_9</code></td>
+<td>λ</td>
+<td>0.50 to 1.50</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-other">Sensors - Other<a class="headerlink" href="#sensors-other" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ABS Mode</td>
+<td><code>abs_mode</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Auxiliary Input 1</td>
+<td><code>aux_1</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Auxiliary Input 2</td>
+<td><code>aux_2</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Auxiliary Input 3</td>
+<td><code>aux_3</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Auxiliary Input 4</td>
+<td><code>aux_4</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Auxiliary Input 5</td>
+<td><code>aux_5</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Auxiliary Input 6</td>
+<td><code>aux_6</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Battery Voltage</td>
+<td><code>battery</code></td>
+<td>V</td>
+<td>0.00 to 32.00</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>ECU Temperature</td>
+<td><code>ecu_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Electrical Load Switch</td>
+<td><code>electrical_load_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Level</td>
+<td><code>fuel_level_l</code></td>
+<td>L</td>
+<td>0.0 to 500.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Level 1</td>
+<td><code>fuel_level_1</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Level 2</td>
+<td><code>fuel_level_2</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Fuel Tank Pressure</td>
+<td><code>fuel_tank_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Generic Switch 1</td>
+<td><code>switch_1</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Generic Switch 2</td>
+<td><code>switch_2</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Generic Switch 3</td>
+<td><code>switch_3</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Generic Switch 4</td>
+<td><code>switch_4</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Rotary Trim Module 1</td>
+<td><code>rotary_trim_1</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Rotary Trim Module 2</td>
+<td><code>rotary_trim_2</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Rotary Trim Module 3</td>
+<td><code>rotary_trim_3</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Rotary Trim Module 4</td>
+<td><code>rotary_trim_4</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Rotary Trim Module 5</td>
+<td><code>rotary_trim_5</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Rotary Trim Module 6</td>
+<td><code>rotary_trim_6</code></td>
+<td></td>
+<td>-720.000 to 30000.000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Track Temperature</td>
+<td><code>track_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Tumble Generator Valve 1</td>
+<td><code>tumble_valve_1</code></td>
+<td>deg</td>
+<td>-720.0 to 720.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Tumble Generator Valve 2</td>
+<td><code>tumble_valve_2</code></td>
+<td>deg</td>
+<td>-720.0 to 720.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-raw">Sensors - Raw<a class="headerlink" href="#sensors-raw" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DIG1 Frequency</td>
+<td><code>hw_dig1_freq</code></td>
+<td>Hz</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG1 Level</td>
+<td><code>hw_dig1_level</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG1 Pulse Width</td>
+<td><code>hw_dig1_pulse</code></td>
+<td>us</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG1 SENT</td>
+<td><code>hw_dig1_sent</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG2 Frequency</td>
+<td><code>hw_dig2_freq</code></td>
+<td>Hz</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG2 Level</td>
+<td><code>hw_dig2_level</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG2 Pulse Width</td>
+<td><code>hw_dig2_pulse</code></td>
+<td>us</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG2 SENT</td>
+<td><code>hw_dig2_sent</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG3 Frequency</td>
+<td><code>hw_dig3_freq</code></td>
+<td>Hz</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG3 Level</td>
+<td><code>hw_dig3_level</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG3 Pulse Width</td>
+<td><code>hw_dig3_pulse</code></td>
+<td>us</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG3 SENT</td>
+<td><code>hw_dig3_sent</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG4 Frequency</td>
+<td><code>hw_dig4_freq</code></td>
+<td>Hz</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG4 Level</td>
+<td><code>hw_dig4_level</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG4 Pulse Width</td>
+<td><code>hw_dig4_pulse</code></td>
+<td>us</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG4 SENT</td>
+<td><code>hw_dig4_sent</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG5 Frequency</td>
+<td><code>hw_dig5_freq</code></td>
+<td>Hz</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG5 Level</td>
+<td><code>hw_dig5_level</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG5 Pulse Width</td>
+<td><code>hw_dig5_pulse</code></td>
+<td>us</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG5 SENT</td>
+<td><code>hw_dig5_sent</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG6 Frequency</td>
+<td><code>hw_dig6_freq</code></td>
+<td>Hz</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG6 Level</td>
+<td><code>hw_dig6_level</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG6 Pulse Width</td>
+<td><code>hw_dig6_pulse</code></td>
+<td>us</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG6 SENT</td>
+<td><code>hw_dig6_sent</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG7 Frequency</td>
+<td><code>hw_dig7_freq</code></td>
+<td>Hz</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG7 Level</td>
+<td><code>hw_dig7_level</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG7 Pulse Width</td>
+<td><code>hw_dig7_pulse</code></td>
+<td>us</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG7 SENT</td>
+<td><code>hw_dig7_sent</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG8 Frequency</td>
+<td><code>hw_dig8_freq</code></td>
+<td>Hz</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG8 Level</td>
+<td><code>hw_dig8_level</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG8 Pulse Width</td>
+<td><code>hw_dig8_pulse</code></td>
+<td>us</td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>DIG8 SENT</td>
+<td><code>hw_dig8_sent</code></td>
+<td></td>
+<td>0 to 4294967295</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AT1</td>
+<td><code>hw_at1</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AT2</td>
+<td><code>hw_at2</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AT3</td>
+<td><code>hw_at3</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AT4</td>
+<td><code>hw_at4</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV1</td>
+<td><code>hw_av1</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV10</td>
+<td><code>hw_av10</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV11</td>
+<td><code>hw_av11</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV12</td>
+<td><code>hw_av12</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV13</td>
+<td><code>hw_av13</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV14</td>
+<td><code>hw_av14</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV15</td>
+<td><code>hw_av15</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV16</td>
+<td><code>hw_av16</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV2</td>
+<td><code>hw_av2</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV3</td>
+<td><code>hw_av3</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV4</td>
+<td><code>hw_av4</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV5</td>
+<td><code>hw_av5</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV6</td>
+<td><code>hw_av6</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV7</td>
+<td><code>hw_av7</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV8</td>
+<td><code>hw_av8</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+<tr>
+<td>Raw AV9</td>
+<td><code>hw_av9</code></td>
+<td>ADC</td>
+<td>0 to 4095</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-transmission">Sensors - Transmission<a class="headerlink" href="#sensors-transmission" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clutch Pedal Switch</td>
+<td><code>clutch_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Clutch Pressure</td>
+<td><code>clutch_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Differential Oil Temperature</td>
+<td><code>diff_oil_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Neutral Switch</td>
+<td><code>neutral_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Reverse Switch</td>
+<td><code>reverse_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Torque Converter Pressure</td>
+<td><code>torque_conv_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trans Brake Switch</td>
+<td><code>trans_brake_sw</code></td>
+<td>bool</td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Transfer Case Pressure</td>
+<td><code>transfer_case_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Transmission Input RPM</td>
+<td><code>trans_input_rpm</code></td>
+<td>Hz</td>
+<td>0 to 100000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Transmission Line Pressure</td>
+<td><code>trans_line_pressure</code></td>
+<td>kPa</td>
+<td>-101.3 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Transmission Oil Temperature</td>
+<td><code>trans_oil_temp</code></td>
+<td>C</td>
+<td>-40.0 to 300.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sensors-vehicle-speed">Sensors - Vehicle Speed<a class="headerlink" href="#sensors-vehicle-speed" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Drive Shaft Frequency</td>
+<td><code>shaft_hz</code></td>
+<td>Hz</td>
+<td>0 to 3000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Drive Shaft RPM</td>
+<td><code>driveshaft_rpm</code></td>
+<td>RPM</td>
+<td>0 to 20000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Drive Shaft Speed</td>
+<td><code>shaft_spd</code></td>
+<td>km/h</td>
+<td>0.0 to 400.0</td>
+<td></td>
+</tr>
+<tr>
+<td>GPS Frequency</td>
+<td><code>gps_hz</code></td>
+<td>Hz</td>
+<td>0 to 3000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>GPS Speed</td>
+<td><code>gps_spd</code></td>
+<td>km/h</td>
+<td>0.0 to 400.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Vehicle Speed</td>
+<td><code>vehicle_spd</code></td>
+<td>km/h</td>
+<td>0.0 to 400.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Wheel Frequency FL</td>
+<td><code>wheel_hz_fl</code></td>
+<td>Hz</td>
+<td>0 to 3000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheel Frequency FR</td>
+<td><code>wheel_hz_fr</code></td>
+<td>Hz</td>
+<td>0 to 3000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheel Frequency RL</td>
+<td><code>wheel_hz_rl</code></td>
+<td>Hz</td>
+<td>0 to 3000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Wheel Frequency RR</td>
+<td><code>wheel_hz_rr</code></td>
+<td>Hz</td>
+<td>0 to 3000</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stepper">Stepper<a class="headerlink" href="#stepper" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stepper Bridge A Enabled</td>
+<td><code>step_en_a</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Stepper Bridge B Enabled</td>
+<td><code>step_en_b</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Stepper Coil A Demand</td>
+<td><code>step_demand_a</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Stepper Coil B Demand</td>
+<td><code>step_demand_b</code></td>
+<td>%</td>
+<td>-100.0 to 100.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Stepper DIR Level</td>
+<td><code>step_dir</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Stepper ENABLE Level</td>
+<td><code>step_enable</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Stepper STEP Pulse</td>
+<td><code>step_pulse</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="transientthrottle">TransientThrottle<a class="headerlink" href="#transientthrottle" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ign Corr: Transient</td>
+<td><code>ign_corr_transient</code></td>
+<td>deg</td>
+<td>-30.0 to 30.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Transient Active</td>
+<td><code>transient_active</code></td>
+<td></td>
+<td>0 to 2</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Transient Enrich %</td>
+<td><code>transient_enrich_pct</code></td>
+<td>%</td>
+<td>-100.0 to 300.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Transient Load Rate</td>
+<td><code>tt_load_rate</code></td>
+<td>/s</td>
+<td>-3000.0 to 3000.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Transient Start Load</td>
+<td><code>tt_start_load</code></td>
+<td>%</td>
+<td>0.0 to 300.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="trigger">Trigger<a class="headerlink" href="#trigger" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Crank Angle</td>
+<td><code>crank_angle</code></td>
+<td>deg</td>
+<td>0.0 to 720.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Crank Synchronized</td>
+<td><code>synchronized</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Engine RPM</td>
+<td><code>rpm</code></td>
+<td>RPM</td>
+<td>0 to 30000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Sync Level</td>
+<td><code>sync_level</code></td>
+<td></td>
+<td>0 to 2</td>
+<td></td>
+</tr>
+<tr>
+<td>Trigger Edges</td>
+<td><code>trigger_teeth</code></td>
+<td></td>
+<td>0 to 4000000000</td>
+<td></td>
+</tr>
+<tr>
+<td>Trigger Error Rate</td>
+<td><code>trigger_error_pct</code></td>
+<td>%</td>
+<td>0 to 100</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trigger Fault Stream</td>
+<td><code>trigger_fault_stream</code></td>
+<td></td>
+<td>0 to 255</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trigger Last Error Kind</td>
+<td><code>trigger_last_error_kind</code></td>
+<td></td>
+<td>0 to 2</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trigger Last Error Tooth</td>
+<td><code>trigger_last_error_tooth</code></td>
+<td></td>
+<td>0 to 1000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trigger Missed Teeth</td>
+<td><code>trigger_missed_teeth</code></td>
+<td></td>
+<td>0 to 4000000000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trigger Noise Edges</td>
+<td><code>trigger_noise_edges</code></td>
+<td></td>
+<td>0 to 4000000000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trigger Phase Lost</td>
+<td><code>trigger_phase_lost</code></td>
+<td></td>
+<td>0 to 4000000000</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trigger Signal Absent</td>
+<td><code>trigger_absent</code></td>
+<td></td>
+<td>0 to 1</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Trigger Sync Ceiling</td>
+<td><code>trigger_sync_ceiling</code></td>
+<td></td>
+<td>0 to 2</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Cam 1 Advance</td>
+<td><code>vvt_angle_1</code></td>
+<td>deg</td>
+<td>-360.0 to 360.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Cam 2 Advance</td>
+<td><code>vvt_angle_2</code></td>
+<td>deg</td>
+<td>-360.0 to 360.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Cam 3 Advance</td>
+<td><code>vvt_angle_3</code></td>
+<td>deg</td>
+<td>-360.0 to 360.0</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>VVT Cam 4 Advance</td>
+<td><code>vvt_angle_4</code></td>
+<td>deg</td>
+<td>-360.0 to 360.0</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="vehicle-traction">Vehicle - Traction<a class="headerlink" href="#vehicle-traction" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Name</th>
+<th>Units</th>
+<th>Range</th>
+<th>Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Traction Cut</td>
+<td><code>traction_cut_pct</code></td>
+<td>%</td>
+<td>0.0 to 100.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Traction Slip</td>
+<td><code>traction_slip</code></td>
+<td>%</td>
+<td>-100.0 to 200.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Traction Slip Error</td>
+<td><code>traction_slip_err</code></td>
+<td>%</td>
+<td>-100.0 to 200.0</td>
+<td></td>
+</tr>
+<tr>
+<td>Traction Timing Retard</td>
+<td><code>traction_retard</code></td>
+<td>deg</td>
+<td>0.0 to 60.0</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="settings/index.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Every setting, by module">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Every setting, by module
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="dtc.html" class="md-footer__link md-footer__link--next" aria-label="Next: Trouble codes">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Trouble codes
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

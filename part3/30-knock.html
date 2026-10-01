@@ -1,0 +1,3609 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/30-knock.html">
+      
+      
+        <link rel="prev" href="29-protection.html">
+      
+      
+        <link rel="next" href="31-misfire.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>30 Knock - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#knock" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              30 Knock
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="30-knock.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-listening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Listening
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-the-learned-noise-floor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · The learned noise floor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-knock-and-retard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Knock and retard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-pre-ignition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Pre-ignition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-sensor-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · Sensor health
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="knock">Knock<a class="headerlink" href="#knock" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> after each cylinder fires, the ECU listens to the knock sensor in a short
+window, compares what it hears with what that cylinder normally sounds like at that speed and load,
+and pulls timing from a cylinder that is knocking — and it can spot pre-ignition and cut that
+cylinder's fuel.</p>
+</blockquote>
+<p>This chapter sets knock control up. Tuning the thresholds on a running engine is chapter 41.</p>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p><strong>Knock</strong> (detonation) is part of the mixture exploding after the spark instead of burning smoothly.
+It rings the engine block at a frequency set mainly by the bore, and a knock sensor bolted to the block
+hears it. A little is harmless; sustained knock breaks pistons.</p>
+<p>The <strong>Knock Control</strong> module (<code>knock</code>):</p>
+<ol>
+<li><strong>Listens</strong> to the knock sensor in a crank-angle window after each cylinder's top dead centre.</li>
+<li><strong>Filters</strong> the signal to the knock frequency and measures its level in dB.</li>
+<li><strong>Compares</strong> it with a <strong>learned noise floor</strong>: what that cylinder normally sounds like at that
+   engine speed and load. How far above the floor it is — the <strong>intensity</strong> — is what counts.</li>
+<li><strong>Retards</strong> the timing of a cylinder whose intensity goes over the <strong>Knock Threshold</strong>, a step at a
+   time up to <strong>Max Retard</strong>, and gives the timing back slowly once it is quiet.</li>
+<li>Optionally <strong>detects pre-ignition</strong> (the mixture lighting before the spark) and cuts that
+   cylinder's fuel.
+   <!-- src: firmware/Engine/Modules/Knock.h; firmware/Engine/Modules/Knock.cpp -->
+</li>
+</ol>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="1-listening">1 · Listening<a class="headerlink" href="#1-listening" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Detection Source</strong>: <strong>Onboard</strong> samples KNOCK1 and KNOCK2 (CN4-23, CN4-22) directly.
+  <strong>External</strong> reads a knock intensity in dB from another device over the bus (<strong>External
+  Intensity</strong>); it has no per-cylinder detail, so it retards all cylinders together.</li>
+<li>
+<p><strong>Window Start (before spark)</strong> (default <strong>10°</strong>) and <strong>Window Duration</strong> (80°) set when to listen.
+  The window opens that many degrees before <strong>each cylinder's own spark</strong>, so it follows the timing and
+  the firing order: a 20° spark opens it at 30° BTDC, and it listens for 80° from there, to 50° after
+  TDC. It opens before the spark so it can hear pre-ignition (below), and runs well past TDC because
+  knock rings through the expansion stroke. It never opens earlier than 85° BTDC.
+  <!-- src: definition/ecu.schema.yaml (knock.window_before_spark_deg); firmware/Scheduler/EnginePositionHal.cpp (knock_open_btdc); firmware/main.cpp (knock_task) --></p>
+</li>
+<li>
+<p><strong>Knock Frequency</strong>: the centre of the filter. <strong>0</strong> (the default) works it out from the engine's
+  <strong>Bore</strong> (chapter 15): 900 ÷ (π × bore/2) kHz — about 7.2 kHz for an 80 mm bore — or 7 kHz if no bore
+  is set.</p>
+</li>
+<li><strong>Per-Cylinder Knock Input</strong>: which sensor hears each cylinder. <strong>Auto</strong> takes it from the
+  cylinder's bank (bank 1 → Knock 1, bank 2 → Knock 2). <strong>Sensor Gain</strong> trims one cylinder's level up
+  or down, for a cylinder far from its sensor.
+  <!-- src: definition/ecu.schema.yaml (Knock scalars); firmware/main.cpp -->
+</li>
+</ul>
+<p>The onboard sampling borrows the processor's third ADC from the AV13–AV16 inputs for each window and
+hands it back. Those four inputs keep reading, but update only between knock windows — at high engine
+speed on many cylinders the gaps get short.</p>
+<p>A window is sampled for at most 7.3 ms (2048 samples). At very low engine speed a long window is
+therefore cut short: a 40° window is only complete above about 900 RPM.</p>
+<h3 id="2-the-learned-noise-floor">2 · The learned noise floor<a class="headerlink" href="#2-the-learned-noise-floor" title="Permanent link">&para;</a></h3>
+<p>For each cylinder the ECU keeps an 8 × 8 map of its normal noise, by engine speed and load. It learns
+only from <strong>clean</strong> cycles, and only when:</p>
+<ul>
+<li>engine speed is above <strong>Noise Learn Min RPM</strong> (500);</li>
+<li>the operating point has stayed in one cell for <strong>Noise Learn Dwell</strong> (200 ms);</li>
+<li>fuel and spark are not being cut.</li>
+</ul>
+<p>A cell's first reading becomes its floor. Its next <strong>Fast-Learn Cycles</strong> (20) readings are averaged in
+fully, after which it follows slowly at <strong>Noise Learn Rate</strong> (0.05 per cycle). A knocking cycle
+never teaches the floor — otherwise the floor would chase the knock and the ECU would go deaf.</p>
+<div class="admonition warning">
+<p class="admonition-title">A new engine is deaf until it has learned</p>
+<p>A cell that has never been learned <strong>cannot report knock</strong> — its first reading becomes the floor.
+After flashing, or on a new engine, drive gently through the speed and load range before loading
+the engine hard, so every cell you will use has a floor. <strong>Noise Floor Seed</strong> is only what the
+studio shows for an unlearned cell.</p>
+</div>
+<p>The learned floor is saved on the SD card with the other learned tables (chapter 23), so the engine is
+not deaf after every start.</p>
+<!-- src: firmware/Engine/Modules/Knock.cpp -->
+
+<p><img alt="The learned noise floor for cylinder 1" src="../img/studio/knock-noise-floor.png" /></p>
+<h3 id="3-knock-and-retard">3 · Knock and retard<a class="headerlink" href="#3-knock-and-retard" title="Permanent link">&para;</a></h3>
+<p>A measurement is <strong>knock</strong> when its intensity is above the <strong>Knock Threshold</strong> table (default 12 dB
+over the floor, by RPM and load). Each knock event adds <strong>Retard Step per Event</strong> (0.50°) to that
+cylinder's retard, up to the <strong>Max Knock Retard</strong> table (8°). The retard falls back at <strong>Retard
+Recovery Rate</strong> (1.00 °/s) once it stops. Each cylinder has its own retard with the onboard source;
+<strong>Knock Retard</strong> <code>knock_retard</code> shows the largest.</p>
+<p>While fuel is cut (overrun, a limiter, a protection) nothing is judged, and the retard recovers at the
+normal rate. <strong>Knock Suppress Below TPS</strong> (0 = off) adds a throttle gate if you need one.</p>
+<!-- src: firmware/Engine/Modules/Knock.cpp -->
+
+<p><img alt="The Knock Threshold table" src="../img/studio/knock-threshold.png" /></p>
+<h3 id="4-pre-ignition">4 · Pre-ignition<a class="headerlink" href="#4-pre-ignition" title="Permanent link">&para;</a></h3>
+<p>Pre-ignition lights the charge at or before the spark. The window always opens <strong>Window Start</strong>
+before each spark, so the energy before the spark is always in it, at any timing. With
+<strong>Pre-Ignition Detection</strong> on, a loud event is judged <strong>pre-ignition</strong> when either:</p>
+<ul>
+<li>at least <strong>Pre-Spark Energy Fraction</strong> (35 %) of its energy came before the spark and it is
+  <strong>Pre-Ignition Margin</strong> (6 dB) louder than the knock threshold; or</li>
+<li>it is louder than <strong>Pre-Ignition Extreme Level</strong> (30 dB over the floor), whatever the timing.</li>
+</ul>
+<p>After <strong>Events Before Action</strong> (2) such events on one cylinder, the code <strong>P1790</strong> + cylinder is set
+(severity 3) and that cylinder is cut: <strong>Cut Fuel on Pre-Ignition</strong> (on), and optionally <strong>Cut Spark</strong>
+(off by default — on wasted spark it also kills the partner cylinder). <strong>Pre-Ignition Cut Hold</strong> (0 =
+until the engine stops) says how long the cut lasts. Pre-ignition is not answered with retard:
+retarding does not stop it.</p>
+<!-- src: firmware/Engine/Modules/Knock.cpp -->
+
+<h3 id="5-sensor-health">5 · Sensor health<a class="headerlink" href="#5-sensor-health" title="Permanent link">&para;</a></h3>
+<p>A missing knock signal sets <strong>P1750</strong> (Knock 1) or <strong>P1751</strong> (Knock 2). A disconnected sensor still
+gives a reading — the input hears its own noise — so to catch one, turn on <strong>Detect a Quiet
+(Disconnected) Sensor</strong> and set <strong>Quiet Level</strong> from a log: the level at idle with the sensor plugged
+in, and with it unplugged.</p>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<ul>
+<li>Knock sensors wired to KNOCK1/KNOCK2 with shielded cable and torqued to the maker's figure
+  (chapter 11). The <strong>H1</strong>/<strong>H2</strong> jumpers and the CN1 listening jack are in chapter 7.</li>
+<li><strong>Bore</strong> set on the engine page (chapter 15), for the knock frequency.</li>
+<li>The cylinders' <strong>banks</strong> set (chapter 15), if you use Auto input selection on a V engine.</li>
+<li>The trigger and ignition working (chapters 16 and 20).</li>
+</ul>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>Open <strong>Configuration ▸ Ignition Tuning ▸ Knock Control</strong> and tick <strong>Enabled</strong>.</p>
+<p><img alt="The Knock Control page" src="../img/studio/knock-page.png" /></p>
+<ol>
+<li><strong>Listening:</strong> Source Onboard; Knock Frequency 0 (from the bore); Window Start 10° before the spark,
+   Duration 80°.</li>
+<li><strong>Sensor per cylinder:</strong> leave on Auto, or set each cylinder to the sensor nearest it.</li>
+<li><strong>Response:</strong> keep Retard Step 0.5° and Recovery 1 °/s.</li>
+<li><strong>Learn the floor:</strong> drive gently through the range with the engine warm. Watch the <strong>Noise Floor</strong>
+   page fill in (the <strong>Samples</strong> grid shows how many clean cycles taught each cell).</li>
+<li><strong>Thresholds:</strong> tune them on a running engine — chapter 41.</li>
+</ol>
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — inline four, one sensor</p>
+<p>One sensor on Knock 1 between cylinders 2 and 3. Cylinders 1–4 on Knock 1 (Auto works if all four
+are bank 1). Sensor Gain +2 dB on cylinders 1 and 4, which are further from the sensor.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — V8, a sensor per bank</p>
+<p>Banks set in chapter 15; Auto sends bank 1 to Knock 1 and bank 2 to Knock 2.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — watching for pre-ignition on a boosted engine</p>
+<p>Window Start 10° before the spark, Duration 80°; Pre-Ignition Detection on, Events Before Action 2,
+Cut Fuel on, Cut Hold 0.</p>
+</div>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<p>Chapter 41 covers threshold tuning with the Knock Scope, which shows each measurement against its
+cylinder's floor and threshold. In short: log <code>knock_level</code>, <code>knock_count</code> and <code>knock_retard</code>; raise
+the threshold where clean running trips it, and lower it where real knock (heard through the CN1
+jack) goes unnoticed.</p>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>What sets it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1750</strong> / <strong>P1751</strong></td>
+<td>Knock sensor 1 / 2 signal missing</td>
+<td>The sensor not reading, or reading quieter than Quiet Level (if enabled)</td>
+</tr>
+<tr>
+<td><strong>P1752</strong></td>
+<td>Throttle signal missing</td>
+<td>Knock Suppress Below TPS is set and there is no throttle reading: detection is suppressed</td>
+</tr>
+<tr>
+<td><strong>P1790</strong>–<strong>P179B</strong></td>
+<td>Pre-ignition on cylinder 1–12</td>
+<td>Events Before Action confirmed events (severity 3)</td>
+</tr>
+</tbody>
+</table>
+<p>Live channels: <code>knock_level</code> (the loudest recent measurement in dB, before the floor is taken off;
+it falls back at 20 dB/s), <code>knock_count</code>, <code>knock_retard</code>, <code>knock_1</code>, <code>knock_2</code>.</p>
+<!-- src: firmware/Engine/Modules/Knock.cpp -->
+
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Never detects knock</td>
+<td>Cells not learned yet; threshold too high; wrong sensor per cylinder</td>
+<td>The Samples grid; Threshold; Knock Input</td>
+</tr>
+<tr>
+<td>Retard on a clean engine</td>
+<td>Threshold too low at that point; valve or injector noise in the window</td>
+<td>Threshold; a later or shorter window</td>
+</tr>
+<tr>
+<td>Knock only ever on one cylinder</td>
+<td>That cylinder's sensor gain; the cylinder is far from the sensor</td>
+<td>Sensor Gain</td>
+</tr>
+<tr>
+<td>AV13–AV16 readings lag</td>
+<td>Onboard knock sampling shares their converter</td>
+<td>Expected; use AV1–AV11 for fast signals</td>
+</tr>
+<tr>
+<td>A pre-ignition cut on a healthy engine</td>
+<td>Pre-ignition limits too low; the window opens too early</td>
+<td>Margin, Extreme Level, Events Before Action</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Knock Control Enabled</strong><br><code>knock.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Listen for knock on the knock sensor input, judge each combustion event against a learned per-cylinder noise floor, and act on it. Off, no sampling is done at all — the ADC is not even re-tasked for it.</td>
+</tr>
+<tr>
+<td><strong>Detection Source</strong><br><code>knock.source</code><br>Range: one of: Onboard (ADC3 burst), External (bus signal)<br>Default: Onboard (ADC3 burst)</td>
+<td>Onboard: per-cylinder crank-angle-windowed ADC3 burst + DSP. The burst borrows ADC3 from the AV13-16 scan and hands it straight back, so those four inputs keep reading — but they update only between bursts, and on a many-cylinder engine at high rpm those gaps get short. External: a normalized intensity (dB) signal off the bus, which touches ADC3 not at all.</td>
+</tr>
+<tr>
+<td><strong>Knock Frequency</strong><br><code>knock.knock_frequency</code><br>Range: 0 to 25000<br>Default: 0<br>Units: Hz</td>
+<td>Centre of the knock bandpass. 0 = derive it from the engine's Bore (900 / (pi x bore/2) kHz), or a generic 7 kHz if no bore is entered. A knocking cylinder rings at a frequency set by its bore, so a band in the wrong place is partly deaf to knock while looking configured.</td>
+</tr>
+<tr>
+<td><strong>Window Start (before spark)</strong><br><code>knock.window_before_spark_deg</code><br>Range: 0 to 60<br>Default: 10<br>Units: deg</td>
+<td>How far BEFORE each cylinder's own spark its knock window opens, so the window follows the timing wherever it is: a 20 deg spark and 10 here opens it at 30 deg BTDC. It opens before the spark because pre-ignition lights the charge at or before it, and a window that opened after the spark could only hear knock. Never earlier than 85 deg BTDC (the point the window is armed from).</td>
+</tr>
+<tr>
+<td><strong>Window Duration</strong><br><code>knock.window_length_deg</code><br>Range: 1 to 180<br>Default: 80<br>Units: deg</td>
+<td>How long the window listens, in crank degrees from where it opens. It opens before the spark, so it must run well past TDC to hear knock, which rings through the expansion stroke: the default 80 reaches 30-60 deg ATDC across 10-40 deg of advance. Longer lets in valve noise. At low RPM a long window can outlast the sample buffer; the rest is dropped and counted (knk).</td>
+</tr>
+<tr>
+<td><strong>External Intensity Signal</strong><br><code>knock.external_intensity_sig</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>source=External: the bus signal (dB) to threshold as the global knock level. Unassigned = none.</td>
+</tr>
+<tr>
+<td><strong>Retard Step per Event</strong><br><code>knock.retard_step_deg</code><br>Range: 0.00 to 10.00<br>Default: 0.50<br>Units: deg</td>
+<td>How much timing is pulled per knocking event. It is a STEP, applied each time an event is judged as knock, so a persistently knocking cylinder walks back quickly while a single event costs one step. Too small and the retard cannot outrun the knock; too large and one false detection dumps a large chunk of timing.</td>
+</tr>
+<tr>
+<td><strong>Retard Recovery Rate</strong><br><code>knock.retard_reapply_rate</code><br>Range: 0.00 to 20.00<br>Default: 1.00<br>Units: deg/s</td>
+<td>How fast the accumulated retard is given back once the knocking stops, in degrees per second. Slow is safe: it keeps a margin after the event rather than walking straight back into the condition that caused it. Fast recovers power sooner and risks a knock-retard-knock cycle.</td>
+</tr>
+<tr>
+<td><strong>Knock Suppress Below TPS</strong><br><code>knock.suppress_min_tps</code><br>Range: 0.0 to 100.0<br>Default: 0.0<br>Units: %</td>
+<td>OPT-IN throttle gate; 0 = off, which is the default. Detection is already suppressed during overrun by wk::fuel_cut (DFCO), which is the precise "no combustion" condition, and the per-cylinder learned noise floor handles light-load mechanical noise by construction. Set this only if you want an additional throttle threshold — and note that on a drive-by-wire engine the ETB does idle control, so the plate sits at a few percent AT IDLE and a small value here will straddle the idle point.</td>
+</tr>
+<tr>
+<td><strong>Noise Floor Seed</strong><br><code>knock.noise_seed_db</code><br>Range: -60.0 to 20.0<br>Default: -35.0<br>Units: dB</td>
+<td>The level shown for a cell that has never been learned. It does not judge anything: a cell with no learned samples cannot report knock at all, and its first reading taken while learning is allowed becomes its floor. So a fresh engine hears knock in a cell only after it has run there once, gently, with learning on.</td>
+</tr>
+<tr>
+<td><strong>Noise Learn Rate</strong><br><code>knock.learn_rate</code><br>Range: 0.000 to 1.000<br>Default: 0.050</td>
+<td>EMA weight applied to each clean cycle once a cell is established (0.05 = a cell follows a slow change over ~20 cycles). Higher tracks a changing engine faster and forgets a real noise floor faster.</td>
+</tr>
+<tr>
+<td><strong>Fast-Learn Cycles</strong><br><code>knock.learn_fast_n</code><br>Range: 0 to 200<br>Default: 20</td>
+<td>While a cell has fewer than this many clean samples it averages 1/n instead of the EMA rate, so a fresh cell converges in a few cycles rather than crawling up from the seed.</td>
+</tr>
+<tr>
+<td><strong>Noise Learn Dwell</strong><br><code>knock.learn_dwell_ms</code><br>Range: 0 to 5000<br>Default: 200<br>Units: ms</td>
+<td>The operating point must sit in one cell this long before it learns — a transient sweeping across cells would otherwise smear one cell's noise into its neighbours.</td>
+</tr>
+<tr>
+<td><strong>Detect a Quiet (Disconnected) Sensor</strong><br><code>knock.quiet_check_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Report a knock sensor that reads too QUIET on a running engine. A disconnected sensor still produces a reading — the input samples its own noise — so it looks present and simply never hears knock. Off by default: set Quiet Level first.</td>
+</tr>
+<tr>
+<td><strong>Quiet Level</strong><br><code>knock.quiet_db</code><br>Range: -120.0 to 20.0<br>Default: -60.0<br>Units: dB</td>
+<td>Below this level for a second, with the engine running above the learn floor, the sensor is reported as missing. Set it from a log: the knock level at idle with the sensor connected, and again with it unplugged — put this between the two, nearer the unplugged reading.</td>
+</tr>
+<tr>
+<td><strong>Noise Learn Min RPM</strong><br><code>knock.learn_min_rpm</code><br>Range: 0 to 10000<br>Default: 500<br>Units: RPM</td>
+<td>Below this the engine is cranking or stalling and the background is not representative.</td>
+</tr>
+<tr>
+<td><strong>Pre-Ignition Detection</strong><br><code>knock.preign_enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Needs a window that opens BEFORE the spark (negative Window Start) — with an ATDC-only window there is nothing to see.</td>
+</tr>
+<tr>
+<td><strong>Pre-Spark Energy Fraction</strong><br><code>knock.preign_pre_frac</code><br>Range: 0 to 100<br>Default: 35<br>Units: %</td>
+<td>How much of the window's energy must sit BEFORE the spark to call it pre-ignition. Normal combustion puts almost none there.</td>
+</tr>
+<tr>
+<td><strong>Pre-Ignition Margin</strong><br><code>knock.preign_margin_db</code><br>Range: 0.0 to 60.0<br>Default: 6.0<br>Units: dB</td>
+<td>How far above the KNOCK threshold the event must also be. Pre-ignition is violent; this keeps ordinary knock with a little pre-spark leakage from being reported as one.</td>
+</tr>
+<tr>
+<td><strong>Pre-Ignition Extreme Level</strong><br><code>knock.preign_extreme_db</code><br>Range: 0.0 to 90.0<br>Default: 30.0<br>Units: dB</td>
+<td>Intensity over the noise floor above which an event is treated as pre-ignition REGARDLESS of phase. Fail toward the protective response: if we cannot tell, cutting is the safe error.</td>
+</tr>
+<tr>
+<td><strong>Events Before Action</strong><br><code>knock.preign_events_to_act</code><br>Range: 1 to 50<br>Default: 2</td>
+<td>Confirmed events on one cylinder before the DTC is raised and the cut applied. 1 acts on a single event; higher rides out a lone false positive.</td>
+</tr>
+<tr>
+<td><strong>Cut Fuel on Pre-Ignition</strong><br><code>knock.preign_cut_fuel</code><br>Range: Off or On<br>Default: On</td>
+<td>Cut the offending cylinder's injector. The correct protective action — and on a wasted-spark engine the only one that isolates a single cylinder, since two share a coil.</td>
+</tr>
+<tr>
+<td><strong>Cut Spark on Pre-Ignition</strong><br><code>knock.preign_cut_spark</code><br>Range: Off or On<br>Default: Off</td>
+<td>Also cut the cylinder's coil. On wasted spark this necessarily kills its companion cylinder's spark too, so it is off by default.</td>
+</tr>
+<tr>
+<td><strong>Pre-Ignition Cut Hold</strong><br><code>knock.preign_clear_s</code><br>Range: 0 to 3600<br>Default: 0<br>Units: s</td>
+<td>Seconds of silence before a cut cylinder is restored. 0 = latch until engine stop, which is the conservative choice for a fault that destroys pistons.</td>
+</tr>
+<tr>
+<td><strong>Knock Threshold (over noise floor) X Channel</strong><br><code>knock.knock_threshold_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Threshold (over noise floor)' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Threshold (over noise floor) Y Channel</strong><br><code>knock.knock_threshold_table_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Threshold (over noise floor)' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Max Knock Retard X Channel</strong><br><code>knock.knock_max_retard_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Max Knock Retard' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Max Knock Retard Y Channel</strong><br><code>knock.knock_max_retard_table_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Max Knock Retard' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 1 X Channel</strong><br><code>knock.knock_noise_1_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 1' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 1 Y Channel</strong><br><code>knock.knock_noise_1_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 1' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 2 X Channel</strong><br><code>knock.knock_noise_2_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 2' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 2 Y Channel</strong><br><code>knock.knock_noise_2_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 2' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 3 X Channel</strong><br><code>knock.knock_noise_3_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 3' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 3 Y Channel</strong><br><code>knock.knock_noise_3_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 3' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 4 X Channel</strong><br><code>knock.knock_noise_4_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 4' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 4 Y Channel</strong><br><code>knock.knock_noise_4_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 4' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 5 X Channel</strong><br><code>knock.knock_noise_5_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 5' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 5 Y Channel</strong><br><code>knock.knock_noise_5_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 5' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 6 X Channel</strong><br><code>knock.knock_noise_6_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 6' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 6 Y Channel</strong><br><code>knock.knock_noise_6_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 6' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 7 X Channel</strong><br><code>knock.knock_noise_7_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 7' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 7 Y Channel</strong><br><code>knock.knock_noise_7_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 7' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 8 X Channel</strong><br><code>knock.knock_noise_8_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 8' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 8 Y Channel</strong><br><code>knock.knock_noise_8_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 8' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 9 X Channel</strong><br><code>knock.knock_noise_9_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 9' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 9 Y Channel</strong><br><code>knock.knock_noise_9_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 9' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 10 X Channel</strong><br><code>knock.knock_noise_10_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 10' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 10 Y Channel</strong><br><code>knock.knock_noise_10_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 10' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 11 X Channel</strong><br><code>knock.knock_noise_11_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 11' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 11 Y Channel</strong><br><code>knock.knock_noise_11_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 11' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 12 X Channel</strong><br><code>knock.knock_noise_12_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Floor 12' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 12 Y Channel</strong><br><code>knock.knock_noise_12_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Floor 12' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 1 X Channel</strong><br><code>knock.knock_noise_n_1_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 1' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 1 Y Channel</strong><br><code>knock.knock_noise_n_1_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 1' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 2 X Channel</strong><br><code>knock.knock_noise_n_2_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 2' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 2 Y Channel</strong><br><code>knock.knock_noise_n_2_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 2' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 3 X Channel</strong><br><code>knock.knock_noise_n_3_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 3' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 3 Y Channel</strong><br><code>knock.knock_noise_n_3_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 3' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 4 X Channel</strong><br><code>knock.knock_noise_n_4_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 4' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 4 Y Channel</strong><br><code>knock.knock_noise_n_4_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 4' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 5 X Channel</strong><br><code>knock.knock_noise_n_5_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 5' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 5 Y Channel</strong><br><code>knock.knock_noise_n_5_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 5' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 6 X Channel</strong><br><code>knock.knock_noise_n_6_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 6' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 6 Y Channel</strong><br><code>knock.knock_noise_n_6_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 6' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 7 X Channel</strong><br><code>knock.knock_noise_n_7_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 7' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 7 Y Channel</strong><br><code>knock.knock_noise_n_7_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 7' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 8 X Channel</strong><br><code>knock.knock_noise_n_8_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 8' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 8 Y Channel</strong><br><code>knock.knock_noise_n_8_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 8' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 9 X Channel</strong><br><code>knock.knock_noise_n_9_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 9' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 9 Y Channel</strong><br><code>knock.knock_noise_n_9_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 9' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 10 X Channel</strong><br><code>knock.knock_noise_n_10_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 10' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 10 Y Channel</strong><br><code>knock.knock_noise_n_10_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 10' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 11 X Channel</strong><br><code>knock.knock_noise_n_11_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 11' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 11 Y Channel</strong><br><code>knock.knock_noise_n_11_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 11' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 12 X Channel</strong><br><code>knock.knock_noise_n_12_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Knock Noise Samples 12' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 12 Y Channel</strong><br><code>knock.knock_noise_n_12_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Knock Noise Samples 12' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Knock RPM Axis bins</strong><br><code>knock.knock_rpm_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Knock RPM Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Knock Load Axis bins</strong><br><code>knock.knock_load_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Knock Load Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 1 X Axis bins</strong><br><code>knock.knock_noise_1_x_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Knock Noise Floor 1 X Axis' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 1 Y Axis bins</strong><br><code>knock.knock_noise_1_y_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Knock Noise Floor 1 Y Axis' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Knock Threshold (over noise floor)</strong><br><code>knock.knock_threshold_table</code><br>Range: 0.0 to 60.0<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>How far ABOVE the learned noise floor a measurement has to be before it counts as knock, per RPM and load. It is a margin, not an absolute level, which is what makes it portable: the floor already carries the engine's own mechanical noise at that operating point, so this number is purely how much louder than normal is abnormal. Too low and mechanical noise reads as knock; too high and real knock passes unremarked.</td>
+</tr>
+<tr>
+<td><strong>Max Knock Retard</strong><br><code>knock.knock_max_retard_table</code><br>Range: 0.0 to 30.0<br>Default: 8 × 8 table<br>Units: deg</td>
+<td>The most timing knock control may pull at each RPM and load, whatever it hears. It is the floor under the authority: it bounds how far a runaway detection — a loose sensor, a noisy accessory — can retard the engine, and it stops the controller from retarding into a condition worse than the knock it was chasing.</td>
+</tr>
+<tr>
+<td><strong>Knock RPM Axis</strong><br><code>knock.knock_rpm_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: RPM</td>
+<td>The RPM breakpoints the knock threshold and max-retard tables are looked up on. Knock sensitivity is strongly RPM-dependent, because both the engine's noise and its knock frequency move with speed — concentrate breakpoints where the engine actually spends its time under load.</td>
+</tr>
+<tr>
+<td><strong>Knock Load Axis</strong><br><code>knock.knock_load_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: kPa</td>
+<td>The load breakpoints for the knock tables. Knock is a load phenomenon above all, so this axis is what lets a cruise cell be judged differently from a full-throttle one; it matches the load axis the ignition tables use so the two are read at the same operating point.</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 1 X Axis</strong><br><code>knock.knock_noise_1_x_axis</code><br>Range: 0 to 0<br>Default: 8-point curve</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 1 Y Axis</strong><br><code>knock.knock_noise_1_y_axis</code><br>Range: 0 to 0<br>Default: 8-point curve</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 1</strong><br><code>knock.knock_noise_1</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 2</strong><br><code>knock.knock_noise_2</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 3</strong><br><code>knock.knock_noise_3</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 4</strong><br><code>knock.knock_noise_4</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 5</strong><br><code>knock.knock_noise_5</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 6</strong><br><code>knock.knock_noise_6</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 7</strong><br><code>knock.knock_noise_7</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 8</strong><br><code>knock.knock_noise_8</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 9</strong><br><code>knock.knock_noise_9</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 10</strong><br><code>knock.knock_noise_10</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 11</strong><br><code>knock.knock_noise_11</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Floor 12</strong><br><code>knock.knock_noise_12</code><br>Range: -100.000 to 100.000<br>Default: 8 × 8 table<br>Units: dB</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 1</strong><br><code>knock.knock_noise_n_1</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 2</strong><br><code>knock.knock_noise_n_2</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 3</strong><br><code>knock.knock_noise_n_3</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 4</strong><br><code>knock.knock_noise_n_4</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 5</strong><br><code>knock.knock_noise_n_5</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 6</strong><br><code>knock.knock_noise_n_6</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 7</strong><br><code>knock.knock_noise_n_7</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 8</strong><br><code>knock.knock_noise_n_8</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 9</strong><br><code>knock.knock_noise_n_9</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 10</strong><br><code>knock.knock_noise_n_10</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 11</strong><br><code>knock.knock_noise_n_11</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+<tr>
+<td><strong>Knock Noise Samples 12</strong><br><code>knock.knock_noise_n_12</code><br>Range: -100 to 100<br>Default: 8 × 8 table</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../part2/07-board.html">Chapter 7 — The board</a> (knock inputs, H1/H2, CN1)</li>
+<li><a href="../part2/11-wiring-sensors.html">Chapter 11 — Wiring sensors</a> (knock sensors)</li>
+<li><a href="15-engine-vehicle.html">Chapter 15 — Engine and vehicle basics</a> (bore, banks)</li>
+<li><a href="20-ignition.html">Chapter 20 — Ignition</a> (how knock retard is applied)</li>
+<li><a href="../part4/41-knock-tuning.html">Chapter 41 — Knock tuning</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="29-protection.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 29 Engine protection">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                29 Engine protection
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="31-misfire.html" class="md-footer__link md-footer__link--next" aria-label="Next: 31 Misfire detection">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                31 Misfire detection
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

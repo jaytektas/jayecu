@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 640" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Supplying and grounding the ECU in a vehicle</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: #f6f7f9; stroke: #5f6670; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pin  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .wred { stroke: #d23b2a; stroke-width: 3; fill: none; }
+    .wblk { stroke: #1d1f23; stroke-width: 3; fill: none; }
+    .wbrg { stroke: #8a5a2b; stroke-width: 3; fill: none; stroke-dasharray: 7 5; }
+    .strap { stroke: #1d1f23; stroke-width: 6; fill: none; }
+    .gnd  { stroke: #1d1f23; stroke-width: 2; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .pin { fill: #20232a; stroke: #9aa1ab; } .ecu { fill: #1c1f25; stroke: #9aa1ab; }
+      .ff { fill: #33240f; } .safe { fill: #361512; }
+      .wblk, .strap, .gnd { stroke: #cfd3d9; } .wbrg { stroke: #c08a55; }
+    }
+  </style>
+
+  <!-- ===== battery ===== -->
+  <rect x="30" y="50" width="120" height="90" rx="6" class="box"/>
+  <text x="90" y="88" text-anchor="middle" class="fg head">Battery</text>
+  <text x="140" y="72" text-anchor="end" class="fg head">+</text>
+  <text x="90" y="128" text-anchor="middle" class="fg head">−</text>
+
+  <!-- ignition path to CN4-9 -->
+  <path d="M150 80 H198" class="line"/>
+  <rect x="200" y="62" width="100" height="36" rx="6" class="safe"/>
+  <text x="250" y="85" text-anchor="middle" class="fg">Fuse A</text>
+  <path d="M300 80 H338" class="line"/>
+  <rect x="340" y="62" width="130" height="36" rx="6" class="box"/>
+  <text x="405" y="85" text-anchor="middle" class="fg">Ignition switch</text>
+  <path d="M470 80 H608" class="line"/>
+  <rect x="610" y="62" width="100" height="36" rx="6" class="safe"/>
+  <text x="660" y="85" text-anchor="middle" class="fg">Fuse 1</text>
+  <path d="M710 80 H898" class="wred"/>
+  <text x="800" y="70" text-anchor="middle" class="muted">R (red)</text>
+
+  <!-- relay coil feed (86) from the switched side -->
+  <path d="M540 80 V160 H470 V196" class="line"/>
+  <text x="478" y="190" class="mono muted">86</text>
+
+  <!-- relay supply (30) straight from the battery -->
+  <path d="M150 110 H175 V250 H198" class="line"/>
+  <rect x="200" y="232" width="100" height="36" rx="6" class="safe"/>
+  <text x="250" y="255" text-anchor="middle" class="fg">Fuse B</text>
+  <path d="M300 250 H398" class="line"/>
+  <text x="370" y="242" class="mono muted">30</text>
+
+  <!-- the relay -->
+  <rect x="400" y="198" width="140" height="120" rx="6" class="ff"/>
+  <text x="470" y="250" text-anchor="middle" class="fg head">Main relay</text>
+  <text x="470" y="272" text-anchor="middle" class="muted">coil 85–86</text>
+  <text x="470" y="292" text-anchor="middle" class="muted">contact 30–87</text>
+
+  <!-- 87 out: to CN4-13 and to the loads -->
+  <path d="M540 250 H608" class="line"/>
+  <text x="548" y="242" class="mono muted">87</text>
+  <rect x="610" y="232" width="100" height="36" rx="6" class="safe"/>
+  <text x="660" y="255" text-anchor="middle" class="fg">Fuse 2</text>
+  <path d="M710 250 H898" class="wred"/>
+  <text x="800" y="240" text-anchor="middle" class="muted">R/W (red/white)</text>
+
+  <path d="M580 250 V380 H608" class="line"/>
+  <rect x="610" y="362" width="100" height="36" rx="6" class="safe"/>
+  <text x="660" y="385" text-anchor="middle" class="fg">Fuse 3</text>
+  <path d="M710 380 H728" class="line"/>
+  <rect x="730" y="350" width="140" height="60" rx="6" class="box"/>
+  <text x="800" y="376" text-anchor="middle" class="fg">Injector and</text>
+  <text x="800" y="396" text-anchor="middle" class="fg">coil supplies</text>
+
+  <!-- 85: example 1 to ground, example 2 to LS17 -->
+  <path d="M440 318 V372" class="gnd"/>
+  <path d="M424 372 H456 M430 379 H450 M436 386 H444" class="gnd"/>
+  <text x="456" y="408" class="muted">Example 1: 85 to ground</text>
+  <text x="448" y="338" class="mono muted">85</text>
+  <path d="M440 340 H360 V590 H898" class="wbrg"/>
+  <text x="620" y="582" text-anchor="middle" class="muted">Example 2: 85 to LS17 — Br/G (brown/green)</text>
+
+  <!-- ===== ground: battery strap and ECU grounds ===== -->
+  <path d="M90 140 V520 H748" class="strap"/>
+  <text x="200" y="510" class="muted">battery − strap to the engine</text>
+  <circle cx="760" cy="520" r="12" class="box"/>
+  <text x="760" y="552" text-anchor="middle" class="muted">engine ground point</text>
+  <path d="M772 520 H820 V440 H898" class="wblk"/>
+  <path d="M820 470 H898" class="wblk"/>
+  <path d="M820 500 H898" class="wblk"/>
+  <path d="M820 520 V500" class="wblk"/>
+  <text x="858" y="432" text-anchor="middle" class="muted">B (black)</text>
+
+  <!-- ===== ECU ===== -->
+  <rect x="900" y="30" width="180" height="590" rx="8" class="ecu"/>
+  <text x="990" y="52" text-anchor="middle" class="fg head">ECU</text>
+  <rect x="900" y="64" width="140" height="32" rx="4" class="pin"/>
+  <text x="970" y="85" text-anchor="middle" class="fg">CN4-9 · +12 V</text>
+  <rect x="900" y="234" width="140" height="32" rx="4" class="pin"/>
+  <text x="970" y="255" text-anchor="middle" class="fg">CN4-13 · +12 V</text>
+  <rect x="900" y="424" width="140" height="32" rx="4" class="pin"/>
+  <text x="970" y="445" text-anchor="middle" class="fg">CN4-11 · GND</text>
+  <rect x="900" y="454" width="140" height="32" rx="4" class="pin"/>
+  <text x="970" y="475" text-anchor="middle" class="fg">CN4-12 · GND</text>
+  <rect x="900" y="484" width="140" height="32" rx="4" class="pin"/>
+  <text x="970" y="505" text-anchor="middle" class="fg">CN2-23 · GND</text>
+  <rect x="900" y="574" width="140" height="32" rx="4" class="pin"/>
+  <text x="970" y="595" text-anchor="middle" class="fg">CN2-2 · LS17</text>
+</svg>

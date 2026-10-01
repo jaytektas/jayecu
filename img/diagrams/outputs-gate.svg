@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 400" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The gate of a Generic output as a state machine</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <!-- start -->
+  <text x="40" y="40" class="muted">after a rebuild or key-on</text>
+  <path d="M120 50 V112" class="line" marker-end="url(#a)"/>
+
+  <!-- OFF -->
+  <rect x="40" y="114" width="240" height="96" rx="6" class="box"/>
+  <text x="160" y="142" text-anchor="middle" class="fg head">OFF</text>
+  <text x="160" y="166" text-anchor="middle" class="muted">emits Clamp Low</text>
+  <text x="160" y="188" text-anchor="middle" class="muted">(an output with no conditions</text>
+  <text x="160" y="204" text-anchor="middle" class="muted">is ON from the start)</text>
+
+  <!-- ON -->
+  <rect x="700" y="114" width="300" height="96" rx="6" class="ff"/>
+  <text x="850" y="142" text-anchor="middle" class="fg head">ON</text>
+  <text x="850" y="166" text-anchor="middle" class="muted">emits the value</text>
+  <text x="850" y="188" text-anchor="middle" class="muted">(Candidates, Table, Fixed</text>
+  <text x="850" y="204" text-anchor="middle" class="muted">or Expression)</text>
+
+  <!-- OFF -> ON -->
+  <path d="M280 136 H698" class="line" marker-end="url(#a)"/>
+  <text x="490" y="102" text-anchor="middle" class="fg">Turn On When is true</text>
+  <text x="490" y="122" text-anchor="middle" class="muted">and it has been off for Minimum Off Time</text>
+
+  <!-- ON -> OFF -->
+  <path d="M698 188 H282" class="line" marker-end="url(#a)"/>
+  <text x="490" y="210" text-anchor="middle" class="fg">Turn Off When is true</text>
+  <text x="490" y="230" text-anchor="middle" class="muted">and it has been on for Minimum On Time</text>
+  <text x="490" y="250" text-anchor="middle" class="muted">(no Turn Off When: when Turn On When stops being true)</text>
+
+  <!-- LOCKED OUT -->
+  <rect x="380" y="296" width="300" height="90" rx="6" class="safe"/>
+  <text x="530" y="324" text-anchor="middle" class="fg head">LOCKED OUT (off)</text>
+  <text x="530" y="348" text-anchor="middle" class="muted">ignores Turn On When</text>
+  <text x="530" y="368" text-anchor="middle" class="muted">for the Re-Arm Delay</text>
+  <path d="M850 210 V341 H682" class="safeline" marker-end="url(#r)"/>
+  <text x="860" y="270" class="fg">on for Maximum On Time</text>
+  <text x="860" y="290" class="muted">(if not 0) — checked first,</text>
+  <text x="860" y="308" class="muted">whatever the conditions say</text>
+  <path d="M380 341 H160 V212" class="line" marker-end="url(#a)"/>
+  <text x="170" y="324" class="muted">Re-Arm Delay over</text>
+</svg>

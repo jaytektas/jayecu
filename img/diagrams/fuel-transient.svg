@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 500" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Transient throttle: detection, peak and per-cycle decay of a tip-in</title>
+  <style>
+    .fg { fill: #1d1f23; } .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .load { stroke: #1d1f23; stroke-width: 3; fill: none; }
+    .rate { stroke: #3b82c4; stroke-width: 3; fill: none; }
+    .db   { stroke: #3b82c4; stroke-width: 1.5; fill: none; stroke-dasharray: 6 4; }
+    .enr  { stroke: #d9822b; stroke-width: 3; fill: none; }
+    .phA { fill: #f1f2f4; } .phB { fill: #eef7ee; } .phC { fill: #fdf0e3; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; }
+      .load { stroke: #e4e6ea; }
+      .phA { fill: #1c1f25; } .phB { fill: #13291a; } .phC { fill: #33240f; }
+    }
+  </style>
+
+  <!-- phases -->
+  <rect x="90"  y="20" width="115" height="425" class="phA"/>
+  <rect x="205" y="20" width="95"  height="425" class="phB"/>
+  <rect x="300" y="20" width="400" height="425" class="phC"/>
+  <rect x="700" y="20" width="260" height="425" class="phA"/>
+  <text x="148" y="38" text-anchor="middle" class="fg head">IDLE</text>
+  <text x="252" y="38" text-anchor="middle" class="fg head">ENRICH</text>
+  <text x="252" y="54" text-anchor="middle" class="muted">peak builds</text>
+  <text x="500" y="38" text-anchor="middle" class="fg head">ENRICH</text>
+  <text x="500" y="54" text-anchor="middle" class="muted">decays once per engine cycle</text>
+  <text x="830" y="38" text-anchor="middle" class="fg head">IDLE</text>
+
+  <!-- panel A: load -->
+  <line x1="90" y1="140" x2="960" y2="140" class="axis"/>
+  <path d="M90 130 L200 130 C260 128 300 110 340 90 C380 72 410 62 440 60 L960 60" class="load"/>
+  <text x="970" y="64" class="fg">Load</text>
+  <text x="970" y="82" class="mono muted">tps / map</text>
+
+  <!-- panel B: rate and dead band -->
+  <line x1="90" y1="260" x2="960" y2="260" class="axis"/>
+  <line x1="90" y1="245" x2="960" y2="245" class="db"/>
+  <path d="M90 260 L200 260 C240 258 270 195 300 187 L380 187 C400 190 420 250 440 260 L960 260" class="rate"/>
+  <text x="970" y="191" class="fg">Load rate</text>
+  <text x="970" y="209" class="mono muted">tt_load_rate</text>
+  <text x="970" y="249" class="muted">Enr Load Rate</text>
+  <text x="970" y="267" class="muted">Dead Band</text>
+
+  <!-- panel C: transient enrichment -->
+  <line x1="90" y1="430" x2="960" y2="430" class="axis"/>
+  <path d="M90 430 L208 430 C240 420 275 330 300 318 L350 318 L350 362.8 L400 362.8 L400 389.7 L450 389.7 L450 405.8 L500 405.8 L500 415.5 L550 415.5 L550 421.3 L600 421.3 L600 424.8 L650 424.8 L650 426.9 L700 426.9 L700 430 L960 430" class="enr"/>
+  <text x="970" y="322" class="fg">Enrichment</text>
+  <text x="970" y="340" class="mono muted">transient_enrich_pct</text>
+
+  <!-- callouts -->
+  <text x="100" y="300" class="muted">rate passes the dead band</text>
+  <text x="100" y="318" class="muted">for Enr Detect Duration</text>
+  <text x="362" y="300" class="muted">load stops accelerating:</text>
+  <text x="362" y="318" class="muted">the peak is held</text>
+  <text x="560" y="385" class="muted">× (1 − Decay Rate %) each cycle</text>
+  <text x="705" y="410" class="muted">below 0.1 %: event over</text>
+
+  <text x="90" y="475" class="muted">time →</text>
+  <text x="200" y="475" class="fg">Magnitude = Enrich Rate (start load, rate) × Sync Amount (rpm) × (1 + Coolant Temp Corr)</text>
+</svg>

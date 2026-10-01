@@ -1,0 +1,3401 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part2/09-wiring-practice.html">
+      
+      
+        <link rel="prev" href="08-tools.html">
+      
+      
+        <link rel="next" href="10-power-grounds.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>9 Wiring practice - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#wiring-practice" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              9 Wiring practice
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="09-wiring-practice.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Concepts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quiet-and-noisy-how-the-connectors-are-laid-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quiet and noisy: how the connectors are laid out
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wire-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wire size
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#twisting-and-shielding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Twisting and shielding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connectors-sealing-and-strain-relief" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connectors, sealing and strain relief
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#labelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Labelling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#procedure-building-and-testing-a-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procedure: building and testing a harness
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls-and-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls and troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part3/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="wiring-practice">Wiring practice<a class="headerlink" href="#wiring-practice" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> how to build a harness for the jaytek_v1 board that carries clean signals,
+survives heat, water and vibration, and can be understood and repaired years later.</p>
+</blockquote>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>The ECU can only be as good as the wires that feed it. A sensor wire that picks up ignition noise
+gives a jumpy reading. An undersized ground shifts every sensor reading. A crank signal with a
+glitch on it loses sync. Most of these faults are intermittent and look like tuning or firmware
+problems, so they are expensive to find. Good wiring practice prevents them.</p>
+<p>This chapter covers:</p>
+<ul>
+<li>how the board's three connectors split the harness into <strong>quiet</strong> and <strong>noisy</strong> bundles;</li>
+<li>choosing <strong>wire sizes</strong> for current and voltage drop;</li>
+<li><strong>twisting and shielding</strong> the signals that need it;</li>
+<li><strong>splices</strong>, <strong>connectors</strong>, <strong>sealing</strong> and <strong>strain relief</strong>;</li>
+<li><strong>labelling</strong>, so that you or anyone else can trace a wire later;</li>
+<li>a step-by-step <strong>procedure</strong> for building and testing a harness.</li>
+</ul>
+<p>Chapter 8 lists the tools. Chapters 10 to 14 cover what to connect to each pin.</p>
+<h2 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="quiet-and-noisy-how-the-connectors-are-laid-out">Quiet and noisy: how the connectors are laid out<a class="headerlink" href="#quiet-and-noisy-how-the-connectors-are-laid-out" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>The board groups its terminals by the kind of signal they carry. Your harness should keep the same
+groups:</p>
+<!-- src: definition/boards/jaytek_v1.board.yaml -->
+
+<ul>
+<li><strong>CN2 (white)</strong> carries all twelve ignition outputs and all twenty-two low-side outputs:
+  injectors, solenoids and relays. These switch current on and off quickly, many times per engine
+  cycle, and each edge radiates noise. This is the <strong>noisy</strong> bundle.</li>
+<li><strong>CN3 (blue)</strong> carries the sensor inputs: the analog voltage inputs AV, the temperature inputs AT,
+  the VR crank and cam inputs, and the digital inputs DIG1–8. It also has four ground terminals. These
+  signals are small and easily disturbed. This is the <strong>quiet</strong> bundle.</li>
+<li><strong>CN4 (black)</strong> is mixed. It has the power feeds and two grounds, the two 5 V sensor supplies, the
+  high-side outputs, the two H-bridge outputs, CAN1 and the two knock inputs. The sensor supplies
+  and knock wires belong with the quiet bundle as soon as they leave the connector. The power,
+  high-side and H-bridge wires belong with the switched loads.</li>
+</ul>
+<figure>
+<p><img alt="The three connectors and the bundles they feed: CN4 to power, high-side loads, CAN and knock; CN3 to sensors; CN2 to injectors and coils, with the sensor bundle kept apart and crossing at a right angle" src="../img/diagrams/tools-wiring-practice-routing.svg" />
+  </p>
+<figcaption>Figure 9.1: Route the sensor bundle (blue) apart from the switched outputs (orange) and
+  the power feeds (red). Where a sensor branch has to cross the noisy bundle, cross at a right angle.
+  </figcaption>
+</figure>
+<p>Noise gets from one wire to another in two ways. The fast voltage edge on an injector or coil wire
+couples into a neighbour through the capacitance between them. The current change creates a
+magnetic field that induces voltage in any loop nearby. Both effects shrink quickly with distance, and
+both are largest where wires run side by side for a long way. So:</p>
+<ul>
+<li><strong>Run the sensor bundle separately</strong> from the injector and coil bundle, as far apart as the car
+  allows.</li>
+<li><strong>Keep sensor wires well away from spark-plug leads and coils.</strong> These carry the fastest and
+  largest edges in the car.</li>
+<li><strong>Where a sensor wire must cross the noisy bundle, cross at a right angle</strong>, never alongside.</li>
+<li><strong>Keep each signal and its return close together</strong>, so the loop between them is small (see
+  <em>Twisting and shielding</em>).</li>
+</ul>
+<h3 id="wire-size">Wire size<a class="headerlink" href="#wire-size" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>A wire must be big enough for two things:</p>
+<ol>
+<li><strong>Heat.</strong> It must carry its current without getting hot. Undersized wire gets warm, its
+   insulation ages, and in a fault it becomes the fuse.</li>
+<li><strong>Voltage drop.</strong> It must carry its current without losing much voltage along the way. That lost
+   voltage is missing at the load, or, on a ground, it is added to every signal that shares it.</li>
+</ol>
+<p>The resistance of copper wire is about <strong>0.0172 Ω for each metre of 1 mm² cross-section</strong>. So
+0.5 mm² wire is about 34 mΩ per metre, and 1.0 mm² about 17 mΩ per metre. Voltage drop is current
+times resistance. Remember that current goes out <strong>and</strong> back.</p>
+<div class="admonition example">
+<p class="admonition-title">How a shared ground shifts a sensor</p>
+<p>A sensor's ground wire is 2 m of 0.5 mm², and a 1 A load has been grounded onto it as well. The
+wire drops 1 A × 2 m × 0.034 Ω/m ≈ <strong>69 mV</strong>. The ECU reads its analog inputs over 0–5 V in 4095
+steps, about 1.2 mV per step. So the sensor now reads about <strong>56 steps</strong> away from the truth, and it
+moves every time the load switches.
+<!-- src: definition/boards/jaytek_v1.board.yaml (analog full scale 5000 mV over 4095 counts) --></p>
+<p>The fix is not a bigger wire. <strong>Never share a sensor ground with a load.</strong> Return sensor grounds to
+the ECU's own ground terminals, and ground loads elsewhere (chapter 10).</p>
+</div>
+<p>Typical sizes for a car harness are below. They are good practice, not limits the ECU sets: size
+any wire for the current its load really draws (measure it with a clamp), and for its length.</p>
+<table>
+<thead>
+<tr>
+<th>Circuit</th>
+<th>Typical size</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sensor signals, 5 V sensor supplies, sensor grounds, VR, knock, CAN, digital inputs</td>
+<td>0.35–0.5 mm² (22–20 AWG)</td>
+<td>Almost no current. 0.5 mm² is easier to crimp and tougher.</td>
+</tr>
+<tr>
+<td>Ignition outputs IGN1–12 to coils with built-in igniters</td>
+<td>0.5 mm²</td>
+<td>Logic-level trigger signals. The board drives them from a 5 V gate driver through 100 Ω.</td>
+</tr>
+<tr>
+<td>Injectors, solenoids, relay coils on low-side outputs</td>
+<td>0.5–0.75 mm² (20–18 AWG)</td>
+<td>About an amp or two each. Longer runs go up a size.</td>
+</tr>
+<tr>
+<td>High-side outputs and H-bridge motor outputs</td>
+<td>0.75–1.0 mm² (18 AWG)</td>
+<td>Heavier loads such as valves, pumps and the throttle motor.</td>
+</tr>
+<tr>
+<td>ECU power feeds and ECU grounds</td>
+<td>1.0 mm² or the largest the terminal takes</td>
+<td>They carry the sum of many loads (below).</td>
+</tr>
+<tr>
+<td>Coil power, injector power, fuel pump, fans</td>
+<td>1.5 mm² and up, from their own fuse and relay</td>
+<td>These do not go through the ECU (chapter 10).</td>
+</tr>
+</tbody>
+</table>
+<!-- src: hardware/PDF_JAYTEK_2026-04-29/Ignition_1 (IX4427 on +5V, 100 Ω series output); general practice for the rest -->
+
+<p>Two paths on this board carry the current of many loads at once, so size them with care:</p>
+<ul>
+<li>
+<p><strong>The main-relay feed, CN4 pin 13 (<code>12V_MR</code>),</strong> supplies the high-side output drivers. The current
+  of every high-side load you connect comes in through this one terminal.
+  <!-- src: hardware/PDF_JAYTEK_2026-04-29/High side (VNQ7140AJTR supply pin EP = CON_12V_MR); definition/boards/jaytek_v1.board.yaml --></p>
+</li>
+<li>
+<p><strong>The ECU grounds.</strong> A low-side output switches its load to the board's ground. So every injector,
+  solenoid and relay on a low-side output returns its current through the ECU's ground terminals.
+  There are seven: <strong>CN2 pin 23</strong>, <strong>CN3 pins 10, 11, 12 and 35</strong>, and <strong>CN4 pins 11 and 12</strong>. Connect
+  all of them, each on its own wire, to the engine ground point (chapter 10).
+  <!-- src: hardware/PDF_JAYTEK_2026-04-29/Low side (VNLD5090 sources to GND); definition/boards/jaytek_v1.board.yaml -->
+</p>
+</li>
+</ul>
+<h3 id="twisting-and-shielding">Twisting and shielding<a class="headerlink" href="#twisting-and-shielding" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p><strong>Twisting</strong> a signal wire with its return wire keeps the loop between them tiny. Each twist also
+reverses the loop, so the voltage a passing magnetic field induces in one twist cancels the next.
+<strong>A shield</strong> is a foil or braid around the wires. It catches the electric field from nearby edges
+and drains it to ground before it reaches the signal.</p>
+<p>Twist or shield these signals on the jaytek_v1:</p>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Terminals</th>
+<th>Treatment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>VR1</strong> crank / primary</td>
+<td>CN3 pin 6 (VR1+, Bu) and pin 7 (VR1−, Bu/B)</td>
+<td>Shielded twisted pair, both wires to the ECU</td>
+</tr>
+<tr>
+<td><strong>VR2</strong> secondary</td>
+<td>CN3 pin 8 (VR2+, Bu) and pin 9 (VR2−, Bu/B)</td>
+<td>Shielded twisted pair, both wires to the ECU</td>
+</tr>
+<tr>
+<td><strong>KNOCK1</strong>, <strong>KNOCK2</strong></td>
+<td>CN4 pin 23 (Pk/B), pin 22 (Pk/W)</td>
+<td>Shielded cable</td>
+</tr>
+<tr>
+<td><strong>CAN1</strong></td>
+<td>CN4 pin 10 (H, Lg) and pin 17 (L, Lg/B)</td>
+<td>Twisted pair (chapter 13)</td>
+</tr>
+<tr>
+<td>Hall and optical trigger sensors on DIG1–8</td>
+<td>CN3 pins 16–23</td>
+<td>Twist signal, supply and ground together. Shield long runs.</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/boards/jaytek_v1.board.yaml (VR) (CAN1) (knock) (DIG) -->
+
+<p>The VR inputs are <strong>differential</strong>. The board's VR interface reads the difference between the + and −
+wires. So run <strong>both</strong> wires back to the ECU. Do not ground the − side at the sensor or on the
+engine. Noise that reaches both twisted wires equally cancels in the difference. (A Hall sensor on a VR
+input is the exception: only VR+ is used, and VR− is left unconnected — chapter 11.)</p>
+<!-- src: hardware/PDF_JAYTEK_2026-04-29/Trigger (MAX9924 IN+ / IN− from VR1+_IN / VR1-_IN) -->
+
+<figure>
+<p><img alt="A VR crank sensor on a shielded twisted pair to CN3 pins 6 and 7, the shield drained to CN3 pin 12 at the ECU end and cut back at the sensor end" src="../img/diagrams/tools-wiring-practice-shield.svg" />
+  </p>
+<figcaption>Figure 9.2: A VR sensor wired properly. Both wires go back to the ECU, twisted inside the
+  shield. The shield is grounded at the ECU end only; at the sensor end it is cut back and
+  insulated.</figcaption>
+</figure>
+<p><strong>Ground a shield at one end only: the ECU end.</strong> A shield grounded at both ends becomes part of a
+ground loop. Any difference between engine ground and ECU ground drives current along the shield,
+right next to the signal it is meant to protect. Connect the drain wire to an ECU ground terminal on
+the same connector as the signal: CN3 for the VR pairs, CN4 pin 11 or 12 for the knock sensors. At the
+sensor end, cut the shield back and cover it with heat-shrink so it cannot touch anything.</p>
+<div class="admonition warning">
+<p class="admonition-title">The shield is not the signal return</p>
+<p>Never use a shield as a wire. VR− and a knock sensor's return each need a wire of their own. The
+shield only carries noise to ground.</p>
+</div>
+<h3 id="splices">Splices<a class="headerlink" href="#splices" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>You need splices where one feed serves several loads: the 5 V sensor supply to several sensors, a
+sensor ground, or an injector power feed. A good splice is mechanically strong, sealed, and in the
+right place.</p>
+<figure>
+<p><img alt="A crimp splice sealed in adhesive heat-shrink, and three splices staggered along a bundle compared with three side by side" src="../img/diagrams/tools-wiring-practice-splice.svg" />
+  </p>
+<figcaption>Figure 9.3: Top, a sealed splice. Adhesive-lined heat-shrink overlaps the insulation on
+  both sides. Bottom, stagger splices along the bundle instead of stacking them in one lump.
+  (Wire colours are for illustration.)</figcaption>
+</figure>
+<ul>
+<li><strong>Crimp or solder, then seal.</strong> A crimp splice made with the proper tool is reliable and quick. A
+  soldered splice also works, if the joint is made mechanically first and then soldered. Either way,
+  cover it with <strong>adhesive-lined heat-shrink</strong> that overlaps the insulation on both sides. Otherwise
+  water wicks along the strands and corrodes the wire from the inside, far from the splice.</li>
+<li><strong>Keep solder away from vibration.</strong> Solder turns stranded wire into a solid rod. The joint flexes
+  at the point where the solder stops, and breaks there. Support a soldered splice on both sides, and
+  never solder in a place the harness bends.</li>
+<li><strong>Stagger splices</strong> along a bundle (Figure 9.3), so the bundle stays slim and one splice cannot rub
+  through another.</li>
+<li><strong>Put splices where you can reach them</strong>, not inside a tight loom section or behind the engine.</li>
+<li><strong>Never "tap" a wire</strong> by stripping a window in the middle, or with an insulation-piercing
+  connector. Both let water in and weaken the wire.</li>
+</ul>
+<h3 id="connectors-sealing-and-strain-relief">Connectors, sealing and strain relief<a class="headerlink" href="#connectors-sealing-and-strain-relief" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>The CN2, CN3 and CN4 plugs are <strong>sealed</strong>: each wire passes through a seal in the housing (chapter 8).
+The seal only works if:</p>
+<ul>
+<li>the wire's insulation is the size the seal is made for (thin-wall automotive wire of a suitable
+  size);</li>
+<li>every cavity has either a wire or a <strong>sealing plug</strong>;</li>
+<li>the wires leave the back of the plug <strong>straight</strong>, in line with the cavities, for a short distance
+  before they bend. A wire bent hard at the seal opens a gap on one side.</li>
+</ul>
+<p><strong>Strain relief</strong> stops the harness's weight and the engine's movement pulling on the terminals:</p>
+<ul>
+<li>Support the harness with a clip or tie close to the connector, so the plug does not hold its weight.</li>
+<li>Leave a little slack at the connector so it can be unplugged and plugged without stretching wires.</li>
+<li>Where the harness moves with the engine, leave a gentle loop of slack between the engine and the
+  body, fixed at both ends. The loop takes the movement, not the terminals.</li>
+<li>Where the harness passes through metal, use a <strong>grommet</strong>, and sleeve it where it could rub.</li>
+</ul>
+<p><strong>Drip loops.</strong> Route the harness so it approaches each connector from <strong>below</strong>, or droops just
+before it. Water running along the harness then drips off at the low point instead of running into
+the connector.</p>
+<div class="admonition tip">
+<p class="admonition-title">Mount the ECU with the connectors facing down or sideways</p>
+<p>Water that gets past a seal drains out of a downward-facing connector instead of sitting on the
+terminals.</p>
+</div>
+<h3 id="labelling">Labelling<a class="headerlink" href="#labelling" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p><strong>Label both ends of every wire</strong> with its signal and its terminal, for example <code>AT1 · CN3-14 · CLT</code>.
+Colours alone cannot identify a jayecu wire. The board file's colour scheme <strong>repeats colours on the
+same connector</strong>. For example:</p>
+<!-- src: definition/boards/jaytek_v1.board.yaml (CN2) (CN3) (CN4) -->
+
+<ul>
+<li>on CN2, Br (brown) is LS19, LS7 and LS12, and W (white) is both IGN2 and IGN12;</li>
+<li>on CN3, G/Y is both AV16 and AV4, and Bu is both VR1+ and VR2+;</li>
+<li>on CN4, O/W is both 5 V sensor supplies, and V is both H-bridge + terminals.</li>
+</ul>
+<p>You do not need a printed pinout to find the terminal for a function. Every page where you assign an
+input or output shows the terminal and the suggested wire colour for the pin you picked (Figure 9.4).
+The <strong>Assign</strong> button lists every pin that function can use, each with its colour and terminal, and
+marks the ones already taken.</p>
+<!-- src: apps/studio-jf/src/surface/widgets/WiringWidget.cpp; apps/studio-jf/src/ui/SelectConnectionDialog.h; apps/studio-jf/src/surface/widgets/WireColors.h -->
+
+<figure>
+<p><img alt="The Coolant Temperature page's input panel: AT1 assigned, a grey-black wire swatch, [Gy/B], and the badge CN3 (BLUE) 14" src="../img/studio/tools-wiring-practice-wiring-row.png" />
+  </p>
+<figcaption>Figure 9.4: Configuration ▸ Sensors ▸ Engine ▸ Coolant Temperature, with the sensor on
+  AT1. The row under the assigned pin gives the wire colour, Gy/B (grey with a black stripe), and the
+  terminal, CN3 (BLUE) 14. The connector's colour is written out as a word, so a printout or a
+  colour-blind reader can still use it.</figcaption>
+</figure>
+<p>Keep a written <strong>harness sheet</strong> as well: one line per wire, with the terminal, signal, colour, size,
+what it goes to and where it is spliced. It is the first thing you will want when something stops
+working.</p>
+<h2 id="procedure-building-and-testing-a-harness">Procedure: building and testing a harness<a class="headerlink" href="#procedure-building-and-testing-a-harness" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<figure>
+<p><img alt="Eight steps: plan, cut and label, lay out, terminate, splice and shield, cover and support, test unpowered, first power" src="../img/diagrams/tools-wiring-practice-build.svg" />
+  </p>
+<figcaption>Figure 9.5: The harness build in eight steps. The numbers match the steps below.
+  Steps 7 and 8 are the ones people skip, and they find most of the mistakes.</figcaption>
+</figure>
+<ol>
+<li><strong>Plan.</strong> List every function you need: each sensor, output, feed and ground. For each one,
+   decide its pin in the studio (chapters 17 and 18), then note its terminal, colour and wire size.
+   Choose where each bundle runs in the car. Keep the sensor bundle away from the ignition
+   (Figure 9.1).</li>
+<li><strong>Cut and label.</strong> Measure each run along its real route, add spare for a service loop and for
+   re-terminating once, and cut. Put a label on <strong>both ends</strong> before anything else.</li>
+<li><strong>Lay out.</strong> Lay the wires out bundle by bundle, on a board with the connector positions marked or
+   in the car itself. Tie the bundles loosely as you go.</li>
+<li><strong>Terminate.</strong> Crimp each terminal, inspect it, pull-test it and insert it into its cavity
+   (chapter 8, Figure 8.2). Check the cavity against your plan before you insert each one. Fill every
+   empty cavity with a sealing plug.</li>
+<li><strong>Splice and shield.</strong> Make the splices, staggered and sealed (Figure 9.3). Terminate each shield's
+   drain at the ECU end and cut it back at the sensor end (Figure 9.2).</li>
+<li><strong>Cover and support.</strong> Sleeve the bundles, fit grommets, and tie or clip the harness so that no
+   connector holds its weight. Leave drip loops.</li>
+<li><strong>Test unpowered</strong>, with the ECU unplugged:<ul>
+<li><strong>continuity</strong> from each terminal to the far end of its wire: one beep for the right wire;</li>
+<li><strong>no short</strong> from each terminal to its neighbours, or to ground (except ground wires);</li>
+<li><strong>grounds:</strong> close to 0 Ω from each ECU ground terminal to the engine ground point.</li>
+</ul>
+</li>
+<li><strong>First power</strong>, still with the ECU unplugged. Turn the ignition on and measure at the plugs:
+   battery voltage on CN4 pin 9, and on pin 13 when the main relay is on; about 0 V between each
+   ground terminal and battery negative. Turn it off, plug the ECU in, and power up again. Then check
+   in the studio that every sensor reads something sensible before you crank (chapter 6).
+   <!-- src: definition/boards/jaytek_v1.board.yaml -->
+</li>
+</ol>
+<div class="admonition danger">
+<p class="admonition-title">Fuel and ignition stay disabled until the harness is proven</p>
+<p>Do not connect fuel-pump power or coil power for a first power-up. A mis-wired output can open an
+injector or fire a coil the moment the ECU powers up. Prove the harness first, then test each output
+on its own (chapter 43).</p>
+</div>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1: four injectors and four coils on CN2</p>
+<p>A four-cylinder engine with sequential injection and one coil per cylinder, each coil with a
+built-in igniter. The Outputs page lays injectors and coils out for you (chapter 18). Suppose it
+gives you LS1–LS4 and IGN1–IGN4:</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Terminal</th>
+<th>Colour</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Injector 1–4</td>
+<td>CN2 pins 1, 13, 3, 15 (LS1, LS2, LS3, LS4)</td>
+<td>Br/B, Br/W, Br/R, Br/Y</td>
+<td>0.5 mm²</td>
+</tr>
+<tr>
+<td>Coil 1–4 trigger</td>
+<td>CN2 pins 24, 25, 26, 27 (IGN1–4)</td>
+<td>W/B, W, W/R, W/Y</td>
+<td>0.5 mm²</td>
+</tr>
+<tr>
+<td>ECU ground</td>
+<td>CN2 pin 23</td>
+<td>B</td>
+<td>largest the terminal takes</td>
+</tr>
+</tbody>
+</table>
+<p>The eight wires run together in the noisy bundle to the injector rail and the coils. The coils'
+own power and ground, and the injectors' 12 V feed, come from their own fused relay (chapter 10), not
+from the ECU. LS1 to LS4 are not on neighbouring terminals: the board <strong>interleaves</strong> its low-side
+outputs across CN2. That is one more reason to check each cavity against the plan, not by position.
+<!-- src: definition/boards/jaytek_v1.board.yaml --></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2: a VR crank sensor and a Hall cam sensor on CN3</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Terminal</th>
+<th>Colour</th>
+<th>Wiring</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Crank VR +</td>
+<td>CN3 pin 6 (VR1+)</td>
+<td>Bu</td>
+<td>shielded twisted pair with VR1−</td>
+</tr>
+<tr>
+<td>Crank VR −</td>
+<td>CN3 pin 7 (VR1−)</td>
+<td>Bu/B</td>
+<td>the other wire of the pair</td>
+</tr>
+<tr>
+<td>Crank shield drain</td>
+<td>CN3 pin 12 (GND)</td>
+<td>B</td>
+<td>ECU end only</td>
+</tr>
+<tr>
+<td>Cam Hall signal</td>
+<td>CN3 pin 23 (DIG1)</td>
+<td>O/B</td>
+<td>twisted with its supply and ground</td>
+</tr>
+<tr>
+<td>Cam Hall supply</td>
+<td>CN4 pin 14 (5 V sensor supply 1), if the sensor runs on 5 V</td>
+<td>O/W</td>
+<td>spliced from the sensor-supply feed</td>
+</tr>
+<tr>
+<td>Cam Hall ground</td>
+<td>CN3 pin 11 (GND)</td>
+<td>B</td>
+<td>a sensor ground, not a load ground</td>
+</tr>
+</tbody>
+</table>
+<p>The digital inputs have a 2.7 kΩ pull-up to 5 V on the board. An open-collector Hall sensor needs
+no pull-up of its own. The crank pair runs in the sensor bundle, away from the coils. If it must
+cross the coil wires, it crosses at a right angle. Chapter 11 covers VR polarity and Hall sensor
+supplies.
+<!-- src: definition/boards/jaytek_v1.board.yaml; hardware/PDF_JAYTEK_2026-04-29/Digital (2.7 kΩ pull-up) --></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3: two knock sensors on CN4</p>
+<p>KNOCK1 on CN4 pin 23 (Pk/B) and KNOCK2 on CN4 pin 22 (Pk/W), each in its own shielded cable. Both
+drains go to CN4 pin 11 or 12 at the ECU end. The cables leave CN4 beside the high-side and
+H-bridge wires, so separate them from those as soon as they leave the connector, and route them with
+the sensor bundle. Chapter 11 covers the sensors' own wiring, and chapter 30 covers knock setup.
+<!-- src: definition/boards/jaytek_v1.board.yaml --></p>
+</div>
+<h2 id="pitfalls-and-troubleshooting">Pitfalls and troubleshooting<a class="headerlink" href="#pitfalls-and-troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sensor readings jump when injectors or coils fire</td>
+<td>Sensor wires bundled with the noisy bundle; sensor ground shared with a load</td>
+<td>Re-route (Figure 9.1); every sensor ground back to a CN3 ground terminal</td>
+</tr>
+<tr>
+<td>A sensor reads a steady offset that changes with load</td>
+<td>Voltage drop on a shared or undersized ground</td>
+<td>Measure between the sensor's ground pin and an ECU ground with the load on (see the example under <em>Wire size</em>)</td>
+</tr>
+<tr>
+<td>Loss of sync or trigger errors at higher engine speed</td>
+<td>VR wires not twisted or not shielded; shield grounded at both ends; VR− grounded at the engine</td>
+<td>Figure 9.2; both VR wires back to the ECU</td>
+</tr>
+<tr>
+<td>Noise on a shielded signal is worse, not better</td>
+<td>Shield grounded at both ends (a ground loop)</td>
+<td>Disconnect the sensor-end shield</td>
+</tr>
+<tr>
+<td>A fault comes and goes with engine movement or bumps</td>
+<td>A poor crimp, a terminal not locked, or a wire pulling on its terminal</td>
+<td>Wiggle-test with the engine running; pull-test suspect terminals; add strain relief</td>
+</tr>
+<tr>
+<td>Green corrosion found inside a wire, away from any joint</td>
+<td>Water wicking from an unsealed splice or an empty connector cavity</td>
+<td>Adhesive heat-shrink on splices; sealing plugs in every empty cavity</td>
+</tr>
+<tr>
+<td>Wrong load switches in output test</td>
+<td>Terminal in the wrong cavity (colours repeat, and CN2's low-side outputs are interleaved)</td>
+<td>Check each terminal against the harness sheet, not by colour or position</td>
+</tr>
+<tr>
+<td>High-side loads are weak or drop out together</td>
+<td>Main-relay feed (CN4 pin 13) undersized or poorly connected</td>
+<td>Voltage at CN4 pin 13 with the loads on</td>
+</tr>
+<tr>
+<td>A wire has melted</td>
+<td>Undersized for its load, or no fuse</td>
+<td>Measure the load's real current; resize and fuse it (chapter 10)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="08-tools.html">Chapter 8: Tools and materials</a>: the crimper, wire and heat-shrink</li>
+<li><a href="10-power-grounds.html">Chapter 10: Power, grounds and protection</a>: feeds, grounds, fuses and relays</li>
+<li><a href="11-wiring-sensors.html">Chapter 11: Wiring sensors</a>: each sensor type, VR polarity, Hall supplies</li>
+<li><a href="12-wiring-outputs.html">Chapter 12: Wiring outputs</a>: injectors, coils, solenoids, H-bridges</li>
+<li><a href="13-can-bus.html">Chapter 13: CAN bus</a>: the CAN pair and termination</li>
+<li><a href="../part3/18-outputs.html">Chapter 18: Outputs and the pin system</a>: assigning pins in the studio</li>
+<li><a href="../part5/43-bench-testing.html">Chapter 43: Bench testing</a>: testing each output before the first start</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="08-tools.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 8 Tools and materials">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                8 Tools and materials
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="10-power-grounds.html" class="md-footer__link md-footer__link--next" aria-label="Next: 10 Power, grounds and protection">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                10 Power, grounds and protection
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
