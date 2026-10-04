@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.6
 - Drive-by-wire pedal: turning the key off and on no longer leaves the pedal faulted (P1780 "pedal A missing", no throttle until the ECU restarts). The pedal is not judged with the key off, a missing pedal track has to stay missing for APP Match Debounce before it becomes a fault, and pedal calibration is cancelled if the key goes off mid-sweep instead of saving a calibration read with the key off.
 - Cruise control: turning the key off and on no longer puts cruise into Fault with a vehicle-speed code that needed a button press to clear. Key-off now turns cruise off, and key-on starts it in its power-on state.
 
