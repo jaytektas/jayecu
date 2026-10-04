@@ -45,6 +45,7 @@ private:
     const AppConfig* cfg_ = nullptr;
     uint32_t last_ms_      = 0;
     float disagree_ms_  = 0;
+    float missing_ms_   = 0;      // app_1 absent this long (latches NO SIGNAL at match_ms)
     // Calibrate working state. The sweep captures each track's raw EXTREMES — order-independent, so the
     // operator cannot get it wrong. Which extreme is "released" comes from the declared track sense, not
     // from the sweep: released->pressed and pressed->released yield the identical set of values, so no

@@ -16,6 +16,7 @@
 
 static uint32_t g_ms = 1000;
 extern "C" uint32_t platform_get_tick_ms() { return g_ms; }
+bool g_system_active = true;   // key-on (Sensors owns it on target); key-off is cruise off
 
 // Defined in CommsManager on the target. The module watches it to know the tune changed under it and
 // its button programs want re-validating, so a test has to supply it.
@@ -439,6 +440,25 @@ int main() {
       St s = r.run(20, 0, 0);
       CHECK_STATE(s.state, OFF);
       CHECK(!r.dtc_active(ModuleDtc::CRUISE_VSS)); }
+
+    // With the key off the sensors publish nothing. Judged as faults, a dead speed sensor and stalk
+    // latched FAULT through key-off, and key-on inherited it: a VSS code every key cycle and a cruise
+    // that would not engage until a button acknowledged a fault that was only the key.
+    SECTION("key off -> on: cruise wakes in its power-on state, with no fault and no code");
+    { auto d = make_cfg(); d.power_on_state = 1; Rig r(d);     // power on into Ready
+      St s = r.run(20, 100, 0);
+      CHECK_STATE(s.state, READY);
+      g_system_active = false;
+      r.b.invalidate(wk::vehicle_spd); r.b.invalidate(SIG_CRUISE_SW); r.fresh_speed = false;
+      for (int i = 0; i < 50; ++i) { g_ms += 20; EnginePosition p{}; EngineFrame f{}; r.cc.update(p, r.b, f); }
+      CHECK(!r.dtc_active(ModuleDtc::CRUISE_VSS));
+      CHECK(!r.dtc_active(ModuleDtc::CRUISE_SW));
+      g_system_active = true; r.fresh_speed = true;
+      s = r.run(20, 100, 0);
+      CHECK_STATE(s.state, READY);                 // not FAULT
+      CHECK(!r.dtc_active(ModuleDtc::CRUISE_VSS));
+      s = r.engage(100);
+      CHECK_STATE(s.state, CRUISING); }            // engages without an acknowledge press
 
     return test_summary();
 }

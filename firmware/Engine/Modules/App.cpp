@@ -46,7 +46,7 @@ void app_bench_calibrate() noexcept { if (g_app) g_app->start_calibrate(); }
 
 static constexpr uint32_t CAL_WINDOW_MS = 5000;   // press + release the pedal fully within this window
 
-void App::reset_state() { last_ms_ = 0; disagree_ms_ = 0; calibrating_ = false; }
+void App::reset_state() { last_ms_ = 0; disagree_ms_ = 0; missing_ms_ = 0; calibrating_ = false; }
 
 // One code at a time: a pedal that is both missing and uncorrelated is one fault with one cause, and
 // leaving the old code raised beside the new one would leave the table saying two things happened.
@@ -87,6 +87,27 @@ void App::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& /*f
         calibrating_ = false;
         // Heal what we raised: this return skips the heal() below — see DtcManager::heal.
         if (active_dtc_ && dtc_) { dtc_->heal(active_dtc_); active_dtc_ = 0; }
+        return;
+    }
+
+    // KEY OFF: PARK, AND JUDGE NOTHING. The sensors stop publishing with the key off (Sensors gates every
+    // pin-read input on it), so app_1 is absent for the whole of key-off — and this used to clear the
+    // latch and then re-latch NO SIGNAL on that absence in the same frame. The latch only ever cleared
+    // while the key was off, so every key-on began with the pedal already faulted: P1780 and a dead
+    // throttle until a reset, from a pedal that was fine. Same rule as the ETB's park: no fault is
+    // accumulated on feedback that cannot physically be there.
+    extern bool g_system_active;                             // key-on: owned by Sensors/EngineTask
+    if (!g_system_active) {
+        latched_state_ = 0; latched_code_ = 0;               // a new key cycle trusts the pedal again
+        disagree_ms_ = 0; missing_ms_ = 0;
+        // A cal in flight is ANSWERED, and must not finish: key-off moves the 5 V reference the raw
+        // reads are measured against, so a sweep that ran on into key-off would write a wrong cal.
+        if (calibrating_) {
+            calibrating_ = false;
+            set_command_state(cmdstate::PEDALCAL, cmdstate::FAIL);
+            g_text_log.printf("pedalcal ABORTED: key off - the pedal cannot be read without the key\n");
+        }
+        set_fault(0, now);
         return;
     }
 
@@ -164,16 +185,22 @@ void App::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& /*f
     const bool  matched = va && vb && std::fabs(pa - pb) <= static_cast<float>(cfg_->match_err_pct) * 0.1f;
     if (matched) disagree_ms_ = 0;
     else         disagree_ms_ += dt_ms;             // float: a ~1 ms frame must not truncate to 0
+    if (va) missing_ms_ = 0;
+    else    missing_ms_ += dt_ms;
     // Two causes, reported apart: no primary track at all, or a pair that disagreed past the debounce.
     // The missing-signal case is checked first — with no A there is nothing to correlate, so calling it a
     // correlation fault would send someone looking at the wrong wire.
-    const bool no_signal   = !va;
+    //
+    // A MISSING TRACK HAS TO HOLD FOR match_ms TOO before it LATCHES. It latched on one frame, and a
+    // single frame of absence is normal at key-on: the 5 V references can come up a moment after the
+    // battery crosses the key threshold, and for that moment Sensors publishes every pin-read input
+    // invalid. Latching on it would hold the pedal dead for the key cycle. Demand is still cut on the
+    // FIRST frame A is missing (below) — the debounce delays the verdict, never the fail-safe.
+    const bool no_signal   = missing_ms_ >= cfg_->match_ms;
     const bool disagreeing = disagree_ms_ >= cfg_->match_ms;
     // A PEDAL FAULT HOLDS UNTIL THE KEY GOES OFF. It used to clear on the first frame the tracks agreed
     // again, and the ETB dropped and re-enabled its bridge in step — so an intermittent track cycled the
     // throttle between limp and driven. What was seen once is not trusted again this key cycle.
-    extern bool g_system_active;                             // key-on: owned by Sensors/EngineTask
-    if (!g_system_active) { latched_state_ = 0; latched_code_ = 0; }
     if (no_signal || disagreeing) {
         latched_code_  = no_signal ? ModuleDtc::APP_A_MISSING : ModuleDtc::APP_CORRELATION;
         latched_state_ = static_cast<uint8_t>(no_signal ? ST_FAULT_NO_SIGNAL : ST_FAULT_CORRELATION);
@@ -186,6 +213,10 @@ void App::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& /*f
     }
     set_fault(0, now);                                       // trustworthy again -> heal whatever was raised
     bus.set(SIG_APP_STATE, static_cast<float>(ST_OK), true, now, ttl());
+    if (!va) {                                               // missing, not yet a verdict: no throttle on it
+        bus.set(SIG_PEDAL_DEMAND, 0.0f, true, now, ttl());
+        return;
+    }
 
     const float demand = std::clamp(tbl::table_eval(pedal_to_throttle_table_desc(cfg_), bus), 0.0f, 100.0f);
     bus.set(SIG_PEDAL_DEMAND, demand, true, now, ttl());

@@ -147,9 +147,72 @@ int main() {
         bus.set(SIG_APP_2, 50.0f, true);                            // app_1 never published
         bus.set(wk::engine_state, 2.0f);
         run(a, bus, 10);
+        CHECK(dtc.code_severity(ModuleDtc::APP_A_MISSING) == 0);            // inside the debounce: no verdict yet
+        CHECK_NEAR(bus.get(SIG_PEDAL_DEMAND, -1.0f), 0.0f, 0.01f);  // ...but no throttle on it either
+        for (int i = 0; i < 25; i++) run(a, bus, 10);               // 250 ms > match_ms (200)
         CHECK(dtc.code_severity(ModuleDtc::APP_A_MISSING) != 0);
         CHECK(dtc.code_severity(ModuleDtc::APP_CORRELATION) == 0);          // nothing to correlate WITH
         CHECK_NEAR(bus.get(SIG_APP_STATE, -1.0f), 3.0f, 0.01f);     // ST_FAULT_NO_SIGNAL
+    }
+
+    // THE BENCH BUG: with the key off the sensors publish nothing, so app_1 is absent for the whole of
+    // key-off. The module used to latch NO SIGNAL on that absence and carry it into key-on — every key
+    // cycle began with P1780 and a dead pedal. Key-off must judge nothing.
+    SECTION("key off -> on with the sensors silent while off: the pedal is trusted at key-on");
+    {
+        auto cfg = make_cfg(); App a; a.init(cfg);
+        DtcManager dtc; dtc.init(1); dtc.set_active(true); a.set_dtc(&dtc);
+        SignalBus bus{};
+        bus.set(wk::engine_state, 0.0f);
+        g_system_active = false;
+        for (int i = 0; i < 100; i++) run(a, bus, 10);              // 1 s of key-off, nothing published
+        CHECK(dtc.code_severity(ModuleDtc::APP_A_MISSING) == 0);
+        g_system_active = true;
+        bus.set(SIG_APP_1, 50.0f, true); bus.set(SIG_APP_2, 50.0f, true);
+        run(a, bus, 10);                                            // the key-on frame: sensors publish
+        CHECK_NEAR(bus.get(SIG_APP_STATE, -1.0f), 0.0f, 0.01f);     // ST_OK, not a carried-over NO SIGNAL
+        CHECK_NEAR(bus.get(SIG_PEDAL_DEMAND, -1.0f), 42.0f, 0.5f);
+        CHECK(dtc.code_severity(ModuleDtc::APP_A_MISSING) == 0);
+    }
+
+    SECTION("key-on with app_1 late by less than match_ms (5 V rail coming up): no latch");
+    {
+        auto cfg = make_cfg(); App a; a.init(cfg);
+        DtcManager dtc; dtc.init(1); dtc.set_active(true); a.set_dtc(&dtc);
+        SignalBus bus{};
+        bus.set(wk::engine_state, 0.0f);
+        g_system_active = false; run(a, bus, 10);
+        g_system_active = true;
+        for (int i = 0; i < 5; i++) run(a, bus, 10);                // 50 ms with app_1 absent
+        CHECK_NEAR(bus.get(SIG_PEDAL_DEMAND, -1.0f), 0.0f, 0.01f);  // no throttle while absent
+        bus.set(SIG_APP_1, 50.0f, true); bus.set(SIG_APP_2, 50.0f, true);
+        run(a, bus, 10);
+        CHECK_NEAR(bus.get(SIG_APP_STATE, -1.0f), 0.0f, 0.01f);
+        CHECK_NEAR(bus.get(SIG_PEDAL_DEMAND, -1.0f), 42.0f, 0.5f);
+        CHECK(dtc.code_severity(ModuleDtc::APP_A_MISSING) == 0);
+    }
+
+    SECTION("key off mid-calibration aborts it: no cal written from a key-off sweep");
+    {
+        auto cfg = make_cfg(); App a; a.init(cfg);
+        SignalBus bus{};
+        bus.set(wk::engine_state, 0.0f);
+        const int ia = find_app(SIG_APP_1);
+        g_config.sensors.sensor[ia].source = 2;                     // distinct analog channels for the seam
+        g_config.sensors.sensor[find_app(SIG_APP_2)].source = 3;
+        const uint8_t ch_a = g_config.sensors.sensor[ia].source;
+        const uint8_t ch_b = g_config.sensors.sensor[find_app(SIG_APP_2)].source;
+        const uint16_t was = g_config.sensors.sensor[ia].cal_raw[1];
+        a.start_calibrate();
+        // a full sweep on both tracks — enough span that the window WOULD write a cal if it closed
+        g_raw[ch_a] = 300;  g_raw[ch_b] = 3900; run(a, bus, 100);
+        g_raw[ch_a] = 3900; g_raw[ch_b] = 300;  run(a, bus, 100);
+        g_system_active = false;
+        run(a, bus, 6000);                                          // the window would have closed
+        g_system_active = true;
+        CHECK(g_config.sensors.sensor[ia].cal_raw[1] == was);       // nothing written
+        CHECK((g_command_state & 3) == 3);                          // answered: FAIL
+        g_raw[ch_a] = 0; g_raw[ch_b] = 0;
     }
 
     // The pedal cut and the throttle cut must never be mistaken for one another: P2138 is the pedal pair,

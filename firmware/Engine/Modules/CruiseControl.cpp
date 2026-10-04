@@ -123,7 +123,13 @@ void CruiseControl::update(const EnginePosition& /*pos*/, SignalBus& bus, Engine
         bus.set_u32(SIG_CRUISE_INHIBIT, inhibit_, true, now, ttl());
     };
 
-    if (!cfg_ || !cfg_->enabled) {
+    // KEY OFF IS CRUISE OFF. With the key off the sensors publish nothing, so road speed and the stalk
+    // read invalid — and judged as faults, they latched FAULT (for a Ready power-on state), which the
+    // key-on then inherited: a stored VSS code every key cycle, and cruise refusing to engage until a
+    // button was pressed to acknowledge a fault that was only the key. Key-on is this module's power-on,
+    // so key-off resets it exactly as switching it off does, and it wakes in its power-on state.
+    extern bool g_system_active;                       // key-on: owned by Sensors
+    if (!cfg_ || !cfg_->enabled || !g_system_active) {
         state_ = CruiseState::OFF;
         target_kph_ = 0.0f; inhibit_ = 0; pi_.reset();
         ramped_ = 0.0f; ramp_valid_ = false; decay_rate_ = 0.0f; last_err_ = 0.0f;
