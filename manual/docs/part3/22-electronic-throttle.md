@@ -46,15 +46,18 @@ own sensors, its own calibration and its own half bridge.
 ### 1 · The pedal
 
 Track A of the pedal (`app_1`) is the one that is used; track B (`app_2`) is the check. The two must
-read within **APP Match Error Limit** (default 10 %) of each other. If they disagree for longer than
-**APP Match Debounce** (default 200 ms), or track A disappears, the pedal is not trusted:
+read within **APP Match Error Limit** (default 10 %) of each other. If they disagree, or track A
+disappears, for longer than **APP Match Debounce** (default 200 ms), the pedal is not trusted. A missing
+track A asks for no throttle from the moment it goes; the debounce only delays the fault, so the instant
+at key-on before the sensors read cannot set it. Once the pedal is not trusted:
 
 - Pedal Demand goes to 0 and a code is set (**P2138** for a disagreement, **P1780** for a missing
   track A).
 - The throttle switches its motor **off**, so the spring takes the plate to its rest position (the
   "limp-home" position, a little open). The engine keeps running at a fast idle.
 - The fault **holds until the key is turned off**, even if the tracks agree again. A pedal that failed
-  once is not trusted again on the same drive.
+  once is not trusted again on the same drive. With the key off the pedal is not judged at all (the
+  sensors are not read), so each key-on starts with the pedal trusted.
   <!-- src: firmware/Engine/Modules/App.cpp; firmware/Engine/Modules/ElectronicThrottle.cpp -->
 
 When the pedal is trusted, track A goes through the **Pedal to Throttle** table (pedal % across,

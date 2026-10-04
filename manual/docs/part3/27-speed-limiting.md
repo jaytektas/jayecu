@@ -124,6 +124,9 @@ is pressed again) happens when:
 | An assigned brake, clutch or handbrake sensor has no fault checks enabled | P17A8 |
 | No **Brake Signal** assigned at all | P17A9 |
 
+Turning the key off is not a fault: cruise switches off with the key (the sensors are not read with the
+key off), and the next key-on starts it in **State At Power-On** with nothing to acknowledge.
+
 <!-- src: firmware/Engine/Modules/CruiseControl.cpp; generated/module_dtc.h -->
 
 **Why it will not engage** on the **Limits** page lights the reason for each block.
