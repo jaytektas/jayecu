@@ -178,6 +178,13 @@ is on screen, and a dock you show again returns to where you last had it. Which 
 strip sits on, and whether a side is used at all, are set in **Edit ▸ Preferences… ▸ Appearance**.
 <!-- src: apps/studio-jf/main.cpp (dock homes, View toggles) (ticks follow placement) (Appearance ▸ Docks) -->
 
+To move a dock, drag it by its tab. Over another part of the window, the place it would dock is
+highlighted; let go there to dock it. Let go anywhere else and it floats in a window of its own. On a
+crowded layout almost everywhere offers a place to dock, so **hold the right mouse button** while you
+drag: nothing is highlighted, and the dock stays floating wherever you let go. Press **Esc** before
+you let go to cancel the move.
+<!-- src: JFramework include/j/platforms/FloatingDockWindow.h (drag: right button held offers no drop; Escape cancels a move); JFramework include/j/app/JAppWindow.h (Escape reverts a tear-out) -->
+
 ### Locked and Editing
 
 The first button on the toolbar switches the studio between two modes. The studio always starts in
