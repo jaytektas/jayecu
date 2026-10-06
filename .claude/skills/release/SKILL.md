@@ -16,8 +16,8 @@ request. Never delete or overwrite a published release without being asked.
 
 ## 0. Before anything
 
-- Everything to ship is **committed**; `git status --short` is empty. Work normally happens on a branch
-  (e.g. `studio-j8hp`); `master` is fast-forwarded to it at publish time (step 6).
+- Everything to ship is **committed** on `master`; `git status --short` is empty. Work happens on
+  `master` directly — there is no work branch.
 - **Firmware notes are written.** `firmware/CHANGES.md` → `## Unreleased` holds a plain-words line for
   every change a user would notice in the firmware *or the kit* (the kit carries the meta and the
   dashboard, so page changes count). No hashes, no file names. The release step refuses if the firmware
@@ -117,9 +117,8 @@ different build must never be published (it would never be offered, and the pack
 ## 6. Publish (after the user's go-ahead)
 
 ```
-git checkout master && git merge --ff-only <branch> && git push origin master
+git push origin master
 gh release create v<studio> --target master --title "jayecu v<studio>" --notes "<notes>" release/v<studio>/*
-git checkout <branch>
 gh release view v<studio> --json isDraft,isPrerelease,assets --jq '{draft:.isDraft,pre:.isPrerelease,n:(.assets|length)}'
 gh release list -L 2           # the new one is Latest
 ```

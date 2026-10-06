@@ -62,7 +62,7 @@ studio updates itself) and **Include beta firmware** (the kits are offered on co
    kits, puts the build dirs back to the plain version, and gathers `release/v<studio beta>/`.
 4. Check it (`ls release/v<beta>/`, each `*-kit.json`'s version and build = the last firmware commit).
 5. **Ask the user before publishing** — it is public. The tag's commit must be on GitHub: push it to the
-   **`beta`** branch there — never the local work branch (its name belongs to other work):
+   **`beta`** branch there, not `master` (a beta is not a release):
    ```
    git push --force origin HEAD:refs/heads/beta
    gh release create v<studio beta> --prerelease --target <commit> --title "jayecu v<studio beta> (beta)" \
