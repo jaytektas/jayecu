@@ -762,7 +762,7 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
             const float X     = std::clamp(tbl::table_eval(film_pool_table_desc(cfg_), bus) / 100.0f, 0.0f, 0.9f);
             const float tau_s = std::clamp(tbl::table_eval(film_evap_table_desc(cfg_), bus), 1.0f, 1000.0f) / 1000.0f;
             const float evap_frac = 1.0f - std::exp(-dt_s / tau_s);
-            const bool  cut = bus.valid(wk::fuel_cut);
+            const bool  cut = bus.get_bool(wk::fuel_cut);
             const float ev  = static_cast<float>(std::max<uint8_t>(inj_events, 1));   // per event <-> per cycle
             for (uint8_t st = 0; st < nstages; ++st) {
                 if (!film_on[st]) { film_pw_[st] = 0.0f; continue; }
@@ -829,7 +829,7 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     // this used to publish 0 while cutting, which told the tuner the fuel model wanted nothing when
     // it wanted plenty, and made a cut indistinguishable from a collapsed calculation.
     frame.base_fuel_pw_us = pw_us;
-    const bool  cut      = bus.valid(wk::fuel_cut);   // still needed for the STAGED split below
+    const bool  cut      = bus.get_bool(wk::fuel_cut);   // still needed for the STAGED split below
     const float final_pw = pw_us;
     bus.set(wk::base_pw, final_pw, true, now, ttl());
 

@@ -274,8 +274,11 @@ void EngineTask::run_frame() {
     // the coils/injectors); the per-cycle task also skips its fuel/spark commit while inactive.
     epos_hal_.set_firing_gate(key_on_);
     // Cut requesters (rev limiter, launch, flat shift, pit limiter, overboost, EngineProtection)
-    // publish wk::ign_cut / wk::fuel_cut; validity IS the OR. Push them to the output stage, which is
-    // where a cut belongs — see EnginePositionHal::set_output_cuts.
+    // publish wk::ign_cut / wk::fuel_cut = true only while cutting, and the cut ends when the value
+    // expires. Read as VALID AND TRUE, not as valid alone: a Lua signalWrite("fuel_cut", 0) or a CAN
+    // field mapped to the channel publishes a valid 0, and reading validity alone made that a cut —
+    // latched, for a script write with no ttl. Push them to the output stage, which is where a cut
+    // belongs — see EnginePositionHal::set_output_cuts.
     // …and the two OPERATOR gateways, which join the same OR rather than getting a path of their own:
     // engine.ign_enable / engine.inj_enable, off = that half of the engine does not fire. Crank with no
     // fuel to look for spark, or with no spark to check fuel delivery and clear a flood. They persist
@@ -285,8 +288,8 @@ void EngineTask::run_frame() {
     // same thing cost telemetry bytes and pushed a Diagnostics column past its card.
     const bool ign_on = g_config.engine.ign_enable != 0;
     const bool inj_on = g_config.engine.inj_enable != 0;
-    const bool cut_ign = signal_bus_.valid(wk::ign_cut) || !ign_on;
-    const bool cut_inj = signal_bus_.valid(wk::fuel_cut) || !inj_on;
+    const bool cut_ign = signal_bus_.get_bool(wk::ign_cut) || !ign_on;
+    const bool cut_inj = signal_bus_.get_bool(wk::fuel_cut) || !inj_on;
     epos_hal_.set_output_cuts(cut_ign, cut_inj);
 
     // Per-cylinder cuts, composed with the global cuts inside the scheduler rather than overwriting
@@ -359,6 +362,9 @@ void EngineTask::run_frame() {
     // No shadow commit here — both ignition AND injection are computed + committed on the per-cycle
     // task now (E-2c). The 1 kHz frame is sensors / lambda / protection / telemetry only.
     epos_hal_.service();
+    // AGE THE BUS AT THE END OF THE FRAME, not the start: the per-cycle task (Ignition, FuelCalculator —
+    // wk::fuel_cut, the launch advance) runs in the slack AFTER this frame, and it must see the bus
+    // already cleaned. Aged at the start, every value would outlive its ttl by that gap.
     signal_bus_.expire_stale(platform_get_tick_ms());
     update_telemetry(pos, signal_bus_, frame);
 }

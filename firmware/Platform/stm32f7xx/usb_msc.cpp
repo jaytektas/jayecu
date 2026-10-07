@@ -293,6 +293,9 @@ static bool scsi_exec(uint8_t* out_status, uint32_t* out_residue) {
         uint32_t sent = 0;
         while (nblk) {
             uint32_t chunk = (nblk < CHUNK_SECTORS) ? nblk : CHUNK_SECTORS;
+            // OWNERSHIP PER CHUNK, not per command: a READ(10) can run for many chunks, and the ECU may
+            // take the card back part-way. Stop at the chunk boundary and say so, short.
+            if (!SdArbitrator_UsbHasCard()) { set_sense(SENSE_NOT_READY); *out_residue = hlen - sent; return true; }
             if (!SdCard_Read(s_blkbuf, lba, chunk)) { set_sense(SENSE_MEDIUM_ERR); *out_residue = hlen - sent; return true; }
             uint32_t bytes = chunk * BLK_SIZE;
             if (!ep_send(s_blkbuf, bytes)) return false;
@@ -309,6 +312,10 @@ static bool scsi_exec(uint8_t* out_status, uint32_t* out_residue) {
             uint32_t chunk = (nblk < CHUNK_SECTORS) ? nblk : CHUNK_SECTORS;
             uint32_t bytes = chunk * BLK_SIZE, got = 0;
             if (!ep_recv(s_blkbuf, bytes, &got, pdMS_TO_TICKS(3000)) || got != bytes) return false;
+            // Ownership and the quiet beacon PER CHUNK. The beacon was stamped once at the start of the
+            // command, so a long write looked quiet 300 ms in and the card could be withdrawn under it.
+            if (!SdArbitrator_UsbHasCard()) { set_sense(SENSE_NOT_READY); *out_residue = hlen - recvd; return true; }
+            SdArbitrator_UsbNoteWrite();
             if (!SdCard_Write(s_blkbuf, lba, chunk)) { set_sense(SENSE_MEDIUM_ERR); *out_residue = hlen - recvd; return true; }
             lba += chunk; nblk -= chunk; recvd += bytes;
         }

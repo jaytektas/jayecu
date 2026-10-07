@@ -78,6 +78,18 @@ int main() {
         CHECK(bus.valid(SIG_MAP));
     }
 
+    SECTION("a ttl of N ms is N ms, not N+1");
+    {
+        // The frame ages the bus after its reads, so a value set with ttl 5 at t must be gone by the
+        // sweep at t+5 — or it is still read in that frame, and a one-decision soft cut holds 6 frames.
+        SignalBus bus{};
+        bus.set_bool(SIG_FUEL_CUT, true, 1000u, 5u);
+        bus.expire_stale(1004u);                          // age 4 < 5: still live
+        CHECK(bus.valid(SIG_FUEL_CUT));
+        bus.expire_stale(1005u);                          // age 5: expired
+        CHECK(!bus.valid(SIG_FUEL_CUT));
+    }
+
     SECTION("clear resets all slots to invalid");
     {
         SignalBus bus{};

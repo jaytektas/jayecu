@@ -8,6 +8,8 @@
 #include "../firmware/Engine/EngineFrame.h"
 #include "../generated/signal_ids.h"
 #include "../generated/ecu_config.h"   // g_config — the SHIPPED defaults, so a test starts where a user does
+#include "../generated/learned_layout.h"   // LEARNED_VVT_LTT_* — seed a learned cell directly
+#include "../firmware/Platform/platform_hal.h"   // platform_learned_block
 
 static uint32_t g_ms = 0;
 extern "C" uint32_t platform_get_tick_ms() { return g_ms; }
@@ -235,6 +237,19 @@ int main() {
       step(v,b,0,24,0,0,0,0);
       for (int k = 0; k < 200; k++) step(v,b,20,24,0,0,0,0);
       CHECK(v.ltt(0, 90.0f) <= 5.0f + 0.01f); }               // never exceeds the 5% authority
+
+    SECTION("LTT cell stays put when the CLT axis is resized");
+    // The block is 4 cams x the CLT axis ALLOCATION (8). Shrinking the axis to 4 live bins must not move
+    // cam 2's learned duty: it used to stride by the live count, so cam 2 bin 1 read cell 5 (cam 1's)
+    // instead of cell 9, and the studio showed different cells than the firmware wrote.
+    { resetRegion();
+      auto* cells = reinterpret_cast<float*>(platform_learned_block(LEARNED_VVT_LTT_OFFSET, LEARNED_VVT_LTT_BYTES));
+      CHECK(cells != nullptr);
+      cells[1 * LEARNED_VVT_LTT_COLS + 1] = 3.0f;              // cam index 1, CLT bin 1 (17.5 °C)
+      auto c = make_cfg(); c.vvt_ltt_x_axis_n = 4;
+      VvtControl v; v.init(c);
+      CHECK_NEAR(v.ltt(1, 17.5f), 3.0f, 0.001f);
+      CHECK_NEAR(v.ltt(0, 17.5f), 0.0f, 0.001f); }
 
     SECTION("disabled -> all loops 0");
     { auto c = make_cfg(); c.enabled = 0; VvtControl v; v.init(c); SignalBus b{};

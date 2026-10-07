@@ -9,6 +9,11 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- A Lua script or a CAN template that writes 0 to Fuel Cut or Ignition Cut no longer cuts the engine. Only a written 1 cuts. Before, any write counted as a cut, and a script write with no timeout held it until the script was reloaded.
+- The rev limiter, launch and traction control soft cuts now cut the share they report. Each cut decision was held one frame too long, so a 50% soft cut cut about 60%.
+- VVT and knock learned values stay in their own cells when the VVT coolant axis or the knock rpm axis is resized. Before, shrinking the axis moved each cam's (or each load row's) learned values into another's cells, and the studio showed different cells from the ones the ECU used. Values learned while the axis was shrunk may be in the wrong cells; clear them and let them re-learn.
+- Throttle feed-forward table: with the Y axis turned on, rows after the first now hold what the studio shows. The ECU and the studio used to lay those rows out differently. Re-run the feed-forward sweep (fillff) for any row past the first.
+- Taking the SD card back from a PC (key on) no longer cuts into a long USB copy partway through a transfer.
 
 ## 0.4.6
 - Drive-by-wire pedal: turning the key off and on no longer leaves the pedal faulted (P1780 "pedal A missing", no throttle until the ECU restarts). The pedal is not judged with the key off, a missing pedal track has to stay missing for APP Match Debounce before it becomes a fault, and pedal calibration is cancelled if the key goes off mid-sweep instead of saving a calibration read with the key off.

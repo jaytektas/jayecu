@@ -12,7 +12,8 @@
 //
 // One path covers 1D / 2D / 3D: a dimension with fewer than 2 live bins collapses to index 0 (its
 // fraction is 0), so linear / bilinear / trilinear all fall out of the same trilinear expression.
-// Cells are stored row-major at the LIVE strides (not the max alloc): cell[z*(xn*yn) + y*xn + x].
+// Cells are stored row-major at the ALLOCATION strides (xa, ya), not the live counts:
+// cell[z*(xa*ya) + y*xa + x]. The live counts only bound the search — see interp_at.
 //
 // The channel-driven layer (read bus.get(axis.channel) for each enabled axis, then call interp())
 // lives with the table config; this header is pure + host-testable.

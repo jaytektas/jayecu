@@ -331,7 +331,7 @@ void Lambda::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& 
     // own account — it cannot answer, and refusing on that basis would disable the feature on a rig
     // that simply has not wired that sensor.
     const float rpm_now = bus.get(wk::rpm, 0.0f);
-    bool built_in = !bus.valid(wk::fuel_cut)                                  // not cutting fuel
+    bool built_in = !bus.get_bool(wk::fuel_cut)                                  // not cutting fuel
                  && bus.get(wk::fuel_corr_poststart, 1.0f) < 1.01f;           // past post-start
 
     if (bus.valid(wk::clt))                                                   // warm
@@ -399,8 +399,8 @@ void Lambda::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& 
     //     sweeps lean on overrun, so it added fuel; past the sensor's range it zeroed the trim instead of
     //     freezing it, and every overrun ended in a rich-or-lean spike. The same reset fired on a genuinely
     //     lean reading past the range — dropping the trim at the moment the engine was leanest.
-    if (bus.valid(wk::fuel_cut)) last_cut_ms_ = now;
-    const bool in_cut     = bus.valid(wk::fuel_cut);
+    if (bus.get_bool(wk::fuel_cut)) last_cut_ms_ = now;
+    const bool in_cut     = bus.get_bool(wk::fuel_cut);
     const bool after_cut  = last_cut_ms_ != 0 && (now - last_cut_ms_) < static_cast<uint32_t>(cfg_->cl_after_cut_ms);
     const bool unsettled  = running_since_ms_ == 0 ||
                             (now - running_since_ms_) < static_cast<uint32_t>(cfg_->cl_start_delay_s) * 1000u;

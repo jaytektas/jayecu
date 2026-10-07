@@ -649,7 +649,8 @@ void ElectronicThrottle::finalize_autotune(unsigned i) {
 
 // Stage-2 write: fuse the down/up crossings into the friction-free MIDPOINT per X bin, linearly fill any
 // bin the sweep missed (hold the ends), and write the row into this ETB's ff_table (cells int16 x0.1).
-// Stride is row-major at the LIVE x count: cell[ff_row_ * xn + k] (Z absent -> z=0).
+// Stride is row-major at the X ALLOCATION, FF_BINS, like every table: cell[ff_row_ * FF_BINS + k]
+// (Z absent -> z=0). The live count only says how many of the row's cells are in play.
 void ElectronicThrottle::write_ff_row(int xn) {
     if (xn <= 0) return;
     EtbConfig& w = g_config.electronic_throttle.etb[ff_etb_];
@@ -671,7 +672,7 @@ void ElectronicThrottle::write_ff_row(int xn) {
     }
     if (prev >= 0) for (int j = prev + 1; j < xn; j++) v[j] = v[prev];                           // tail
     for (int k = 0; k < xn; k++)
-        w.ff_table[ff_row_ * xn + k] =
+        w.ff_table[ff_row_ * FF_BINS + k] =
             static_cast<int16_t>(std::lround(std::clamp(v[k], -100.0f, 100.0f) * 10.0f));
     ++g_config_generation;
 }

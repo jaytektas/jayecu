@@ -179,8 +179,8 @@ void Launch::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& fram
     if (use_ign)  worst = std::max(worst, cut_channel(pos.rpm, ign_thr,  ign_,  fire_ign));
     else          ign_  = Channel{};
 
-    // A CUT ENDS WHEN ITS SIGNAL EXPIRES (EngineTask reads bus.valid(), so validity is the OR and
-    // publishing `false` would still read as a cut). A hard cut is renewed every frame and released by
+    // A CUT ENDS WHEN ITS SIGNAL EXPIRES (requesters publish only `true`; a `false` from this one would
+    // overwrite a cut another requester holds). A hard cut is renewed every frame and released by
     // the ttl; a soft cut's frame is one frame wide, so it publishes with frame_ms() — ttl() is period
     // PLUS grace, which would hold each cut into the next frame and double every duty.
     const uint32_t pulse = (cfg_->cut_type == SoftCut) ? frame_ms() : ttl();

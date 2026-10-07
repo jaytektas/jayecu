@@ -93,9 +93,10 @@ void Knock::on_engine_stop() {
 uint16_t Knock::cell_index(float rpm, float load) const {
     if (!cfg_) return 0;
     const tbl::TableDesc d = knock_noise_1_desc(cfg_);
-    const int xn = tbl::axis_live_n(d.x);
-    return static_cast<uint16_t>(tbl::nearest_bin(d.y, load) * (xn > 0 ? xn : 1)
-                                 + tbl::nearest_bin(d.x, rpm));
+    // Row width = the ALLOCATION (see TableEngine.h interp_at), so resizing the rpm axis changes how
+    // far the search runs, not which cell a learned floor lives in.
+    const int xs = (d.x.alloc >= 1) ? d.x.alloc : 1;
+    return static_cast<uint16_t>(tbl::nearest_bin(d.y, load) * xs + tbl::nearest_bin(d.x, rpm));
 }
 
 float Knock::noise_floor(uint8_t cyl) const {
@@ -350,7 +351,7 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
     // already normalises light-load mechanical noise by construction — that is the whole point of a
     // floor per operating point — so the throttle threshold was doing work nothing needed done.
     // It survives as an OPT-IN override (0 = off, the default) for anyone who wants it.
-    const bool cut = bus.valid(wk::fuel_cut);
+    const bool cut = bus.get_bool(wk::fuel_cut);
     const bool tps_gate = cfg_->suppress_min_tps > 0;
     const bool tps_ok   = bus.valid(wk::tps);
     const float tps     = bus.get(wk::tps, 0.0f);
@@ -378,7 +379,7 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
     // traction, a soft cut's pattern) does not burn, so its window is "clean" by construction — and
     // averaging those into the floor drags it down in exactly the high-load cells, after which normal
     // combustion reads as knock and timing is pulled for nothing. Detection may run; teaching may not.
-    const bool spark_cut = bus.valid(wk::ign_cut) || bus.get(SIG_SOFT_CUT_PCT, 0.0f) > 0.0f;
+    const bool spark_cut = bus.get_bool(wk::ign_cut) || bus.get(SIG_SOFT_CUT_PCT, 0.0f) > 0.0f;
     learn_ok_ = !suppressed_ && !spark_cut && dwelt && rpm >= static_cast<float>(cfg_->learn_min_rpm);
 
     if (suppressed_) {
@@ -419,7 +420,7 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
         // cut — a protection level holding a cut after a trigger fault, a rev limiter, overrun — no
         // window is sampled and the channel expires on a perfectly good sensor. Judged then, a cut
         // caused by one fault reported a second one (P1750) that was nothing but its consequence.
-        const bool combustion = !bus.valid(wk::fuel_cut) && !bus.valid(wk::ign_cut);
+        const bool combustion = !bus.get_bool(wk::fuel_cut) && !bus.get_bool(wk::ign_cut);
         // …AND NOT AT ONCE. The first window is sampled a few firings after spark begins; judged in the
         // frame the engine crosses the floor, the channel has not been published yet. A real start ramps
         // through cranking and hides that, but key-on into a crank already turning (a bench, a bump

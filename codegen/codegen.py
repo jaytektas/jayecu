@@ -1155,8 +1155,12 @@ def gen_table_descs_h(modules: dict) -> str:
                     bt  = _CELL_TYPE.get(cfg["type"], "tbl::CELL_F32")
                     src = f"&e->{cfg['src']}" if "src" in cfg else "nullptr"
                     en  = f"&e->{cfg['en']}"  if "en"  in cfg else "nullptr"
+                    # The ALLOCATION rides on the descriptor like a module table's _ALLOC: it is the
+                    # stride the cells are laid out at (and the stride the studio addresses them by).
+                    # Leaving it 0 made the firmware read and write etb[i].ff_table at the LIVE x count
+                    # while the studio used the allocation, so rows past the first disagreed.
                     return (f"{{ e->{nm}_{ax}_axis, {bt}, &e->{cfg['n']}, 0, {src}, {en}, "
-                            f"{float(cfg.get('scale', 1.0))!r}f }}")
+                            f"{float(cfg.get('scale', 1.0))!r}f, (uint16_t){int(cfg['max'])} }}")
                 out += [
                     f"inline tbl::TableDesc {arr['name']}_{nm}_desc(const {elem_type}* e) {{",
                     f"    return {{ e->{nm}, {_CELL_TYPE[st['cell_type']]}, {float(st['scale'])!r}f,",

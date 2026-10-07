@@ -129,10 +129,15 @@ public:
     // frame with the current tick. Age-based, so a co-producer that keeps writing a
     // shared channel keeps it fresh; only a channel no producer is refreshing decays.
     // ttl_ms == 0 slots never expire here.
+    //
+    // A TTL OF N IS N MILLISECONDS, not N+1: a value set at t is gone once t+N is reached. This was
+    // `> ttl`, and the frame ages the bus after its reads, so a value set with ttl N was still read in
+    // the frame at t+N — one frame too many. Nothing noticed except a cut that publishes for exactly one
+    // decision (a soft cut, ttl = frame_ms()): each one held a frame longer, so a 50 % cut cut ~60 %.
     void expire_stale(uint32_t now_ms) {
         for (uint16_t s = 0; s < SIG_COUNT; s++) {
             SignalValue& v = slots_[s];
-            if (v.valid && v.ttl_ms != 0 && (now_ms - v.set_at_ms) > v.ttl_ms) {
+            if (v.valid && v.ttl_ms != 0 && (now_ms - v.set_at_ms) >= v.ttl_ms) {
                 v.valid = false;
             }
         }
@@ -266,7 +271,7 @@ private:
         // An expired override is still reclaimed: expire_stale() runs on the engine frame and marks it
         // invalid, after which !v.valid lets an untimed writer take the slot back.
         const bool timed = (now_ms != 0);
-        const bool stale = !v.valid || (timed && v.ttl_ms != 0 && (now_ms - v.set_at_ms) > v.ttl_ms);
+        const bool stale = !v.valid || (timed && v.ttl_ms != 0 && (now_ms - v.set_at_ms) >= v.ttl_ms);
         if (prio < v.prio && !stale)
             return false;                     // out-voted by a live higher-priority override
         v.valid     = valid;

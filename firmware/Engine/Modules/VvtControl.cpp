@@ -44,8 +44,11 @@ void VvtControl::init(const VvtControlConfig& cfg) {
 int VvtControl::ltt_cell(int loop, float clt) const {
     if (!cfg_) return loop * CLT_BINS;
     const tbl::TableDesc d = vvt_ltt_desc(cfg_);
-    const int cols = tbl::axis_live_n(d.x);
-    return loop * (cols > 0 ? cols : 1) + tbl::nearest_bin(d.x, clt);
+    // The row width is the ALLOCATION, not the live bin count — the stride every table and the studio
+    // use. Striding by the live count moved every cam's learned duty into another cam's cells the moment
+    // the CLT axis was resized, and the studio showed cells the firmware never wrote.
+    const int cols = (d.x.alloc >= 1) ? d.x.alloc : 1;
+    return loop * cols + tbl::nearest_bin(d.x, clt);
 }
 
 void VvtControl::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& /*frame*/) {

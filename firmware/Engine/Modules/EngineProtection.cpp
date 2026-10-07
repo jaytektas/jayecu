@@ -388,7 +388,7 @@ void EngineProtection::update(const EnginePosition& pos,
     bus.set(SIG_BLINK_SLOW, ((now_ms / 500u) & 1u) ? 1.0f : 0.0f, true, now_ms, ttl());
     bus.set(SIG_BLINK_FAST, ((now_ms / 125u) & 1u) ? 1.0f : 0.0f, true, now_ms, ttl());
     bus.set_u32(wk::prot_status, static_cast<uint32_t>(
-        ((bus.valid(wk::fuel_cut) || bus.valid(wk::ign_cut)) ? 0x01u : 0u) |
+        ((bus.get_bool(wk::fuel_cut) || bus.get_bool(wk::ign_cut)) ? 0x01u : 0u) |
         ((worst >= 1)                      ? 0x02u : 0u) |
         ((worst >= 3)                      ? 0x04u : 0u)), true, now_ms, ttl());
 

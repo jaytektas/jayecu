@@ -13,11 +13,12 @@
 // frame rather than a third of the time in one lump — the difference between a limiter that bounces and
 // one that buzzes.
 //
-// AND THE TTL IS THE PULSE WIDTH. A cut is released by its signal EXPIRING (EngineTask reads
-// bus.valid(), so validity is the OR and publishing `false` would still read as a cut). ttl() is the
-// module's period PLUS grace, which is right for freshness and wrong here: at a 5 ms cadence it is 9 ms,
-// so one frame's cut would last two frames and every duty would come out roughly double. Publish a cut
-// frame with EngineModule::frame_ms() instead, so one decision is one frame.
+// AND THE TTL IS THE PULSE WIDTH. A cut is released by its signal EXPIRING: requesters publish only
+// `true`, and several may hold the same cut, so one publishing `false` must not release another's.
+// ttl() is the module's period PLUS grace, which is right for freshness and wrong here: at a 5 ms
+// cadence it is 9 ms, so one frame's cut would last two frames and every duty would come out roughly
+// double. Publish a cut frame with EngineModule::frame_ms() instead, so one decision is one frame
+// (a ttl of N expires once N ms have passed — see SignalBus::expire_stale — so it is read for N frames).
 struct CutDuty {
     float acc = 0.0f;
 

@@ -157,7 +157,7 @@ void Misfire::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& fra
 
     ncyl_ = timer_->segment_count();      // the scheduler's count, via the timer that uses it
     const float rpm = pos.rpm;
-    const bool overrun = bus.valid(wk::fuel_cut);
+    const bool overrun = bus.get_bool(wk::fuel_cut);
 
     // Speed window. Below the floor the crank is cranking or stalling and the variation is the
     // starter's; above the ceiling the segments are short enough that timing resolution and torsional

@@ -12,10 +12,10 @@
 // resizable <axis>_n scalar), the channel it reads (a SignalId selector the tuner picks), and an
 // optional enable. Reading a table is two steps: locate_site() turns the live sizes + channel values
 // into a tbl::Site (which bin on each axis, and the fraction into it), and interp_site() blends the
-// cells around it at the LIVE strides cell[z*(xn*yn) + y*xn + x]. tableresolve() is the pair, which is
-// what a value lookup wants; a module that LEARNS keeps the Site. Because both the firmware and the
-// tuning app key off the same <axis>_n, resizing an axis stays coherent: the app rewrites the cells at
-// the new stride, the firmware reads the matching stride.
+// cells around it at the ALLOCATION strides cell[z*(xa*ya) + y*xa + x]. tableresolve() is the pair,
+// which is what a value lookup wants; a module that LEARNS keeps the Site — and must address its cell
+// at the same allocation stride. Both the firmware and the tuning app stride by the allocation, so
+// resizing an axis moves no cell: <axis>_n only says how far the search runs.
 //
 // Codegen emits a <table>_desc(const <Module>Config*) builder per table; modules call
 //   tbl::table_eval(<table>_desc(cfg_), bus)
@@ -51,8 +51,12 @@ struct TableDesc {
     AxisDesc    x, y, z;
 };
 
+// Never more than the allocation. The studio holds <axis>_n to it, but the firmware takes tune bytes
+// from a raw write or a restored file on trust (CRC and layout hash only), and every search and learned
+// write is bounded by this number.
 inline int axis_live_n(const AxisDesc& a) {
-    return a.n_live ? static_cast<int>(*a.n_live) : static_cast<int>(a.n_fixed);
+    const int n = a.n_live ? static_cast<int>(*a.n_live) : static_cast<int>(a.n_fixed);
+    return (a.alloc >= 1 && n > static_cast<int>(a.alloc)) ? static_cast<int>(a.alloc) : n;
 }
 
 // The nearest bin of ONE axis of a described table. The AxisDesc already knows its breakpoints, their
