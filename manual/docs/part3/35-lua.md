@@ -80,7 +80,12 @@ long as it lasts. **Always give a time** (a few times your tick period) unless y
 value to stay: then, if the script stops, errors or is switched off, the ECU's own value comes back.
 A write with no time stays until the script writes it again, is switched off or is reloaded.
 Writing a name the ECU does not have does nothing and prints a message in the ECU console once.
-<!-- src: firmware/Scripting/ScriptEngine.cpp; firmware/Signal/SignalBus.h (PRIO_LUA, release_prio) -->
+
+**Fuel Cut** and **Ignition Cut** (`fuel_cut`, `ign_cut`) are the exception. A script can **add** a cut
+— `signalWrite("fuel_cut", 1, 50)` cuts fuel for 50 ms — but it cannot take one away: writing 0 there is
+ignored, so a script can never switch off the rev limiter or engine protection. Give a cut a time, or
+it holds until the script is switched off or reloaded.
+<!-- src: firmware/Scripting/ScriptEngine.cpp; firmware/Signal/SignalBus.h (PRIO_LUA, release_prio, set) -->
 
 **CAN**
 

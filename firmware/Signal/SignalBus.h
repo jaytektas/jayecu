@@ -89,6 +89,12 @@ public:
             return;
         }
         if (s >= SIG_COUNT || s == SIG_NONE) return;
+        // A CUT IS ONLY EVER ASKED FOR, NEVER REFUSED. fuel_cut / ign_cut hold a cut while some requester
+        // keeps writing `true`, and end when it expires. Anything else written there is dropped: a Lua
+        // signalWrite("fuel_cut", 0) or a CAN field mapped to the channel would otherwise take the slot
+        // at its priority and out-vote the rev limiter and engine protection for as long as it lasted —
+        // for ever, with no ttl. A script may add a cut; it cannot take one away.
+        if ((s == SIG_FUEL_CUT || s == SIG_IGN_CUT) && !(valid && value >= 0.5f)) return;
         SigLockGuard g(prio > PRIO_BASE);   // low-priority override: atomic RMW vs the engine task
         if (accept_(slots_[s], valid, now_ms, ttl_ms, prio))
             slots_[s].value.f = value;

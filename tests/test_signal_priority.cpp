@@ -111,6 +111,21 @@ int main() {
         CHECK_NEAR(bus.get(X), 1234.0f, 1e-6);
     }
 
+    SECTION("a cut channel takes only a TRUE: a script cannot write a cut away");
+    {
+        // fuel_cut / ign_cut hold a cut while a requester writes true. A Lua or CAN write of 0 at a
+        // higher priority used to take the slot and out-vote the rev limiter's cut; now it is dropped.
+        SignalBus bus;
+        bus.set(SIG_FUEL_CUT, 0.0f, true, T, 0, PRIO_LUA);     // a script "clearing" the cut
+        CHECK(!bus.valid(SIG_FUEL_CUT));                       // dropped: not a cut, holds nothing
+        bus.set_bool(SIG_FUEL_CUT, true, T, 5);                // the rev limiter asks for one
+        CHECK(bus.get_bool(SIG_FUEL_CUT));                     // and gets it
+        bus.set(SIG_IGN_CUT, 1.0f, true, T, 0, PRIO_LUA);      // a script may ADD a cut
+        CHECK(bus.get_bool(SIG_IGN_CUT));
+        bus.set(SIG_IGN_CUT, 0.0f, false, T, 0, PRIO_LUA);     // ...an invalid write does not end it either
+        CHECK(bus.get_bool(SIG_IGN_CUT));
+    }
+
     SECTION("an EXPIRED override is still reclaimed by an untimed writer");
     {
         // The other half of the contract: the fix must not let an override hold a slot for ever.
