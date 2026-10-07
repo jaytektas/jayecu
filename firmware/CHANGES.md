@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.7
 - A Lua script or a CAN template that writes 0 to Fuel Cut or Ignition Cut no longer cuts the engine, and it cannot switch off a cut the ECU is making either (rev limiter, engine protection): writing 0 there is ignored. Writing 1 still adds a cut. Before, any write counted as a cut, and a script write with no timeout held it until the script was reloaded.
 - The rev limiter, launch and traction control soft cuts now cut the share they report. Each cut decision was held one frame too long, so a 50% soft cut cut about 60%.
 - VVT and knock learned values stay in their own cells when the VVT coolant axis or the knock rpm axis is resized. Before, shrinking the axis moved each cam's (or each load row's) learned values into another's cells, and the studio showed different cells from the ones the ECU used. Values learned while the axis was shrunk may be in the wrong cells; clear them and let them re-learn.
