@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 600" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Which parts of the ECU and studio read each engine setting, and when a change takes effect</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .dot  { fill: #3b82c4; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .grid { stroke: #2c3038; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .dot { fill: #6aa6e0; }
+    }
+  </style>
+
+  <!-- column headers: who reads the setting -->
+  <text x="20" y="40" class="muted head">Setting</text>
+  <text x="20" y="60" class="muted">(Engine module)</text>
+
+  <rect x="344" y="18" width="112" height="56" rx="6" class="ff"/>
+  <text x="400" y="42" text-anchor="middle" class="fg head">Scheduler</text>
+  <text x="400" y="62" text-anchor="middle" class="muted">coils, injectors</text>
+  <rect x="464" y="18" width="112" height="56" rx="6" class="box"/>
+  <text x="520" y="42" text-anchor="middle" class="fg head">Output layout</text>
+  <text x="520" y="62" text-anchor="middle" class="muted">in the studio</text>
+  <rect x="584" y="18" width="112" height="56" rx="6" class="box"/>
+  <text x="640" y="42" text-anchor="middle" class="fg head">Fuel model</text>
+  <text x="640" y="62" text-anchor="middle" class="muted">air, squirts</text>
+  <rect x="704" y="18" width="112" height="56" rx="6" class="box"/>
+  <text x="760" y="42" text-anchor="middle" class="fg head">Knock</text>
+  <text x="760" y="62" text-anchor="middle" class="muted">band, sensor</text>
+  <rect x="824" y="18" width="112" height="56" rx="6" class="box"/>
+  <text x="880" y="42" text-anchor="middle" class="fg head">Engine state</text>
+  <text x="880" y="62" text-anchor="middle" class="muted">run-state</text>
+  <rect x="944" y="18" width="112" height="56" rx="6" class="safe"/>
+  <text x="1000" y="42" text-anchor="middle" class="fg head">Output gate</text>
+  <text x="1000" y="62" text-anchor="middle" class="muted">stop firing</text>
+
+  <!-- row rules -->
+  <path d="M20 96 H1056 M20 130 H1056 M20 164 H1056 M20 198 H1056 M20 232 H1056 M20 266 H1056 M20 300 H1056 M20 334 H1056 M20 368 H1056 M20 402 H1056 M20 436 H1056 M20 470 H1056" class="grid"/>
+
+  <!-- rows: setting names -->
+  <text x="20" y="118" class="fg">Cylinders</text>
+  <text x="20" y="152" class="fg">Engine Cycle</text>
+  <text x="20" y="186" class="fg">Firing Order</text>
+  <text x="20" y="220" class="fg">Odd-Fire Engine · TDC Angle</text>
+  <text x="20" y="254" class="fg">Bank (per cylinder)</text>
+  <text x="20" y="288" class="fg">Ignition Mode</text>
+  <text x="20" y="322" class="fg">Injection Stages, Mode, Per Cycle</text>
+  <text x="20" y="356" class="fg">Injector Timing Method</text>
+  <text x="20" y="390" class="fg">Displacement · Bore</text>
+  <text x="20" y="424" class="fg">Cranking Threshold</text>
+  <text x="20" y="458" class="fg">Ignition / Injector Outputs</text>
+
+  <!-- dots: read by (row y centre = rule + 17) -->
+  <!-- Cylinders: scheduler, layout, fuel, knock -->
+  <circle cx="400" cy="113" r="7" class="dot"/><circle cx="520" cy="113" r="7" class="dot"/>
+  <circle cx="640" cy="113" r="7" class="dot"/><circle cx="760" cy="113" r="7" class="dot"/>
+  <!-- Engine Cycle: scheduler, layout, fuel -->
+  <circle cx="400" cy="147" r="7" class="dot"/><circle cx="520" cy="147" r="7" class="dot"/>
+  <circle cx="640" cy="147" r="7" class="dot"/>
+  <!-- Firing Order: scheduler -->
+  <circle cx="400" cy="181" r="7" class="dot"/>
+  <!-- Odd-fire / TDC: scheduler -->
+  <circle cx="400" cy="215" r="7" class="dot"/>
+  <!-- Bank: scheduler, fuel, knock -->
+  <circle cx="400" cy="249" r="7" class="dot"/><circle cx="640" cy="249" r="7" class="dot"/>
+  <circle cx="760" cy="249" r="7" class="dot"/>
+  <!-- Ignition Mode: scheduler, layout -->
+  <circle cx="400" cy="283" r="7" class="dot"/><circle cx="520" cy="283" r="7" class="dot"/>
+  <!-- Injection stages: scheduler, layout, fuel -->
+  <circle cx="400" cy="317" r="7" class="dot"/><circle cx="520" cy="317" r="7" class="dot"/>
+  <circle cx="640" cy="317" r="7" class="dot"/>
+  <!-- Injector timing: scheduler -->
+  <circle cx="400" cy="351" r="7" class="dot"/>
+  <!-- Displacement / bore: fuel (displacement), knock (bore) -->
+  <circle cx="640" cy="385" r="7" class="dot"/><circle cx="760" cy="385" r="7" class="dot"/>
+  <!-- Cranking threshold: engine state -->
+  <circle cx="880" cy="419" r="7" class="dot"/>
+  <!-- Outputs gateways: output gate -->
+  <circle cx="1000" cy="453" r="7" class="dot"/>
+
+  <!-- when it takes effect -->
+  <text x="20" y="508" class="muted head">A change takes effect</text>
+  <rect x="344" y="486" width="112" height="56" rx="6" class="ff"/>
+  <text x="400" y="510" text-anchor="middle" class="fg">next time the</text>
+  <text x="400" y="530" text-anchor="middle" class="fg">engine stops</text>
+  <rect x="464" y="486" width="112" height="56" rx="6" class="box"/>
+  <text x="520" y="510" text-anchor="middle" class="fg">as you</text>
+  <text x="520" y="530" text-anchor="middle" class="fg">edit</text>
+  <rect x="584" y="486" width="112" height="56" rx="6" class="box"/>
+  <text x="640" y="520" text-anchor="middle" class="fg">at once</text>
+  <rect x="704" y="486" width="112" height="56" rx="6" class="box"/>
+  <text x="760" y="520" text-anchor="middle" class="fg">at once</text>
+  <rect x="824" y="486" width="112" height="56" rx="6" class="box"/>
+  <text x="880" y="510" text-anchor="middle" class="fg">after the ECU</text>
+  <text x="880" y="530" text-anchor="middle" class="fg">restarts</text>
+  <rect x="944" y="486" width="112" height="56" rx="6" class="safe"/>
+  <text x="1000" y="520" text-anchor="middle" class="fg">at once</text>
+
+  <text x="20" y="580" class="muted">A dot means that part reads the setting. Vehicle Identity is read by nothing: it is a label for the tune.</text>
+</svg>

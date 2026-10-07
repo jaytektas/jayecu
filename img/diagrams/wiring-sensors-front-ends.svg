@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 850" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>What sits behind each kind of sensor input on the jaytek_v1 board</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1.5; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: none; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 8 5; }
+    .ecufill { fill: #f4f5f7; }
+    .part { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pin  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2.5; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2.5; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2.5; fill: none; }
+    .wout { stroke: #5f6670; stroke-width: 7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .shield { stroke: #8d939b; stroke-width: 2; fill: none; stroke-dasharray: 3 3; }
+    .node { fill: #5f6670; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .part { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { stroke: #9aa1ab; } .ecufill { fill: #1c1f25; }
+      .tgt, .pin { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .wout { stroke: #9aa1ab; } .node { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+  <rect x="212" y="14" width="773" height="828" rx="8" class="ecufill"/>
+  <rect x="212" y="14" width="773" height="828" rx="8" class="ecu"/>
+  <text x="975" y="36" text-anchor="end" class="muted">Inside the ECU (simplified)</text>
+  <text x="228" y="44" text-anchor="start" class="fg head">1 · Analogue voltage inputs AV1–AV16</text>
+  <rect x="30" y="88" width="160" height="44" rx="4" class="pin"/>
+  <text x="110.0" y="107" text-anchor="middle" class="fg head mono">CN3-27</text>
+  <text x="110.0" y="124" text-anchor="middle" class="muted mono">AV1, for example</text>
+  <path d="M190 110 H308" class="line"/>
+  <circle cx="250" cy="110" r="4" class="node"/>
+  <path d="M250 110 V128" class="line"/>
+  <rect x="242" y="128.0" width="16" height="36" rx="2" class="part"/>
+  <text x="264" y="151" text-anchor="start" class="muted small">470 kΩ</text>
+  <path d="M250 164 V168" class="line"/>
+  <path d="M250 168 V176 M238 176 H262 M242 181 H258 M246 186 H254" class="line"/>
+  <rect x="308.0" y="102" width="44" height="16" rx="2" class="part"/>
+  <text x="330" y="96" text-anchor="middle" class="muted small">10 kΩ</text>
+  <path d="M352 110 H598" class="line" marker-end="url(#a)"/>
+  <circle cx="420" cy="110" r="4" class="node"/>
+  <path d="M420 110 V140" class="line"/>
+  <path d="M408 140 H432 M408 148 H432" class="line"/>
+  <text x="436" y="149" text-anchor="start" class="muted small">100 nF</text>
+  <path d="M420 148 V160" class="line"/>
+  <path d="M420 160 V168 M408 168 H432 M412 173 H428 M416 178 H424" class="line"/>
+  <circle cx="530" cy="110" r="4" class="node"/>
+  <path d="M530 110 V134" class="line"/>
+  <rect x="490" y="134" width="80" height="28" rx="4" class="part"/>
+  <text x="530" y="153" text-anchor="middle" class="muted small">clamp</text>
+  <rect x="600" y="83.0" width="150" height="54" rx="6" class="tgt"/>
+  <text x="675" y="106" text-anchor="middle" class="fg">Buffer</text>
+  <text x="675" y="125" text-anchor="middle" class="muted small">scaled for the ADC</text>
+  <path d="M750 110 H788" class="line" marker-end="url(#a)"/>
+  <rect x="790" y="80" width="180" height="60" rx="6" class="box"/>
+  <text x="880" y="102" text-anchor="middle" class="fg small">Reported 0–5.000 V</text>
+  <text x="880" y="120" text-anchor="middle" class="muted small">Open pin reads ≈ 0 V</text>
+  <text x="228" y="214" text-anchor="start" class="fg head">2 · Temperature inputs AT1–AT4</text>
+  <rect x="30" y="278" width="160" height="44" rx="4" class="pin"/>
+  <text x="110.0" y="297" text-anchor="middle" class="fg head mono">CN3-14</text>
+  <text x="110.0" y="314" text-anchor="middle" class="muted mono">AT1, for example</text>
+  <path d="M190 300 H308" class="line"/>
+  <circle cx="250" cy="300" r="4" class="node"/>
+  <path d="M250 300 V282" class="line"/>
+  <rect x="242" y="242.0" width="16" height="40" rx="2" class="part"/>
+  <text x="264" y="267" text-anchor="start" class="muted small">2.7 kΩ pull-up</text>
+  <path d="M250 242 V234" class="line"/>
+  <path d="M236 234 H264" class="line"/>
+  <text x="270" y="239" text-anchor="start" class="muted small">5V Sensor 1</text>
+  <rect x="308.0" y="292" width="44" height="16" rx="2" class="part"/>
+  <text x="330" y="286" text-anchor="middle" class="muted small">10 kΩ</text>
+  <path d="M352 300 H598" class="line" marker-end="url(#a)"/>
+  <circle cx="420" cy="300" r="4" class="node"/>
+  <path d="M420 300 V330" class="line"/>
+  <path d="M408 330 H432 M408 338 H432" class="line"/>
+  <text x="436" y="339" text-anchor="start" class="muted small">100 nF</text>
+  <path d="M420 338 V350" class="line"/>
+  <path d="M420 350 V358 M408 358 H432 M412 363 H428 M416 368 H424" class="line"/>
+  <circle cx="530" cy="300" r="4" class="node"/>
+  <path d="M530 300 V324" class="line"/>
+  <rect x="490" y="324" width="80" height="28" rx="4" class="part"/>
+  <text x="530" y="343" text-anchor="middle" class="muted small">clamp</text>
+  <rect x="600" y="273.0" width="150" height="54" rx="6" class="tgt"/>
+  <text x="675" y="296" text-anchor="middle" class="fg">Buffer</text>
+  <text x="675" y="315" text-anchor="middle" class="muted small">scaled for the ADC</text>
+  <path d="M750 300 H788" class="line" marker-end="url(#a)"/>
+  <rect x="790" y="270" width="180" height="60" rx="6" class="box"/>
+  <text x="880" y="292" text-anchor="middle" class="fg small">Reported 0–5.000 V</text>
+  <text x="880" y="310" text-anchor="middle" class="muted small">Open pin reads ≈ 5 V</text>
+  <text x="228" y="384" text-anchor="start" class="fg head">3 · Digital inputs DIG1–DIG8</text>
+  <rect x="30" y="458" width="160" height="44" rx="4" class="pin"/>
+  <text x="110.0" y="477" text-anchor="middle" class="fg head mono">CN3-23</text>
+  <text x="110.0" y="494" text-anchor="middle" class="muted mono">DIG1, for example</text>
+  <path d="M190 480 H318" class="line"/>
+  <circle cx="240" cy="480" r="4" class="node"/>
+  <circle cx="290" cy="480" r="4" class="node"/>
+  <path d="M240 480 V462" class="line"/>
+  <rect x="232" y="422.0" width="16" height="40" rx="2" class="part"/>
+  <text x="254" y="447" text-anchor="start" class="muted small">2.7 kΩ pull-up</text>
+  <path d="M240 422 V414" class="line"/>
+  <path d="M226 414 H254" class="line"/>
+  <text x="260" y="419" text-anchor="start" class="muted small">5V Sensor 1</text>
+  <path d="M290 480 V510" class="line"/>
+  <path d="M278 510 H302 M278 518 H302" class="line"/>
+  <text x="306" y="519" text-anchor="start" class="muted small">1 nF</text>
+  <path d="M290 518 V530" class="line"/>
+  <path d="M290 530 V538 M278 538 H302 M282 543 H298 M286 548 H294" class="line"/>
+  <rect x="318.0" y="472" width="44" height="16" rx="2" class="part"/>
+  <text x="340" y="466" text-anchor="middle" class="muted small">2.7 kΩ</text>
+  <path d="M362 480 H598" class="line" marker-end="url(#a)"/>
+  <circle cx="430" cy="480" r="4" class="node"/>
+  <path d="M430 480 V510" class="line"/>
+  <path d="M418 510 H442 M418 518 H442" class="line"/>
+  <text x="446" y="519" text-anchor="start" class="muted small">1 nF</text>
+  <path d="M430 518 V530" class="line"/>
+  <path d="M430 530 V538 M418 538 H442 M422 543 H438 M426 548 H434" class="line"/>
+  <rect x="600" y="453.0" width="150" height="54" rx="6" class="tgt"/>
+  <text x="675" y="476" text-anchor="middle" class="fg">Schmitt buffer</text>
+  <text x="675" y="495" text-anchor="middle" class="muted small">clean logic level</text>
+  <path d="M750 480 H788" class="line" marker-end="url(#a)"/>
+  <rect x="790" y="450" width="180" height="60" rx="6" class="box"/>
+  <text x="880" y="472" text-anchor="middle" class="fg small">Level, edges, SENT</text>
+  <text x="880" y="490" text-anchor="middle" class="muted small">Open pin reads high (1)</text>
+  <text x="228" y="570" text-anchor="start" class="fg head">4 · VR inputs VR1, VR2 (differential)</text>
+  <rect x="30" y="606" width="160" height="44" rx="4" class="pin"/>
+  <text x="110.0" y="625" text-anchor="middle" class="fg head mono">CN3-6</text>
+  <text x="110.0" y="642" text-anchor="middle" class="muted mono">VR1+</text>
+  <rect x="30" y="664" width="160" height="44" rx="4" class="pin"/>
+  <text x="110.0" y="683" text-anchor="middle" class="fg head mono">CN3-7</text>
+  <text x="110.0" y="700" text-anchor="middle" class="muted mono">VR1−</text>
+  <path d="M190 621 H268" class="line"/>
+  <rect x="268" y="613" width="44" height="16" rx="2" class="part"/>
+  <path d="M312 621 H348" class="line"/>
+  <rect x="348" y="613" width="44" height="16" rx="2" class="part"/>
+  <path d="M392 621 H598" class="line" marker-end="url(#a)"/>
+  <path d="M190 679 H268" class="line"/>
+  <rect x="268" y="671" width="44" height="16" rx="2" class="part"/>
+  <path d="M312 679 H348" class="line"/>
+  <rect x="348" y="671" width="44" height="16" rx="2" class="part"/>
+  <path d="M392 679 H598" class="line" marker-end="url(#a)"/>
+  <text x="330" y="605" text-anchor="middle" class="muted small">4.7 kΩ + 4.7 kΩ in each leg</text>
+  <circle cx="470" cy="621" r="4" class="node"/>
+  <circle cx="470" cy="679" r="4" class="node"/>
+  <path d="M470 621 V646 M470 654 V679" class="line"/>
+  <path d="M458 646 H482 M458 654 H482" class="line"/>
+  <text x="490" y="655" text-anchor="start" class="muted small">1 nF</text>
+  <rect x="600" y="602" width="150" height="96" rx="6" class="tgt"/>
+  <text x="675" y="644" text-anchor="middle" class="fg">VR interface</text>
+  <text x="675" y="663" text-anchor="middle" class="muted small mono">MAX9924</text>
+  <path d="M750 650 H788" class="line" marker-end="url(#a)"/>
+  <rect x="790" y="620" width="180" height="60" rx="6" class="box"/>
+  <text x="880" y="642" text-anchor="middle" class="fg small">One edge per tooth</text>
+  <text x="880" y="660" text-anchor="middle" class="muted small">at the zero crossing</text>
+  <text x="228" y="742" text-anchor="start" class="fg head">5 · Knock inputs KNOCK1, KNOCK2</text>
+  <rect x="30" y="768" width="160" height="44" rx="4" class="pin"/>
+  <text x="110.0" y="787" text-anchor="middle" class="fg head mono">CN4-23</text>
+  <text x="110.0" y="804" text-anchor="middle" class="muted mono">KNOCK1</text>
+  <path d="M190 790 H326" class="line"/>
+  <path d="M326 778 V802 M334 778 V802" class="line"/>
+  <text x="330" y="772" text-anchor="middle" class="muted small">3.3 nF: AC coupling</text>
+  <path d="M334 790 H598" class="line" marker-end="url(#a)"/>
+  <rect x="600" y="763.0" width="150" height="54" rx="6" class="tgt"/>
+  <text x="675" y="786" text-anchor="middle" class="fg">Amplifier</text>
+  <text x="675" y="805" text-anchor="middle" class="muted small">to the ADC</text>
+  <path d="M750 790 H788" class="line" marker-end="url(#a)"/>
+  <rect x="790" y="764" width="180" height="52" rx="6" class="box"/>
+  <text x="880" y="785" text-anchor="middle" class="fg small">Sampled in bursts</text>
+  <text x="880" y="803" text-anchor="middle" class="muted small">in each knock window</text>
+</svg>

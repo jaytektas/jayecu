@@ -1,0 +1,4106 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/18-outputs.html">
+      
+      
+        <link rel="prev" href="17-sensors.html">
+      
+      
+        <link rel="next" href="19-fuel.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>18 Outputs and the pin system - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#outputs-and-the-pin-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              18 Outputs and the pin system
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="18-outputs.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-who-drives-each-pin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Who drives each pin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-what-a-generic-output-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · What a Generic output does
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-candidates-how-a-modules-demand-reaches-a-pin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Candidates: how a module's demand reaches a pin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-the-gate-on-off-and-the-timers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · The gate: on, off and the timers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-when-changes-take-effect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · When changes take effect
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting it up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-check-the-coil-and-injector-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Check the coil and injector layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-give-a-pin-a-job" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Give a pin a job
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-driving-kind-polarity-frequency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Driving: Kind, polarity, frequency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-the-wizard-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — The wizard (templates)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-how-much-the-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — How Much: the value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-when-the-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — When: the conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-template-numbers-and-timing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Template Numbers and Timing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-shaping-and-what-the-output-is-doing-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 — Shaping, and what the output is doing now
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-9-the-frequency-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 9 — The Frequency page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-10-test-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 10 — Test it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="outputs-and-the-pin-system">Outputs and the pin system<a class="headerlink" href="#outputs-and-the-pin-system" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> every output pin on the ECU has one row in the tune that says what the pin
+does: fire a coil, open an injector, or drive a load such as a pump, fan or solenoid from
+conditions and a value you choose.</p>
+</blockquote>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>The ECU has 42 output pins you can wire to: twelve ignition outputs (<strong>IGN1–IGN12</strong>), twenty-two
+low-side outputs (<strong>LS1–LS22</strong>) and eight high-side outputs (<strong>HS1–HS8</strong>). A low-side output switches
+the load's ground; a high-side output switches its supply. Chapter 12 covers how to wire each kind.</p>
+<!-- src: definition/boards/jaytek_v1.board.yaml (IGN, LS, HS pins); definition/ecu.schema.yaml -->
+
+<p>In the tune, each of those pins has <strong>one row</strong>, in board order: the twelve IGN pins first, then the
+twenty-two LS pins, then the eight HS pins. A row's <strong>Function</strong> says what its pin does:</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What the pin does</th>
+<th>Which pins can do it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>None</strong></td>
+<td>Nothing. The pin is not driven.</td>
+<td>all</td>
+</tr>
+<tr>
+<td><strong>Ignition</strong></td>
+<td>Fires a coil for the cylinder the row names.</td>
+<td>IGN pins only</td>
+</tr>
+<tr>
+<td><strong>Injector</strong></td>
+<td>Opens an injector for the cylinder the row names.</td>
+<td>LS pins only</td>
+</tr>
+<tr>
+<td><strong>Generic</strong></td>
+<td>Drives a load from its own conditions and value: a fuel pump, a fan, a boost solenoid, a tachometer.</td>
+<td>all</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/ecu.schema.yaml (function); codegen/codegen.py (per-pin function options: IGN [0,1,3], LS [0,2,3], HS [0,3]) -->
+
+<p>Because a row <em>is</em> its pin, one pin can never be given two jobs. This is the <strong>pin system</strong>: the tune
+says what each pin does, and the ECU makes sure only one part of the firmware drives each pin.</p>
+<p>You do not normally set the coil and injector rows yourself. When you set the cylinder count, engine
+cycle, ignition mode or injection stages (chapter 15), the studio lays them out for you. What you do set up here is
+everything else: every pump, fan, relay, valve and gauge the ECU drives.</p>
+<!-- src: apps/studio-jf/src/model/EngineOutputLayout.h; apps/studio-jf/src/model/EngineOutputLayout.cpp -->
+
+<p>Boost control, idle control, cam control and other modules work out <em>how much</em> they want (a
+wastegate duty, an idle valve duty). They do not own a pin. A Generic output delivers that demand to
+the pin you wired the valve to. This chapter shows how.</p>
+<p>The two H-bridges (<strong>Half Bridge A</strong> and <strong>B</strong>) are not rows. They are owned by the H-bridge module and
+set up with the electronic throttle and idle stepper (chapters 21 and 22).</p>
+<!-- src: definition/ecu.schema.yaml -->
+
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="1-who-drives-each-pin">1 · Who drives each pin<a class="headerlink" href="#1-who-drives-each-pin" title="Permanent link">&para;</a></h3>
+<figure>
+<p><img alt="The 42 output rows in board order, the owner each Function hands the pin to, and the pin arbiter underneath" src="../img/diagrams/outputs-rows.svg" />
+  </p>
+<figcaption>Figure 18.1 — Each row's Function decides which part of the firmware drives its pin.
+  Every claim goes through the pin arbiter, which allows one owner per pin and leaves every unowned
+  pin undriven.</figcaption>
+</figure>
+<ul>
+<li><strong>Ignition and Injector rows</strong> belong to the firing scheduler. It fires exactly what the rows say.
+  It does not invent outputs or move them. A cylinder no row names gets no spark or no fuel, and the
+  ECU raises a trouble code for it (see <em>Diagnostics</em>).</li>
+<li><strong>Generic rows</strong> belong to the output manager, which runs each one every millisecond (Figure 18.2).</li>
+<li><strong>None rows</strong> are left alone. The pin stays high-impedance: not driven high, not driven low.
+  <!-- src: firmware/Scheduler/OutputMap.h; firmware/Integration/OutputManager.h; firmware/Scheduler/PinArbiter.h; firmware/Engine/EngineTask.cpp (OUTPUT phase at 1 kHz) -->
+</li>
+</ul>
+<p>Every owner claims its pin from the <strong>pin arbiter</strong> first. The arbiter keeps one owner per pin. A pin
+nobody owns, or that an owner lets go of, is forced back to high-impedance. A claim for a pin that
+someone else still holds is refused: the output is not built at all, and the ECU sets <strong>P1650</strong>. A pin
+can only have one Function, so this happens only when you change a coil or injector row to Generic while
+the engine runs: the firing scheduler keeps the pin until the engine stops (see <em>When changes take
+effect</em> below).</p>
+<!-- src: firmware/Scheduler/PinArbiter.h; firmware/Integration/OutputManager.cpp -->
+
+<div class="admonition info">
+<p class="admonition-title">Advanced — the output test is an owner too</p>
+<p>The bench output test borrows a pin from whoever holds it, drives it, and hands it back to the same
+owner when it finishes. It does this only while the engine is stopped. Handing a coil back to
+"nobody" would leave that cylinder without spark on the next start.
+<!-- src: firmware/Scheduler/PinArbiter.h; firmware/Engine/Modules/OutputTest.cpp --></p>
+</div>
+<h3 id="2-what-a-generic-output-does">2 · What a Generic output does<a class="headerlink" href="#2-what-a-generic-output-does" title="Permanent link">&para;</a></h3>
+<p>A Generic output answers three questions every millisecond: <strong>is it on</strong>, <strong>how much</strong>, and <strong>at what
+frequency</strong>.</p>
+<figure>
+<p><img alt="Signal path of a Generic output: the gate from the two conditions, the value source, the failsafe, shaping, then Kind and the pin" src="../img/diagrams/outputs-generic-path.svg" />
+  </p>
+<figcaption>Figure 18.2 — One Generic output, every millisecond. Blue is what you ask for, orange is
+  what is driven, red is the failsafe. The gate decides whether it is on; Value From decides how much.
+  </figcaption>
+</figure>
+<p><strong>Is it on?</strong> Two conditions, <strong>Turn On When</strong> and <strong>Turn Off When</strong>, are expressions such as
+<code>clt &gt; 95</code>. They feed a <strong>gate</strong> that remembers its state and applies the timing rules (Figure 18.3).
+If both conditions are empty, the output has no gate: it is always on, and its value alone decides what
+the pin does.</p>
+<!-- src: firmware/Integration/OutputManager.cpp -->
+
+<p><strong>How much?</strong> <strong>Value From</strong> picks one source:</p>
+<ul>
+<li><strong>Candidates</strong>: bus channels that modules publish, such as <strong>Wastegate Duty</strong> <code>wastegate_duty</code>
+  (section 3).</li>
+<li><strong>Table</strong>: a table you name, read at its own axes. The eight Generic Tables exist for this
+  (chapter 34).</li>
+<li><strong>Fixed</strong>: a constant, such as 100 % for a relay.</li>
+<li><strong>Expression</strong>: a formula whose number is the duty, such as <code>clt * 2 - 100</code>.
+  <!-- src: firmware/Integration/OutputManager.cpp; definition/ecu.schema.yaml -->
+</li>
+</ul>
+<p>While the gate is <strong>closed</strong>, the output ignores its source and sends <strong>Clamp Low</strong> instead. A closed
+gate does not even read its candidates, so no module can push an output on that its conditions say is
+off.</p>
+<!-- src: firmware/Pipeline/OutputStages.h; firmware/Integration/OutputManager.cpp -->
+
+<p>The value then goes through <strong>Shaping</strong>: it is multiplied by <strong>Scale</strong>, <strong>Offset</strong> is added, and the
+result is held between <strong>Clamp Low</strong> and <strong>Clamp High</strong>. What comes out is the <strong>command</strong>.</p>
+<!-- src: firmware/Pipeline/OutputStages.h; firmware/Integration/OutputManager.cpp -->
+
+<p><strong>At what frequency, and what level?</strong> <strong>Kind</strong> decides how the command reaches the pin:</p>
+<ul>
+<li><strong>PWM</strong>: the command is a duty cycle in per cent, switched at the output's carrier frequency. The
+  carrier can be fixed, looked up in a table, or computed (the <strong>Frequency</strong> page).</li>
+<li><strong>Digital</strong>: the pin is on or off. It is <strong>on when the command is at least halfway between Clamp
+  Low and Clamp High</strong>. With the default clamps (0 and 100 %) that is 50 %.
+  <!-- src: firmware/Integration/OutputManager.cpp; firmware/Integration/EmitSinks.h -->
+</li>
+</ul>
+<p><strong>Active High</strong> sets which electrical level means "on". The live command is published as a channel for
+each pin (<strong>IGN1</strong> <code>out_1</code> … <strong>HS8</strong> <code>out_42</code>), so you can watch and log every output.</p>
+<!-- src: firmware/Integration/OutputManager.cpp; definition/ecu.schema.yaml -->
+
+<h3 id="3-candidates-how-a-modules-demand-reaches-a-pin">3 · Candidates: how a module's demand reaches a pin<a class="headerlink" href="#3-candidates-how-a-modules-demand-reaches-a-pin" title="Permanent link">&para;</a></h3>
+<p>A module that wants an actuator moved publishes a <strong>demand</strong> on the bus. For example, Boost publishes
+<strong>Wastegate Duty</strong> <code>wastegate_duty</code>, and Idle publishes <strong>Idle Duty</strong> <code>idle_duty</code>. A Generic output with
+<strong>Value From</strong> set to <em>Candidates</em> lists up to four channels, each with a <strong>Role</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Primary</strong></td>
+<td>Makes the request. If more than one primary is valid, <strong>Primary Policy</strong> combines them: <em>First</em> (the first valid one, in list order), <em>Average</em>, <em>Minimum</em> or <em>Maximum</em>.</td>
+</tr>
+<tr>
+<td><strong>Limit</strong></td>
+<td>Clamps the result <strong>down</strong>. The lowest valid limit wins, so a limit can hold the output back but never push it up.</td>
+</tr>
+<tr>
+<td><strong>Override</strong></td>
+<td>Replaces everything. The first valid override wins.</td>
+</tr>
+</tbody>
+</table>
+<p>The order is fixed: primaries first, then limits, then overrides. The role alone decides who has
+authority; where a candidate sits in the list only matters between primaries under <em>First</em>, and
+between overrides.</p>
+<!-- src: firmware/Pipeline/OutputStages.h; definition/ecu.schema.yaml -->
+
+<p><strong>Valid</strong> is the key word. A channel is valid while its module keeps publishing it. A module with
+nothing to say stops publishing, and its candidate is then skipped. It is not read as zero. For
+example, Boost publishes nothing below its activation RPM and pressure. <strong>If no candidate is valid,
+the output sends its Failsafe value.</strong></p>
+<!-- src: firmware/Engine/Modules/Boost.cpp; firmware/Pipeline/OutputStages.h -->
+
+<div class="admonition example">
+<p class="admonition-title">How the roles combine</p>
+<p>Four candidates: primary A = 40 %, primary B = 55 %, limit L = 50 %, override O.</p>
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Policy <em>First</em>, O not valid</td>
+<td>40 % (A; L does not reduce it)</td>
+</tr>
+<tr>
+<td>Policy <em>Maximum</em>, O not valid</td>
+<td>50 % (B would be 55, L clamps it to 50)</td>
+</tr>
+<tr>
+<td>O valid and reading 0 %</td>
+<td>0 % (the override replaces the lot)</td>
+</tr>
+<tr>
+<td>No candidate valid</td>
+<td>the Failsafe value</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Advanced — a limit with no valid primary</p>
+<p>The starting value is the Failsafe. If no primary is valid but a limit is, the result is the
+Failsafe or the limit, whichever is lower. An override that is always published (a 0/1 flag that
+every frame reads 0 or 1) is always valid, so it always replaces everything. An override is useful
+only for a channel that goes quiet when it has nothing to say.
+<!-- src: firmware/Pipeline/OutputStages.h --></p>
+</div>
+<h3 id="4-the-gate-on-off-and-the-timers">4 · The gate: on, off and the timers<a class="headerlink" href="#4-the-gate-on-off-and-the-timers" title="Permanent link">&para;</a></h3>
+<figure>
+<p><img alt="Gate state machine: OFF, ON and LOCKED OUT, with the conditions and timers on each arrow" src="../img/diagrams/outputs-gate.svg" />
+  </p>
+<figcaption>Figure 18.3 — The gate. Two conditions give hysteresis; the minimum times stop chatter;
+  the maximum on time and re-arm delay bound anything that must not run for ever.</figcaption>
+</figure>
+<ul>
+<li><strong>Two conditions give hysteresis.</strong> A fan that turns on above 95 °C and off below 90 °C keeps its
+  state between the two. With only <strong>Turn On When</strong>, the output turns off as soon as the condition
+  stops being true.</li>
+<li><strong>Minimum On Time / Minimum Off Time</strong>: once the output changes state, it holds that state at least
+  this long.</li>
+<li><strong>Maximum On Time</strong> (0 = no limit): after this long on, the output turns off <strong>whatever the
+  conditions say</strong> and is locked out for the <strong>Re-Arm Delay</strong>. It is checked before anything else.
+  <!-- src: firmware/Integration/OutputGate.h; firmware/Integration/OutputManager.cpp -->
+</li>
+</ul>
+<p><strong>If Unanswerable</strong> decides what happens when a condition cannot be worked out, for example because it
+reads a sensor that has failed or was never wired. <em>Off</em> turns the output off, <em>On</em> turns it on, <em>Hold</em>
+keeps its last state. A cooling fan should fail <em>On</em>; a starter or fuel pump should fail <em>Off</em>.</p>
+<!-- src: firmware/Integration/OutputGate.h; firmware/Integration/OutputManager.cpp; definition/ecu.schema.yaml -->
+
+<h3 id="5-when-changes-take-effect">5 · When changes take effect<a class="headerlink" href="#5-when-changes-take-effect" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>Coil and injector rows</strong> (Function, Cylinder, Stage, Plug, Active High) take effect at the <strong>next
+  engine stop</strong>. A row edited while the engine runs changes nothing until then.
+  <!-- src: firmware/main.cpp; firmware/Scheduler/EnginePositionHal.h; firmware/Scheduler/OutputMap.h --></p>
+</li>
+<li>
+<p><strong>Generic rows</strong> take effect <strong>at once</strong>. Any edit to any Outputs setting rebuilds every Generic
+  output: each pin is released, forced undriven, and claimed again. Edits elsewhere in the tune (a
+  fuel cell, a boost table) do not touch the outputs.
+  <!-- src: firmware/Integration/OutputManager.h; firmware/Integration/OutputManager.cpp --></p>
+</li>
+<li>
+<p><strong>Key off:</strong> while battery voltage is below the key-on threshold (on above 8.0 V, off at 7.0 V or below),
+  every Generic output is released and left undriven. On USB power alone, nothing is driven. The
+  outputs are rebuilt when the key comes back.
+  <!-- src: firmware/Integration/OutputManager.cpp; firmware/Sensors/Sensors.h; firmware/Sensors/Sensors.cpp -->
+</p>
+</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Advanced — a rebuild starts every gated output from OFF</p>
+<p>After a rebuild or key-on, an output that has conditions starts <strong>off</strong>, and its <strong>Minimum Off
+Time</strong> starts counting then. A fan with a 5 s minimum off time therefore stays off for 5 s after
+any Outputs edit. An output with no conditions is on at once.
+<!-- src: firmware/Integration/OutputManager.cpp; firmware/Integration/OutputGate.h --></p>
+</div>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>You need:</p>
+<ul>
+<li>
+<p><strong>The loads wired</strong>, each to a pin that can drive it (chapter 12). The pin page shows which connector
+  and connector pin each output is on: LS5 is <strong>CN2 pin 5</strong>, for example.
+  <!-- src: definition/boards/jaytek_v1.board.yaml (CN2) (CN4); apps/studio-jf/src/surface/widgets/PinWireWidget.cpp --></p>
+</li>
+<li>
+<p><strong>The engine basics set</strong> (chapter 15): cylinder count, engine cycle, <strong>Ignition Mode</strong> and the
+  injection stages. These lay out your coil and injector rows.</p>
+</li>
+<li><strong>The sensors your conditions read</strong>, configured (chapter 17). A fan needs coolant temperature; a
+  starter button needs its switch input.</li>
+<li><strong>The modules whose demands you deliver</strong>, configured: Boost (chapter 24), Idle (chapter 21), cam
+  control (chapter 25), and so on.</li>
+</ul>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>The Outputs pages are under <strong>Configuration ▸ Electrical ▸ Outputs</strong>. The <strong>Outputs</strong> page shows every
+pin at once. Each pin also has its own page (<strong>Outputs ▸ LS5</strong>) with a <strong>Frequency</strong> page under it.</p>
+<h3 id="step-1-check-the-coil-and-injector-layout">Step 1 — Check the coil and injector layout<a class="headerlink" href="#step-1-check-the-coil-and-injector-layout" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Set the cylinder count, <strong>Ignition Mode</strong> and injection stages (chapter 15).</li>
+<li>Open <strong>Configuration ▸ Electrical ▸ Outputs</strong> (Figure 18.4). The studio has laid out the coils and
+   injectors by cylinder number.</li>
+<li>Check each coil and injector row against your wiring. To change one, pick its <strong>Function</strong> and
+   <strong>Cylinder</strong> here, or on the pin's own page.</li>
+</ol>
+<figure>
+<p><img alt="The Outputs page: every pin with its Function, Cylinder and live command" src="../img/studio/outputs-overview.png" />
+  </p>
+<figcaption>Figure 18.4 — The Outputs page for a 4-cylinder engine on coil-on-plug: IGN1–4 are the
+  coils, LS1–4 the injectors. LS5 (boost solenoid), LS6 (fan) and HS1 (fuel pump) are Generic. The
+  right-hand column is each pin's live command; a Digital output shows its level.</figcaption>
+</figure>
+<p>The standard layout is by cylinder number. The firing order never moves an output:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Rows it lays out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coil-on-Plug</td>
+<td>IGN<em>n</em> fires cylinder <em>n</em></td>
+</tr>
+<tr>
+<td>Wasted Spark</td>
+<td>one coil per pair of cylinders, named by the lower cylinder of the pair, in cylinder order. On a 1-3-4-2 four, IGN1 = cylinder 1 (with 4), IGN2 = cylinder 2 (with 3).</td>
+</tr>
+<tr>
+<td>Single Coil (distributor)</td>
+<td>IGN1 = All Cylinders</td>
+</tr>
+<tr>
+<td>Rotary</td>
+<td>IGN<em>r</em> leading and IGN(4 + <em>r</em>) trailing for rotor <em>r</em>; with Single Coil, IGN1 (leading) and IGN5 (trailing) = All</td>
+</tr>
+<tr>
+<td>Injectors</td>
+<td>one block of LS pins per stage, starting at LS1. Sequential, Semi-Sequential and Sequential-Any-Sync stages get one injector per cylinder; a Bank stage splits its injectors between the banks; a Multi-Point stage's injectors are all <em>All Cylinders</em>.</td>
+</tr>
+</tbody>
+</table>
+<!-- src: apps/studio-jf/src/model/EngineOutputLayout.h; apps/studio-jf/src/model/EngineOutputLayout.cpp -->
+
+<p>The studio re-lays the rows only when you change one of those settings. After that you can edit any
+row by hand, and it stays as you left it. A pin that is already Generic is never taken: if the layout
+wants it, that coil or injector moves to the next free pin of its class.</p>
+<!-- src: apps/studio-jf/src/model/EngineOutputLayout.cpp (place) (triggers) (apply, install) -->
+
+<div class="admonition note">
+<p class="admonition-title">Wasted spark pairs are found at run time</p>
+<p>Under wasted spark, a coil row names one cylinder, and the ECU also fires the cylinder half a
+cycle away from it. It works that companion out from the firing order each time it applies the
+tune, so changing the firing order re-pairs the coils without moving any output.
+<!-- src: definition/ecu.schema.yaml (ign_mode help) (cylinder) --></p>
+</div>
+<figure>
+<p><img alt="The IGN1 pin page with Function set to Ignition and Cylinder 1" src="../img/studio/outputs-pin-coil.png" />
+  </p>
+<figcaption>Figure 18.5 — A coil row on its own page. Cylinder is the only choice a coil needs;
+  Plug is live only on a rotary, and Stage only for an injector.</figcaption>
+</figure>
+<p>On a coil or injector row, the page offers:</p>
+<ul>
+<li><strong>Cylinder</strong> <code>outputs.output[].cylinder</code>: the cylinder this coil or injector serves (on a rotary,
+  the rotor). <strong>All Cylinders</strong> is a distributor coil or a multi-point injector. <strong>Bank 1 / Bank 2</strong>
+  is an injector shared by every cylinder on that bank.</li>
+<li><strong>Stage</strong> <code>inj_stage</code> (injectors): which injection stage it belongs to. A row in a stage beyond
+  <strong>Number of Injection Stages</strong> is ignored.</li>
+<li><strong>Plug</strong> <code>ign_plug</code> (rotary coils): the leading or trailing plug.</li>
+<li><strong>Active High</strong>: see Step 3. Leave it ticked for coils and injectors on this board.
+  <!-- src: definition/ecu.schema.yaml; firmware/Scheduler/OutputMap.h; definition/boards/jaytek_v1.dashboard.gui (Outputs/<pin> ▸ Coil or Injector panel) -->
+</li>
+</ul>
+<h3 id="step-2-give-a-pin-a-job">Step 2 — Give a pin a job<a class="headerlink" href="#step-2-give-a-pin-a-job" title="Permanent link">&para;</a></h3>
+<p>Open the pin's page, for example <strong>Outputs ▸ LS5</strong>. The page is in three columns. The left column is
+the pin itself (Figure 18.6).</p>
+<figure>
+<p><img alt="This Pin, Coil or Injector and Driving panels for LS5 set up as a Generic PWM output at 30 Hz" src="../img/studio/outputs-pin-this.png" />
+  </p>
+<figcaption>Figure 18.6 — LS5 as a boost solenoid (Example 1). The label beside the pin name gives
+  its connector and pin, CN2 pin 5, and its wire colour.</figcaption>
+</figure>
+<ol>
+<li><strong>Function</strong> <code>outputs.output[].function</code>: choose <strong>Generic</strong>. The rest of the page comes alive.</li>
+<li><strong>Name</strong> <code>name</code>: a short name for what is on the end of the wire ("Boost Sol", "Fan"). The pin
+   name says where it is wired; this says what it is.</li>
+<li><strong>Set up this output…</strong>: opens the output wizard, which fills in the whole page from a template (Step 4).
+   Use it for anything the wizard offers; set the page by hand for anything else.</li>
+</ol>
+<h3 id="step-3-driving-kind-polarity-frequency">Step 3 — Driving: Kind, polarity, frequency<a class="headerlink" href="#step-3-driving-kind-polarity-frequency" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>Active High</strong> <code>active_high</code> (default ticked): which level means <em>on</em>, for every function. On
+  this board every IGN, LS and HS output is switched on by a high level from the processor, so leave
+  it ticked for a normal load. Untick it only to invert an output. Getting it wrong energises the load
+  whenever it should be idle.
+  <!-- src: definition/boards/jaytek_v1.board.yaml (polarity HIGH=dwell / HIGH=on); definition/ecu.schema.yaml --></p>
+</li>
+<li>
+<p><strong>Kind</strong> <code>kind</code>: <em>PWM</em> for something you modulate (a solenoid valve, a PWM pump, a gauge), <em>Digital</em>
+  for something that is on or off (a relay, a lamp). A relay driven with PWM buzzes.</p>
+</li>
+<li><strong>PWM Frequency</strong> <code>pwm_freq_hz</code> (default 250 Hz, PWM only): the carrier. Set it for the load: the
+  boost solenoid template uses 30 Hz. The <strong>Frequency</strong> page can make it a table or an expression
+  instead (Step 9).
+  <!-- src: definition/ecu.schema.yaml -->
+</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">At most 16 PWM outputs</p>
+<p>PWM outputs are timed in software by one pulse engine with 16 channels, at 10 µs resolution. A
+17th Generic PWM output is not driven at all: its pin stays undriven. Make on/off loads <em>Digital</em>;
+a Digital output does not use a channel.
+<!-- src: firmware/Scheduler/SoftPwm.h; firmware/main.cpp; firmware/Integration/OutputManager.cpp --></p>
+</div>
+<h3 id="step-4-the-wizard-templates">Step 4 — The wizard (templates)<a class="headerlink" href="#step-4-the-wizard-templates" title="Permanent link">&para;</a></h3>
+<p><strong>Set up this output…</strong> opens <strong>Set Up LS5</strong>. Pick what the output is on the left, answer its questions on the
+right, and press <strong>OK</strong>. The wizard sets Function to Generic and writes the Kind, value, timings,
+failure direction and both conditions. It shows the conditions it will write under <strong>It will run</strong>, so
+you can read and edit them afterwards.</p>
+<!-- src: apps/studio-jf/src/ui/OutputWizardDialog.h; apps/studio-jf/src/model/OutputTemplate.cpp -->
+
+<p>The templates come from the firmware's own definition, so the list always matches what your ECU can
+run. With this firmware they are:</p>
+<table>
+<thead>
+<tr>
+<th>Template</th>
+<th>Kind</th>
+<th>Value</th>
+<th>Fails</th>
+<th>What it asks for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fuel Pump</strong></td>
+<td>Digital</td>
+<td>Fixed 100 %</td>
+<td>Off</td>
+<td><strong>Prime Time</strong> (3 s), <strong>Stop After</strong> (1500 ms without a trigger tooth)</td>
+</tr>
+<tr>
+<td><strong>Thermo Fan</strong></td>
+<td>Digital</td>
+<td>Fixed 100 %</td>
+<td>On</td>
+<td><strong>Switch On Above</strong> (95 °C), <strong>Switch Off Below</strong> (90 °C); 5 s minimum on and off</td>
+</tr>
+<tr>
+<td><strong>Thermo Fan with A/C</strong></td>
+<td>Digital</td>
+<td>Fixed 100 %</td>
+<td>On</td>
+<td>the same, plus the A/C request as a reason to run</td>
+</tr>
+<tr>
+<td><strong>Variable-Speed Fan</strong></td>
+<td>PWM 200 Hz</td>
+<td>Generic Table 1</td>
+<td>On</td>
+<td>switch-on and switch-off temperatures (92 / 86 °C); duty from the table</td>
+</tr>
+<tr>
+<td><strong>Starter Motor</strong></td>
+<td>Digital</td>
+<td>Fixed 100 %</td>
+<td>Off</td>
+<td><strong>Maximum Crank</strong> (10 s), <strong>Rest Before Retry</strong> (3 s); interlocks to tick: in neutral, clutch down, brake pressed</td>
+</tr>
+<tr>
+<td><strong>Main Relay</strong></td>
+<td>Digital</td>
+<td>Fixed 100 %</td>
+<td>On</td>
+<td>nothing: on whenever the ECU is awake</td>
+</tr>
+<tr>
+<td><strong>Shift Light</strong></td>
+<td>Digital</td>
+<td>Fixed 100 %</td>
+<td>Off</td>
+<td><strong>Light On Above</strong> (6500 rpm), <strong>Light Off Below</strong> (6300 rpm)</td>
+</tr>
+<tr>
+<td><strong>Check Engine Light</strong></td>
+<td>Digital</td>
+<td>Fixed 100 %</td>
+<td>On</td>
+<td><strong>Bulb Check</strong> (3 s): lit at key-on; then on for any current code or level 3, fast flash for level 2 and slow flash for level 1 once their codes have cleared</td>
+</tr>
+<tr>
+<td><strong>Tachometer</strong></td>
+<td>PWM</td>
+<td>Fixed 50 %</td>
+<td>Off</td>
+<td><strong>Pulses per Rev</strong> (2), <strong>Squelch Below</strong> (60 rpm); frequency = rpm × pulses ÷ 60</td>
+</tr>
+<tr>
+<td><strong>Boost Solenoid (Wastegate)</strong></td>
+<td>PWM 30 Hz</td>
+<td>Candidate <code>wastegate_duty</code></td>
+<td>Off</td>
+<td><strong>Stop Below RPM</strong> (200)</td>
+</tr>
+<tr>
+<td><strong>VVT Solenoid (Intake Bank 1)</strong> … <strong>(Exhaust Bank 2)</strong></td>
+<td>PWM 250 Hz</td>
+<td>Candidate <code>vvt_duty_1</code> … <code>vvt_duty_4</code></td>
+<td>Off</td>
+<td><strong>Stop Below RPM</strong> (200); four templates, one per cam (chapter 25)</td>
+</tr>
+<tr>
+<td><strong>Power Steering Pump</strong></td>
+<td>PWM 200 Hz</td>
+<td>Fixed 100 %</td>
+<td>Off</td>
+<td><strong>Stop Below RPM</strong> (200); 2 s min on, 1 s min off</td>
+</tr>
+<tr>
+<td><strong>A/C Compressor Clutch</strong></td>
+<td>Digital</td>
+<td>Fixed 100 %</td>
+<td>Off</td>
+<td><strong>Cut Above Throttle</strong> (90 %); 5 s min on, 10 s min off</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/ecu.schema.yaml (output_templates) -->
+
+<p>The full text of each template, with its conditions, is in the reference (<em>Output templates</em>).</p>
+<p>The <strong>Check Engine Light</strong> is <strong>on</strong> while any code is current (<strong>Active DTC Count</strong> <code>dtc_active</code>) and
+<strong>on</strong> at protection level 3. A protection level can hold after its codes have cleared, or act on stored
+codes (chapter 29); then level 2 gives a <strong>fast flash</strong> (4 Hz) and level 1 a <strong>slow flash</strong> (1 Hz), so the
+lamp still says the engine is in limp mode. A level only ever adds a flash: it never turns the lamp off
+while a code is current. The key-on flash is the bulb check: a lamp that never lights at key-on is a dead
+bulb or an open circuit, not a healthy engine. It fails <strong>on</strong>: if the ECU cannot read its state, the lamp
+lights. Which codes are active, and why, is on the Diagnostic Trouble Codes list (chapter 44). The flashers
+it uses, <strong>Flasher (slow, 1 Hz)</strong> <code>blink_slow</code> and <strong>Flasher (fast, 4 Hz)</strong> <code>blink_fast</code>, can be read by
+any output's conditions.</p>
+<!-- src: definition/ecu.schema.yaml (output_templates: check_engine_light) -->
+
+<ul>
+<li>The numbers you enter land in the output's <strong>Template Numbers</strong> (A–D), and the conditions read them
+  from there. Change a number later on the page, and the template still recognises the output as its
+  own.</li>
+<li><strong>Switches it reads</strong> lists the switch inputs the conditions use, and says <strong>NOT WIRED</strong> for any
+  that is not set up. A condition that reads an unwired switch reads it as false, so an interlock you
+  ticked but did not wire gives a starter that never cranks. The <strong>inverted</strong> box beside a wired
+  switch is that sensor's own invert setting: changing it here changes it everywhere the switch is
+  read.
+  <!-- src: apps/studio-jf/src/ui/OutputWizardDialog.h; definition/ecu.schema.yaml -->
+</li>
+</ul>
+<div class="admonition danger">
+<p class="admonition-title">Check the starter's interlocks</p>
+<p>The Starter Motor template latches: one press cranks until the engine runs or <strong>Maximum Crank</strong>
+runs out. On a manual gearbox, keep at least one interlock (neutral or clutch) ticked and wired,
+or the car can be started in gear.
+<!-- src: definition/ecu.schema.yaml --></p>
+</div>
+<h3 id="step-5-how-much-the-value">Step 5 — How Much: the value<a class="headerlink" href="#step-5-how-much-the-value" title="Permanent link">&para;</a></h3>
+<p>The middle column decides the value (Figure 18.7). Only the controls for the chosen source are live.</p>
+<figure>
+<p><img alt="How Much panel with Value From Candidates, one candidate Wastegate Duty as Primary, and the empty When panel below" src="../img/studio/outputs-pin-value.png" />
+  </p>
+<figcaption>Figure 18.7 — LS5 takes its value from one candidate, Wastegate Duty, as Primary. With
+  both conditions empty the output has no gate; Boost alone decides when there is a duty to deliver.
+  </figcaption>
+</figure>
+<ul>
+<li><strong>Value From</strong> <code>value_source</code>: <em>Candidates</em> (default), <em>Table</em>, <em>Fixed</em> or <em>Expression</em>.</li>
+<li><strong>Fixed Value</strong> <code>fixed_x10</code> (Fixed; default 100 %): the constant sent while the output is on.</li>
+<li><strong>Duty Table</strong> <code>duty_table_sel</code> (Table): pick the table. It is read at its own axes. With no table
+  chosen, the output sends its Failsafe.</li>
+<li><strong>Duty Expression</strong> <code>duty_expr</code> (Expression): the number it returns is the duty. If it cannot be
+  worked out, the output sends its Failsafe.</li>
+<li><strong>Candidates In Use</strong> <code>n_cand</code> (Candidates, 0–4) and <strong>Primary Policy</strong> <code>primary_policy</code>: how many
+  of the four candidate rows are used, and how several valid primaries combine.</li>
+<li><strong>Candidate rows 1–4</strong> <code>cand[].sig</code>, <code>cand[].role</code>: the channel (pick it with <strong>…</strong>, clear it with
+  <strong>×</strong>) and its <strong>Role</strong>.
+  <!-- src: definition/ecu.schema.yaml; firmware/Integration/OutputManager.cpp -->
+</li>
+</ul>
+<h3 id="step-6-when-the-conditions">Step 6 — When: the conditions<a class="headerlink" href="#step-6-when-the-conditions" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Turn on when</strong> <code>on_expr</code> and <strong>Turn off when</strong> <code>off_expr</code>: expressions that read any channel or
+  setting. Leave both empty for an output driven by its value
+  alone. Leave <strong>Turn off when</strong> empty for a plain switch. Chapter 34 covers the expression language.
+  <!-- src: definition/ecu.schema.yaml -->
+</li>
+</ul>
+<h3 id="step-7-template-numbers-and-timing">Step 7 — Template Numbers and Timing<a class="headerlink" href="#step-7-template-numbers-and-timing" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Template Numbers A–D</strong> <code>param_a</code> … <code>param_d</code>: the numbers a template's conditions read. What each
+  means is shown on the wizard that set it.</li>
+<li><strong>Timing</strong> (left column, under Driving): <strong>Minimum On Time</strong> <code>min_on_ms</code>, <strong>Minimum Off Time</strong>
+  <code>min_off_ms</code>, <strong>Maximum On Time</strong> <code>max_on_ms</code> (0 = no limit), <strong>Re-Arm Delay</strong> <code>rearm_ms</code>, all in
+  ms up to 65535, and <strong>If Unanswerable</strong> <code>on_invalid</code> (<em>Off</em>, <em>On</em> or <em>Hold</em>). How they work is in
+  Figure 18.3.
+  <!-- src: definition/ecu.schema.yaml -->
+</li>
+</ul>
+<h3 id="step-8-shaping-and-what-the-output-is-doing-now">Step 8 — Shaping, and what the output is doing now<a class="headerlink" href="#step-8-shaping-and-what-the-output-is-doing-now" title="Permanent link">&para;</a></h3>
+<p>The right column shapes the command, shows it live, and holds the bench test (Figure 18.8).</p>
+<figure>
+<p><img alt="Shaping panel at its defaults, the Right Now readout, and the Bench Test fields" src="../img/studio/outputs-pin-shaping.png" />
+  </p>
+<figcaption>Figure 18.8 — Shaping at its defaults: ×1, no offset, clamped 0–100 %, failsafe 0 %.
+  Right Now is the live command. The Test, Stop and Stop All buttons sit below the Bench Test fields.
+  </figcaption>
+</figure>
+<p>These five fields are stored as whole numbers, and the page shows them as stored:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Stored as</th>
+<th>Default</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Scale (x1000)</strong> <code>scale_x1000</code></td>
+<td>thousandths</td>
+<td>1000</td>
+<td>× 1.000</td>
+</tr>
+<tr>
+<td><strong>Offset (x10)</strong> <code>offset_x10</code></td>
+<td>tenths of a per cent</td>
+<td>0</td>
+<td>+ 0.0 %</td>
+</tr>
+<tr>
+<td><strong>Clamp Low (x10)</strong> <code>clamp_lo_x10</code></td>
+<td>tenths of a per cent</td>
+<td>0</td>
+<td>0.0 %</td>
+</tr>
+<tr>
+<td><strong>Clamp High (x10)</strong> <code>clamp_hi_x10</code></td>
+<td>tenths of a per cent</td>
+<td>1000</td>
+<td>100.0 %</td>
+</tr>
+<tr>
+<td><strong>Failsafe (x10)</strong> <code>failsafe_x10</code></td>
+<td>tenths of a per cent</td>
+<td>0</td>
+<td>0.0 %</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/ecu.schema.yaml; firmware/Integration/OutputManager.cpp -->
+
+<ul>
+<li><strong>Scale</strong> and <strong>Offset</strong> convert the value into what the hardware wants: command = value × scale +
+  offset. The defaults pass the value through unchanged.</li>
+<li><strong>Clamp Low / Clamp High</strong> are the actuator's own limits. Nothing upstream can command past them.
+  Clamp Low is also what a closed gate sends, and for a Digital output the switching point is halfway
+  between the two.</li>
+<li><strong>Failsafe</strong> is what the output sends when it has nothing valid to use: no candidate valid, no table,
+  or an expression that cannot be worked out. Choose it as the <strong>safe state of the load</strong>, not "off"
+  by habit.
+  <!-- src: firmware/Pipeline/OutputStages.h; firmware/Integration/OutputManager.cpp -->
+</li>
+</ul>
+<p><strong>Right Now</strong> shows the live command for this pin, the same value as its <code>out_N</code> channel. For a PWM
+output that is its duty. For a Digital output the channel reads 100 when the pin is on and 0 when it
+is off, and the Outputs page shows it as a level.</p>
+<!-- src: firmware/Integration/OutputManager.cpp -->
+
+<h3 id="step-9-the-frequency-page">Step 9 — The Frequency page<a class="headerlink" href="#step-9-the-frequency-page" title="Permanent link">&para;</a></h3>
+<p>Each pin has a <strong>Frequency</strong> page (<strong>Outputs ▸ LS5 ▸ Frequency</strong>) for its PWM carrier (Figure 18.9). A
+Digital output ignores it.</p>
+<figure>
+<p><img alt="Frequency page for LS5: Frequency From Fixed at 30 Hz" src="../img/studio/outputs-frequency.png" />
+  </p>
+<figcaption>Figure 18.9 — The Frequency page. Fixed is right for almost every load; Table and
+  Expression are for loads whose frequency is the signal, such as a tachometer.</figcaption>
+</figure>
+<ul>
+<li><strong>Frequency From</strong> <code>freq_source</code>: <em>Fixed</em> (the <strong>Fixed Frequency</strong>, the same setting as PWM
+  Frequency), <em>Table</em> or <em>Expression</em>.</li>
+<li><strong>Frequency Table</strong> <code>freq_table_sel</code> and <strong>Expression</strong> <code>freq_expr</code>: the answer is in Hz. It is
+  limited to 1–50000 Hz. If it cannot be worked out, or is below 1 Hz, the output falls back to the
+  fixed frequency rather than stopping.
+  <!-- src: firmware/Integration/OutputManager.cpp; definition/ecu.schema.yaml -->
+</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Keep the carrier low</p>
+<p>The pulse engine counts in 10 µs steps. At 250 Hz a period is 400 steps, so the duty resolves to
+0.25 %. At 2 kHz it is 50 steps, or 2 % per step. The studio's own advice is to stay under about
+2 kHz.
+<!-- src: firmware/main.cpp (100 kHz tick); firmware/Scheduler/SoftPwm.h; definition/boards/jaytek_v1.dashboard.gui (Outputs/<pin>/Frequency note) --></p>
+</div>
+<h3 id="step-10-test-it">Step 10 — Test it<a class="headerlink" href="#step-10-test-it" title="Permanent link">&para;</a></h3>
+<p>With the engine stopped, the <strong>Bench Test</strong> panel on each pin page fires that output:</p>
+<ol>
+<li>Set <strong>Count</strong> (how many times), <strong>On Time</strong> and <strong>Off Time</strong> in ms.</li>
+<li>Press <strong>Test</strong>. What happens depends on the row's Function:<ul>
+<li>an <strong>Ignition</strong> row charges the coil for On Time and releases it: the release is the spark;</li>
+<li>an <strong>Injector</strong> row opens the injector for On Time;</li>
+<li>anything else is switched on for On Time.</li>
+</ul>
+</li>
+<li><strong>Stop</strong> ends this pin's test; <strong>Stop All</strong> ends every test.
+   <!-- src: firmware/Engine/Modules/OutputTest.h; firmware/Engine/Modules/OutputTest.cpp; definition/boards/jaytek_v1.dashboard.gui (Bench Test panel: test <row> / test <row> 0 0 0 / test 255 0 0 0) -->
+</li>
+</ol>
+<p><strong>Test</strong> needs the <strong>key on</strong> and the <strong>engine stopped</strong>, and is greyed out otherwise while the studio
+is connected. With the key off nothing is driven, the test included: the ECU refuses it, and a test
+already running stops when the key goes off. The ECU also cancels a test the moment the engine turns,
+because a start takes the coils and injectors back, so on a turning engine (or a bench stimulator left
+spinning) the button would do nothing at all. <strong>Stop</strong> and <strong>Stop All</strong> always work.</p>
+<!-- src: apps/studio-jf/tools/layout/more_pages.py (TEST_ENABLED); firmware/Engine/Modules/OutputTest.cpp (step) -->
+
+<p>The ECU enforces the safety rules, not the studio:</p>
+<ul>
+<li><strong>Engine stopped only.</strong> If the engine starts turning, every test is cancelled at once.</li>
+<li><strong>It ends on its own.</strong> A test stops after Count pulses, or after (On + Off) × Count + 1 s, and never
+  later than 10 minutes, even if the studio disconnects.</li>
+<li><strong>Count 0 means stop.</strong> If Count is 0, <strong>Test</strong> stops the output instead of firing it.</li>
+<li><strong>On Time 0 lets the ECU choose:</strong> 3 ms for a coil, 4 ms for an injector, 2 s for anything else.
+  <strong>Off Time 0</strong> becomes 500 ms when Count is more than 1.</li>
+<li><strong>Active High is respected</strong>, so "off" leaves the load off.
+  <!-- src: firmware/Engine/Modules/OutputTest.h; firmware/Engine/Modules/OutputTest.cpp -->
+</li>
+</ul>
+<div class="admonition danger">
+<p class="admonition-title">The ECU does not limit the dwell</p>
+<p>On Time is used exactly as you set it, on a coil too. A coil held on for a long On Time saturates,
+and can overheat the coil or its driver. Keep coil tests to a few milliseconds.
+<!-- src: firmware/Engine/Modules/OutputTest.h --></p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Advanced — what the buttons send</p>
+<p>The buttons send the ECU the command <code>test &lt;row&gt; &lt;count&gt; &lt;on_ms&gt; &lt;off_ms&gt;</code>, and the ECU's reply
+appears in the <strong>ECU Console</strong>: what was applied, or <strong>REFUSED</strong> if the row is out of range or the
+pin could not be taken. The row is counted from 0: IGN1 is 0, LS1 is 12, LS5 is 16, HS1 is 34.
+<!-- src: firmware/Cli/CliCommands.cpp --></p>
+</div>
+<p>Finally, burn the tune.</p>
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>These are the settings as the page shows them. Check each against your own wiring and hardware.</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — boost solenoid on LS5, driven by Boost Control</p>
+<p>A 3-port wastegate solenoid on LS5. Boost Control (chapter 24) publishes <strong>Wastegate Duty</strong>; this
+output delivers it.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Function</td>
+<td>Generic</td>
+<td></td>
+</tr>
+<tr>
+<td>Kind</td>
+<td>PWM</td>
+<td>a modulated valve</td>
+</tr>
+<tr>
+<td>PWM Frequency</td>
+<td>30 Hz</td>
+<td>the boost solenoid template's value</td>
+</tr>
+<tr>
+<td>Value From</td>
+<td>Candidates</td>
+<td>the duty comes from Boost</td>
+</tr>
+<tr>
+<td>Candidates In Use / 1</td>
+<td>1 / Wastegate Duty, Primary</td>
+<td></td>
+</tr>
+<tr>
+<td>Turn on when / Turn off when</td>
+<td>empty</td>
+<td>Boost already decides when to ask</td>
+</tr>
+<tr>
+<td>Failsafe (x10)</td>
+<td>0</td>
+<td>solenoid off: see below</td>
+</tr>
+</tbody>
+</table>
+<p>This is the setup in Figures 18.6–18.9. When Boost is off or below activation, it publishes
+nothing, the candidate is not valid, and the output sends its failsafe of 0 %. The
+<strong>Boost Solenoid (Wastegate)</strong> template does the same, and adds two conditions: on above the
+cranking threshold, off below 200 rpm.</p>
+<p>The template's reasoning for the failsafe: on a conventionally plumbed 3-port valve, 0 % leaves the
+wastegate on its spring, which is the least boost. Check that against your own plumbing.
+<!-- src: definition/ecu.schema.yaml --></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — fuel pump on HS1 and thermo fan on LS6, from templates</p>
+<p>Both come from the wizard (Step 4).</p>
+<table>
+<thead>
+<tr>
+<th>Output</th>
+<th>Template</th>
+<th>Numbers</th>
+<th>What you get</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HS1 "Fuel Pump"</td>
+<td>Fuel Pump</td>
+<td>Prime Time 3 s, Stop After 1500 ms</td>
+<td>Digital, on for 3 s at key-on, then on while trigger teeth are arriving; off 1.5 s after the last tooth. Fails <strong>off</strong>.</td>
+</tr>
+<tr>
+<td>LS6 "Fan"</td>
+<td>Thermo Fan</td>
+<td>On Above 95 °C, Off Below 90 °C</td>
+<td>Digital, on above 95 °C, off below 90 °C, at least 5 s on and 5 s off. Fails <strong>on</strong> if coolant temperature is lost.</td>
+</tr>
+</tbody>
+</table>
+<p>The pump watches trigger teeth, not sync, so the rail is up before the decoder locks, and the pump
+stops when the engine stops however it stopped.
+<!-- src: definition/ecu.schema.yaml --></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — nitrous solenoid from a 0/1 flag</p>
+<p>Nitrous publishes <strong>Nitrous Active</strong> <code>nitrous_active</code> as 0 or 1 (chapter 28). Wire the solenoid's
+relay to LS8.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Function / Kind</td>
+<td>Generic / Digital</td>
+<td>a relay is on or off</td>
+</tr>
+<tr>
+<td>Value From</td>
+<td>Candidates: Nitrous Active, Primary</td>
+<td></td>
+</tr>
+<tr>
+<td>Clamp High (x10)</td>
+<td><strong>10</strong> (1.0)</td>
+<td>moves the switching point to 0.5</td>
+</tr>
+<tr>
+<td>Failsafe (x10)</td>
+<td>0</td>
+<td>no signal, no nitrous</td>
+</tr>
+<tr>
+<td>If Unanswerable</td>
+<td>Off</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The Clamp High change is the important one. A Digital output switches on halfway between its
+clamps. With the default clamps (0 and 100) that is 50, and a flag that reads 1 never reaches it.
+With Clamp High at 1.0 the switching point is 0.5, and the flag works.
+<!-- src: firmware/Engine/Modules/Nitrous.cpp; firmware/Integration/OutputManager.cpp --></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 4 — tachometer on LS7</p>
+<p>From the <strong>Tachometer</strong> template: Pulses per Rev <strong>2</strong> (a 4-cylinder tacho), Squelch Below
+<strong>60 rpm</strong>.</p>
+<p>It writes: Kind <em>PWM</em>, Value From <em>Fixed</em> <strong>50 %</strong>, <strong>Frequency From</strong> <em>Expression</em>
+<code>rpm * pulses / 60</code>, on above 60 rpm and off at or below it. At 3000 rpm the output runs at
+100 Hz. Below the squelch the output is off, because the carrier cannot go below 1 Hz. How to wire
+the tacho input is in chapter 14.
+<!-- src: definition/ecu.schema.yaml; apps/studio-jf/src/model/OutputTemplate.cpp --></p>
+</div>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<p>An output has little to tune. What matters is that it does what you meant, including when something
+fails.</p>
+<p><strong>Log these channels</strong> (chapter 42): the pin's own channel (<code>out_1</code> … <code>out_42</code>), the channel it reads
+(for example <code>wastegate_duty</code>), and every channel its conditions read. The Standard datalog template
+leaves the output channels out, so add the ones you need.</p>
+<!-- src: definition/ecu.schema.yaml -->
+
+<ol>
+<li><strong>Test every output with the bench test</strong> before the engine first runs. Listen for each injector,
+   check each coil sparks on the cylinder you expect, and watch each relay.</li>
+<li><strong>Check polarity.</strong> With the key on and the output commanded off, the load must be off. If a load
+   runs when it should be idle, <strong>Active High</strong> is wrong.</li>
+<li>
+<p><strong>Set the PWM frequency</strong> from the valve's data or the template. A valve driven too fast only sees
+   the average and stops responding. A valve driven too slowly can buzz or move with each pulse.
+   <!-- src: definition/ecu.schema.yaml --></p>
+</li>
+<li>
+<p><strong>Set the clamps</strong> to the range the actuator may be commanded. Clamp Low is also what a closed gate
+   sends, and the failsafe is held above it too, so raise it only for a load that must never be fully
+   off.</p>
+</li>
+<li><strong>Decide each failure direction.</strong> Unplug the sensor a condition reads and check that the output
+   does what <strong>If Unanswerable</strong> says. Stop the module that feeds a candidate and check the Failsafe.</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Failsafe and a closed gate go through Shaping</p>
+<p>The Failsafe value and a closed gate's Clamp Low both pass through Scale and Offset before they
+reach the pin. With the defaults this changes nothing. If you set an Offset or a Scale other than
+×1, check the pin's <code>out_N</code> channel with the gate closed and with the source removed, and adjust.
+<!-- src: firmware/Pipeline/OutputStages.h; firmware/Integration/OutputManager.cpp --></p>
+</div>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>What sets it</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1650</strong></td>
+<td>Config: pin / output conflict</td>
+<td>A Generic output could not take its pin because the firing scheduler still holds it. It also covers input pin clashes (chapter 17).</td>
+<td>You changed a coil or injector row to Generic with the engine running. Stop the engine: the scheduler lets go, the output is built, and the code clears.</td>
+</tr>
+<tr>
+<td><strong>P1653</strong></td>
+<td>A cylinder in the firing order has no coil output</td>
+<td>No Ignition row serves a cylinder in the firing order</td>
+<td>The coil rows on the Outputs page. A cleared row means no spark on that cylinder.</td>
+</tr>
+<tr>
+<td><strong>P1654</strong></td>
+<td>A cylinder in the firing order has no stage 1 injector output</td>
+<td>No stage 1 Injector row serves a cylinder in the firing order</td>
+<td>The injector rows and their Stage.</td>
+</tr>
+</tbody>
+</table>
+<!-- src: firmware/Integration/OutputManager.cpp; firmware/Engine/EngineTask.cpp; definition/ecu.schema.yaml -->
+
+<p>P1650 is severity level 1. P1653 and P1654 are level 3, and are checked against the rows the ECU has
+applied, so they change only at an engine stop. What each level does is set in the tune (chapters 29
+and 44).</p>
+<!-- src: firmware/Engine/EngineTask.cpp; firmware/Diagnostics/Dtc.h -->
+
+<p><strong>Output channels:</strong> one per pin, labelled with the pin name, in the <strong>Outputs</strong> category: <code>out_1</code>
+to <code>out_12</code> are IGN1–IGN12, <code>out_13</code> to <code>out_34</code> are LS1–LS22, and <code>out_35</code> to <code>out_42</code> are HS1–HS8.
+Each is the command after the gate, arbitration and shaping, in 0.5 % steps. Only Generic outputs
+publish one; a coil, an injector or an unused pin reads as not valid.</p>
+<!-- src: shared/tuneit-meta.json telemetry out_1..out_42; definition/ecu.schema.yaml; firmware/Integration/OutputManager.cpp -->
+
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No Generic output does anything on the bench</td>
+<td>Key off: on USB power alone, or with the battery below the key-on threshold, every Generic output is left undriven</td>
+<td>Power the ECU from 12 V; key-on is decided from battery voltage</td>
+</tr>
+<tr>
+<td>Output never comes on</td>
+<td>Function not Generic; a condition reads an unwired switch; the Value source is empty</td>
+<td>Function; the wizard's <strong>Switches it reads</strong> list; <code>out_N</code>; Value From and its source</td>
+</tr>
+<tr>
+<td>Digital output never comes on from a 0/1 channel</td>
+<td>The switching point is halfway between the clamps: 50 by default</td>
+<td>Set Clamp High (x10) to 10 (Example 3)</td>
+</tr>
+<tr>
+<td>Output always at its failsafe</td>
+<td>No valid candidate (the module is off or not asking); no table chosen; the expression cannot be answered</td>
+<td>The candidate channel in the Dashboard or log; <strong>Duty Table</strong>; the expression</td>
+</tr>
+<tr>
+<td>Load runs when it should be off</td>
+<td><strong>Active High</strong> backwards; Failsafe set to on</td>
+<td>Active High; Failsafe (x10)</td>
+</tr>
+<tr>
+<td>Fan stays off for a few seconds after you change an output setting</td>
+<td>Every Outputs edit rebuilds the outputs; a gated output restarts off and waits its Minimum Off Time</td>
+<td>Expected (see <em>When changes take effect</em>)</td>
+</tr>
+<tr>
+<td>A PWM output does nothing, others work</td>
+<td>More than 16 Generic PWM outputs; PWM Frequency set to 0</td>
+<td>Make on/off loads Digital; set the frequency</td>
+</tr>
+<tr>
+<td>Coil or injector edit has no effect</td>
+<td>Firing rows apply at the next engine stop</td>
+<td>Stop the engine</td>
+</tr>
+<tr>
+<td>P1650 after changing a row</td>
+<td>A coil or injector row changed to Generic while running</td>
+<td>Stop the engine</td>
+</tr>
+<tr>
+<td>P1653 / P1654</td>
+<td>A cylinder has no coil or no stage 1 injector</td>
+<td>The rows on the Outputs page; re-set Ignition Mode or the stages to re-lay them</td>
+</tr>
+<tr>
+<td>Engine cranks, no spark or no fuel, no codes</td>
+<td><strong>Ignition Outputs</strong> or <strong>Injector Outputs</strong> switched off (they survive a reset)</td>
+<td>Chapter 15</td>
+</tr>
+<tr>
+<td>Bench test does nothing</td>
+<td>Count is 0 (that means stop); the engine is turning</td>
+<td>Count; <code>rpm</code></td>
+</tr>
+<tr>
+<td>Tacho reads wrong</td>
+<td>Pulses per Rev wrong for the gauge</td>
+<td>Most 4-stroke tachos want half the cylinder count</td>
+</tr>
+</tbody>
+</table>
+<!-- src: firmware/Integration/OutputManager.cpp; firmware/Scheduler/SoftPwm.h; firmware/Integration/EmitSinks.h; definition/ecu.schema.yaml; firmware/Engine/Modules/OutputTest.cpp -->
+
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<p>The output settings are one row per pin, so they are listed here by field rather than by pin. Every
+field is explained, in page order, in <em>Setting it up</em>: the path of each is
+<code>outputs.output[&lt;row&gt;].&lt;field&gt;</code>, with the row counted from 0 (IGN1 is 0, LS1 is 12, HS1 is 34). The
+studio's tooltip on each control carries the same help text as the definition.</p>
+<p>The generic tables that outputs read are in chapter 34, and the full output template definitions are
+in the reference (<a href="../reference/output-templates.html">Output templates</a>).</p>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../part2/07-board.html">Chapter 7 — The jaytek_v1 board</a> (the connectors and pins)</li>
+<li><a href="../part2/12-wiring-outputs.html">Chapter 12 — Wiring outputs</a> (injectors, coils, relays, PWM valves)</li>
+<li><a href="15-engine-vehicle.html">Chapter 15 — Engine and vehicle basics</a> (the settings that lay out coils and injectors)</li>
+<li><a href="17-sensors.html">Chapter 17 — Sensors and calibration</a> (the inputs conditions read)</li>
+<li><a href="24-boost.html">Chapter 24 — Boost</a> (the wastegate demand)</li>
+<li><a href="34-tables-expressions.html">Chapter 34 — Generic tables and expressions</a></li>
+<li><a href="../part5/43-bench-testing.html">Chapter 43 — Bench testing</a></li>
+<li><a href="../part5/44-diagnostics.html">Chapter 44 — Diagnostics and trouble codes</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="17-sensors.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 17 Sensors and calibration">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                17 Sensors and calibration
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="19-fuel.html" class="md-footer__link md-footer__link--next" aria-label="Next: 19 Fuel">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                19 Fuel
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

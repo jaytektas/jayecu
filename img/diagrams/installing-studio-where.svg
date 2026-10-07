@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 530" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Where jayecu Studio keeps its files, and what it talks to</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <!-- ===== 1 · THE PROGRAM ===== -->
+  <text x="20" y="28" class="muted head">1 · The program — replaced by every update</text>
+  <rect x="20" y="44" width="330" height="116" rx="6" class="tgt"/>
+  <text x="36" y="68" class="fg head">Linux: one AppImage file</text>
+  <text x="36" y="92" class="mono fg">jayecu-studio-&lt;ver&gt;-x86_64.AppImage</text>
+  <text x="36" y="116" class="muted">anywhere you can write, e.g.</text>
+  <text x="36" y="136" class="mono fg">~/Applications/</text>
+
+  <rect x="20" y="180" width="330" height="116" rx="6" class="tgt"/>
+  <text x="36" y="204" class="fg head">Windows: installed for you only</text>
+  <text x="36" y="228" class="mono fg">%LOCALAPPDATA%\Programs\</text>
+  <text x="60" y="246" class="mono fg">jayecu Studio\</text>
+  <text x="36" y="272" class="muted"><tspan class="mono">studio.exe</tspan>, styles, <tspan class="mono">manual\</tspan></text>
+
+  <rect x="20" y="316" width="330" height="70" rx="6" class="box"/>
+  <text x="36" y="342" class="fg">Inside both: the studio, its styles</text>
+  <text x="36" y="364" class="fg">and this manual (<tspan class="mono">manual/</tspan>)</text>
+
+  <!-- ===== 2 · YOUR DATA ===== -->
+  <text x="390" y="28" class="muted head">2 · Your data — never touched by an update</text>
+  <rect x="390" y="44" width="330" height="440" rx="6" class="ff"/>
+  <text x="406" y="68" class="fg head">The data folder</text>
+  <text x="406" y="92" class="muted">Linux</text>
+  <text x="406" y="110" class="mono fg">~/.local/share/jayecu/jayecu Studio/</text>
+  <text x="406" y="134" class="muted">Windows</text>
+  <text x="406" y="152" class="mono fg">%APPDATA%\jayecu\jayecu Studio\</text>
+  <path d="M406 168 H704" class="line" stroke-width="1"/>
+  <text x="406" y="192" class="mono fg">ecus/</text>
+  <text x="530" y="192" class="muted">tunes, restore, backups</text>
+  <text x="406" y="216" class="mono fg">meta/</text>
+  <text x="530" y="216" class="muted">ECU descriptors</text>
+  <text x="406" y="240" class="mono fg">dashboards/</text>
+  <text x="530" y="240" class="muted">page layouts</text>
+  <text x="406" y="264" class="mono fg">firmware/</text>
+  <text x="530" y="264" class="muted">downloaded firmware</text>
+  <text x="406" y="288" class="mono fg">datalogs/</text>
+  <text x="530" y="288" class="muted">recorded logs</text>
+  <text x="406" y="312" class="mono fg">calibrations/</text>
+  <text x="530" y="312" class="muted">sensor curves</text>
+  <text x="406" y="336" class="mono fg">ini/</text>
+  <text x="530" y="336" class="muted">imported .ini files</text>
+  <text x="406" y="360" class="mono fg">can_templates/</text>
+  <text x="530" y="360" class="muted">CAN templates</text>
+  <text x="406" y="384" class="mono fg">help/</text>
+  <text x="530" y="384" class="muted">Lua API page</text>
+  <text x="406" y="408" class="mono fg">trigger_wheels.json</text>
+  <text x="560" y="408" class="muted">wheel library</text>
+  <path d="M406 424 H704" class="line" stroke-width="1"/>
+  <text x="406" y="448" class="muted">Settings, Linux (window, units, updates):</text>
+  <text x="406" y="468" class="mono fg">~/.config/jayecu-studio/settings.json</text>
+  <text x="406" y="506" class="muted">On Windows <tspan class="mono">settings.json</tspan> sits in the data folder.</text>
+
+  <!-- ===== 3 · WHAT IT TALKS TO ===== -->
+  <text x="760" y="28" class="muted head">3 · What it talks to</text>
+  <rect x="760" y="44" width="280" height="96" rx="6" class="box"/>
+  <text x="776" y="68" class="fg head">GitHub releases (HTTPS)</text>
+  <text x="776" y="92" class="muted">new studio versions</text>
+  <text x="776" y="112" class="muted">new ECU firmware kits</text>
+  <text x="776" y="130" class="muted">checked against SHA256SUMS</text>
+
+  <rect x="760" y="170" width="280" height="96" rx="6" class="box"/>
+  <text x="776" y="194" class="fg head">Your web browser</text>
+  <text x="776" y="218" class="muted">User Manual (F1), Lua API page</text>
+  <text x="776" y="238" class="mono fg">http://127.0.0.1:&lt;port&gt;/</text>
+  <text x="776" y="256" class="muted">this computer only</text>
+
+  <rect x="760" y="296" width="280" height="96" rx="6" class="pid"/>
+  <text x="776" y="320" class="fg head">The ECU, over USB</text>
+  <text x="776" y="344" class="muted">serial port <tspan class="mono">0483:5740</tspan></text>
+  <text x="776" y="364" class="muted">bootloader <tspan class="mono">0483:df11</tspan></text>
+  <text x="776" y="384" class="muted">Linux: needs the USB rule</text>
+
+  <!-- arrows -->
+  <path d="M350 102 H388" class="line" marker-end="url(#a)"/>
+  <path d="M350 238 H388" class="line" marker-end="url(#a)"/>
+  <path d="M720 92 H758" class="line" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path d="M720 218 H758" class="line" marker-end="url(#a)"/>
+  <path d="M720 344 H758" class="line" marker-start="url(#a)" marker-end="url(#a)"/>
+</svg>

@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 600" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The output rows and who drives each pin</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .dash { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <!-- ===== 1 · THE ROWS ===== -->
+  <text x="20" y="28" class="muted head">1 · One row per physical output, in board order: row n is pin n</text>
+  <rect x="20" y="42" width="300" height="86" rx="6" class="tgt"/>
+  <text x="170" y="66" text-anchor="middle" class="fg head">IGN1 – IGN12</text>
+  <text x="170" y="87" text-anchor="middle" class="muted">rows 0–11 · CN2 pins 24–35</text>
+  <text x="170" y="110" text-anchor="middle" class="fg">None · Ignition · Generic</text>
+
+  <rect x="350" y="42" width="360" height="86" rx="6" class="tgt"/>
+  <text x="530" y="66" text-anchor="middle" class="fg head">LS1 – LS22</text>
+  <text x="530" y="87" text-anchor="middle" class="muted">rows 12–33 · CN2 pins 1–22</text>
+  <text x="530" y="110" text-anchor="middle" class="fg">None · Injector · Generic</text>
+
+  <rect x="740" y="42" width="300" height="86" rx="6" class="tgt"/>
+  <text x="890" y="66" text-anchor="middle" class="fg head">HS1 – HS8</text>
+  <text x="890" y="87" text-anchor="middle" class="muted">rows 34–41 · CN4 pins 1–8</text>
+  <text x="890" y="110" text-anchor="middle" class="fg">None · Generic</text>
+
+  <!-- the Function field fans out -->
+  <path d="M170 128 V160 H890 V128" class="line"/>
+  <path d="M530 128 V160" class="line"/>
+  <text x="530" y="184" text-anchor="middle" class="fg head">Each row's <tspan class="mono">function</tspan> decides who drives its pin</text>
+  <path d="M170 160 V206" class="line" marker-end="url(#a)"/>
+  <path d="M530 196 V206" class="line" marker-end="url(#a)"/>
+  <path d="M890 160 V206" class="line" marker-end="url(#a)"/>
+
+  <!-- ===== 2 · THE OWNERS ===== -->
+  <rect x="20" y="208" width="300" height="108" rx="6" class="ff"/>
+  <text x="170" y="232" text-anchor="middle" class="fg head">Ignition / Injector</text>
+  <text x="170" y="254" text-anchor="middle" class="fg">the firing scheduler</text>
+  <text x="170" y="276" text-anchor="middle" class="muted">fires the cylinder the row names</text>
+  <text x="170" y="297" text-anchor="middle" class="muted">an edit binds at the next engine stop</text>
+
+  <rect x="350" y="208" width="360" height="108" rx="6" class="ff"/>
+  <text x="530" y="232" text-anchor="middle" class="fg head">Generic</text>
+  <text x="530" y="254" text-anchor="middle" class="fg">the output manager</text>
+  <text x="530" y="276" text-anchor="middle" class="muted">conditions · value · shaping (Figure 18.2)</text>
+  <text x="530" y="297" text-anchor="middle" class="muted">rebuilt at once on any Outputs edit</text>
+
+  <rect x="740" y="208" width="300" height="108" rx="6" class="box"/>
+  <text x="890" y="232" text-anchor="middle" class="fg head">None</text>
+  <text x="890" y="254" text-anchor="middle" class="fg">nobody</text>
+  <text x="890" y="276" text-anchor="middle" class="muted">the pin is left high-impedance</text>
+  <text x="890" y="297" text-anchor="middle" class="muted">(undriven)</text>
+
+  <!-- ===== 3 · THE ARBITER ===== -->
+  <path d="M170 316 V386" class="line" marker-end="url(#a)"/>
+  <path d="M530 316 V386" class="line" marker-end="url(#a)"/>
+  <path d="M890 316 V386" class="line" marker-end="url(#a)"/>
+  <rect x="20" y="388" width="1020" height="84" rx="6" class="safe"/>
+  <text x="530" y="414" text-anchor="middle" class="fg head">Pin arbiter: every claim goes through it, one owner per pin</text>
+  <text x="530" y="436" text-anchor="middle" class="fg">An unowned pin is high-impedance. A pin already held by another owner is refused: the output is not built and P1650 is set.</text>
+  <text x="530" y="458" text-anchor="middle" class="muted">A released pin is forced back to high-impedance before anyone else may claim it.</text>
+
+  <!-- ===== 4 · THE BENCH TEST ===== -->
+  <rect x="20" y="508" width="480" height="72" rx="6" class="box"/>
+  <text x="260" y="532" text-anchor="middle" class="fg head">Output test</text>
+  <text x="260" y="554" text-anchor="middle" class="muted">borrows one pin while the engine is stopped,</text>
+  <text x="260" y="572" text-anchor="middle" class="muted">then hands it back to the owner it borrowed from</text>
+  <path d="M260 506 V474" class="dash" marker-end="url(#a)"/>
+
+  <rect x="540" y="508" width="500" height="72" rx="6" class="safe"/>
+  <text x="790" y="532" text-anchor="middle" class="fg head">Key off (battery below 7 V)</text>
+  <text x="790" y="554" text-anchor="middle" class="muted">every Generic output is released to high-impedance,</text>
+  <text x="790" y="572" text-anchor="middle" class="muted">and nothing fires; it is rebuilt when the key comes back</text>
+</svg>

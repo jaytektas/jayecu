@@ -1,0 +1,3580 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/23-lambda.html">
+      
+      
+        <link rel="prev" href="22-electronic-throttle.html">
+      
+      
+        <link rel="next" href="24-boost.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>23 Closed-loop lambda - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#closed-loop-lambda" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              23 Closed-loop lambda
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="23-lambda.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-which-sensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Which sensor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-the-short-term-trim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · The short-term trim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-the-long-term-trim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · The long-term trim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-two-banks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Two banks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-narrowband-sensors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · Narrowband sensors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-target-oscillation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6 · Target oscillation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting it up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-give-the-wideband-its-job" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Give the wideband its job
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-o2-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — O2 Control
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-check-the-gains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Check the gains
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-long-term-trim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Long-term trim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-apply-to-base-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Apply to Base Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="closed-loop-lambda">Closed-loop lambda<a class="headerlink" href="#closed-loop-lambda" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> closed loop reads the oxygen sensor and adjusts the fuel until the mixture
+matches <strong>Target Lambda</strong> — a fast trim that corrects right now, and a learned trim that remembers
+the correction, cell by cell, on the VE table's own grid.</p>
+</blockquote>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>The fuel calculation (chapter 19) works out how much fuel the engine <em>should</em> need. If the VE table
+is a little wrong, or the fuel is different, or the engine has changed, the mixture ends up off
+target. An oxygen sensor in the exhaust measures what actually happened.</p>
+<p>The <strong>O2 Control</strong> module (<code>lambda</code>) uses that measurement two ways:</p>
+<ol>
+<li><strong>Short-term fuel trim (STFT)</strong> — a fast correction, updated about 30 times a second, that moves
+   the mixture towards the target now. It is never saved: it starts from zero every time the engine
+   starts.</li>
+<li><strong>Long-term fuel trim (LTFT)</strong> — a learned table with exactly the same cells as the VE table. When
+   the short-term trim keeps having to make the same correction in a cell, that correction moves into
+   the long-term table. The long-term trim is applied from the moment the engine starts, before the
+   sensor has even warmed up.
+   <!-- src: firmware/Engine/Modules/Lambda.h -->
+</li>
+</ol>
+<p>Each has its own switch. Both off is open loop: the fuel is exactly what the tables say.</p>
+<p>Both trims multiply the fuel: 5 % STFT and 3 % LTFT give 1.05 × 1.03 of the calculated fuel.</p>
+<p><img alt="Closed-loop lambda signal flow" src="../img/diagrams/lambda-signal-flow.svg" /></p>
+<div class="admonition tip">
+<p class="admonition-title">The trims are a message about the VE table</p>
+<p>A long-term trim of +8 % in a cell means the VE table is 8 % short there. The trims are there to
+correct small, changing errors — fuel, weather, wear — not to hold up a wrong map. When the
+long-term table has settled, press <strong>Apply to Base Table</strong> to move it into the VE table (see
+<a href="#step-5-apply-to-base-table">Step 5</a>).</p>
+</div>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="1-which-sensor">1 · Which sensor<a class="headerlink" href="#1-which-sensor" title="Permanent link">&para;</a></h3>
+<p><strong>O2 Control</strong> listens to <strong>one</strong> sensor per bank, chosen with <strong>Unbanked/Bank 1</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Choice</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Disabled</strong></td>
+<td>No sensor: no closed loop</td>
+</tr>
+<tr>
+<td><strong>Narrowband 1</strong> / <strong>Narrowband 2</strong></td>
+<td>A narrowband (switching) sensor, set up in chapter 17</td>
+</tr>
+<tr>
+<td><strong>Wideband Overall</strong></td>
+<td>Whichever enabled wideband has the job <em>Wideband Overall</em> on the <strong>Wideband Scope</strong> page</td>
+</tr>
+<tr>
+<td><strong>Wideband Bank 1</strong></td>
+<td>Whichever enabled wideband has the job <em>Wideband Bank 1</em></td>
+</tr>
+<tr>
+<td><strong>Wideband 1</strong> … <strong>Wideband 15</strong></td>
+<td>That wideband directly, whatever its job</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>Wideband Scope</strong> page gives each wideband a job: <em>Unassigned</em>, <em>Wideband Overall</em>, <em>Wideband
+Bank 1</em>, <em>Wideband Bank 2</em>, or <em>Cylinder 1–12</em>. Choosing by job means that if you move a sensor to
+another input, you change one line on Wideband Scope and the loop follows it. Each job can belong to
+only <strong>one</strong> sensor; give it to two and the rows turn red and <strong>P1754</strong> is set.</p>
+<!-- src: firmware/Engine/Modules/Lambda.cpp; definition/ecu.schema.yaml (lambda.o2_src_1, wb[].assign) -->
+
+<p>A sensor with a <em>Cylinder</em> job, or <em>Unassigned</em>, is still read and logged — useful for a reference
+probe or for tuning individual cylinder trims (chapter 19) — but the closed loop does not use it.
+There is no automatic per-cylinder trim.</p>
+<h3 id="2-the-short-term-trim">2 · The short-term trim<a class="headerlink" href="#2-the-short-term-trim" title="Permanent link">&para;</a></h3>
+<p>About 30 times a second:</p>
+<ol>
+<li><strong>The error.</strong> For a wideband, the error is how far the reading is from Target Lambda, as a
+   fraction: reading 1.05 with target 1.00 is 5 % lean, and fuel is added. A reading outside the
+   sensor's valid range is ignored.</li>
+<li><strong>The controller.</strong> A proportional-integral (PI) controller turns the error into a correction. Its
+   two gains, <strong>Proportional Gain</strong> and <strong>Integral Gain</strong>, are tables by engine speed and manifold
+   pressure, because the exhaust takes much longer to reach the sensor at idle than at full load.</li>
+<li><strong>The limits.</strong> The correction is kept within <strong>STFT Max Enrich</strong> (default 20 %) and <strong>STFT Max
+   Disenrich</strong> (default 15 %). Removing fuel is limited more tightly, because a sensor that wrongly
+   reads rich would lean the engine out.
+   <!-- src: firmware/Engine/Modules/Lambda.cpp; definition/ecu.schema.yaml (stft_max_*) -->
+</li>
+</ol>
+<p>The trim is <strong>held</strong> — kept at its value, not driven and not reset — while:</p>
+<ul>
+<li>fuel is cut (overrun, a limiter, protection), and for <strong>Closed Loop After Fuel Cut</strong> (default
+  1000 ms) afterwards, while the exhaust refills;</li>
+<li>the engine has been running less than <strong>Closed Loop After Start</strong> (default 3 s);</li>
+<li>the coolant is below <strong>Closed Loop Min Coolant</strong> (default −40 °C, meaning never);</li>
+<li>the wideband reads outside its valid range;</li>
+<li>MAP prediction is active: the throttle is moving and the fuel is being worked out from the Predicted
+  MAP table rather than the sensor (chapter 19, section 6).</li>
+</ul>
+<p><strong>Closed-Loop Hold</strong> <code>lambda_cl_hold</code> says which of these is holding it: None, Fuel Cut, After Cut,
+Settling, Cold, Off Range or Transient. While held, the trim shows its integral part only; the
+proportional part drops out until the loop runs again.</p>
+<p>If the sensor stops reading altogether, or you switch closed loop off, the trim goes back to zero.</p>
+<!-- src: firmware/Engine/Modules/Lambda.cpp -->
+
+<h3 id="3-the-long-term-trim">3 · The long-term trim<a class="headerlink" href="#3-the-long-term-trim" title="Permanent link">&para;</a></h3>
+<p>The long-term trim is a table with the same axes as the VE table, so each of its cells matches a VE
+cell. While the engine is running in a cell, that cell's value is applied (the nearest cell, not an
+interpolation).</p>
+<p><strong>Learning.</strong> Each time the short-term trim updates, a part of it — set by <strong>LTFT Learn Rate</strong>
+(default 30) — moves into the long-term cell, and the short-term trim drops by the same amount. The
+total correction does not change; it just moves from the fast trim into the stored table. Over a few
+seconds of steady running, the short-term trim settles near zero and the long-term cell holds the
+correction. The long-term trim is kept within <strong>LTFT Max Enrich</strong> and <strong>LTFT Max Disenrich</strong> (default
+15 % each).</p>
+<!-- src: firmware/Engine/Modules/Lambda.cpp -->
+
+<p><strong>Which cell.</strong> The gas the sensor reads now left the cylinder a moment ago, when the engine may have
+been in a different cell. The <strong>Lambda Delay</strong> table (by engine speed and fuel load) says how long
+ago. The ECU remembers where the engine has been and credits each reading to the cell that made it.
+This lets it learn during a hard acceleration, not only at steady speeds.</p>
+<!-- src: firmware/Engine/Modules/Lambda.cpp; firmware/Engine/Modules/Lambda.h -->
+
+<p><strong>When it learns.</strong> Only when all of these are true:</p>
+<ul>
+<li>closed loop is running (not held);</li>
+<li>not in a fuel cut, and post-start enrichment has finished;</li>
+<li>coolant at least <strong>Min Coolant Temp</strong> (default 60 °C);</li>
+<li>engine speed between <strong>Min RPM</strong> (450) and <strong>Max RPM</strong> (10000);</li>
+<li>the engine has been running at least <strong>Initial Engine Running Time</strong> (5 s);</li>
+<li>the throttle moving slower than <strong>Transient Throttle Rate Limit</strong> (200 %/s);</li>
+<li>throttle below <strong>Max TPS</strong> and manifold pressure below <strong>Max MAP</strong> (default 100 kPa absolute, about
+  atmospheric), if you enable those limits;</li>
+<li>and the <strong>Learn While</strong> expression is true, if you write one.</li>
+</ul>
+<p><strong>Learn While</strong> adds a condition of your own, for example <code>rpm &gt; 1200</code> to keep learning out of idle.
+It can only narrow learning, never widen it. It is written in the expression language (chapter 34).</p>
+<!-- src: firmware/Engine/Modules/Lambda.cpp -->
+
+<p><strong>Saving.</strong> The long-term table lives in the ECU's memory and is saved to the SD card every 30 seconds
+if it has changed, and again when the engine stops. Without an SD card it is learned afresh at every
+power-up.</p>
+<!-- src: firmware/main.cpp -->
+
+<h3 id="4-two-banks">4 · Two banks<a class="headerlink" href="#4-two-banks" title="Permanent link">&para;</a></h3>
+<p>On a V engine with a sensor in each bank, set <strong>Bank 2</strong> to the second bank's sensor. Each bank then
+runs its own short-term trim. The two are split into a common part, applied to the whole engine, and
+each bank's difference from it, applied to that bank's injectors. The long-term table learns the
+common part; the difference is learned as two single numbers on the <strong>Bank Trim</strong> page, because the
+difference between banks is mostly injector flow and manifold shape, which is much the same
+everywhere.</p>
+<!-- src: firmware/Engine/Modules/Lambda.cpp; firmware/Engine/Modules/FuelCalculator.cpp -->
+
+<p>Both bank sensors must be the same kind (both widebands or both narrowbands) and different sensors;
+otherwise <strong>P1754</strong> is set and closed loop stays off. With <strong>Multi-Point</strong> injection every injector
+fires together, so the two bank corrections are averaged.</p>
+<h3 id="5-narrowband-sensors">5 · Narrowband sensors<a class="headerlink" href="#5-narrowband-sensors" title="Permanent link">&para;</a></h3>
+<p>A narrowband (standard zirconia) sensor only says <strong>rich</strong> or <strong>lean</strong> of stoichiometric (lambda 1.00);
+its voltage jumps between about 0.1 V (lean) and 0.9 V (rich). With a narrowband:</p>
+<ul>
+<li>The loop drives the voltage towards <strong>Target Voltage</strong> (default 450 mV). It naturally cycles
+  either side of it.</li>
+<li>The sensor is trusted only after it has once reached <strong>Warm Voltage</strong> (default 600 mV) — a cold
+  sensor cannot produce that much.</li>
+<li>Closed loop runs only while Target Lambda is within <strong>NB Stoich Band</strong> (default ±0.02) of 1.00. A
+  richer target (under boost, for example) is open loop: a narrowband cannot measure it.</li>
+<li><strong>NB Bias</strong> shifts the correction richer (positive) or leaner. It is the only mixture adjustment a
+  narrowband allows.
+  <!-- src: firmware/Engine/Modules/Lambda.cpp -->
+</li>
+</ul>
+<h3 id="6-target-oscillation">6 · Target oscillation<a class="headerlink" href="#6-target-oscillation" title="Permanent link">&para;</a></h3>
+<p><strong>Target Oscillation Amplitude</strong> makes the target swing either side of Target Lambda on purpose. A
+three-way catalytic converter works best with the mixture cycling a little rich and lean. On a
+wideband it is in lambda: 0.02 cycles the mixture between about 0.98 and 1.02, the target stepping
+to the other side each time the reading reaches it. On a narrowband it is in volts. Zero (the
+default) holds the target still.</p>
+<!-- src: firmware/Engine/Modules/Lambda.cpp -->
+
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<ul>
+<li>A <strong>wideband</strong> sensor and controller, wired to an analog input or connected over CAN, and set up
+  as a sensor in chapter 17 (or chapter 13 for CAN). Check it reads correctly: about 1.00 at idle on
+  a warm engine with a stoichiometric target, and it responds when you blip the throttle. Or a
+  <strong>narrowband</strong> sensor, set up the same way.</li>
+<li>A <strong>Target Lambda</strong> table (chapter 19).</li>
+<li>A <strong>VE table</strong> that is roughly right. Closed loop corrects small errors; it cannot rescue a VE table
+  that is 30 % out. Get close first — chapter 38, or the auto tuner in chapter 40.</li>
+<li>The sensor in the right place: in the exhaust before any catalyst, far enough from the engine to
+  avoid excess heat, and with no air leaks upstream (a leak reads lean).</li>
+</ul>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="step-1-give-the-wideband-its-job">Step 1 — Give the wideband its job<a class="headerlink" href="#step-1-give-the-wideband-its-job" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Configuration ▸ Fuel Tuning ▸ O2 Control ▸ Wideband Scope</strong>. For your sensor's row, choose
+<strong>Wideband Overall</strong> (one sensor for the engine) or <strong>Wideband Bank 1</strong> and <strong>Wideband Bank 2</strong> (one
+per bank). Leave the others <strong>Unassigned</strong>. The row number is the wideband's number (Wideband O2 1 is
+row 1).</p>
+<p><img alt="The Wideband Scope page" src="../img/studio/lambda-scope.png" /></p>
+<h3 id="step-2-o2-control">Step 2 — O2 Control<a class="headerlink" href="#step-2-o2-control" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Configuration ▸ Fuel Tuning ▸ O2 Control</strong>.</p>
+<p><img alt="The O2 Control page" src="../img/studio/lambda-o2-control.png" /></p>
+<ol>
+<li>Set <strong>Unbanked/Bank 1</strong> to <strong>Wideband Overall</strong> (or <strong>Wideband Bank 1</strong>, or the narrowband).</li>
+<li>Leave <strong>Bank 2</strong> <strong>Disabled</strong> unless you have a sensor for each bank; then set it to <strong>Wideband
+   Bank 2</strong>.</li>
+<li>Tick <strong>Enabled</strong> (at the top) to turn on the short-term trim.</li>
+<li>Leave <strong>Long-Term Trim</strong> off for now.</li>
+</ol>
+<p>Start the engine and let it warm up. Watch <strong>STFT</strong> (<code>stft_pct</code>): once the engine has been running a
+few seconds, it should move and then settle. <strong>Closed-Loop State</strong> (<code>lambda_cl_state</code>) shows 1
+(wideband closed loop) or 2 (narrowband closed loop); 3 means enabled but open loop right now (held,
+or a narrowband outside its band).</p>
+<h3 id="step-3-check-the-gains">Step 3 — Check the gains<a class="headerlink" href="#step-3-check-the-gains" title="Permanent link">&para;</a></h3>
+<p>At a steady idle and a steady cruise, watch lambda against the target:</p>
+<ul>
+<li>If lambda slowly creeps to the target, raise <strong>Integral Gain</strong> in that area.</li>
+<li>If lambda swings back and forth about the target, the gains are too high for the delay there;
+  lower <strong>Proportional Gain</strong> first, then Integral Gain.</li>
+</ul>
+<p>The defaults (Proportional 50 %, Integral 80 %) suit most engines.</p>
+<h3 id="step-4-long-term-trim">Step 4 — Long-term trim<a class="headerlink" href="#step-4-long-term-trim" title="Permanent link">&para;</a></h3>
+<p>Tick <strong>Long-Term Trim</strong>. Drive normally, at a range of speeds and loads, with the engine warm. Open
+<strong>Configuration ▸ Fuel Tuning ▸ Long Term Fuel Trim</strong> to watch the table fill in.</p>
+<p><img alt="The Long Term Fuel Trim page" src="../img/studio/lambda-ltft.png" /></p>
+<p>Check the <strong>Lambda Delay</strong> table suits your exhaust. The defaults are typical for a sensor in the
+downpipe; a sensor much further from the engine needs longer delays, and one right at the turbo
+outlet shorter ones.</p>
+<p><img alt="The Lambda Delay table" src="../img/studio/lambda-delay.png" /></p>
+<h3 id="step-5-apply-to-base-table">Step 5 — Apply to Base Table<a class="headerlink" href="#step-5-apply-to-base-table" title="Permanent link">&para;</a></h3>
+<p>When the long-term table has stopped changing, press <strong>Apply to Base Table</strong> on the Long Term Fuel
+Trim page. Every cell that has learned something is multiplied into the matching VE cell, and the
+learned cell goes back to zero, in one step (one Undo). Then <strong>Burn</strong>.</p>
+<!-- src: apps/studio-jf/src/model/LearnedOps.cpp (applyToBase) -->
+
+<p><strong>Reset Learned Values</strong> throws the learned table away without changing the VE table. The studio
+tells you how many cells it would lose and the largest of them first.</p>
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — one wideband</p>
+<p>A four-cylinder with one wideband on analog input, sensor <strong>Wideband O2 1</strong>.</p>
+<ul>
+<li>Wideband Scope: row 1 <strong>Wideband Overall</strong>.</li>
+<li>O2 Control: <strong>Unbanked/Bank 1</strong> = Wideband Overall, Bank 2 Disabled, Enabled, Long-Term Trim on.</li>
+<li>Everything else at the defaults.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — a V8 with a wideband per bank</p>
+<ul>
+<li>Wideband Scope: row 1 <strong>Wideband Bank 1</strong>, row 2 <strong>Wideband Bank 2</strong>.</li>
+<li>O2 Control: <strong>Unbanked/Bank 1</strong> = Wideband Bank 1, <strong>Bank 2</strong> = Wideband Bank 2.</li>
+<li>Sequential or semi-sequential injection, so each bank's injectors can be trimmed separately.</li>
+<li>Watch <strong>STFT Bank 1</strong> and <strong>STFT Bank 2</strong> (each bank's difference from the common trim) and the
+  <strong>Bank Trim</strong> page.</li>
+</ul>
+<p><img alt="The Bank Trim page" src="../img/studio/lambda-bank.png" /></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — the original narrowband</p>
+<p>A road car keeping its standard narrowband sensor for emissions, with a stoichiometric target at
+cruise.</p>
+<ul>
+<li><strong>Unbanked/Bank 1</strong> = Narrowband 1. Target Voltage 450 mV, Warm Voltage 600 mV.</li>
+<li>Target Lambda 1.00 wherever you want closed loop. Richer cells (full load) are open loop
+  automatically.</li>
+<li><strong>Target Oscillation Amplitude</strong> 0.100 (100 mV) if the catalyst needs a firmer swing.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 4 — learning only at cruise</p>
+<p>A turbo engine where you want the learned trim to cover part throttle only: tick <strong>Enable Max MAP</strong>
+and set <strong>Max MAP</strong> to 100 kPa (about atmospheric — MAP is absolute pressure), or write <strong>Learn
+While</strong> as <code>map &lt; 100 and rpm &gt; 1500</code>.
+The short-term trim still corrects everywhere the target is measurable.</p>
+</div>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<ul>
+<li><strong>Authority.</strong> If the short-term trim often sits at its limit, the VE table is wrong there — fix
+  the table rather than widening the limit. The same goes for long-term cells pinned at 15 %.</li>
+<li><strong>Transport delay.</strong> The loop cannot react faster than the exhaust reaches the sensor. If lambda
+  hunts at idle but not at load, lower the gains in the low-RPM, low-MAP corner of both gain tables.</li>
+<li><strong>Learn rate.</strong> A higher <strong>LTFT Learn Rate</strong> fills the table faster but lets one noisy cell swing
+  more. 30 is a good compromise; lower it if the table looks patchy.</li>
+<li><strong>Keep learning out of transients.</strong> If cells after gear changes or tip-ins learn nonsense, lower
+  <strong>Transient Throttle Rate Limit</strong>, or check the Lambda Delay is long enough.</li>
+</ul>
+<p>Channels to log: <code>lambda_1</code> (or the sensor used), <code>lambda_target</code>, <code>stft_pct</code>, <code>ltft_pct</code>,
+<code>lambda_cl_state</code>, <code>rpm</code>, <code>fuel_load</code>, and for two banks <code>stft_bank_1_pct</code>, <code>stft_bank_2_pct</code>,
+<code>ltft_bank_1_pct</code>, <code>ltft_bank_2_pct</code>.</p>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>What sets it</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1753</strong></td>
+<td>Closed loop enabled but no O2 sensor is reading</td>
+<td>The chosen sensor is not giving a valid reading (normal for a few seconds while a sensor warms up)</td>
+<td>The sensor is enabled and wired; the wideband controller; a narrowband has reached Warm Voltage</td>
+</tr>
+<tr>
+<td><strong>P1754</strong></td>
+<td>O2 source configuration invalid</td>
+<td>The chosen source names no enabled sensor; two widebands share a job; the two banks use different kinds of sensor or the same sensor</td>
+<td>Wideband Scope jobs; Unbanked/Bank 1 and Bank 2</td>
+</tr>
+</tbody>
+</table>
+<p>Both are severity 1 (a warning). With P1754 the closed loop stays off.</p>
+<!-- src: firmware/Engine/Modules/Lambda.cpp; generated/module_dtc.h -->
+
+<p><strong>Closed-Loop State</strong> <code>lambda_cl_state</code>: 0 off, 1 wideband closed loop, 2 narrowband closed loop,
+3 enabled but open loop now. <strong>O2 Source Invalid</strong> <code>o2_src_fault</code> and <code>o2_assign_fault</code> say which
+kind of P1754 it is.</p>
+<p>Lean protection (cutting power when the mixture goes dangerously lean under load) is a separate
+module, <strong>Lambda Protection</strong>, in chapter 29.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STFT stays at 0</td>
+<td>Closed loop off; no source chosen; engine not warm or just started; P1754</td>
+<td>Enabled; Unbanked/Bank 1; <code>lambda_cl_state</code></td>
+</tr>
+<tr>
+<td>State stays 3 on a narrowband</td>
+<td>Target Lambda not near 1.00; sensor never reached Warm Voltage</td>
+<td>NB Stoich Band; the sensor heater</td>
+</tr>
+<tr>
+<td>STFT pinned at +20 %</td>
+<td>VE table far too lean; an exhaust leak before the sensor; low fuel pressure</td>
+<td>The VE table; the exhaust; fuel pressure</td>
+</tr>
+<tr>
+<td>STFT pinned at −15 %</td>
+<td>VE table far too rich; the sensor reading wrongly rich</td>
+<td>The VE table; the sensor's calibration</td>
+</tr>
+<tr>
+<td>Lambda hunts about the target</td>
+<td>Gains too high for the transport delay</td>
+<td>Lower Proportional Gain, then Integral Gain, in that area</td>
+</tr>
+<tr>
+<td>LTFT never changes</td>
+<td>Long-Term Trim off; a learn condition never met (coolant, run time, Max MAP)</td>
+<td>The Learn While and Learn Limits settings on O2 Control</td>
+</tr>
+<tr>
+<td>LTFT learns in the wrong cells</td>
+<td>Lambda Delay too short or too long</td>
+<td>The Lambda Delay table</td>
+</tr>
+<tr>
+<td>Bank trims fight each other</td>
+<td>Bank sensors swapped</td>
+<td>Wideband Scope jobs match the banks</td>
+</tr>
+<tr>
+<td>LTFT lost after a restart</td>
+<td>No SD card</td>
+<td>Fit an SD card (chapter 48)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Closed-Loop Enabled</strong><br><code>lambda.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>The FAST correction: move the mixture toward the target now, from what the widebands are reading. Off, nothing corrects for a wideband and the fuel calculation is whatever the tables say — which is exactly what is wanted while measuring how wrong those tables are. Turning it off zeroes the correction and clears the integrator, so re-enabling starts from nothing rather than from a stale wind-up. Short-term trim is never stored: it dies with the key.</td>
+</tr>
+<tr>
+<td><strong>Long-Term Trim</strong><br><code>lambda.ltft_enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>The LEARNED correction: a stored surface of what the short-term trim keeps having to do, applied from the moment the engine starts — before a wideband has even warmed up, which is where its value is. Off, the surface is retained but not applied; this switch never clears what was learned. Learning INTO it additionally needs the short-term trim running, because what it learns is whatever that trim settles on.</td>
+</tr>
+<tr>
+<td><strong>Unbanked/Bank 1</strong><br><code>lambda.o2_src_1</code><br>Range: one of: Disabled, Narrowband 1, Narrowband 2, Wideband Bank 1, Wideband 1, Wideband 2, Wideband 3, Wideband 4, Wideband 5, Wideband 6, Wideband 7, Wideband 8, Wideband 9, Wideband 10, Wideband 11, Wideband 12, Wideband 13, Wideband 14, Wideband 15, Wideband Overall<br>Default: Disabled</td>
+<td>The O2 sensor the closed loop listens to. Bank and overall resolve through the wideband assignment list — whichever ENABLED sensor holds that job — so re-plumbing is one edit there rather than two in different places; Wideband N names one sensor directly. A wideband is compared against the target lambda table; a narrowband reports only which side of stoichiometry the mixture is on, is compared against Target Voltage, and can close the loop only where the target IS stoichiometry. Disabled stops the fast correction entirely, and the learned long-term trim is a separate switch that still applies. A role nothing is assigned to leaves the loop with nothing to hear, which raises P1753 rather than silently correcting nothing.</td>
+</tr>
+<tr>
+<td><strong>Bank 2</strong><br><code>lambda.o2_src_2</code><br>Range: one of: Disabled, Narrowband 1, Narrowband 2, Wideband Bank 2, Wideband 1, Wideband 2, Wideband 3, Wideband 4, Wideband 5, Wideband 6, Wideband 7, Wideband 8, Wideband 9, Wideband 10, Wideband 11, Wideband 12, Wideband 13, Wideband 14, Wideband 15<br>Default: Disabled</td>
+<td>The second bank's source, and the switch between unbanked and banked control. Disabled means ONE loop for the whole engine on the Unbanked/Bank 1 source. Set it, and bank 1 and bank 2 each run their own correction from their own sensor — which is what a V engine with a sensor per bank wants, because the two banks genuinely do run differently. It cannot be set while Bank 1 is Disabled: there is no second bank without a first.</td>
+</tr>
+<tr>
+<td><strong>Target Voltage</strong><br><code>lambda.nb_target_mv</code><br>Range: 100 to 900<br>Default: 450<br>Units: mV</td>
+<td>The sensor voltage the loop drives towards, and with it the point that divides rich from lean. A zirconia cell switches almost vertically through stoichiometry, so the exact figure matters far less than it looks — 450 mV is the convention, and it drifts a little with heat and age. Above it the mixture is rich and fuel comes out; below it, lean and fuel goes in. Ignored on a wideband, which is measuring lambda and takes its target from the lambda table.</td>
+</tr>
+<tr>
+<td><strong>Warm Voltage</strong><br><code>lambda.nb_warm_mv</code><br>Range: 0 to 900<br>Default: 600<br>Units: mV</td>
+<td>The voltage a narrowband must have reached at least once before it is believed. A cold Nernst cell cannot source much EMF, so "has it ever got this high" is a direct readiness test needing no timer and no heater feedback — and it closes the trap where a warming sensor sits near the switch point looking exactly like a live signal that happens to be at stoich.</td>
+</tr>
+<tr>
+<td><strong>Target Oscillation Amplitude</strong><br><code>lambda.osc_amplitude</code><br>Range: 0.000 to 0.500<br>Default: 0.000</td>
+<td>A deliberate swing added to the target — in VOLTS on a narrowband, in LAMBDA on a wideband. On a narrowband it alternates each time the sensor crosses it; on a wideband the target steps to the other side once the reading has reached it, so 0.02 cycles the mixture between about 0.98 and 1.02. Zero means hold the target still. It is not a tolerance: a three-way catalyst wants the mixture cycling, because alternating oxygen storage and release is what lets one brick reduce NOx and oxidise CO and HC at the same time. On a narrowband the loop will cycle anyway (a switching sensor gives it nothing to settle on); this is how you ask for that swing rather than inherit whatever the gains happen to produce.</td>
+</tr>
+<tr>
+<td><strong>NB Stoich Band</strong><br><code>lambda.nb_stoich_band</code><br>Range: 0.000 to 0.200<br>Default: 0.020<br>Units: λ</td>
+<td>How far the TARGET may sit from lambda 1.00 and still be closed-loop on a narrowband. Outside this the sensor is pinned to one rail and reports nothing useful, so the loop opens rather than chasing a saturated reading — a target of 0.85 under boost is open loop, and no narrowband setting changes that.</td>
+</tr>
+<tr>
+<td><strong>NB Bias</strong><br><code>lambda.nb_bias_pct</code><br>Range: -5.00 to 5.00<br>Default: 0.00<br>Units: %</td>
+<td>A deliberate offset applied to the averaged correction, positive richer. The only mixture adjustment a narrowband can actually give you: the sensor still switches at stoich, so this biases where the oscillation sits about it rather than moving the target.</td>
+</tr>
+<tr>
+<td><strong>STFT Max Enrich</strong><br><code>lambda.stft_max_enrich</code><br>Range: 0.0 to 320.0<br>Default: 20.0<br>Units: %</td>
+<td>How much FUEL the short-term trim may add, in percent. Wide enough to cover real variation, narrow enough that one bad reading cannot do damage.</td>
+</tr>
+<tr>
+<td><strong>STFT Max Disenrich</strong><br><code>lambda.stft_max_disenrich</code><br>Range: 0.0 to 320.0<br>Default: 15.0<br>Units: %</td>
+<td>How much fuel the short-term trim may REMOVE. Deliberately tighter than the enrich limit by default: a sensor reading falsely rich leans the engine out, which is the direction that destroys pistons.</td>
+</tr>
+<tr>
+<td><strong>LTFT Max Enrich</strong><br><code>lambda.ltft_max_enrich</code><br>Range: 0.0 to 320.0<br>Default: 15.0<br>Units: %</td>
+<td>How much fuel the LEARNED trim may add. If real trims sit pinned at this limit the base fuel table is wrong and should be corrected — with Apply to Base Table — rather than the limit raised.</td>
+</tr>
+<tr>
+<td><strong>LTFT Max Disenrich</strong><br><code>lambda.ltft_max_disenrich</code><br>Range: 0.0 to 320.0<br>Default: 15.0<br>Units: %</td>
+<td>How much fuel the learned trim may remove. Same reasoning as the short-term disenrich limit: leaning out is the dangerous direction, and a learned lean correction persists across a key cycle.</td>
+</tr>
+<tr>
+<td><strong>LTFT Learn Rate</strong><br><code>lambda.ltft_gain</code><br>Range: 0 to 255<br>Default: 30</td>
+<td>How fast the settled short-term trim migrates into the learned table. Larger learns faster and can oscillate; smaller follows slowly and is barely moved by one bad cell. Only what the clamp and the cell resolution actually accept is removed from the short-term trim, so the total correction is preserved either way.</td>
+</tr>
+<tr>
+<td><strong>Closed Loop After Start</strong><br><code>lambda.cl_start_delay_s</code><br>Range: 0 to 120<br>Default: 3<br>Units: s</td>
+<td>How long the engine must have been running before the fast trim may correct. Straight after start the mixture is carried by cranking and post-start enrichment, and the trim would only learn to fight them.</td>
+</tr>
+<tr>
+<td><strong>Closed Loop After Fuel Cut</strong><br><code>lambda.cl_after_cut_ms</code><br>Range: 0 to 10000<br>Default: 1000<br>Units: ms</td>
+<td>After ANY fuel cut ends (overrun, rev limiter, a protection) the fast trim stays frozen this long while the exhaust refills. During the cut itself it is always frozen: the wideband sweeps lean on air, and correcting that added fuel on every overrun.</td>
+</tr>
+<tr>
+<td><strong>Closed Loop Min Coolant</strong><br><code>lambda.cl_min_clt</code><br>Range: -40 to 150<br>Default: -40<br>Units: C</td>
+<td>Coolant below which the fast trim is frozen. -40 = no coolant condition. A cold engine is fuelled by warm-up enrichment on purpose, and a trim chasing stoichiometry there works against it.</td>
+</tr>
+<tr>
+<td><strong>Min Coolant Temp</strong><br><code>lambda.learn_min_clt</code><br>Range: -40 to 150<br>Default: 60<br>Units: C</td>
+<td>Coolant temperature below which nothing is learned. Warm-up enrichment is a correction against COOLANT, and any error in it would otherwise be stored against rpm and load, where it is wrong the moment the engine is warm. Set to the temperature at which warm-up enrichment has essentially finished. At -40 it never gates, which is also what to use when no coolant sensor is configured.</td>
+</tr>
+<tr>
+<td><strong>Min RPM</strong><br><code>lambda.learn_min_rpm</code><br>Range: 0 to 3000<br>Default: 450<br>Units: RPM</td>
+<td>Below this the engine is cranking or stalling, not running: fuelling comes from the cranking table rather than the VE model, and the sensor is usually not lit. Nothing learned here describes the running engine.</td>
+</tr>
+<tr>
+<td><strong>Max RPM</strong><br><code>lambda.learn_max_rpm</code><br>Range: 1000 to 12000<br>Default: 10000<br>Units: RPM</td>
+<td>Above this, learning stops. The useful ceiling is wherever the mixture stops being steady enough for a stored cell to mean anything — and on a narrowband it is well below the point where the target leaves stoichiometry anyway.</td>
+</tr>
+<tr>
+<td><strong>Initial Engine Running Time</strong><br><code>lambda.learn_run_time_s</code><br>Range: 0 to 120<br>Default: 5<br>Units: s</td>
+<td>How long the engine must have been RUNNING before learning may start, measured from the transition into running. It covers the settling that post-start enrichment alone does not: a sensor coming up to temperature, and a fuel system finding its pressure. Distinct from the post-start correction, which is about fuelling rather than about time.</td>
+</tr>
+<tr>
+<td><strong>Transient Throttle Rate Limit</strong><br><code>lambda.learn_tps_rate_limit</code><br>Range: 0.0 to 2000.0<br>Default: 200.0<br>Units: %/sec</td>
+<td>How fast the throttle may be moving and still allow learning. A tip-in is corrected by accel enrichment, whose error belongs to the RATE of the throttle rather than to the operating point — and by the time the exhaust reaches the sensor the engine has moved cells, so what would be stored is an error attributed to the wrong place entirely. At 0 it never gates.</td>
+</tr>
+<tr>
+<td><strong>Enable Max TPS</strong><br><code>lambda.learn_max_tps_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Opt in to an upper throttle limit for learning. Off by default because the sensible ceiling is engine-specific and the target usually leaves stoichiometry before throttle alone becomes the problem.</td>
+</tr>
+<tr>
+<td><strong>Max TPS</strong><br><code>lambda.learn_max_tps</code><br>Range: 0.0 to 100.0<br>Default: 30.0<br>Units: %</td>
+<td>Throttle above which nothing is learned, when the limit is enabled. A way of keeping the surface to the part-throttle region a closed loop can actually measure.</td>
+</tr>
+<tr>
+<td><strong>Enable Max MAP</strong><br><code>lambda.learn_max_map_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Opt in to an upper manifold-pressure limit for learning.</td>
+</tr>
+<tr>
+<td><strong>Max MAP</strong><br><code>lambda.learn_max_map</code><br>Range: -100.0 to 400.0<br>Default: 100.0<br>Units: kPa</td>
+<td>Manifold pressure above which nothing is learned, when the limit is enabled. On a boosted engine this is the honest way to keep learning out of the region where the target is not stoichiometric and, on a narrowband, cannot be measured at all.</td>
+</tr>
+<tr>
+<td><strong>Learn While</strong><br><code>lambda.ltft_learn_when</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>An extra condition the learned trim must also meet before it absorbs correction. It is ADDED to the built-in rule (warm, running, past post-start enrichment, not in a fuel cut, and the limits on this page), so it can only narrow learning, never widen it; empty adds nothing. Reads any bus channel and any config setting — "clt &gt; 60 and rpm &gt; 1200" keeps learning out of idle and warm-up, "and not dfco_active" keeps it out of overrun, "and tps &gt; 2" keeps it off a closed throttle. The short-term trim still corrects whenever it is enabled; this governs only what gets BAKED IN.</td>
+</tr>
+<tr>
+<td><strong>Proportional Gain X Channel</strong><br><code>lambda.stft_kp_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Proportional Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Proportional Gain Y Channel</strong><br><code>lambda.stft_kp_table_y_src</code><br>Range: -1 to 32767<br>Default: 273</td>
+<td>WHICH SIGNAL the Y axis of 'Proportional Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Integral Gain X Channel</strong><br><code>lambda.stft_ki_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Integral Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Integral Gain Y Channel</strong><br><code>lambda.stft_ki_table_y_src</code><br>Range: -1 to 32767<br>Default: 273</td>
+<td>WHICH SIGNAL the Y axis of 'Integral Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Lambda Delay X Channel</strong><br><code>lambda.ltft_delay_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Lambda Delay' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Lambda Delay Y Channel</strong><br><code>lambda.ltft_delay_table_y_src</code><br>Range: -1 to 32767<br>Default: 125</td>
+<td>WHICH SIGNAL the Y axis of 'Lambda Delay' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Gain RPM Axis bins</strong><br><code>lambda.lambda_gain_rpm_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Gain RPM Axis' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Gain MAP Axis bins</strong><br><code>lambda.lambda_gain_map_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Gain MAP Axis' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Lambda Delay X Axis bins</strong><br><code>lambda.ltft_delay_table_x_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Lambda Delay X Axis' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Lambda Delay Y Axis bins</strong><br><code>lambda.ltft_delay_table_y_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Lambda Delay Y Axis' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Proportional Gain</strong><br><code>lambda.stft_kp_table</code><br>Range: 0.0 to 2000.0<br>Default: 8 × 8 table<br>Units: %</td>
+<td>How hard the correction reacts to the error as it stands, per RPM and manifold pressure. It is the term that recovers from a step: raise it and the loop responds faster, raise it past what the transport delay allows and the mixture hunts, because the loop is still reacting to gas that left the cylinder a moment ago.</td>
+</tr>
+<tr>
+<td><strong>Integral Gain</strong><br><code>lambda.stft_ki_table</code><br>Range: 0.0 to 2000.0<br>Default: 8 × 8 table<br>Units: %</td>
+<td>How fast the correction accumulates while an error persists, per RPM and manifold pressure. This is the term that actually removes a steady error rather than merely reducing it — and on a narrowband it is very nearly the whole controller, because a switching sensor offers nothing to be proportional to once it has saturated. It is also what migrates into the learned trim, so the stored surface ends up holding whatever this converges on.</td>
+</tr>
+<tr>
+<td><strong>Gain RPM Axis</strong><br><code>lambda.lambda_gain_rpm_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: RPM</td>
+<td>The RPM breakpoints the closed-loop gains are looked up on. Concentrate them at the low end, where exhaust transport delay is actually changing: the difference between 750 and 2000 RPM matters far more to this loop than the difference between 6000 and 8000.</td>
+</tr>
+<tr>
+<td><strong>Gain MAP Axis</strong><br><code>lambda.lambda_gain_map_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: kPa</td>
+<td>The manifold-pressure breakpoints (ABSOLUTE kPa: 100 is atmospheric) the closed-loop gains are looked up on. With RPM these stand in for mass flow, which is what sets how long the loop must wait to hear the result of what it just did.</td>
+</tr>
+<tr>
+<td><strong>Lambda Delay</strong><br><code>lambda.ltft_delay_table</code><br>Range: 0 to 1000<br>Default: 8 × 8 table<br>Units: ms</td>
+<td>How long ago the gas a wideband is reading now actually left the cylinder — exhaust transport time plus the sensor's own response. It falls as mass flow rises, so it is largest at idle and low load and smallest at high RPM under boost. The trim uses it to credit a reading to the cell the engine was in when that gas was made, which is what lets the map learn through a hard pull instead of only at steady state. Too small and corrections land in cells ahead of where they belong; too large and they land behind.</td>
+</tr>
+<tr>
+<td><strong>Lambda Delay X Axis</strong><br><code>lambda.ltft_delay_table_x_axis</code><br>Range: 0 to 0<br>Default: 8-point curve</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Lambda Delay Y Axis</strong><br><code>lambda.ltft_delay_table_y_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: kPa</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../part2/13-can-bus.html">Chapter 13 — CAN bus</a> (CAN widebands)</li>
+<li><a href="17-sensors.html">Chapter 17 — Sensors</a> (wideband and narrowband sensors)</li>
+<li><a href="19-fuel.html">Chapter 19 — Fuel</a> (Target Lambda, the VE table, cylinder trims)</li>
+<li><a href="29-protection.html">Chapter 29 — Engine protection</a> (Lambda Protection)</li>
+<li><a href="34-tables-expressions.html">Chapter 34 — Generic tables and expressions</a> (Learn While)</li>
+<li><a href="../part4/38-tuning-fuel.html">Chapter 38 — Tuning fuel</a></li>
+<li><a href="../part4/40-auto-tune.html">Chapter 40 — Auto tune</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="22-electronic-throttle.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 22 Electronic throttle">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                22 Electronic throttle
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="24-boost.html" class="md-footer__link md-footer__link--next" aria-label="Next: 24 Boost">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                24 Boost
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

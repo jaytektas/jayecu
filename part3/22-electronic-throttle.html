@@ -1,0 +1,3678 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/22-electronic-throttle.html">
+      
+      
+        <link rel="prev" href="21-idle.html">
+      
+      
+        <link rel="next" href="23-lambda.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>22 Electronic throttle - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#electronic-throttle" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              22 Electronic throttle
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="22-electronic-throttle.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-the-pedal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · The pedal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-the-throttle-demand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · The throttle demand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-the-position-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · The position loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-safety-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Safety checks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-the-key-on-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · The key-on check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-the-half-bridges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6 · The half bridges
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting it up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-the-pedal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — The pedal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-the-pedal-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — The pedal map
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-the-half-bridge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — The half bridge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-throttle-body-a-find-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Throttle body A, Find limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-fill-feed-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Fill feed-forward
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-autotune" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Autotune
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-save" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Save
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#before-you-drive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you drive
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="electronic-throttle">Electronic throttle<a class="headerlink" href="#electronic-throttle" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> drive-by-wire reads the accelerator pedal, decides where the throttle plate
+should be, and moves the plate there with a motor — checking both the pedal and the plate with two
+sensors each, and letting the plate's spring take over the moment anything disagrees.</p>
+</blockquote>
+<div class="admonition danger">
+<p class="admonition-title">A throttle that can open itself</p>
+<p>With drive-by-wire, the ECU — not a cable — opens the throttle. A wiring mistake, a wrong sensor
+direction or a skipped calibration step can open the plate when nobody asked for it. Set it up
+<strong>with the engine stopped</strong>, follow the steps in order, and prove every safety check works (section
+<a href="#before-you-drive">Before you drive</a>) before the engine runs. Never fit a throttle body with only one
+position sensor, and never use a pedal with only one track.</p>
+</div>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>A drive-by-wire throttle body has a small DC motor that turns the plate against a return spring, and
+two position sensors on the plate. A drive-by-wire pedal has no cable: it is a sensor with two tracks.
+Three modules work together:</p>
+<ol>
+<li>
+<p><strong>Accelerator Pedal</strong> (<code>app</code>) reads the two pedal tracks, checks they agree, and turns pedal travel
+   into a throttle request through the <strong>Pedal to Throttle</strong> table. It publishes <strong>Pedal Demand</strong>
+   <code>pedal_demand</code>.
+   <!-- src: firmware/Engine/Modules/App.cpp --></p>
+</li>
+<li>
+<p><strong>Electronic throttle</strong> (<code>electronic_throttle</code>) adds the idle controller's share, lets cruise control
+   raise the request and traction control lower it, and publishes the result as <strong>Throttle Demand</strong>
+   <code>throttle_demand</code>. Then, for each throttle body, it runs a position loop that drives the plate to
+   that demand, and it watches both plate sensors and the plate's movement.
+   <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp --></p>
+</li>
+<li>
+<p><strong>Half Bridge</strong> (<code>h_bridge</code>) is the motor driver. It applies the duty the throttle asks for, in
+   either direction, and only while the throttle says it may.
+   <!-- src: firmware/Engine/Modules/HBridge.cpp -->
+</p>
+</li>
+</ol>
+<p>There can be <strong>two</strong> throttle bodies (A and B), for an engine with one throttle per bank. Each has its
+own sensors, its own calibration and its own half bridge.</p>
+<p><img alt="Electronic throttle signal flow" src="../img/diagrams/etb-signal-flow.svg" /></p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="1-the-pedal">1 · The pedal<a class="headerlink" href="#1-the-pedal" title="Permanent link">&para;</a></h3>
+<p>Track A of the pedal (<code>app_1</code>) is the one that is used; track B (<code>app_2</code>) is the check. The two must
+read within <strong>APP Match Error Limit</strong> (default 10 %) of each other. If they disagree, or track A
+disappears, for longer than <strong>APP Match Debounce</strong> (default 200 ms), the pedal is not trusted. A missing
+track A asks for no throttle from the moment it goes; the debounce only delays the fault, so the instant
+at key-on before the sensors read cannot set it. Once the pedal is not trusted:</p>
+<ul>
+<li>Pedal Demand goes to 0 and a code is set (<strong>P2138</strong> for a disagreement, <strong>P1780</strong> for a missing
+  track A).</li>
+<li>The throttle switches its motor <strong>off</strong>, so the spring takes the plate to its rest position (the
+  "limp-home" position, a little open). The engine keeps running at a fast idle.</li>
+<li>The fault <strong>holds until the key is turned off</strong>, even if the tracks agree again. A pedal that failed
+  once is not trusted again on the same drive. With the key off the pedal is not judged at all (the
+  sensors are not read), so each key-on starts with the pedal trusted.
+  <!-- src: firmware/Engine/Modules/App.cpp; firmware/Engine/Modules/ElectronicThrottle.cpp -->
+</li>
+</ul>
+<p>When the pedal is trusted, track A goes through the <strong>Pedal to Throttle</strong> table (pedal % across,
+engine speed down, optionally a plane per gear). The default table is a straight line: 10 % pedal asks
+for 10 % throttle.</p>
+<!-- src: definition/ecu.schema.yaml -->
+
+<h3 id="2-the-throttle-demand">2 · The throttle demand<a class="headerlink" href="#2-the-throttle-demand" title="Permanent link">&para;</a></h3>
+<p>The throttle works out one number, <strong>Throttle Demand</strong>, in this order:</p>
+<ol>
+<li><strong>Cruise.</strong> While cruise control is holding a speed, its request is a floor under the pedal: the
+   higher of the two is used, so pressing the pedal always overrides cruise.</li>
+<li><strong>Idle floor.</strong> The idle controller's <strong>Idle Duty</strong> is scaled by <strong>Idle Authority</strong> (default 15 %):
+   100 % idle duty opens the plate 15 %. The pedal then works <em>above</em> that floor, so the full pedal range
+   is still 0–100 %:
+   <code>demand = floor + pedal × (100 − floor) / 100</code>.</li>
+<li><strong>Caps.</strong> <strong>Traction Cap Signal</strong> (wired to traction control by default) and <strong>Torque Cap Signal</strong>
+   can each limit the demand. The lower one wins. A cap that is not assigned, or not being published,
+   has no effect.
+   <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
+</li>
+</ol>
+<p>Throttle Demand is a bus signal, so a Lua script can change it before the plate follows it
+(chapter 35).</p>
+<h3 id="3-the-position-loop">3 · The position loop<a class="headerlink" href="#3-the-position-loop" title="Permanent link">&para;</a></h3>
+<p>For each throttle body, 1000 times a second:</p>
+<ol>
+<li>The target is Throttle Demand, clamped between <strong>Min TPS</strong> (default 3 %) and <strong>Max TPS</strong> (default
+   98 %), so the plate never hits its end stops in normal use.</li>
+<li>The target is slew-limited: it moves at most <strong>Open Rate Limit</strong> (default 300 %/s) opening and
+   <strong>Close Rate Limit</strong> (default 500 %/s) closing. A sudden stab of the pedal becomes a fast ramp.</li>
+<li>The <strong>Spring Feed-Forward</strong> table gives the duty that <em>holds</em> the plate at the target — against the
+   return spring — with no help from the controller.</li>
+<li>A <strong>PID</strong> controller adds a correction from the difference between the target and where the plate
+   is (sensor A, <code>etb_position_1</code>). The integral part is limited to <strong>Integral Clamp</strong> (default 50 %).</li>
+<li>The total duty, −100 to +100 %, goes to the half bridge. Positive opens, negative closes.
+   <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
+</li>
+</ol>
+<p>The feed-forward does most of the work; the PID only trims. That is why the calibration has three
+steps: find the stops, measure the feed-forward, then tune the PID.</p>
+<p>Plate position is measured in <strong>plate percent</strong>: 0 % is the closed stop and 100 % the open stop, as
+found by calibration. This is not the same as pedal percent.</p>
+<h3 id="4-safety-checks">4 · Safety checks<a class="headerlink" href="#4-safety-checks" title="Permanent link">&para;</a></h3>
+<p>The throttle stops driving the motor — and the spring closes the plate to its rest position — when:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>What trips it</th>
+<th>Code</th>
+<th>Clears</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Plate sensors disagree</strong></td>
+<td>Sensors A and B differ by more than <strong>TPS Match Error Limit</strong> (default 10 %) for longer than <strong>TPS Match Debounce</strong> (default 200 ms), or a sensor stops reading</td>
+<td><strong>P2135</strong></td>
+<td>latched</td>
+</tr>
+<tr>
+<td><strong>Plate stuck closed</strong></td>
+<td>The loop is pushing the plate open (error over 8 %, duty over 25 %) and it moves less than 1.5 % in 600 ms</td>
+<td><strong>P2112</strong></td>
+<td>latched</td>
+</tr>
+<tr>
+<td><strong>Plate stuck open</strong></td>
+<td>The same, while pushing the plate closed</td>
+<td><strong>P2111</strong></td>
+<td>latched</td>
+</tr>
+<tr>
+<td><strong>Pedal not trusted</strong></td>
+<td>Pedal fault (section 1)</td>
+<td>P2138 / P1780</td>
+<td>at key-off</td>
+</tr>
+<tr>
+<td><strong>Key off</strong></td>
+<td>Ignition switched off</td>
+<td>—</td>
+<td>at key-on</td>
+</tr>
+<tr>
+<td><strong>Not calibrated</strong></td>
+<td>The body has never been through Find limits</td>
+<td>—</td>
+<td>after Find limits</td>
+</tr>
+</tbody>
+</table>
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
+
+<p>A <strong>latched</strong> fault stays until a successful <strong>Find limits</strong>, or until the ECU restarts. Turning the
+key off and on does <strong>not</strong> clear it, and neither does clearing the codes. The motor stays off and the
+engine runs on the plate's rest position.</p>
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
+
+<h3 id="5-the-key-on-check">5 · The key-on check<a class="headerlink" href="#5-the-key-on-check" title="Permanent link">&para;</a></h3>
+<p>A calibration saved in the tune is not trusted blindly. Each time the key is turned on:</p>
+<ol>
+<li>The throttle reads both plate sensors and checks they agree and are inside the calibrated range.
+   If not, <strong>P2135</strong> latches.</li>
+<li>If the engine is stopped, it then <strong>sweeps the plate</strong> to the closed stop and to the open stop and
+   checks both are where the calibration says (within 10 %). If a stop has moved, or the plate cannot
+   reach it, <strong>P2111</strong> (the closed stop) or <strong>P2112</strong> (the open stop) latches. If sensor B does not
+   move with the plate, <strong>P2135</strong> latches.</li>
+<li>Only then does the loop close and the pedal work.
+   <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
+</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">The plate opens fully at key-on</p>
+<p>The key-on sweep drives the plate wide open for a moment. Fuel and spark are cut while it runs and
+for half a second afterwards, so the engine cannot start into an open throttle — but it does mean
+the engine will not fire if you crank straight away. With the default settings the check takes two
+to three seconds. Turn the key, wait until the throttle has gone quiet, then start.
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp --></p>
+</div>
+<p>If the key is turned on with the engine already turning, the sweep is skipped and the sensor check
+alone is used.</p>
+<h3 id="6-the-half-bridges">6 · The half bridges<a class="headerlink" href="#6-the-half-bridges" title="Permanent link">&para;</a></h3>
+<p>The ECU has two H-bridge drivers, <strong>Half Bridge A</strong> and <strong>Half Bridge B</strong> (chapter 12 has the pins).
+Each drives a motor both ways. A half bridge does nothing clever: it applies its <strong>Demand Signal</strong>
+while its <strong>Enable Signal</strong> is on, and switches off if either signal is missing. By default Half Bridge
+A takes <code>etb_duty_1</code>/<code>etb_en_1</code> (throttle body A) and B takes <code>etb_duty_2</code>/<code>etb_en_2</code>.</p>
+<!-- src: firmware/Engine/Modules/HBridge.cpp; definition/ecu.schema.yaml -->
+
+<p>The same two bridges also drive a stepper idle valve (chapter 21), which needs <strong>both</strong>. So an engine
+can have an electronic throttle <em>or</em> a bridge-driven stepper valve, not both. Two throttle bodies also
+use both bridges.</p>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>You need:</p>
+<ul>
+<li>A drive-by-wire <strong>throttle body</strong> with <strong>two</strong> position sensors. Most have one track rising and one
+  falling with plate opening; that is fine.</li>
+<li>A drive-by-wire <strong>pedal</strong> with <strong>two</strong> tracks.</li>
+<li>The throttle motor wired to a <strong>half bridge</strong> output, and the four sensor signals wired to analog
+  inputs, each with its 5 V supply and ground (chapters 11 and 12).</li>
+<li>A good battery or a bench supply. The motor draws several amps while it moves.</li>
+<li>The sensors set up in chapter 17: <strong>Throttle Position</strong> and <strong>Throttle Position 2</strong> for body A,
+  <strong>Accelerator Pedal</strong> and <strong>Accelerator Pedal 2</strong> for the pedal, each on the right analog input.
+  Their calibration is written for you by the steps below.</li>
+</ul>
+<p>Work with the engine <strong>stopped</strong> and the key <strong>on</strong> throughout. Every calibration step refuses to run
+while the engine turns, and stops if it starts.</p>
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
+
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>The <strong>Electronic throttle</strong> page lists the throttle bodies and the half bridges, with Idle Authority
+and the two caps. The note on it gives the order: assign the half bridge, prove the plate moves both
+ways, then Find limits, Fill feed-forward and Autotune.</p>
+<p><img alt="The Electronic throttle page" src="../img/studio/etb-branch.png" /></p>
+<h3 id="step-1-the-pedal">Step 1 — The pedal<a class="headerlink" href="#step-1-the-pedal" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Configuration ▸ Engine Functions ▸ Accelerator Pedal</strong> and tick <strong>Enabled</strong>. Under <strong>Its
+Sensors</strong>, both pedal sensors must be on.</p>
+<p><img alt="The Accelerator Pedal page" src="../img/studio/etb-pedal.png" /></p>
+<ol>
+<li>
+<p>Set <strong>Track A Sense</strong> and <strong>Track B Sense</strong>: which way each track's voltage moves as the pedal is
+   pressed. Check it with a meter or by watching the sensor's raw voltage in the studio. The ECU
+   cannot work this out itself, because pressing then releasing gives the same readings as releasing
+   then pressing. Most pedals have one track rising and one falling (the default: A rising, B
+   falling).
+   <!-- src: firmware/Engine/Modules/App.cpp --></p>
+</li>
+<li>
+<p>Press <strong>Calibrate pedal</strong>, then within <strong>5 seconds</strong> press the pedal <strong>all the way down</strong> and
+   <strong>let it go</strong>. The button turns amber while it runs, then green if it worked or red if it did not.
+   The ECU Console says what it measured.</p>
+</li>
+<li>It fails if either track moved less than <strong>Minimum Span</strong> (default 0.5 V). Press further, or check
+   the wiring.</li>
+<li>Check the result under <strong>Right Now</strong>: foot off, both tracks read about 0 %; pedal down, both about
+   100 %; in between, they move together. The <strong>OK</strong> lamp is lit. If one track reads 100 % with your
+   foot off, its Sense setting is the wrong way round — change it and calibrate again.</li>
+</ol>
+<h3 id="step-2-the-pedal-map">Step 2 — The pedal map<a class="headerlink" href="#step-2-the-pedal-map" title="Permanent link">&para;</a></h3>
+<p><strong>Pedal to Throttle</strong> turns pedal travel into a throttle request, by engine speed. Start with the
+straight-line default. Change it later, when the engine runs (see <a href="#tuning-it">Tuning it</a>).</p>
+<p><img alt="The Pedal to Throttle table" src="../img/studio/etb-pedal-map.png" /></p>
+<h3 id="step-3-the-half-bridge">Step 3 — The half bridge<a class="headerlink" href="#step-3-the-half-bridge" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Configuration ▸ Electrical ▸ Half Bridges ▸ Half Bridge A</strong> and tick <strong>Enabled</strong>. The defaults
+are right for throttle body A: <strong>Demand Signal</strong> ETB1 Duty, <strong>Enable Signal</strong> ETB1 Enabled, <strong>DC Map</strong>
+Unipolar, <strong>Max Authority</strong> 100 %, <strong>PWM Frequency</strong> 20000 Hz.</p>
+<p><img alt="The Half Bridge A page" src="../img/studio/etb-half-bridge.png" /></p>
+<p>Now prove the motor moves, before any controller is involved:</p>
+<ol>
+<li>Press <strong>Drive forward 40%</strong>. The bridge drives for four seconds, then lets go. The plate should
+   <strong>open</strong>, and <strong>Position</strong> should rise.</li>
+<li>Press <strong>Drive reverse 40%</strong>. The plate should push <strong>closed</strong>.</li>
+<li>If it moves the wrong way — forward closes — tick <strong>Direction Invert</strong> (or swap the two motor
+   wires). If it moves only one way, <strong>DC Map</strong> is wrong: the throttle needs <strong>Unipolar</strong>.
+   <!-- src: firmware/Engine/Modules/HBridge.cpp -->
+</li>
+</ol>
+<p>Position may not read correctly yet (it is calibrated in the next step), but it must <em>move</em>.</p>
+<h3 id="step-4-throttle-body-a-find-limits">Step 4 — Throttle body A, Find limits<a class="headerlink" href="#step-4-throttle-body-a-find-limits" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Configuration ▸ Engine Functions ▸ Electronic throttle ▸ Throttle body A</strong> and tick
+<strong>Enabled</strong>. The state lamps under <strong>Right Now</strong> show <strong>UNCAL</strong> (not calibrated yet).</p>
+<p><img alt="The Throttle body A page" src="../img/studio/etb-body.png" /></p>
+<ol>
+<li>Under <strong>Feedback</strong>, check <strong>TPS A Signal</strong> is Throttle Position and <strong>TPS B Signal</strong> is Throttle
+   Position 2.</li>
+<li>Press <strong>Step 1 · Find limits</strong>. The ECU:<ul>
+<li>switches the motor off and lets the plate settle on its spring, and records that rest position;</li>
+<li>drives the plate gently closed until it stops moving, and records the closed stop;</li>
+<li>drives it open until it stops moving, and records the open stop;</li>
+<li>writes the calibration of <strong>both</strong> plate sensors (closed = 0 %, open = 100 %) and the <strong>Relax
+  Position</strong>.
+  <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp --></li>
+</ul>
+</li>
+<li>The button turns green and the lamp shows <strong>RUNNING</strong>. The ECU Console shows the raw readings, the
+   travel and the rest position. The plate now holds the demand: with foot off, it sits at Min TPS plus
+   any idle floor.</li>
+</ol>
+<p>It fails, with a message in the ECU Console, if the plate does not reach a stop within <strong>Step
+Timeout</strong> (default 6 s), or if either sensor moves less than <strong>Motion Threshold</strong> (default 0.2 V) — a
+stuck plate, a dead sensor or a wiring fault. Settings for this step are on <strong>Calibration Settings</strong>.</p>
+<h3 id="step-5-fill-feed-forward">Step 5 — Fill feed-forward<a class="headerlink" href="#step-5-fill-feed-forward" title="Permanent link">&para;</a></h3>
+<p>Press <strong>Step 2 · Fill feed-forward</strong>. The ECU drives the plate to the open stop, then sweeps it slowly
+closed and open again, and records the duty needed at each position in the <strong>Spring Feed-Forward</strong>
+table. It uses the row selected in the table (there is one row unless you have added a coolant axis).</p>
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
+
+<p>The shipped table holds values measured on one particular throttle body. Run this step for yours.</p>
+<h3 id="step-6-autotune">Step 6 — Autotune<a class="headerlink" href="#step-6-autotune" title="Permanent link">&para;</a></h3>
+<p>Choose a <strong>Rule</strong> (the default, <strong>Tyreus-Luyben</strong>, is the most cautious) and press <strong>Step 3 · Autotune
+PID</strong>. The ECU first nudges the plate open to check it moves (<strong>Check Duty</strong>, <strong>Check Minimum</strong>). Then
+at each feed-forward point it holds the plate still and makes it oscillate on purpose, measures how it
+responds, and keeps the worst case. From that it sets <strong>Kp</strong>, <strong>Ki</strong> and <strong>Kd</strong>.</p>
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
+
+<p>The ECU Console lists the gains every rule would give and marks the one applied. A point that "could
+not settle" or gave "no clean oscillation" is skipped; see <a href="#troubleshooting">Troubleshooting</a>.</p>
+<p><img alt="The Calibration Settings page" src="../img/studio/etb-cal-settings.png" /></p>
+<h3 id="step-7-save">Step 7 — Save<a class="headerlink" href="#step-7-save" title="Permanent link">&para;</a></h3>
+<p>The three steps write their results into the tune in the ECU. Press <strong>Burn</strong> to keep them. Turn the
+key off and on: the key-on check (section 5) should run and the lamp should come back to <strong>RUNNING</strong>.</p>
+<h3 id="before-you-drive">Before you drive<a class="headerlink" href="#before-you-drive" title="Permanent link">&para;</a></h3>
+<p>Prove the safety checks with the engine stopped and the key on, watching the lamps:</p>
+<ol>
+<li><strong>Pedal:</strong> unplug the pedal connector. The pedal page shows <strong>NO SIGNAL</strong> or <strong>A/B DISAGREE</strong>, the
+   throttle motor switches off and the plate goes to rest. Plug it back in; it stays faulted until
+   you turn the key off and on.</li>
+<li><strong>Plate:</strong> unplug the throttle body's sensor connector. <strong>FAULT</strong> lights and <strong>P2135</strong> is set. Plug
+   it back in and run <strong>Find limits</strong> to clear it.</li>
+<li><strong>Stuck plate:</strong> with the pedal pressed a little, hold the plate so it cannot move (keep fingers
+   out of the bore — use a piece of wood). Within a second <strong>P2112</strong> is set and the motor stops.</li>
+</ol>
+<p>Do not drive until all three work.</p>
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — one throttle body</p>
+<p>A four-cylinder with one drive-by-wire throttle body and a two-track pedal.</p>
+<ul>
+<li>Sensors (chapter 17): Throttle Position, Throttle Position 2, Accelerator Pedal, Accelerator
+  Pedal 2, all enabled on their analog inputs.</li>
+<li>Accelerator Pedal: Enabled; Track A Rising, Track B Falling; calibrated.</li>
+<li>Half Bridge A: Enabled, defaults.</li>
+<li>Throttle body A: Enabled; Find limits, Fill feed-forward, Autotune; Burn.</li>
+<li>Idle Control (chapter 21): no idle valve. <strong>Idle Duty</strong> opens the plate through Idle Authority.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — two throttle bodies</p>
+<p>A V8 with one throttle body per bank. Body B uses <strong>Half Bridge B</strong> and, by default, the auxiliary
+inputs <code>aux_2</code> and <code>aux_3</code> as its two sensors (set them up in chapter 17). Calibrate each body on its
+own page; only one calibration can run at a time. Both bodies follow the same Throttle Demand. With
+both bridges in use there is none left for a stepper idle valve.
+<!-- src: definition/ecu.schema.yaml; firmware/Engine/Modules/ElectronicThrottle.cpp --></p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — idle with drive-by-wire</p>
+<p>Idle Authority 15 %, idle Base Duty 40 %: the idle floor is 40 % × 15 % = 6 % plate. With the pedal
+half pressed, demand is 6 + 50 × 0.94 = 53 %. Raise Idle Authority if the idle controller runs out of
+range (Idle Duty sitting at its maximum); lower it for finer idle control.</p>
+</div>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<p><strong>The pedal map.</strong> The throttle body's airflow is not linear: the first 20 % of plate opening gives
+most of the engine's airflow at low speed. A straight pedal map makes the car jumpy off idle. Make the
+low end shallower — for example 25 % pedal asking for 10 % throttle — while keeping 100 % pedal at
+100 %. Use the engine speed rows to make it gentler at low speed only.</p>
+<p><strong>Response.</strong> If the plate lags the pedal, raise <strong>Open Rate Limit</strong>. If the car lurches on a sharp
+stab of the pedal, lower it.</p>
+<p><strong>The loop.</strong> Log <code>throttle_demand</code>, <code>etb_position_1</code> and <code>etb_duty_1</code> together, and step the pedal.</p>
+<ul>
+<li>The plate overshoots and rings: lower <strong>Kp</strong> and <strong>Kd</strong>, or re-run Autotune with a more cautious
+  rule.</li>
+<li>The plate stops short and creeps to the target: the feed-forward is off. Re-run Fill feed-forward
+  (warm, if the body is sensitive to temperature), or raise <strong>Ki</strong>.</li>
+<li>The duty buzzes with the plate still: lower <strong>Kd</strong>.</li>
+<li><code>etb_iterm_1</code> grows over weeks: the body is getting stiff (dirt or a weak spring). Clean it and
+  re-run the three steps.</li>
+</ul>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>What sets it</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P2135</strong></td>
+<td>Throttle position sensors A/B disagree, or feedback lost</td>
+<td>Tracks differ past TPS Match Error Limit for TPS Match Debounce; a sensor not reading; key-on check outside the calibrated range</td>
+<td>Sensor wiring and 5 V supply; run Find limits</td>
+</tr>
+<tr>
+<td><strong>P2112</strong></td>
+<td>Throttle stuck closed</td>
+<td>Pushing open with no movement for 600 ms; key-on sweep could not reach the open stop, or found it moved</td>
+<td>Motor wiring; the bridge; ice or dirt; a seized plate</td>
+</tr>
+<tr>
+<td><strong>P2111</strong></td>
+<td>Throttle stuck open</td>
+<td>Pushing closed with no movement; key-on sweep could not reach the closed stop, or found it moved</td>
+<td>Something holding the plate open; the stop screw</td>
+</tr>
+<tr>
+<td><strong>P2138</strong></td>
+<td>Pedal tracks A/B disagree</td>
+<td>Tracks differ past APP Match Error Limit for APP Match Debounce</td>
+<td>Pedal wiring; Track Sense settings; calibrate the pedal</td>
+</tr>
+<tr>
+<td><strong>P1780</strong></td>
+<td>Pedal track A missing</td>
+<td>Accelerator Pedal sensor not reading</td>
+<td>Pedal connector; sensor enabled</td>
+</tr>
+<tr>
+<td><strong>P1760</strong> / <strong>P1762</strong></td>
+<td>Half Bridge A / B: demand signal missing</td>
+<td>Bridge enabled, its Demand Signal unset or not published</td>
+<td>Throttle body enabled? Demand Signal</td>
+</tr>
+<tr>
+<td><strong>P1761</strong> / <strong>P1763</strong></td>
+<td>Half Bridge A / B: enable signal missing</td>
+<td>Bridge enabled, its Enable Signal unset or not published</td>
+<td>Throttle body enabled? Enable Signal</td>
+</tr>
+</tbody>
+</table>
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp; generated/module_dtc.h -->
+
+<p>The throttle codes are severity 3, the pedal and bridge codes severity 2: that decides which
+<strong>Protection Level</strong> reacts, if you have enabled one (chapter 29). Whether or not a level is enabled,
+the throttle itself always switches its motor off for P2135, P2111, P2112, P2138 and P1780.</p>
+<p>Live channels: <code>pedal_demand</code>, <code>app_state</code>, <code>throttle_demand</code>, <code>etb_position_1</code>, <code>etb_duty_1</code>,
+<code>etb_en_1</code>, <code>etb_target_1</code>, <code>etb_iterm_1</code>, <code>etb_state_1</code> (and <code>_2</code> for body B), <code>hbridge_duty_1</code>,
+<code>hbridge_en_1</code>.</p>
+<p><strong>ETB State</strong> <code>etb_state_1</code>: 0 <strong>UNCAL</strong> (not calibrated, or waiting for the key-on check),
+1 <strong>CALIBRATING</strong> (a step or the key-on sweep is running), 2 <strong>RUNNING</strong> (the loop is closed),
+3 <strong>FAULT</strong>. <strong>App State</strong> <code>app_state</code>: 0 OK, 1 calibrating, 2 tracks disagree, 3 no signal.</p>
+<div class="admonition note">
+<p class="admonition-title">Engine protection does not limit the throttle</p>
+<p>A protection level can enrich, retard, trim boost and lower the rev limit (chapter 29), but it
+cannot cap the electronic throttle's opening.</p>
+</div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pedal does nothing, lamp <strong>UNCAL</strong></td>
+<td>Find limits never run (Relax Position is 0), or the key-on check has not finished</td>
+<td>Run Find limits; wait after key-on</td>
+</tr>
+<tr>
+<td>Pedal does nothing, lamp <strong>RUNNING</strong></td>
+<td>Pedal module off or faulted; Pedal to Throttle all zero</td>
+<td>Accelerator Pedal page: Enabled, OK lamp; the map</td>
+</tr>
+<tr>
+<td>Lamp <strong>FAULT</strong> after every key-on</td>
+<td>Key-on check failing: a sensor or a stop has changed</td>
+<td>ECU Console message; run Find limits</td>
+</tr>
+<tr>
+<td>Engine will not fire straight after key-on</td>
+<td>The key-on sweep cuts fuel and spark</td>
+<td>Wait two to three seconds before cranking</td>
+</tr>
+<tr>
+<td>Drive forward closes the plate</td>
+<td>Motor wired the other way</td>
+<td>Direction Invert</td>
+</tr>
+<tr>
+<td>Plate moves only one way</td>
+<td>DC Map set to Bipolar</td>
+<td>DC Map Unipolar</td>
+</tr>
+<tr>
+<td>Find limits: "no closed stop" / "no open stop"</td>
+<td>Plate cannot reach a stop in time; Duty Cap below the spring's breakaway</td>
+<td>Motor wiring; raise Duty Cap a little; Step Timeout</td>
+</tr>
+<tr>
+<td>Find limits: "TPS-B span too small"</td>
+<td>Sensor B dead or on the wrong input</td>
+<td>TPS B Signal; sensor B wiring</td>
+</tr>
+<tr>
+<td>Autotune "could not settle"</td>
+<td>The plate cannot hold inside the Settle Band</td>
+<td>Widen Settle Band; re-run Fill feed-forward first</td>
+</tr>
+<tr>
+<td>Autotune "no clean oscillation"</td>
+<td>Relay too small to move the plate cleanly</td>
+<td>Raise Relay Amplitude</td>
+</tr>
+<tr>
+<td>Pedal faults on the road</td>
+<td>Bad pedal connector; Match Limit too tight</td>
+<td>Log <code>app_1</code>, <code>app_2</code>; the connector</td>
+</tr>
+<tr>
+<td>P1760/P1761 with no throttle fitted</td>
+<td>Half Bridge enabled with no throttle body enabled</td>
+<td>Disable the bridge, or point it at what it should drive</td>
+</tr>
+<tr>
+<td>Button turns red at once</td>
+<td>The engine is turning</td>
+<td>Stop the engine</td>
+</tr>
+<tr>
+<td>Button does nothing</td>
+<td>Another calibration is running (only one at a time, across both bodies); Steps 2 and 3 need the lamp on <strong>RUNNING</strong></td>
+<td>Wait for it; run Step 1 first</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<p>Accelerator Pedal:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>APP Enabled</strong><br><code>app.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Accelerator-pedal input for drive-by-wire: app_1 is the pedal value, app_2 is a cross-check, and the pair publishes <code>pedal_demand</code> through the pedal-to-throttle table. Off, nothing publishes pedal demand and the throttle falls to its idle floor.</td>
+</tr>
+<tr>
+<td><strong>APP A Track Sense</strong><br><code>app.app1_sense</code><br>Range: one of: Rising (raw up with travel), Falling (raw down with travel)<br>Default: Rising (raw up with travel)</td>
+<td>Which way track A's RAW reading moves as the pedal is pressed. This is DECLARED rather than discovered, and it has to be: a calibration sweep sees the same four raw extremes whether the pedal was pressed then released or released then pressed, so no procedure can tell which extreme was the resting one. Getting it backwards gives a track that reads 100% with your foot off.</td>
+</tr>
+<tr>
+<td><strong>APP B Track Sense</strong><br><code>app.app2_sense</code><br>Range: one of: Rising (raw up with travel), Falling (raw down with travel)<br>Default: Falling (raw down with travel)</td>
+<td>A redundant pedal usually runs its second track the opposite way, so a short between the tracks is detectable. Default Falling.</td>
+</tr>
+<tr>
+<td><strong>APP Match Error Limit</strong><br><code>app.match_err_pct</code><br>Range: 0.0 to 100.0<br>Default: 10.0<br>Units: %</td>
+<td>A/B pedal disagreement (%) beyond which pedal_demand fails safe to 0.</td>
+</tr>
+<tr>
+<td><strong>APP Match Debounce</strong><br><code>app.match_ms</code><br>Range: 0 to 5000<br>Default: 200<br>Units: ms</td>
+<td>A pedal fault, the tracks disagreeing or track A missing, must hold this long before it latches (rejects blips, and the moment at key-on before the sensors read). A missing track gives no throttle from its first frame; it only waits this long to become a fault.</td>
+</tr>
+<tr>
+<td><strong>Pedal Calibrate Min Span</strong><br><code>app.cal_min_span</code><br>Range: 0 to 4095<br>Default: 410<br>Units: ADC</td>
+<td>Released-&gt;pressed pedal voltage must move at least this far during pedal calibrate; less =&gt; not moved -&gt; abort.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle X Channel</strong><br><code>app.pedal_to_throttle_table_x_src</code><br>Range: -1 to 32767<br>Default: 339</td>
+<td>WHICH SIGNAL the X axis of 'Pedal to Throttle' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle Y Channel</strong><br><code>app.pedal_to_throttle_table_y_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the Y axis of 'Pedal to Throttle' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle Z Channel</strong><br><code>app.pedal_to_throttle_table_z_src</code><br>Range: -1 to 32767<br>Default: 131</td>
+<td>WHICH SIGNAL the Z axis of 'Pedal to Throttle' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle Z Axis Enabled</strong><br><code>app.pedal_to_throttle_table_z_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Z axis of 'Pedal to Throttle' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle X Axis bins</strong><br><code>app.pedal_to_throttle_table_x_axis_n</code><br>Range: 2 to 16<br>Default: 16</td>
+<td>How many breakpoints of 'Pedal to Throttle X Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle Y Axis bins</strong><br><code>app.pedal_to_throttle_table_y_axis_n</code><br>Range: 2 to 16<br>Default: 16</td>
+<td>How many breakpoints of 'Pedal to Throttle Y Axis' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle Z Axis bins</strong><br><code>app.pedal_to_throttle_table_z_axis_n</code><br>Range: 2 to 4<br>Default: 4</td>
+<td>How many breakpoints of 'Pedal to Throttle Z Axis' are LIVE, out of 4 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle</strong><br><code>app.pedal_to_throttle_table</code><br>Range: 0.0 to 100.0<br>Default: 16 × 16 table<br>Units: %</td>
+<td>Pedal position in, throttle demand out — the pedal MAP, and the main character knob for drive-by-wire. A straight 1:1 line makes the pedal literal; a shallow start with a steeper top gives fine control off idle without losing full travel. It is the demand only: what the plate actually does with it is the throttle controller's business.</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle X Axis</strong><br><code>app.pedal_to_throttle_table_x_axis</code><br>Range: 0 to 0<br>Default: 16-point curve<br>Units: %</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle Y Axis</strong><br><code>app.pedal_to_throttle_table_y_axis</code><br>Range: 0 to 0<br>Default: 16-point curve</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Pedal to Throttle Z Axis</strong><br><code>app.pedal_to_throttle_table_z_axis</code><br>Range: 0 to 0<br>Default: 4-point curve</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Electronic throttle:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Idle Authority</strong><br><code>electronic_throttle.idle_authority</code><br>Range: 0.0 to 100.0<br>Default: 15.0<br>Units: %</td>
+<td>Max throttle the idle controller may command (idle_duty 100% -&gt; this % plate). The idle floor under a closed pedal.</td>
+</tr>
+<tr>
+<td><strong>Traction Cap Signal</strong><br><code>electronic_throttle.traction_cap_src</code><br>Range: -1 to 32767<br>Default: 21</td>
+<td>Wired to traction control by default — it publishes 100 % (no cap) whenever it is not intervening, so the default costs nothing and traction control can actually pull throttle. Bus signal (%) that caps throttle for traction control. Unassigned = none.</td>
+</tr>
+<tr>
+<td><strong>Torque Cap Signal</strong><br><code>electronic_throttle.torque_cap_src</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>Bus signal (%) that caps throttle for torque management. Unassigned = none.</td>
+</tr>
+</tbody>
+</table>
+<p>Half Bridge:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PWM Carrier</strong><br><code>h_bridge.pwm_freq_hz</code><br>Range: 1 to 50000<br>Default: 20000<br>Units: Hz</td>
+<td>Shared DMA-PWM carrier for both bridges. Set high (20 kHz) to suppress audible whine.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../part2/11-wiring-sensors.html">Chapter 11 — Wiring sensors</a> (throttle and pedal sensors)</li>
+<li><a href="../part2/12-wiring-outputs.html">Chapter 12 — Wiring outputs</a> (the H-bridge outputs)</li>
+<li><a href="17-sensors.html">Chapter 17 — Sensors</a> (setting up the four sensors)</li>
+<li><a href="21-idle.html">Chapter 21 — Idle</a> (Idle Duty and the stepper valve)</li>
+<li><a href="26-launch-shift-traction.html">Chapter 26 — Launch, shift and traction</a> (the traction cap)</li>
+<li><a href="29-protection.html">Chapter 29 — Protection</a> (protection levels)</li>
+<li><a href="35-lua.html">Chapter 35 — Lua</a> (changing Throttle Demand from a script)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="21-idle.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 21 Idle">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                21 Idle
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="23-lambda.html" class="md-footer__link md-footer__link--next" aria-label="Next: 23 Closed-loop lambda">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                23 Closed-loop lambda
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

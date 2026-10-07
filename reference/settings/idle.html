@@ -1,0 +1,3080 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/reference/settings/idle.html">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Idle settings - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/manual.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#idle-settings" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Idle settings
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part3/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="idle-settings">Idle settings<a class="headerlink" href="#idle-settings" title="Permanent link">&para;</a></h1>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Idle Control Enabled</strong><br><code>idle.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Control idle air. Off, nothing is published for the idle valve and the engine idles on whatever the throttle stop or the ETB idle floor gives it.</td>
+</tr>
+<tr>
+<td><strong>Mode</strong><br><code>idle.mode</code><br>Range: one of: Open Loop, Closed Loop<br>Default: Open Loop</td>
+<td>Open = base table only. Closed = base + PI(+D) trim driving RPM to the target table.</td>
+</tr>
+<tr>
+<td><strong>Closed-Throttle Threshold</strong><br><code>idle.tps_closed_pct</code><br>Range: 0.0 to 20.0<br>Default: 2.0<br>Units: %</td>
+<td>Below this the driver counts as OFF THE THROTTLE, which is the condition idle control acts on. It also arms the decel kick on the falling edge. On drive-by-wire it is the PEDAL that is compared (the plate is held open at idle by the idle floor, so it can never read closed); on a cable throttle it is the throttle position. Set it above the closed reading with a little margin.</td>
+</tr>
+<tr>
+<td><strong>Idle Lockout RPM</strong><br><code>idle.idle_lockout_rpm</code><br>Range: 0 to 5000<br>Default: 2000<br>Units: RPM</td>
+<td>Above this RPM the engine is off-idle (closed loop disengages).</td>
+</tr>
+<tr>
+<td><strong>Closed Loop Activation Offset</strong><br><code>idle.cl_activation_offset_rpm</code><br>Range: 0 to 2000<br>Default: 150<br>Units: RPM</td>
+<td>Closed loop engages only once RPM falls to within this margin above target (lets a blip free-fall before the loop grabs it).</td>
+</tr>
+<tr>
+<td><strong>PID Scaler</strong><br><code>idle.pid_scaler_pct</code><br>Range: 0.0 to 250.0<br>Default: 100.0<br>Units: %</td>
+<td>Overall gain trim applied to P/I/D (100 = table values as-is).</td>
+</tr>
+<tr>
+<td><strong>Max Duty (Output Max)</strong><br><code>idle.max_duty_pct</code><br>Range: 0.0 to 100.0<br>Default: 90.0<br>Units: %</td>
+<td>Ceiling on idle valve output, and also the top of the PI's authority. The integrator's anti-windup is set to exactly this headroom, so the loop cannot accumulate demand it will never be allowed to apply.</td>
+</tr>
+<tr>
+<td><strong>Throttle Follower (Dashpot) Enabled</strong><br><code>idle.throttle_follower_enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Feedforward dashpot — follows TPS x RPM</td>
+</tr>
+<tr>
+<td><strong>Long-Term Trim Enabled</strong><br><code>idle.ltt_enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Learn a per-coolant-temperature correction to the base air, so a valve that has drifted or an engine that has aged stops needing the same manual correction every time. It learns only while idling, after a minimum run time and once settled in one temperature cell; the result persists across power cycles.</td>
+</tr>
+<tr>
+<td><strong>LTT Authority</strong><br><code>idle.ltt_authority_pct</code><br>Range: 0.0 to 50.0<br>Default: 15.0<br>Units: %</td>
+<td>Max magnitude (+/-) of the learned per-CLT base correction.</td>
+</tr>
+<tr>
+<td><strong>LTT Learn Rate</strong><br><code>idle.ltt_learn_pct</code><br>Range: 0.0 to 100.0<br>Default: 20.0<br>Units: %</td>
+<td>Fraction of the current PI trim migrated into the learned cell each dwell.</td>
+</tr>
+<tr>
+<td><strong>LTT Dwell</strong><br><code>idle.ltt_dwell_ms</code><br>Range: 0 to 60000<br>Default: 2000<br>Units: ms</td>
+<td>Time held in a CLT cell (closed-loop</td>
+</tr>
+<tr>
+<td><strong>LTT Min Run Time</strong><br><code>idle.ltt_min_runtime_s</code><br>Range: 0 to 600<br>Default: 20<br>Units: s</td>
+<td>Do not learn until the engine has run this long (avoids learning during warm-up transients).</td>
+</tr>
+<tr>
+<td><strong>Target Rise Rate Limit</strong><br><code>idle.rpm_rate_rising_limit</code><br>Range: 0 to 5000<br>Default: 0<br>Units: RPM/s</td>
+<td>Max rate the idle target may RISE; slews the effective target so the PI does not chase a step. 0 = instant.</td>
+</tr>
+<tr>
+<td><strong>Target Fall Rate Limit</strong><br><code>idle.rpm_rate_falling_limit</code><br>Range: 0 to 5000<br>Default: 0<br>Units: RPM/s</td>
+<td>Max rate (magnitude) the idle target may FALL. 0 = instant.</td>
+</tr>
+<tr>
+<td><strong>Decel Offset</strong><br><code>idle.decel_offset_pct</code><br>Range: 0.0 to 100.0<br>Default: 0.0<br>Units: %</td>
+<td>Extra base duty applied on a throttle tip-out, decaying to 0 over Decel Decay (sums with the throttle follower).</td>
+</tr>
+<tr>
+<td><strong>Decel Decay</strong><br><code>idle.decel_decay_ms</code><br>Range: 0 to 60000<br>Default: 1500<br>Units: ms</td>
+<td>Time for the decel offset to bleed to 0 after a tip-out.</td>
+</tr>
+<tr>
+<td><strong>Stall Save RPM</strong><br><code>idle.stall_offset_rpm</code><br>Range: 0 to 5000<br>Default: 0<br>Units: RPM</td>
+<td>If running RPM falls below this, drive the idle valve full open to catch the stall. 0 = disabled.</td>
+</tr>
+<tr>
+<td><strong>Vehicle Speed Check</strong><br><code>idle.vss_check_enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Force idle control off (not idling) when the vehicle-speed signal exceeds Max Vehicle Speed.</td>
+</tr>
+<tr>
+<td><strong>Max Vehicle Speed</strong><br><code>idle.max_vehicle_speed</code><br>Range: 0 to 1000<br>Default: 10<br>Units: km/h</td>
+<td>Above this vehicle speed, idle_active is forced off (gates closed-loop / learn / ign-corr).</td>
+</tr>
+<tr>
+<td><strong>Close Idle Valve On Boost</strong><br><code>idle.close_on_boost_enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Drive the idle valve fully closed (duty 0) once MAP exceeds the boost threshold.</td>
+</tr>
+<tr>
+<td><strong>Boost Close Threshold</strong><br><code>idle.close_on_boost_kpa</code><br>Range: 0 to 600<br>Default: 105<br>Units: kPa</td>
+<td>MAP above which the idle valve is forced closed.</td>
+</tr>
+<tr>
+<td><strong>Base Duty Table X Channel</strong><br><code>idle.base_duty_table_x_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the X axis of 'Base Duty Table' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Base Duty Table Y Channel</strong><br><code>idle.base_duty_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Base Duty Table' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Base Duty Table Y Axis Enabled</strong><br><code>idle.base_duty_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Base Duty Table' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Target RPM X Channel</strong><br><code>idle.target_rpm_table_x_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the X axis of 'Idle Target RPM' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Target RPM Y Channel</strong><br><code>idle.target_rpm_table_y_src</code><br>Range: -1 to 32767<br>Default: 360</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Target RPM' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Target RPM Y Axis Enabled</strong><br><code>idle.target_rpm_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Target RPM' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Start Target Offset X Channel</strong><br><code>idle.start_target_offset_table_x_src</code><br>Range: -1 to 32767<br>Default: 321</td>
+<td>WHICH SIGNAL the X axis of 'Idle Start Target Offset' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Start Target Offset Y Channel</strong><br><code>idle.start_target_offset_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Start Target Offset' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Start Target Offset Y Axis Enabled</strong><br><code>idle.start_target_offset_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Start Target Offset' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Start Base Offset X Channel</strong><br><code>idle.start_base_offset_table_x_src</code><br>Range: -1 to 32767<br>Default: 321</td>
+<td>WHICH SIGNAL the X axis of 'Idle Start Base Offset' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Start Base Offset Y Channel</strong><br><code>idle.start_base_offset_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Start Base Offset' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Start Base Offset Y Axis Enabled</strong><br><code>idle.start_base_offset_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Start Base Offset' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Min Output X Channel</strong><br><code>idle.min_output_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Idle Min Output' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Min Output Y Channel</strong><br><code>idle.min_output_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Min Output' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Min Output Y Axis Enabled</strong><br><code>idle.min_output_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Min Output' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Proportional Gain X Channel</strong><br><code>idle.p_gain_table_x_src</code><br>Range: -1 to 32767<br>Default: 202</td>
+<td>WHICH SIGNAL the X axis of 'Idle Proportional Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Proportional Gain Y Channel</strong><br><code>idle.p_gain_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Proportional Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Proportional Gain Y Axis Enabled</strong><br><code>idle.p_gain_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Proportional Gain' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Integral Gain X Channel</strong><br><code>idle.i_gain_table_x_src</code><br>Range: -1 to 32767<br>Default: 202</td>
+<td>WHICH SIGNAL the X axis of 'Idle Integral Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Integral Gain Y Channel</strong><br><code>idle.i_gain_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Integral Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Integral Gain Y Axis Enabled</strong><br><code>idle.i_gain_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Integral Gain' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Derivative Gain X Channel</strong><br><code>idle.d_gain_table_x_src</code><br>Range: -1 to 32767<br>Default: 202</td>
+<td>WHICH SIGNAL the X axis of 'Idle Derivative Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Derivative Gain Y Channel</strong><br><code>idle.d_gain_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Derivative Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Derivative Gain Y Axis Enabled</strong><br><code>idle.d_gain_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Derivative Gain' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Ignition Correction X Channel</strong><br><code>idle.idle_ign_corr_table_x_src</code><br>Range: -1 to 32767<br>Default: 202</td>
+<td>WHICH SIGNAL the X axis of 'Idle Ignition Correction' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Ignition Correction X Axis Enabled</strong><br><code>idle.idle_ign_corr_table_x_en</code><br>Range: Off or On<br>Default: On</td>
+<td>Use the X axis of 'Idle Ignition Correction' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Ignition Correction Y Channel</strong><br><code>idle.idle_ign_corr_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Ignition Correction' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Ignition Correction Y Axis Enabled</strong><br><code>idle.idle_ign_corr_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Ignition Correction' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Throttle Follower Target X Channel</strong><br><code>idle.throttle_follower_target_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Idle Throttle Follower Target' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Throttle Follower Target Y Channel</strong><br><code>idle.throttle_follower_target_table_y_src</code><br>Range: -1 to 32767<br>Default: 337</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Throttle Follower Target' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Throttle Follower Decay X Channel</strong><br><code>idle.throttle_follower_decay_table_x_src</code><br>Range: -1 to 32767<br>Default: 319</td>
+<td>WHICH SIGNAL the X axis of 'Idle Throttle Follower Decay' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Throttle Follower Decay Y Channel</strong><br><code>idle.throttle_follower_decay_table_y_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the Y axis of 'Idle Throttle Follower Decay' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Throttle Follower Decay Y Axis Enabled</strong><br><code>idle.throttle_follower_decay_table_y_en</code><br>Range: Off or On<br>Default: Off</td>
+<td>Use the Y axis of 'Idle Throttle Follower Decay' as a real dimension. Off, the table collapses to a curve on its remaining axes and this one is ignored entirely — the right default for most optional axes, since a dimension nobody calibrates is a set of duplicate rows that still has to be kept in step.</td>
+</tr>
+<tr>
+<td><strong>Idle Long-Term Trim X Channel</strong><br><code>idle.idle_ltt_x_src</code><br>Range: -1 to 32767<br>Default: 61</td>
+<td>WHICH SIGNAL the X axis of 'Idle Long-Term Trim' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Idle Base X Axis (CLT °C) bins</strong><br><code>idle.idle_x_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Idle Base X Axis (CLT °C)' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Idle Base 2nd Axis (Air Con State — idle-up, off) bins</strong><br><code>idle.idle_y_axis_n</code><br>Range: 2 to 4<br>Default: 4</td>
+<td>How many breakpoints of 'Idle Base 2nd Axis (Air Con State — idle-up, off)' are LIVE, out of 4 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Target RPM X Axis (CLT °C) bins</strong><br><code>idle.target_clt_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Target RPM X Axis (CLT °C)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Target RPM 2nd Axis (Vehicle Speed — off) bins</strong><br><code>idle.target_vss_axis_n</code><br>Range: 2 to 4<br>Default: 4</td>
+<td>How many breakpoints of 'Target RPM 2nd Axis (Vehicle Speed — off)' are LIVE, out of 4 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Start Offset X Axis (Engine Run Time s) bins</strong><br><code>idle.start_runtime_axis_n</code><br>Range: 2 to 8<br>Default: 6</td>
+<td>How many breakpoints of 'Start Offset X Axis (Engine Run Time s)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Start Offset 2nd Axis (CLT °C — off) bins</strong><br><code>idle.start_clt_axis_n</code><br>Range: 2 to 4<br>Default: 4</td>
+<td>How many breakpoints of 'Start Offset 2nd Axis (CLT °C — off)' are LIVE, out of 4 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Min Output X Axis (RPM) bins</strong><br><code>idle.min_rpm_axis_n</code><br>Range: 2 to 16<br>Default: 7</td>
+<td>How many breakpoints of 'Min Output X Axis (RPM)' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Min Output 2nd Axis (CLT °C — off) bins</strong><br><code>idle.min_clt_axis_n</code><br>Range: 2 to 4<br>Default: 4</td>
+<td>How many breakpoints of 'Min Output 2nd Axis (CLT °C — off)' are LIVE, out of 4 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Gain X Axis (Idle RPM Error) bins</strong><br><code>idle.gain_err_axis_n</code><br>Range: 2 to 8<br>Default: 7</td>
+<td>How many breakpoints of 'Gain X Axis (Idle RPM Error)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Gain 2nd Axis (CLT °C — off) bins</strong><br><code>idle.gain_clt_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Gain 2nd Axis (CLT °C — off)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Ign Corr X Axis (Idle RPM Error) bins</strong><br><code>idle.igncorr_err_axis_n</code><br>Range: 2 to 8<br>Default: 7</td>
+<td>How many breakpoints of 'Ign Corr X Axis (Idle RPM Error)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Ign Corr 2nd Axis (CLT °C — off) bins</strong><br><code>idle.igncorr_clt_axis_n</code><br>Range: 2 to 4<br>Default: 4</td>
+<td>How many breakpoints of 'Ign Corr 2nd Axis (CLT °C — off)' are LIVE, out of 4 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Throttle Follower X Axis (RPM) bins</strong><br><code>idle.tf_rpm_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Throttle Follower X Axis (RPM)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Throttle Follower Y Axis (TPS %) bins</strong><br><code>idle.tf_tps_axis_n</code><br>Range: 2 to 8<br>Default: 5</td>
+<td>How many breakpoints of 'Throttle Follower Y Axis (TPS %)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Decay X Axis (RPM) bins</strong><br><code>idle.tfd_rpm_axis_n</code><br>Range: 2 to 8<br>Default: 6</td>
+<td>How many breakpoints of 'Decay X Axis (RPM)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Decay 2nd Axis (CLT °C — off) bins</strong><br><code>idle.tfd_clt_axis_n</code><br>Range: 2 to 4<br>Default: 4</td>
+<td>How many breakpoints of 'Decay 2nd Axis (CLT °C — off)' are LIVE, out of 4 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Long-Term Trim CLT Axis (°C) bins</strong><br><code>idle.ltt_clt_axis_n</code><br>Range: 2 to 8<br>Default: 8</td>
+<td>How many breakpoints of 'Long-Term Trim CLT Axis (°C)' are LIVE, out of 8 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Base Duty Table</strong><br><code>idle.base_duty_table</code><br>Range: 0.0 to 100.0<br>Default: 4 × 8 table<br>Units: %</td>
+<td>The open-loop air the engine needs to idle at each coolant temperature — the foundation everything else adds to. Get this right and closed loop barely has to act; get it wrong and the loop spends its whole authority covering for it, leaving nothing for real disturbances.</td>
+</tr>
+<tr>
+<td><strong>Idle Base X Axis (CLT °C)</strong><br><code>idle.idle_x_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: C</td>
+<td>Coolant breakpoints for the base duty table. Concentrate them through the warm-up range, where the required air changes fastest.</td>
+</tr>
+<tr>
+<td><strong>Idle Base 2nd Axis (Air Con State — idle-up, off)</strong><br><code>idle.idle_y_axis</code><br>Range: 0 to 0<br>Default: 4-point curve</td>
+<td>Optional second axis for base duty — air-conditioning state, off by default. Normally left off, since the idle-up slots handle accessory loads more directly.</td>
+</tr>
+<tr>
+<td><strong>Idle Target RPM</strong><br><code>idle.target_rpm_table</code><br>Range: 0 to 10000<br>Default: 4 × 8 table<br>Units: RPM</td>
+<td>The idle RPM being aimed for at each coolant temperature. Cold engines want a higher idle for stability and catalyst warm-up; this curve is what walks it down as the engine warms.</td>
+</tr>
+<tr>
+<td><strong>Target RPM X Axis (CLT °C)</strong><br><code>idle.target_clt_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: C</td>
+<td>Coolant breakpoints for the target RPM curve.</td>
+</tr>
+<tr>
+<td><strong>Target RPM 2nd Axis (Vehicle Speed — off)</strong><br><code>idle.target_vss_axis</code><br>Range: 0 to 0<br>Default: 4-point curve<br>Units: km/h</td>
+<td>Optional second axis for target RPM — vehicle speed, off by default. Enabling it raises idle while rolling, which helps a manual car coast to a stop without dipping.</td>
+</tr>
+<tr>
+<td><strong>Idle Start Target Offset</strong><br><code>idle.start_target_offset_table</code><br>Range: -5000 to 5000<br>Default: 4 × 6 table<br>Units: RPM</td>
+<td>Extra idle RPM just after starting, decaying with engine run time. A cold start wants a deliberately high idle for a few seconds; this is what adds it without distorting the steady-state target curve.</td>
+</tr>
+<tr>
+<td><strong>Idle Start Base Offset</strong><br><code>idle.start_base_offset_table</code><br>Range: -10.0 to 10.0<br>Default: 4 × 6 table<br>Units: %</td>
+<td>Extra idle AIR just after starting, decaying with run time. It works with the target offset: the target says what RPM to aim for, this gives the loop a head start on the air needed to get there instead of making it integrate up from nothing.</td>
+</tr>
+<tr>
+<td><strong>Start Offset X Axis (Engine Run Time s)</strong><br><code>idle.start_runtime_axis</code><br>Range: 0 to 0<br>Default: 6-point curve<br>Units: s</td>
+<td>Engine run time breakpoints, in seconds, for both start offsets. These decide how long the after-start enrichment of air and target lasts.</td>
+</tr>
+<tr>
+<td><strong>Start Offset 2nd Axis (CLT °C — off)</strong><br><code>idle.start_clt_axis</code><br>Range: 0 to 0<br>Default: 4-point curve<br>Units: C</td>
+<td>Optional second axis for the start offsets — coolant, off by default. Turn it on when a cold start needs a much longer or larger offset than a warm restart.</td>
+</tr>
+<tr>
+<td><strong>Idle Min Output</strong><br><code>idle.min_output_table</code><br>Range: 0.0 to 100.0<br>Default: 4 × 7 table<br>Units: %</td>
+<td>The floor under idle output at each RPM — the minimum air the engine is ever given. It is also the bottom of the PI's authority, so the loop cannot pull air below it however far RPM overshoots. This is the setting that stops an over-correcting loop from stalling the engine.</td>
+</tr>
+<tr>
+<td><strong>Min Output X Axis (RPM)</strong><br><code>idle.min_rpm_axis</code><br>Range: 0 to 0<br>Default: 7-point curve<br>Units: RPM</td>
+<td>RPM breakpoints for the minimum output floor.</td>
+</tr>
+<tr>
+<td><strong>Min Output 2nd Axis (CLT °C — off)</strong><br><code>idle.min_clt_axis</code><br>Range: 0 to 0<br>Default: 4-point curve<br>Units: C</td>
+<td>Optional second axis for the minimum output — coolant, off by default. Useful when a cold engine needs a higher floor than a hot one to stay running.</td>
+</tr>
+<tr>
+<td><strong>Idle Proportional Gain</strong><br><code>idle.p_gain_table</code><br>Range: 0.00 to 0.00<br>Default: 8 × 7 table</td>
+<td>Proportional gain scheduled on idle RPM ERROR, in percent per 100 RPM. Scheduling on the error itself is what lets a small deviation be corrected gently and a large one — a stall in progress — be met hard, from one curve. It is also where a DEADBAND is written: zero the cells either side of zero error and the loop holds its trim across that band instead of chasing the RPM wander every engine has.</td>
+</tr>
+<tr>
+<td><strong>Idle Integral Gain</strong><br><code>idle.i_gain_table</code><br>Range: 0.00 to 0.00<br>Default: 8 × 7 table</td>
+<td>Integral gain versus RPM error, in percent per 100 RPM per second. This is what removes the standing error so the engine actually sits on target, and it is the term that most often causes a slow hunt if it is too high — so it is gentlest at the centre, where the engine already is, and strongest at the edges, where something has gone wrong. Zeroing the centre cells turns that gentleness into an outright deadband.</td>
+</tr>
+<tr>
+<td><strong>Idle Derivative Gain</strong><br><code>idle.d_gain_table</code><br>Range: 0.00 to 0.00<br>Default: 8 × 7 table</td>
+<td>Derivative gain versus RPM error. It damps the approach to target, which is what stops the loop overshooting after a disturbance and setting up an oscillation.</td>
+</tr>
+<tr>
+<td><strong>Gain X Axis (Idle RPM Error)</strong><br><code>idle.gain_err_axis</code><br>Range: 0 to 0<br>Default: 7-point curve<br>Units: RPM</td>
+<td>Idle RPM error breakpoints for the gain tables. Zero error sits ON a breakpoint, so the gain the engine actually runs on — the one at target — is the number that was typed rather than whatever the two cells either side average to. It is also what makes a deadband expressible: zero the -20/0/+20 cells and the gain is zero across that whole span and ramps back in by +/-50, with no step at the edge.</td>
+</tr>
+<tr>
+<td><strong>Gain 2nd Axis (CLT °C — off)</strong><br><code>idle.gain_clt_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: C</td>
+<td>Optional second axis for the gain tables — coolant, off by default.</td>
+</tr>
+<tr>
+<td><strong>Idle Ignition Correction</strong><br><code>idle.idle_ign_corr_table</code><br>Range: -60.0 to 60.0<br>Default: 4 × 7 table<br>Units: deg</td>
+<td>Timing correction versus idle RPM error. Spark is a far faster idle actuator than air: advancing timing raises torque within one combustion event, where an air change takes several. This curve is what catches a dip before the valve can respond, and it is the main tool for a rock-steady idle.</td>
+</tr>
+<tr>
+<td><strong>Ign Corr X Axis (Idle RPM Error)</strong><br><code>idle.igncorr_err_axis</code><br>Range: 0 to 0<br>Default: 7-point curve<br>Units: RPM</td>
+<td>Idle RPM error breakpoints for the ignition correction curve.</td>
+</tr>
+<tr>
+<td><strong>Ign Corr 2nd Axis (CLT °C — off)</strong><br><code>idle.igncorr_clt_axis</code><br>Range: 0 to 0<br>Default: 4-point curve<br>Units: C</td>
+<td>Optional second axis for the idle ignition correction — coolant, off by default.</td>
+</tr>
+<tr>
+<td><strong>Idle Throttle Follower Target</strong><br><code>idle.throttle_follower_target_table</code><br>Range: 0.0 to 100.0<br>Default: 5 × 8 table<br>Units: %</td>
+<td>A dashpot: extra idle air versus RPM and throttle, which follows the throttle UP instantly and is bled back down on tip-out. It bridges the overrun so the engine does not fall into a closing valve and stall. It runs whether or not idle control is otherwise active.</td>
+</tr>
+<tr>
+<td><strong>Throttle Follower X Axis (RPM)</strong><br><code>idle.tf_rpm_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: RPM</td>
+<td>RPM breakpoints for the throttle follower.</td>
+</tr>
+<tr>
+<td><strong>Throttle Follower Y Axis (TPS %)</strong><br><code>idle.tf_tps_axis</code><br>Range: 0 to 0<br>Default: 5-point curve<br>Units: %</td>
+<td>Throttle breakpoints for the throttle follower — how much air is held for a given throttle opening.</td>
+</tr>
+<tr>
+<td><strong>Idle Throttle Follower Decay</strong><br><code>idle.throttle_follower_decay_table</code><br>Range: 0.0 to 100.0<br>Default: 4 × 6 table<br>Units: %/s</td>
+<td>How fast the follower bleeds away after a tip-out, in percent per second, versus RPM. Slow leaves the engine hanging at high RPM after lifting; fast risks the dip the follower exists to prevent.</td>
+</tr>
+<tr>
+<td><strong>Decay X Axis (RPM)</strong><br><code>idle.tfd_rpm_axis</code><br>Range: 0 to 0<br>Default: 6-point curve<br>Units: RPM</td>
+<td>RPM breakpoints for the follower decay rate.</td>
+</tr>
+<tr>
+<td><strong>Decay 2nd Axis (CLT °C — off)</strong><br><code>idle.tfd_clt_axis</code><br>Range: 0 to 0<br>Default: 4-point curve<br>Units: C</td>
+<td>Optional second axis for the decay rate — coolant, off by default. A cold engine usually wants a slower bleed.</td>
+</tr>
+<tr>
+<td><strong>Long-Term Trim CLT Axis (°C)</strong><br><code>idle.ltt_clt_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: C</td>
+<td>The coolant breakpoints the long-term trim learns against — each is one learned cell. Few, well-spaced cells learn quickly and generalise; many cells are more precise but each is visited rarely, so they take far longer to converge.</td>
+</tr>
+<tr>
+<td><strong>Idle Long-Term Trim</strong><br><code>idle.idle_ltt</code><br>Range: -100.000 to 100.000<br>Default: 8-point curve<br>Units: %</td>
+<td>Learned trim (runtime RAM, persisted to SD; not part of the tune).</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

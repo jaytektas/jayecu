@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Dwell and spark on the crank-angle scale</title>
+  <style>
+    .fg { fill: #1d1f23; } .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .out  { stroke: #d9822b; stroke-width: 3; fill: none; }
+    .out2 { stroke: #d9822b; stroke-width: 2; fill: none; stroke-dasharray: 7 5; }
+    .cur  { stroke: #1d1f23; stroke-width: 3; fill: none; }
+    .spark { stroke: #3b82c4; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .tdc  { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .band { fill: #fdf0e3; }
+    .note { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .sub  { font-size: 13px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis, .tdc { stroke: #9aa1ab; } .grid { stroke: #2c3038; }
+      .cur { stroke: #e4e6ea; } .band { fill: #33240f; } .note { fill: #16283b; }
+    }
+  </style>
+
+  <!-- scale: TDC at x=900, 5 px per crank degree; 20 deg BTDC = 800 -->
+  <!-- dwell band at 3000 rpm: 3.5 ms = 63 deg -> starts at 83 deg BTDC = x 485 -->
+  <rect x="485" y="60" width="315" height="250" class="band"/>
+
+  <!-- output row -->
+  <text x="20" y="84" class="fg head">Coil output</text>
+  <text x="20" y="102" class="muted sub">HIGH = dwell</text>
+  <path d="M130 130 H485 V80 H800 V130 H1000" class="out"/>
+  <text x="642" y="72" text-anchor="middle" class="fg">dwell: 3.5 ms = 63° at 3000 rpm</text>
+
+  <!-- same dwell at 6000 rpm, dashed -->
+  <path d="M130 162 H170 V142 H800 V162 H1000" class="out2"/>
+  <text x="178" y="184" class="muted sub">dashed: the same 3.5 ms at 6000 rpm is 126°, so it starts earlier</text>
+
+  <!-- coil current -->
+  <text x="20" y="214" class="fg head">Coil current</text>
+  <path d="M130 290 H485 C560 262 680 222 800 212 V290 H1000" class="cur"/>
+  <text x="910" y="222" class="fg sub">spark: the output</text>
+  <text x="910" y="240" class="fg sub">falls, the coil fires</text>
+
+  <!-- spark and TDC lines -->
+  <line x1="800" y1="60" x2="800" y2="330" class="spark"/>
+  <line x1="900" y1="60" x2="900" y2="330" class="tdc"/>
+  <text x="900" y="52" text-anchor="middle" class="fg head">TDC</text>
+  <text x="800" y="52" text-anchor="middle" class="fg">advance</text>
+
+  <!-- crank-angle axis -->
+  <line x1="130" y1="330" x2="1000" y2="330" class="axis"/>
+  <line x1="200" y1="330" x2="200" y2="338" class="axis"/><text x="200" y="356" text-anchor="middle" class="muted sub">140</text>
+  <line x1="300" y1="330" x2="300" y2="338" class="axis"/><text x="300" y="356" text-anchor="middle" class="muted sub">120</text>
+  <line x1="400" y1="330" x2="400" y2="338" class="axis"/><text x="400" y="356" text-anchor="middle" class="muted sub">100</text>
+  <line x1="500" y1="330" x2="500" y2="338" class="axis"/><text x="500" y="356" text-anchor="middle" class="muted sub">80</text>
+  <line x1="600" y1="330" x2="600" y2="338" class="axis"/><text x="600" y="356" text-anchor="middle" class="muted sub">60</text>
+  <line x1="700" y1="330" x2="700" y2="338" class="axis"/><text x="700" y="356" text-anchor="middle" class="muted sub">40</text>
+  <line x1="800" y1="330" x2="800" y2="338" class="axis"/><text x="800" y="356" text-anchor="middle" class="muted sub">20</text>
+  <line x1="900" y1="330" x2="900" y2="338" class="axis"/><text x="900" y="356" text-anchor="middle" class="muted sub">0</text>
+  <text x="130" y="380" class="muted sub">degrees before TDC · the engine turns left to right →</text>
+
+  <!-- the rule -->
+  <rect x="130" y="398" width="840" height="58" rx="6" class="note"/>
+  <text x="146" y="422" class="fg head">Dwell is a time; the ECU places it as an angle, at the current engine speed:</text>
+  <text x="146" y="444" class="mono fg">dwell angle (°) = dwell (ms) × rpm × 0.006</text>
+  <text x="560" y="444" class="mono fg">dwell starts at: spark angle + dwell angle, BTDC</text>
+</svg>

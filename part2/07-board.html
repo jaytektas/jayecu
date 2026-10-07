@@ -1,0 +1,4062 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part2/07-board.html">
+      
+      
+        <link rel="prev" href="index.html">
+      
+      
+        <link rel="next" href="08-tools.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>7 The jaytek_v1 board - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-jaytek_v1-board" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              7 The jaytek_v1 board
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="07-board.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Concepts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-processor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The processor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-the-connectors-carry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the connectors carry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Communication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-the-board" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On the board
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pinout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pinout
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pinout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cn2-white-ignition-and-low-side-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CN2 — white, ignition and low-side outputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cn3-blue-sensors-and-triggers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CN3 — blue, sensors and triggers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cn4-black-power-high-sides-h-bridges-knock-can1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CN4 — black, power, high-sides, H-bridges, knock, CAN1
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#procedure-finding-a-pin-in-the-studio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procedure — finding a pin in the studio
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part3/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="the-jaytek_v1-board">The jaytek_v1 board<a class="headerlink" href="#the-jaytek_v1-board" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> the jaytek_v1 is the ECU hardware — three sealed harness connectors, the input
+and output circuits behind them, and a USB link to the studio — and this chapter is its map.</p>
+</blockquote>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>Everything you wire to the ECU goes through three connectors: <strong>CN2</strong> (white), <strong>CN3</strong> (blue) and
+<strong>CN4</strong> (black). This chapter says what is on every pin, what each kind of input and output can do,
+how the ECU is powered, and what else is on the board. Read it before you plan a harness (chapters
+8–14), and keep the pinout tables to hand while you build one.</p>
+<p>Everything here comes from the board definition, <code>definition/boards/jaytek_v1.board.yaml</code>, which the
+firmware and the studio also read. The pin diagrams and tables are generated from it.</p>
+<!-- src: definition/boards/jaytek_v1.board.yaml -->
+
+<h2 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<figure>
+<p><img alt="Block diagram: the three harness connectors, the input front ends and output drivers, the STM32F767 processor, and the on-board parts: USB socket, microSD card, barometer, knock audio jack, status LEDs, buttons, headers, power supplies and coin cell" src="../img/diagrams/board-overview.svg" />
+  </p>
+<figcaption>Figure 7.1 — The board at a glance. Blue is inputs, orange is outputs, green is
+  communication, red is power.</figcaption>
+</figure>
+<h3 id="the-processor">The processor<a class="headerlink" href="#the-processor" title="Permanent link">&para;</a></h3>
+<p>An <strong>STM32F767ZIT6</strong> (ARM Cortex-M7) running at <strong>216 MHz</strong> from an 8 MHz crystal, with a
+32.768 kHz crystal and a <strong>CR2032 coin cell</strong> for the real-time clock. Analogue inputs are read by its
+12-bit converters against a 3.0 V precision reference.</p>
+<!-- src: definition/boards/jaytek_v1.board.yaml; hardware/jaytek_v1_hardware.md -->
+
+<h3 id="what-the-connectors-carry">What the connectors carry<a class="headerlink" href="#what-the-connectors-carry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Connector</th>
+<th>Colour</th>
+<th>Ways</th>
+<th>Carries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CN2</strong></td>
+<td>white</td>
+<td>35</td>
+<td>ignition outputs IGN1–12, low-side outputs LS1–22, one ground</td>
+</tr>
+<tr>
+<td><strong>CN3</strong></td>
+<td>blue</td>
+<td>35</td>
+<td>analogue inputs, temperature inputs, VR and digital inputs, four grounds</td>
+</tr>
+<tr>
+<td><strong>CN4</strong></td>
+<td>black</td>
+<td>23</td>
+<td>power in and out, high-side outputs HS1–8, H-bridges, knock inputs, CAN1, two grounds</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/boards/jaytek_v1.board.yaml -->
+
+<p>The headers on the board are TE Connectivity parts; the harness side needs the matching receptacle
+housings. Both are named at the top of each connector's pinout below, and chapter 8 lists the
+terminals and tools.</p>
+<h3 id="inputs">Inputs<a class="headerlink" href="#inputs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>How many</th>
+<th>Pins</th>
+<th>Can be used as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Analogue voltage</strong></td>
+<td>15</td>
+<td>AV1–AV11, AV13–AV16 (CN3)</td>
+<td>any 0–5 V sensor, a switch against trip points</td>
+</tr>
+<tr>
+<td><strong>Temperature</strong></td>
+<td>4</td>
+<td>AT1–AT4 (CN3)</td>
+<td>thermistors: each has a 2.7 kΩ pull-up to 5 V sensor supply 1</td>
+</tr>
+<tr>
+<td><strong>VR</strong></td>
+<td>2</td>
+<td>VR1, VR2 (CN3, two pins each)</td>
+<td>crank or cam trigger from a two-wire magnetic sensor or a Hall sensor; frequency</td>
+</tr>
+<tr>
+<td><strong>Digital</strong></td>
+<td>8</td>
+<td>DIG1–DIG8 (CN3)</td>
+<td>trigger, switch, frequency, SENT, pulse width</td>
+</tr>
+<tr>
+<td><strong>Knock</strong></td>
+<td>2</td>
+<td>KNOCK1, KNOCK2 (CN4)</td>
+<td>knock sensors</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/boards/jaytek_v1.board.yaml (pins, caps) -->
+
+<p><strong>AV12</strong> is not on a connector. It reads the ECU's own supply voltage through a divider, and that is
+<strong>Battery Voltage</strong>.</p>
+<!-- src: definition/boards/jaytek_v1.board.yaml; hardware/jaytek_v1_hardware.md -->
+
+<figure>
+<p><img alt="The five input circuits: analogue, temperature, digital, VR and knock, from connector pin to the processor" src="../img/diagrams/board-inputs.svg" />
+  </p>
+<figcaption>Figure 7.2 — What is behind each kind of input pin.</figcaption>
+</figure>
+<ul>
+<li><strong>Analogue</strong> inputs have a 470 kΩ resistor to ground, so a disconnected input reads near 0 V, a
+  filter, and a buffer. The studio reports them as 0–5 V at the pin.</li>
+<li><strong>Temperature</strong> inputs are the same, plus the 2.7 kΩ pull-up (chapter 17 shows how to calibrate a
+  thermistor against it).</li>
+<li><strong>Digital</strong> inputs have a 2.7 kΩ pull-up to 5 V sensor supply 1, a small filter, and a Schmitt
+  trigger, so an open-collector Hall sensor needs no pull-up of its own.</li>
+<li>
+<p><strong>VR</strong> inputs go to a VR interface chip (MAX9924) that turns the sensor's sine wave into a clean
+  edge. Its <strong>rising</strong> edge is the zero crossing of the sensor signal. A <strong>Hall</strong> sensor can use a VR
+  input too: its signal to VR+, VR− left unconnected (the chip biases it internally), and a pull-up to
+  5 V if the sensor needs one — the VR inputs have none of their own (chapter 11).
+  <!-- src: hardware/PDF_JAYTEK_2026-04-29/Trigger (MAX9924, BIAS to ground = internal reference, no input pull-up); the MAX9924 datasheet (Analog Devices) --></p>
+</li>
+<li>
+<p><strong>Knock</strong> inputs have a series coupling capacitor, an amplifier and a filter, and are sampled in
+  fast bursts (281.25 kHz) around the knock window. Jumpers <strong>H1</strong> and <strong>H2</strong> short the coupling
+  capacitor for KNOCK1 and KNOCK2. The same signal is buffered to the <strong>CN1</strong> 3.5 mm jack so you can
+  listen to the engine through headphones.
+  <!-- src: hardware/PDF_JAYTEK_2026-04-29/{Analog,Temperature,Digital,Trigger,Knock}; hardware/jaytek_v1_hardware.md; firmware/Engine/Modules/KnockProfile.h; schematic (H1, H2, CN1) -->
+</p>
+</li>
+</ul>
+<h3 id="outputs">Outputs<a class="headerlink" href="#outputs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>How many</th>
+<th>Pins</th>
+<th>Can be used as</th>
+<th>Driver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ignition</strong></td>
+<td>12</td>
+<td>IGN1–IGN12 (CN2)</td>
+<td>coil or igniter trigger signal; tacho</td>
+<td>IX4427 gate driver</td>
+</tr>
+<tr>
+<td><strong>Low-side</strong></td>
+<td>22</td>
+<td>LS1–LS22 (CN2)</td>
+<td>injectors, relays, solenoids; PWM; tacho</td>
+<td>VNLD5090</td>
+</tr>
+<tr>
+<td><strong>High-side</strong></td>
+<td>8</td>
+<td>HS1–HS8 (CN4)</td>
+<td>loads switched to 12 V; PWM; tacho</td>
+<td>VNQ7140</td>
+</tr>
+<tr>
+<td><strong>H-bridge</strong></td>
+<td>2</td>
+<td>HBRIDGE1 ±, HBRIDGE2 ± (CN4)</td>
+<td>DC motors both ways: electronic throttle, idle valve; a pair drives one stepper</td>
+<td>IFX9201</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/boards/jaytek_v1.board.yaml; hardware/jaytek_v1_hardware.md -->
+
+<figure>
+<p><img alt="The output stages: ignition signal, low-side switch, a low-side driving a PWM solenoid, high-side switch, and H-bridge, from processor to the load" src="../img/diagrams/board-outputs.svg" />
+  </p>
+<figcaption>Figure 7.3 — The output stages and what they connect to.</figcaption>
+</figure>
+<ul>
+<li>An <strong>ignition</strong> output is a <strong>5 V logic signal</strong>, not a coil driver. It triggers a coil with a
+  built-in igniter, or a separate igniter module. High is dwell (charging); the fall to low is the
+  spark.</li>
+<li>A <strong>low-side</strong> output connects its pin to ground when on. The load goes between the pin and a
+  switched +12 V.</li>
+<li>
+<p><strong>No output has a freewheel diode.</strong> Each low-side pin has only its driver on it; the board has
+  footprints for diodes on LS13–LS16 (D10–D13), but they are never fitted. Any LS pin drives
+  injectors, relays and PWM valves alike; chapter 12 says when to add a diode at a valve.
+  <!-- src: hardware/PDF_JAYTEK_2026-04-29/Low side/SCH_Low side_1 (VNLD5090 drain straight to the pin); D10-D13 unpopulated --></p>
+</li>
+<li>
+<p>A <strong>high-side</strong> output connects its pin to 12 V (from CN4-13) when on. The load goes between the pin
+  and ground.</p>
+</li>
+<li>An <strong>H-bridge</strong> drives current either way through a motor across its + and − pins, powered from
+  CN4-13.</li>
+</ul>
+<p>The board definition does not state a continuous current rating for any output. Use the driver's own
+data sheet, and use a relay for anything heavy (chapter 12).</p>
+<h3 id="communication">Communication<a class="headerlink" href="#communication" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>USB</strong> (a USB-B socket on the board) is the studio's link to the ECU. The ECU also appears as a
+  drive on the computer, showing the microSD card. The processor can run from USB power alone,
+  without 12 V, for setting up on the bench (chapter 10).</li>
+<li><strong>CAN1</strong> is on CN4 (pins 10 and 17). <strong>CAN2</strong> is on header <strong>H4</strong> on the board. Each has a TJA1051
+  transceiver. Chapter 13 covers wiring and termination.</li>
+<li><strong>microSD card</strong> holds on-board logs and the ECU's files (chapters 42 and 48).
+  <!-- src: hardware/jaytek_v1_hardware.md; schematic (H4, CARD1, USB1, D20) -->
+</li>
+</ul>
+<h3 id="power">Power<a class="headerlink" href="#power" title="Permanent link">&para;</a></h3>
+<figure>
+<p><img alt="The ECU's own supply from CN4-9 through a TVS clamp and series diode to the regulators and fuses, the two 5 V sensor supplies, USB power, and the power stage's supply from CN4-13" src="../img/diagrams/board-power.svg" />
+  </p>
+<figcaption>Figure 7.4 — How the board is powered. Chapter 10 explains every part.</figcaption>
+</figure>
+<p>There are two separate 12 V feeds:</p>
+<ul>
+<li><strong>CN4-9, 12 V RAW</strong>, powers the ECU itself: through a transient clamp and a reverse-polarity diode
+  to the regulators. <strong>Battery Voltage</strong> is read here, before the diode.</li>
+<li><strong>CN4-13, 12 V MR</strong> (main relay), powers the <strong>power stage</strong>: the high-side switches and the
+  H-bridges. Without it the high-sides and H-bridges cannot drive anything.</li>
+</ul>
+<p>And three outputs:</p>
+<ul>
+<li><strong>CN4-14</strong> and <strong>CN4-15</strong>: two separate <strong>5 V sensor supplies</strong>, each with a power-good line the
+  ECU watches (chapter 17). Supply 1 also feeds the temperature and digital input pull-ups.</li>
+<li><strong>CN4-16, 12 V PROT</strong>: a protected 12 V output, through two fuses in parallel on the board.
+  <!-- src: schematic (CON_12V_RAW: CN4.9 D14 D15 R143; 12V_PROT: D14 F1 F2 L2 U37 U38; CON_12V_PROT: CN4.16 F1 F2; CON_12V_MR); hardware/jaytek_v1_hardware.md -->
+</li>
+</ul>
+<p>Chapter 10 covers power, grounding, key-on and protection in full.</p>
+<h3 id="on-the-board">On the board<a class="headerlink" href="#on-the-board" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>What it is for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LPS22HB</strong> barometric sensor</td>
+<td><strong>Barometric Pressure</strong> read On-board (chapter 17)</td>
+</tr>
+<tr>
+<td><strong>Status LEDs</strong> PWR, RUN, WAR, ERR, COM</td>
+<td>see below</td>
+</tr>
+<tr>
+<td><strong>SW4 RESET</strong></td>
+<td>restarts the processor</td>
+</tr>
+<tr>
+<td><strong>SW5 BOOT</strong></td>
+<td>held while resetting, starts the processor's USB bootloader for recovery (chapter 47)</td>
+</tr>
+<tr>
+<td><strong>H3</strong></td>
+<td>debug (SWD) header, for an ST-Link during firmware development (not needed for recovery)</td>
+</tr>
+<tr>
+<td><strong>H5</strong>, <strong>H6</strong></td>
+<td>spare SPI and serial (UART) headers</td>
+</tr>
+<tr>
+<td><strong>H1</strong>, <strong>H2</strong></td>
+<td>knock coupling-capacitor jumpers</td>
+</tr>
+<tr>
+<td><strong>CN1</strong></td>
+<td>3.5 mm knock listening jack</td>
+</tr>
+<tr>
+<td><strong>B1</strong> CR2032</td>
+<td>keeps the real-time clock running with the power off</td>
+</tr>
+</tbody>
+</table>
+<!-- src: schematic ($PACKAGES; nets ~NRST (H3.3, SW4), AUX_SPI (H5), UART (H6)); hardware/jaytek_v1_hardware.md -->
+
+<p><strong>What the status LEDs show:</strong></p>
+<!-- src: firmware/Led/LedTask.h; firmware/Led/LedTask.cpp -->
+
+<table>
+<thead>
+<tr>
+<th>LED</th>
+<th>Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PWR</strong></td>
+<td>the board has power</td>
+</tr>
+<tr>
+<td><strong>RUN</strong></td>
+<td>trigger: off when no teeth are arriving, blinking twice a second while turning without sync, three quick flashes then a pause at Crank sync, solid at Phase sync (chapter 16)</td>
+</tr>
+<tr>
+<td><strong>COM</strong></td>
+<td>USB: a slow heartbeat when nothing is connected, solid when connected, flickering while data flows</td>
+</tr>
+<tr>
+<td><strong>WAR</strong></td>
+<td>flashes out the active Level 1 and 2 trouble codes, one after another</td>
+</tr>
+<tr>
+<td><strong>ERR</strong></td>
+<td>flashes out the active Level 3 trouble codes, one after another</td>
+</tr>
+</tbody>
+</table>
+<p>The WAR and ERR LEDs flash each code digit by digit: a digit from 1 to 9 is that many short flashes, a
+0 is one long flash, with a gap between digits and a longer gap before the next code. So P0117 is: one
+long, one short, one short, seven short. Chapter 44 lists the codes.</p>
+<h2 id="pinout">Pinout<a class="headerlink" href="#pinout" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>Each connector below is drawn looking at the pins, in pin-number order, with the default wire colour
+the studio uses in its wiring hints. The tables list what each pin can be used for.</p>
+<h3 id="cn2-white-ignition-and-low-side-outputs">CN2 — white, ignition and low-side outputs<a class="headerlink" href="#cn2-white-ignition-and-low-side-outputs" title="Permanent link">&para;</a></h3>
+<figure>
+<p><img alt="CN2 pinout: pins 1 to 22 are low-side outputs in an interleaved order, pin 23 is ground, pins 24 to 35 are IGN1 to IGN12" src="../img/diagrams/board-cn2.svg" />
+  </p>
+<figcaption>Figure 7.5 — CN2. The low-side outputs are interleaved: check the number on each pin.</figcaption>
+</figure>
+<!-- GENERATED by manual/tools/shots/board.sh from definition/boards/jaytek_v1.board.yaml. Do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Pin</th>
+<th>Signal</th>
+<th>Can be used as</th>
+<th>Wire</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>LS1</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/B</td>
+</tr>
+<tr>
+<td>2</td>
+<td>LS17</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/G</td>
+</tr>
+<tr>
+<td>3</td>
+<td>LS3</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/R</td>
+</tr>
+<tr>
+<td>4</td>
+<td>LS19</td>
+<td>low-side, PWM, tacho</td>
+<td>Br</td>
+</tr>
+<tr>
+<td>5</td>
+<td>LS5</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/G</td>
+</tr>
+<tr>
+<td>6</td>
+<td>LS21</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/V</td>
+</tr>
+<tr>
+<td>7</td>
+<td>LS7</td>
+<td>low-side, PWM, tacho</td>
+<td>Br</td>
+</tr>
+<tr>
+<td>8</td>
+<td>LS13</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/B</td>
+</tr>
+<tr>
+<td>9</td>
+<td>LS9</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/V</td>
+</tr>
+<tr>
+<td>10</td>
+<td>LS15</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/R</td>
+</tr>
+<tr>
+<td>11</td>
+<td>LS11</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/Pk</td>
+</tr>
+<tr>
+<td>12</td>
+<td>LS12</td>
+<td>low-side, PWM, tacho</td>
+<td>Br</td>
+</tr>
+<tr>
+<td>13</td>
+<td>LS2</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/W</td>
+</tr>
+<tr>
+<td>14</td>
+<td>LS18</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/Bu</td>
+</tr>
+<tr>
+<td>15</td>
+<td>LS4</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/Y</td>
+</tr>
+<tr>
+<td>16</td>
+<td>LS20</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/O</td>
+</tr>
+<tr>
+<td>17</td>
+<td>LS6</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/Bu</td>
+</tr>
+<tr>
+<td>18</td>
+<td>LS22</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/Gy</td>
+</tr>
+<tr>
+<td>19</td>
+<td>LS8</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/O</td>
+</tr>
+<tr>
+<td>20</td>
+<td>LS14</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/W</td>
+</tr>
+<tr>
+<td>21</td>
+<td>LS10</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/Gy</td>
+</tr>
+<tr>
+<td>22</td>
+<td>LS16</td>
+<td>low-side, PWM, tacho</td>
+<td>Br/Y</td>
+</tr>
+<tr>
+<td>23</td>
+<td>GND</td>
+<td>ground</td>
+<td>B</td>
+</tr>
+<tr>
+<td>24</td>
+<td>IGN1</td>
+<td>ignition, tacho</td>
+<td>W/B</td>
+</tr>
+<tr>
+<td>25</td>
+<td>IGN2</td>
+<td>ignition, tacho</td>
+<td>W</td>
+</tr>
+<tr>
+<td>26</td>
+<td>IGN3</td>
+<td>ignition, tacho</td>
+<td>W/R</td>
+</tr>
+<tr>
+<td>27</td>
+<td>IGN4</td>
+<td>ignition, tacho</td>
+<td>W/Y</td>
+</tr>
+<tr>
+<td>28</td>
+<td>IGN5</td>
+<td>ignition, tacho</td>
+<td>W/G</td>
+</tr>
+<tr>
+<td>29</td>
+<td>IGN6</td>
+<td>ignition, tacho</td>
+<td>W/Bu</td>
+</tr>
+<tr>
+<td>30</td>
+<td>IGN7</td>
+<td>ignition, tacho</td>
+<td>W/Br</td>
+</tr>
+<tr>
+<td>31</td>
+<td>IGN8</td>
+<td>ignition, tacho</td>
+<td>W/O</td>
+</tr>
+<tr>
+<td>32</td>
+<td>IGN9</td>
+<td>ignition, tacho</td>
+<td>W/V</td>
+</tr>
+<tr>
+<td>33</td>
+<td>IGN10</td>
+<td>ignition, tacho</td>
+<td>W/Gy</td>
+</tr>
+<tr>
+<td>34</td>
+<td>IGN11</td>
+<td>ignition, tacho</td>
+<td>W/Pk</td>
+</tr>
+<tr>
+<td>35</td>
+<td>IGN12</td>
+<td>ignition, tacho</td>
+<td>W</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cn3-blue-sensors-and-triggers">CN3 — blue, sensors and triggers<a class="headerlink" href="#cn3-blue-sensors-and-triggers" title="Permanent link">&para;</a></h3>
+<figure>
+<p><img alt="CN3 pinout: temperature, analogue, VR and digital inputs, and grounds on pins 10, 11, 12 and 35" src="../img/diagrams/board-cn3.svg" />
+  </p>
+<figcaption>Figure 7.6 — CN3.</figcaption>
+</figure>
+<!-- GENERATED by manual/tools/shots/board.sh from definition/boards/jaytek_v1.board.yaml. Do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Pin</th>
+<th>Signal</th>
+<th>Can be used as</th>
+<th>Wire</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>AT4</td>
+<td>temperature (2.7 kΩ pull-up)</td>
+<td>Gy/Y</td>
+</tr>
+<tr>
+<td>2</td>
+<td>AT2</td>
+<td>temperature (2.7 kΩ pull-up)</td>
+<td>Gy/W</td>
+</tr>
+<tr>
+<td>3</td>
+<td>AV16</td>
+<td>analogue 0–5 V</td>
+<td>G/Y</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AV14</td>
+<td>analogue 0–5 V</td>
+<td>G/W</td>
+</tr>
+<tr>
+<td>5</td>
+<td>AV13</td>
+<td>analogue 0–5 V</td>
+<td>G/B</td>
+</tr>
+<tr>
+<td>6</td>
+<td>VR1 +</td>
+<td>VR sensor input: trigger, frequency</td>
+<td>Bu</td>
+</tr>
+<tr>
+<td>7</td>
+<td>VR1 -</td>
+<td>VR sensor input: trigger, frequency</td>
+<td>Bu/B</td>
+</tr>
+<tr>
+<td>8</td>
+<td>VR2 +</td>
+<td>VR sensor input: trigger, frequency</td>
+<td>Bu</td>
+</tr>
+<tr>
+<td>9</td>
+<td>VR2 -</td>
+<td>VR sensor input: trigger, frequency</td>
+<td>Bu/B</td>
+</tr>
+<tr>
+<td>10</td>
+<td>GND</td>
+<td>ground</td>
+<td>B</td>
+</tr>
+<tr>
+<td>11</td>
+<td>GND</td>
+<td>ground</td>
+<td>B</td>
+</tr>
+<tr>
+<td>12</td>
+<td>GND</td>
+<td>ground</td>
+<td>B</td>
+</tr>
+<tr>
+<td>13</td>
+<td>AT3</td>
+<td>temperature (2.7 kΩ pull-up)</td>
+<td>Gy/R</td>
+</tr>
+<tr>
+<td>14</td>
+<td>AT1</td>
+<td>temperature (2.7 kΩ pull-up)</td>
+<td>Gy/B</td>
+</tr>
+<tr>
+<td>15</td>
+<td>AV15</td>
+<td>analogue 0–5 V</td>
+<td>G/R</td>
+</tr>
+<tr>
+<td>16</td>
+<td>DIG8</td>
+<td>trigger, switch, frequency, SENT</td>
+<td>O</td>
+</tr>
+<tr>
+<td>17</td>
+<td>DIG7</td>
+<td>trigger, switch, frequency, SENT</td>
+<td>O/Br</td>
+</tr>
+<tr>
+<td>18</td>
+<td>DIG6</td>
+<td>trigger, switch, frequency, SENT</td>
+<td>O/Bu</td>
+</tr>
+<tr>
+<td>19</td>
+<td>DIG5</td>
+<td>trigger, switch, frequency, SENT</td>
+<td>O/G</td>
+</tr>
+<tr>
+<td>20</td>
+<td>DIG4</td>
+<td>trigger, switch, frequency, SENT</td>
+<td>O/Y</td>
+</tr>
+<tr>
+<td>21</td>
+<td>DIG3</td>
+<td>trigger, switch, frequency, SENT</td>
+<td>O/R</td>
+</tr>
+<tr>
+<td>22</td>
+<td>DIG2</td>
+<td>trigger, switch, frequency, SENT</td>
+<td>O/W</td>
+</tr>
+<tr>
+<td>23</td>
+<td>DIG1</td>
+<td>trigger, switch, frequency, SENT</td>
+<td>O/B</td>
+</tr>
+<tr>
+<td>24</td>
+<td>AV4</td>
+<td>analogue 0–5 V</td>
+<td>G/Y</td>
+</tr>
+<tr>
+<td>25</td>
+<td>AV3</td>
+<td>analogue 0–5 V</td>
+<td>G/R</td>
+</tr>
+<tr>
+<td>26</td>
+<td>AV2</td>
+<td>analogue 0–5 V</td>
+<td>G/W</td>
+</tr>
+<tr>
+<td>27</td>
+<td>AV1</td>
+<td>analogue 0–5 V</td>
+<td>G/B</td>
+</tr>
+<tr>
+<td>28</td>
+<td>AV11</td>
+<td>analogue 0–5 V</td>
+<td>G/Pk</td>
+</tr>
+<tr>
+<td>29</td>
+<td>AV10</td>
+<td>analogue 0–5 V</td>
+<td>G/Gy</td>
+</tr>
+<tr>
+<td>30</td>
+<td>AV9</td>
+<td>analogue 0–5 V</td>
+<td>G/V</td>
+</tr>
+<tr>
+<td>31</td>
+<td>AV8</td>
+<td>analogue 0–5 V</td>
+<td>G/O</td>
+</tr>
+<tr>
+<td>32</td>
+<td>AV7</td>
+<td>analogue 0–5 V</td>
+<td>G/Br</td>
+</tr>
+<tr>
+<td>33</td>
+<td>AV6</td>
+<td>analogue 0–5 V</td>
+<td>G/Bu</td>
+</tr>
+<tr>
+<td>34</td>
+<td>AV5</td>
+<td>analogue 0–5 V</td>
+<td>G</td>
+</tr>
+<tr>
+<td>35</td>
+<td>GND</td>
+<td>ground</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cn4-black-power-high-sides-h-bridges-knock-can1">CN4 — black, power, high-sides, H-bridges, knock, CAN1<a class="headerlink" href="#cn4-black-power-high-sides-h-bridges-knock-can1" title="Permanent link">&para;</a></h3>
+<figure>
+<p><img alt="CN4 pinout: HS1 to HS8, 12 V RAW, CAN1, grounds, 12 V MR, the two 5 V sensor supplies, 12 V PROT, the H-bridge pins and the knock inputs" src="../img/diagrams/board-cn4.svg" />
+  </p>
+<figcaption>Figure 7.7 — CN4.</figcaption>
+</figure>
+<!-- GENERATED by manual/tools/shots/board.sh from definition/boards/jaytek_v1.board.yaml. Do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Pin</th>
+<th>Signal</th>
+<th>Can be used as</th>
+<th>Wire</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>HS5</td>
+<td>high-side, PWM, tacho</td>
+<td>Y/G</td>
+</tr>
+<tr>
+<td>2</td>
+<td>HS6</td>
+<td>high-side, PWM, tacho</td>
+<td>Y/Bu</td>
+</tr>
+<tr>
+<td>3</td>
+<td>HS8</td>
+<td>high-side, PWM, tacho</td>
+<td>Y/O</td>
+</tr>
+<tr>
+<td>4</td>
+<td>HS7</td>
+<td>high-side, PWM, tacho</td>
+<td>Y/Br</td>
+</tr>
+<tr>
+<td>5</td>
+<td>HS3</td>
+<td>high-side, PWM, tacho</td>
+<td>Y/R</td>
+</tr>
+<tr>
+<td>6</td>
+<td>HS4</td>
+<td>high-side, PWM, tacho</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>7</td>
+<td>HS1</td>
+<td>high-side, PWM, tacho</td>
+<td>Y/B</td>
+</tr>
+<tr>
+<td>8</td>
+<td>HS2</td>
+<td>high-side, PWM, tacho</td>
+<td>Y/W</td>
+</tr>
+<tr>
+<td>9</td>
+<td>12 V RAW</td>
+<td>the ECU's own supply</td>
+<td>R</td>
+</tr>
+<tr>
+<td>10</td>
+<td>CAN1 H</td>
+<td>CAN bus</td>
+<td>Lg</td>
+</tr>
+<tr>
+<td>11</td>
+<td>GND</td>
+<td>ground</td>
+<td>B</td>
+</tr>
+<tr>
+<td>12</td>
+<td>GND</td>
+<td>ground</td>
+<td>B</td>
+</tr>
+<tr>
+<td>13</td>
+<td>12 V MR</td>
+<td>main-relay feed to the power stage</td>
+<td>R/W</td>
+</tr>
+<tr>
+<td>14</td>
+<td>5 V SENS 1</td>
+<td>5 V supply for sensors (output)</td>
+<td>O/W</td>
+</tr>
+<tr>
+<td>15</td>
+<td>5 V SENS 2</td>
+<td>5 V supply for sensors (output)</td>
+<td>O/W</td>
+</tr>
+<tr>
+<td>16</td>
+<td>12 V PROT</td>
+<td>protected 12 V out</td>
+<td>R/Y</td>
+</tr>
+<tr>
+<td>17</td>
+<td>CAN1 L</td>
+<td>CAN bus</td>
+<td>Lg/B</td>
+</tr>
+<tr>
+<td>18</td>
+<td>HBRIDGE2 -</td>
+<td>H-bridge output</td>
+<td>V/B</td>
+</tr>
+<tr>
+<td>19</td>
+<td>HBRIDGE2 +</td>
+<td>H-bridge output</td>
+<td>V</td>
+</tr>
+<tr>
+<td>20</td>
+<td>HBRIDGE1 +</td>
+<td>H-bridge output</td>
+<td>V</td>
+</tr>
+<tr>
+<td>21</td>
+<td>HBRIDGE1 -</td>
+<td>H-bridge output</td>
+<td>V/B</td>
+</tr>
+<tr>
+<td>22</td>
+<td>KNOCK2</td>
+<td>knock</td>
+<td>Pk/W</td>
+</tr>
+<tr>
+<td>23</td>
+<td>KNOCK1</td>
+<td>knock</td>
+<td>Pk/B</td>
+</tr>
+</tbody>
+</table>
+<h2 id="procedure-finding-a-pin-in-the-studio">Procedure — finding a pin in the studio<a class="headerlink" href="#procedure-finding-a-pin-in-the-studio" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>You never type a pin number in the studio. Every input and output is chosen from a list that only
+offers the pins that can do the job, and the page then shows the connector, pin and wire colour.</p>
+<ol>
+<li>
+<p><strong>Outputs</strong>: <strong>Configuration ▸ Electrical ▸ Outputs</strong> lists every output pin with what it does and
+   which cylinder it serves (chapter 18).</p>
+<p><figure markdown>
+  <img alt="The Outputs page: IGN1 to LS2, LS3 to LS16 and LS17 to HS8, each with its function and cylinder" src="../img/studio/board-outputs.png" />
+  <figcaption>Figure 7.8 — Every output pin on one page.</figcaption>
+</figure></p>
+</li>
+<li>
+<p>Click a pin to open its own page, which shows its connector position and wire colour:</p>
+<p><figure markdown>
+  <img alt="This Pin: LS13, CN2 (white) pin 8, with Function Generic" src="../img/studio/board-output-pin.png" width="430" />
+  <figcaption>Figure 7.9 — LS13 is CN2 pin 8.</figcaption>
+</figure></p>
+</li>
+<li>
+<p><strong>Inputs</strong>: on a sensor's page, <strong>Assign</strong> picks the pin, and the page shows where it is:</p>
+<p><figure markdown>
+  <img alt="A sensor's input panel: Analogue Voltage on AT1, grey/black wire, CN3 (blue) pin 14" src="../img/studio/sensors-clt-page.png" width="500" />
+  <figcaption>Figure 7.10 — Coolant temperature on AT1, CN3 pin 14.</figcaption>
+</figure></p>
+</li>
+<li>
+<p><strong>H-bridges</strong>: <strong>Configuration ▸ Electrical ▸ Half Bridges</strong> switches each bridge on and sets its
+   PWM frequency (chapter 22 for throttles, chapter 21 for steppers).</p>
+<p><figure markdown>
+  <img alt="Half Bridges: Half Bridge A enabled, B off, PWM Frequency 20000 Hz, and the live duty of each" src="../img/studio/board-half-bridges.png" />
+  <figcaption>Figure 7.11 — The two H-bridges.</figcaption>
+</figure></p>
+</li>
+<li>
+<p><strong>CAN</strong>: <strong>Configuration ▸ CAN Bus ▸ CAN1</strong> switches the bus on and sets its bit rate (chapter 33).</p>
+<p><figure markdown>
+  <img alt="CAN1: Enabled, Bitrate 500 kbit, Listen Only, and live bus statistics" src="../img/studio/board-can1.png" />
+  <figcaption>Figure 7.12 — CAN1.</figcaption>
+</figure></p>
+</li>
+</ol>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">A four-cylinder, sequential, with coil-on-plug and an idle valve</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Pins</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coils 1–4</td>
+<td>IGN1–IGN4 (CN2-24 to 27)</td>
+<td>coils with built-in igniters</td>
+</tr>
+<tr>
+<td>Injectors 1–4</td>
+<td>LS1–LS4</td>
+<td>low-side, 12 V from the injector relay</td>
+</tr>
+<tr>
+<td>Idle valve (PWM)</td>
+<td>LS13</td>
+<td>any low-side pin can drive a PWM valve</td>
+</tr>
+<tr>
+<td>Fuel pump relay, fan relay</td>
+<td>two more low-sides</td>
+<td>relays switched to ground</td>
+</tr>
+<tr>
+<td>Crank (VR), cam (Hall)</td>
+<td>VR1, DIG1</td>
+<td>the VR interface for the magnetic sensor</td>
+</tr>
+<tr>
+<td>MAP, TPS</td>
+<td>AV1, AV2</td>
+<td>0–5 V sensors on 5 V SENS 1</td>
+</tr>
+<tr>
+<td>Coolant, air temperature</td>
+<td>AT1, AT2</td>
+<td>thermistors with the on-board pull-up</td>
+</tr>
+<tr>
+<td>Knock</td>
+<td>KNOCK1</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition example">
+<p class="admonition-title">A drive-by-wire V8</p>
+<p>The electronic throttle takes <strong>HBRIDGE1</strong> (CN4-20 and 21), and its two position tracks and the two
+pedal tracks take four analogue inputs, split across <strong>both</strong> 5 V sensor supplies so one supply
+failure cannot take out both tracks of a pair (chapters 11 and 22). With <strong>HBRIDGE2</strong> free, the
+ECU can still drive a motorised wastegate or a DC idle valve, but not a stepper, which needs both
+bridges.</p>
+</div>
+<h2 id="pitfalls">Pitfalls<a class="headerlink" href="#pitfalls" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What happens</th>
+<th>Instead</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A coil primary wired straight to an IGN pin</td>
+<td>The IGN output is a 5 V signal and cannot switch a coil</td>
+<td>Use coils with igniters, or an igniter module</td>
+</tr>
+<tr>
+<td>Nothing on CN4-13</td>
+<td>High-sides and H-bridges do nothing</td>
+<td>Feed CN4-13 from the main relay (chapter 10)</td>
+</tr>
+<tr>
+<td>A heavy load on an output pin</td>
+<td>The driver overheats or shuts down</td>
+<td>A relay, driven by the output</td>
+</tr>
+<tr>
+<td>Sensors on the 12 V PROT output</td>
+<td>12 V on a 5 V sensor destroys it</td>
+<td>5 V sensors on CN4-14 or 15</td>
+</tr>
+<tr>
+<td>Two tracks of a safety pair on one 5 V supply</td>
+<td>One supply fault takes out both</td>
+<td>Split them across the two supplies</td>
+</tr>
+<tr>
+<td>Reading the CN2 low-side pins in order</td>
+<td>LS1–LS22 are interleaved</td>
+<td>Use the table</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="08-tools.html">Chapter 8 — Tools and materials</a> (the connector parts, terminals and crimpers)</li>
+<li><a href="10-power-grounds.html">Chapter 10 — Power, grounds and protection</a></li>
+<li><a href="11-wiring-sensors.html">Chapter 11 — Wiring sensors</a></li>
+<li><a href="12-wiring-outputs.html">Chapter 12 — Wiring outputs</a></li>
+<li><a href="13-can-bus.html">Chapter 13 — CAN bus</a></li>
+<li><a href="../part3/18-outputs.html">Chapter 18 — Outputs and the pin system</a></li>
+<li><a href="../reference/specifications.html">Specifications</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="index.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Index">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Index
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="08-tools.html" class="md-footer__link md-footer__link--next" aria-label="Next: 8 Tools and materials">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                8 Tools and materials
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

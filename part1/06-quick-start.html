@@ -1,0 +1,3562 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part1/06-quick-start.html">
+      
+      
+        <link rel="prev" href="05-first-connection.html">
+      
+      
+        <link rel="next" href="../part2/index.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>6 Quick start — box to first start - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#quick-start-box-to-first-start" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              6 Quick start — box to first start
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="06-quick-start.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Concepts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nothing-fires-without-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nothing fires without sync
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trigger-offset-btdc-ties-the-wheel-to-the-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trigger Offset BTDC ties the wheel to the engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#some-changes-wait-for-the-engine-to-stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Some changes wait for the engine to stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edits-live-in-the-ecus-memory-until-you-burn-them" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edits live in the ECU's memory until you burn them
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#procedure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procedure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Procedure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#stage-1-wire-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 1 — Wire it
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-2-power-up-and-connect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 2 — Power up and connect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-3-base-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 3 — Base configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-4-check-the-sensors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 4 — Check the sensors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-5-output-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 5 — Output test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-6-crank-with-no-fuel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 6 — Crank with no fuel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-7-first-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 7 — First start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-8-first-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stage 8 — First fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls-and-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls and troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part3/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/27-speed-limiting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part3/36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="quick-start-box-to-first-start">Quick start — box to first start<a class="headerlink" href="#quick-start-box-to-first-start" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<blockquote>
+<p><strong>In one sentence:</strong> the shortest safe path from a new ECU to an engine that starts and idles, as a
+checklist of eight stages, each pointing to the chapter that explains it in full.</p>
+</blockquote>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>This chapter is a checklist, not a manual. Each stage says what to do, how you know it is done, and
+which chapter to read when it is not. Work through it in order. Every stage assumes the one before it
+passed. An engine that "nearly" syncs will not start however good its fuel table is, and a coil wired
+to the wrong cylinder cannot be fixed with timing.</p>
+<p>It assumes:</p>
+<ul>
+<li>the studio is installed and can talk to the ECU (<a href="03-installing-studio.html">chapter 3</a>,
+  <a href="05-first-connection.html">chapter 5</a>);</li>
+<li>you know your way around the studio's pages, the <strong>Burn</strong> button and the navigation tree
+  (<a href="04-studio-tour.html">chapter 4</a>);</li>
+<li>you know your engine: cylinder count, firing order, the crank (and cam) trigger wheel, and the
+  injectors' flow rate and dead time.</li>
+</ul>
+<figure>
+<p><img alt="The eight stages of the quick start, in two rows: wire it, power up and connect, base configuration, check the sensors; then output test, crank with no fuel, first start, first fixes. Each box says when the stage is done and which chapters cover it." src="../img/diagrams/quick-start-flow.svg" />
+  </p>
+<figcaption>Figure 6.1 — The eight stages. Blue is configuration, green is a check you read off the
+  studio, orange is the ECU driving real hardware. Each box ends with the test that says the stage is
+  done.</figcaption>
+</figure>
+<div class="admonition danger">
+<p class="admonition-title">Fuel, spark and a starter motor</p>
+<p>From stage 5 on, the ECU can open injectors, fire coils and turn the engine. Have the fuel system
+leak-checked, a fire extinguisher in reach, the car in neutral with the handbrake on, and nobody
+near the fan or belts before you crank.</p>
+</div>
+<h2 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>Four ideas explain most first-start trouble. Read these once. The checklist refers back to them.</p>
+<h3 id="nothing-fires-without-sync">Nothing fires without sync<a class="headerlink" href="#nothing-fires-without-sync" title="Permanent link">&para;</a></h3>
+<p>The ECU only knows where the engine is once it has matched the crank trigger to the pattern you told
+it to expect. That match is <strong>sync</strong>, and it has three levels, shown live as <strong>Sync Level</strong>
+<code>sync_level</code>:</p>
+<ul>
+<li><strong>None (0):</strong> position unknown. The ECU fires nothing, and <strong>Engine RPM</strong> reads 0 even while the
+  engine is turning.</li>
+<li><strong>Crank (1):</strong> it knows which tooth is passing, within one crank revolution. That is enough for
+  wasted spark and for grouped injection.</li>
+<li><strong>Phase (2):</strong> a cam signal has told it which of the two revolutions of the cycle it is in. Sequential
+  injection and coil-on-plug need this to fire each cylinder on its own.
+  <!-- src: firmware/Scheduler/EnginePositionHal.cpp (NONE stops dispatch) (rpm 0 at no sync); firmware/Engine/EngineStateMachine.h; definition/ecu.schema.yaml enums.sync_level -->
+</li>
+</ul>
+<p>Until a cam signal is seen, a coil-on-plug engine fires its coils in companion pairs, and a sequential
+injector fires every revolution with half the fuel each time. So an engine with no cam sensor, or one
+still cranking, can still start.</p>
+<!-- src: definition/ecu.schema.yaml (engine.ign_mode help) (inj_stage[].mode help) -->
+
+<figure>
+<p><img alt="A grid of what fires at each sync level. With no sync, RPM reads 0 and nothing fires. At crank sync, wasted spark fires each pair, coil-on-plug fires companion pairs together, grouped injection fires normally and sequential injection fires every turn with half the fuel. At phase sync, coil-on-plug fires each coil on its own and sequential injection fires once per cycle at its own cylinder's TDC." src="../img/diagrams/quick-start-sync.svg" />
+  </p>
+<figcaption>Figure 6.2 — What the ECU fires at each sync level. If <b>Engine RPM</b> stays at 0 while
+  the engine cranks, the problem is the trigger, not fuel or spark.</figcaption>
+</figure>
+<h3 id="trigger-offset-btdc-ties-the-wheel-to-the-engine">Trigger Offset BTDC ties the wheel to the engine<a class="headerlink" href="#trigger-offset-btdc-ties-the-wheel-to-the-engine" title="Permanent link">&para;</a></h3>
+<p>The trigger wheel knows nothing about top dead centre. <strong>Trigger Offset BTDC</strong>
+<code>trigger.trigger_offset_btdc</code> tells the ECU how many crank degrees before TDC of cylinder 1 the
+wheel's reference tooth passes the sensor. On a missing-tooth wheel the reference is the first tooth
+after the gap. Every spark and injection angle is measured from it, so a wrong offset moves all of
+them by the same error. Raising it makes everything fire later.</p>
+<!-- src: definition/ecu.schema.yaml (the offset's comment and help) -->
+
+<p>A number from the Trigger Library or a forum is a starting point. The only proof is a timing light
+with <strong>Fixed Timing</strong> switched on (stage 7). The ECU reads the offset live, so you can adjust it with
+the engine running.</p>
+<!-- src: firmware/Scheduler/EnginePositionHal.cpp; definition/ecu.schema.yaml -->
+
+<h3 id="some-changes-wait-for-the-engine-to-stop">Some changes wait for the engine to stop<a class="headerlink" href="#some-changes-wait-for-the-engine-to-stop" title="Permanent link">&para;</a></h3>
+<p>Settings that change the engine's shape wait until the engine is stopped before they take effect.
+That covers the cylinder count and firing order, the injection stages, the trigger streams, and which
+coil or injector an output drives. Change them with the engine off: while the studio is connected and
+the engine is turning, the studio greys out the settings that would only wait (hover one to see why).
+Trigger Offset BTDC is the exception (above).</p>
+<!-- src: definition/ecu.schema.yaml (Engine and Trigger shadow: when engine_stop); codegen/codegen.py; outputs.output[].function help -->
+
+<h3 id="edits-live-in-the-ecus-memory-until-you-burn-them">Edits live in the ECU's memory until you burn them<a class="headerlink" href="#edits-live-in-the-ecus-memory-until-you-burn-them" title="Permanent link">&para;</a></h3>
+<p>A change you make in the studio goes to the ECU straight away, but it is only kept in the ECU's
+working memory. <strong>Burn</strong> writes it to flash. A reset or power-off before a burn loses it, and the
+ECU comes back on the tune it had before. The studio's <strong>Reset ECU</strong> warns you when there are
+unburned changes.</p>
+<!-- src: apps/studio-jf/main.cpp (Reset ECU: "UNBURNED changes will be lost") -->
+
+<h2 id="procedure">Procedure<a class="headerlink" href="#procedure" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>Tick each item off before moving on. The pins quoted are the jaytek_v1 board's; the full pin-out is in
+<a href="../part2/07-board.html">chapter 7</a>.</p>
+<h3 id="stage-1-wire-it">Stage 1 — Wire it<a class="headerlink" href="#stage-1-wire-it" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<ol>
+<li>
+<p><strong>Power and grounds.</strong> Wire the 12 V feeds on the black connector (CN4-9, CN4-13 and CN4-16) and
+   <strong>every</strong> ground pin: CN2-23, CN3-10, CN3-11, CN3-12, CN3-35, CN4-11 and CN4-12. How each 12 V
+   feed is switched and fused is in <a href="../part2/10-power-grounds.html">chapter 10</a>.
+   <!-- src: definition/boards/jaytek_v1.board.yaml --></p>
+</li>
+<li>
+<p><strong>Sensors.</strong> Temperature sensors on the AT inputs, pressure and position sensors on the AV inputs,
+   powered from a 5 V sensor supply (CN4-14 or CN4-15). See
+   <a href="../part2/11-wiring-sensors.html">chapter 11</a>.
+   <!-- src: definition/boards/jaytek_v1.board.yaml (AV/AT pins) --></p>
+</li>
+<li>
+<p><strong>Trigger.</strong> A VR (magnetic) sensor goes to a VR input as a pair: VR1 is CN3-6 (+) and CN3-7 (−),
+   VR2 is CN3-8 (+) and CN3-9 (−). A Hall or optical sensor goes to a digital input, DIG1 to DIG8
+   (CN3-23 down to CN3-16), or to a VR input: signal on VR+, VR− left unconnected, and a pull-up to
+   5 V if the sensor needs one. See <a href="../part2/11-wiring-sensors.html">chapter 11</a>.
+   <!-- src: definition/boards/jaytek_v1.board.yaml --></p>
+</li>
+<li>
+<p><strong>Injectors and coils.</strong> Coils go to the IGN outputs (IGN1 to IGN12, CN2-24 to CN2-35).
+   Injectors go to the LS outputs, and only an LS pin can drive an injector. <strong>The LS pins are
+   interleaved on the connector:</strong> LS1 is CN2-1 but LS2 is CN2-13, LS3 is CN2-3 and LS4 is CN2-15.
+   Check each against the pin-out. See <a href="../part2/12-wiring-outputs.html">chapter 12</a>.
+   <!-- src: definition/boards/jaytek_v1.board.yaml; outputs.output[].function help (IGN pins fire coils, LS pins drive injectors) --></p>
+</li>
+<li>
+<p><strong>Fuel pump and main relay</strong> on spare LS or HS outputs, each through a relay
+   (<a href="../part2/14-vehicle-integration.html">chapter 14</a>).</p>
+</li>
+</ol>
+<p><strong>Done when:</strong> you have checked every pin with a meter against the pin-out, before power goes on.</p>
+<h3 id="stage-2-power-up-and-connect">Stage 2 — Power up and connect<a class="headerlink" href="#stage-2-power-up-and-connect" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<ol>
+<li>Key on, engine off. Connect the studio over USB (<a href="05-first-connection.html">chapter 5</a>).</li>
+<li>The red <strong>NOT CONNECTED</strong> bar goes away and the values on the dash start to move.</li>
+<li>Open the <strong>Diagnostic Trouble Codes</strong> dock (<strong>View ▸ Diagnostic Trouble Codes</strong>). <strong>P0641</strong> or
+   <strong>P0651</strong> means a 5 V sensor supply is faulty. Look for a shorted sensor wire before you go on.
+   <!-- src: definition/ecu.schema.yaml (P0641, P0651); definition/boards/jaytek_v1.board.yaml -->
+</li>
+</ol>
+<p><strong>Done when:</strong> the studio shows live values and no sensor-supply code.</p>
+<h3 id="stage-3-base-configuration">Stage 3 — Base configuration<a class="headerlink" href="#stage-3-base-configuration" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>Do these with the engine stopped, in this order. Later pages depend on earlier ones.</p>
+<p><strong>3a. Cylinders &amp; Firing</strong> (<strong>Configuration ▸ Engine Configuration ▸ Cylinders &amp; Firing</strong>,
+<a href="../part3/15-engine-vehicle.html">chapter 15</a>). Set <strong>Cylinders</strong> <code>engine.cylinder_count</code>,
+<strong>Displacement</strong>, <strong>Engine Cycle</strong> and the <strong>Firing Order</strong>. <strong>Known Engines</strong> fills in a common
+firing order and the cylinder count in one go. Displacement matters: the speed-density fuel model
+works out each cylinder's air from it.</p>
+<!-- src: definition/ecu.schema.yaml (cylinders, cycle) (firing order) -->
+
+<figure>
+<p><img alt="The Cylinders &amp; Firing page set for a four-cylinder, 1998 cc, four-stroke engine firing 1-3-4-2" src="../img/studio/quick-start-cylinders.png" />
+  </p>
+<figcaption>Figure 6.3 — Cylinders &amp; Firing for Example 1. The TDC angles are greyed because the ECU
+  works them out from the firing order on an even-fire engine.</figcaption>
+</figure>
+<p><strong>3b. Trigger</strong> (<strong>Configuration ▸ Engine Configuration ▸ Trigger System</strong>,
+<a href="../part3/16-trigger.html">chapter 16</a>). Tick the stream for each sensor you wired (<strong>Crank Primary</strong>,
+and a <strong>Cam</strong> stream if you have one). On each stream's page, set <strong>Capture Input</strong> to the pin you
+wired and pick your wheel from the <strong>Pattern</strong> list, or from the Trigger Library
+(<a href="../reference/trigger-wheels.html">reference</a>). A library wheel also writes its <strong>Trigger Offset BTDC</strong>
+if it has one. Otherwise enter your engine's number on the Trigger System page.</p>
+<!-- src: definition/ecu.schema.yaml (streams[].enabled, capture_index); apps/studio-jf/src/model/TriggerWheel.cpp -->
+
+<figure>
+<p><img alt="The Crank Primary stream page: Capture Input VR1, Capture Edge Rising, Pattern 36-1, Primitive Gap, Base Teeth 36, Gap Ratio 2, Cell Length 1" src="../img/studio/quick-start-crank-stream.png" />
+  </p>
+<figcaption>Figure 6.4 — The Crank Primary stream for a 36-1 wheel on VR1. Choosing <b>36-1</b> in
+  the pattern list fills in Primitive, Base Teeth, Gap Ratio and the cell. Tick <b>Enabled</b> at the
+  top of the page, or the stream is not decoded at all.</figcaption>
+</figure>
+<figure>
+<p><img alt="The Trigger System page with Trigger Offset BTDC 155 and Pickup Angle 105, Crank Primary and Cam Intake B1 ticked, and the trigger diagram" src="../img/studio/quick-start-trigger-reference.png" />
+  </p>
+<figcaption>Figure 6.5 — The Trigger System page, set up as in Example 2 (2JZ, 36-2 crank and a cam
+  stream). <b>Pickup Angle</b> only changes how the diagram is drawn. The ECU never uses
+  it.</figcaption>
+</figure>
+<p><strong>3c. Sensors</strong> (<strong>Configuration ▸ Sensors</strong>, <a href="../part3/17-sensors.html">chapter 17</a>). For each sensor
+you wired, at least coolant, air temperature, manifold pressure and throttle position: tick
+<strong>Enabled</strong>, <strong>Assign</strong> the pin, and set the calibration for your sensor. A sensor that is not enabled
+publishes nothing, which is not the same as reading zero. Modules that need it treat it as missing and
+raise a code, for example <strong>P1700</strong> if the fuel model has no manifold pressure.</p>
+<!-- src: definition/ecu.schema.yaml sensors.sensor[].enabled help (P1700-P1702) -->
+
+<figure>
+<p><img alt="The Coolant Temperature sensor page: Enabled ticked, Interface Analogue Voltage, the Assign button, and a two-point calibration line" src="../img/studio/quick-start-sensor.png" />
+  </p>
+<figcaption>Figure 6.6 — A sensor page. Tick <b>Enabled</b>, assign the pin, then replace the
+  calibration with your sensor's own curve. The straight line shown is a placeholder.</figcaption>
+</figure>
+<p><strong>3d. Fuel</strong> (<a href="../part3/19-fuel.html">chapter 19</a>). On <strong>Engine Configuration ▸ Fuel System</strong>, set the
+<strong>Injection Stages</strong> (1 for a normal engine) and each stage's <strong>Mode</strong>. Sequential needs a cam signal
+to fire each injector on its own cylinder. Semi-Sequential needs only the crank. When the stage's mode
+or its number of outputs changes, the studio lays the injector outputs out for you, starting at LS1 for
+cylinder 1.</p>
+<!-- src: definition/ecu.schema.yaml; apps/studio-jf/src/model/EngineOutputLayout.cpp -->
+
+<figure>
+<p><img alt="The Fuel System page: one injection stage, End of Injection timing, Injector Outputs On, Stage 1 in Semi-Sequential" src="../img/studio/quick-start-fuel-system.png" />
+  </p>
+<figcaption>Figure 6.7 — Fuel System for Example 1: one stage, semi-sequential, because the engine
+  has no cam sensor. <b>Injector Outputs</b> must read On for the engine to get fuel.</figcaption>
+</figure>
+<p>Then on <strong>Fuel Tuning ▸ Stage 1 ▸ Setup</strong>, enter your injectors' <strong>Dead Time</strong> and <strong>Flow Rate</strong> from
+their data sheet, and how the rail pressure is known (<strong>Pressure</strong>: a sensor, a fixed regulator, or a
+rising-rate regulator, and its <strong>Base Pressure</strong>). On <strong>Fuel Setup</strong>, check <strong>Stoich AFR</strong> (default
+14.7, for petrol) and the <strong>Air Model</strong> (default Speed-Density).</p>
+<!-- src: definition/ecu.schema.yaml (dead time, flow rate) (stoich 14.7) (Air Model, default Speed-Density) -->
+
+<figure>
+<p><img alt="The Stage 1 Setup page: Dead Time table against battery voltage and pressure difference, Flow Rate row against pressure difference, Fuel Rail pressure settings and the injection timing table" src="../img/studio/quick-start-injector-data.png" />
+  </p>
+<figcaption>Figure 6.8 — Stage 1 ▸ Setup, still at the defaults. The dead time and flow values are
+  example injector data, not yours. Replace them before the first start.</figcaption>
+</figure>
+<p><strong>3e. Ignition</strong> (<strong>Engine Configuration ▸ Ignition System</strong>, <a href="../part3/20-ignition.html">chapter 20</a>).
+Set <strong>Ignition Mode</strong>: Wasted Spark (one coil per pair of cylinders, needs only crank sync),
+Coil-on-Plug (one coil per cylinder, needs a cam signal to fire each one on its own), or Single Coil
+(distributor). The studio lays the coil outputs out from it. Leave <strong>Max Advance</strong> (default 40°) and
+<strong>Min Advance</strong> (default −10°) where they are for now. Then set the coil <strong>Dwell Time</strong>
+(<strong>Ignition Tuning ▸ Dwell Time</strong>) from the coil's data. The default runs from 5.0 ms at 6 V down to
+2.5 ms at 16 V.</p>
+<!-- src: definition/ecu.schema.yaml (ign_mode) (max/min advance), dwell_table default_row 5000…2500 µs; apps/studio-jf/src/model/EngineOutputLayout.cpp -->
+
+<figure>
+<p><img alt="The Ignition System page: Wasted Spark, 4 cylinders, Ignition Outputs On, Max Advance 40, Min Advance -10, and Fixed Timing enabled at 10 degrees" src="../img/studio/quick-start-ignition-system.png" />
+  </p>
+<figcaption>Figure 6.9 — Ignition System, with Fixed Timing switched on as it will be for stage 7.
+  Leave it off until then.</figcaption>
+</figure>
+<p><strong>3f. Outputs</strong> (<strong>Configuration ▸ Electrical ▸ Outputs</strong>, <a href="../part3/18-outputs.html">chapter 18</a>). Open
+each IGN and LS pin you wired and check that its <strong>Function</strong> and <strong>Cylinder</strong> match your wiring. For
+the fuel pump, choose <strong>Set up this output…</strong> on its pin and pick the <strong>Fuel Pump</strong> template
+(<a href="../reference/output-templates.html">reference</a>). It runs the pump for <strong>Prime Time</strong> (default 3 s) at
+key-on, then keeps it running while trigger teeth arrive, and stops it 1500 ms after the last one.</p>
+<!-- src: definition/ecu.schema.yaml (fuel_pump template: prime_s 3, stop_ms 1500) -->
+
+<p><strong>3g. Burn, then check the codes.</strong> Press <strong>Burn</strong>. Stop the engine if it is somehow turning, so the
+new layout applies. Then look at the DTC dock. These codes mean the configuration is not complete:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1650</strong></td>
+<td>One pin is claimed by two functions</td>
+</tr>
+<tr>
+<td><strong>P1651</strong></td>
+<td>The firing order has a duplicate or missing cylinder</td>
+</tr>
+<tr>
+<td><strong>P1652</strong></td>
+<td>The trigger cannot establish position (no absolute reference)</td>
+</tr>
+<tr>
+<td><strong>P1653</strong></td>
+<td>A cylinder in the firing order has no coil output</td>
+</tr>
+<tr>
+<td><strong>P1654</strong></td>
+<td>A cylinder in the firing order has no stage 1 injector output</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/ecu.schema.yaml (P1650-P1654); firmware/Engine/EngineTask.cpp -->
+
+<p><strong>Done when:</strong> the tune is burned and none of P1650 to P1654 is showing.</p>
+<h3 id="stage-4-check-the-sensors">Stage 4 — Check the sensors<a class="headerlink" href="#stage-4-check-the-sensors" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>Key on, engine off and cold. Read each value on the dash and ask whether it makes sense:</p>
+<ul>
+<li><strong>Coolant</strong> and <strong>Air Temp</strong> close to the air temperature around the car.</li>
+<li><strong>MAP</strong> close to the air pressure where you are (about 100 kPa at sea level) with the engine off.</li>
+<li><strong>Throttle</strong> near 0 % closed and near 100 % with the pedal floored.</li>
+<li><strong>Battery</strong> reading what a meter reads at the battery.</li>
+</ul>
+<p>A value that is wildly wrong, or frozen, is a wiring or calibration fault. Fix it now
+(<a href="../part3/17-sensors.html">chapter 17</a>).</p>
+<p><strong>Done when:</strong> every reading is believable.</p>
+<h3 id="stage-5-output-test">Stage 5 — Output test<a class="headerlink" href="#stage-5-output-test" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<p>The output test fires one output on its own with the engine stopped, so you can prove every wire goes
+where you think.</p>
+<ol>
+<li>Open the pin's page, for example <strong>Configuration ▸ Electrical ▸ Outputs ▸ IGN1</strong>.</li>
+<li>In <strong>Bench Test</strong>, set <strong>Count</strong>, <strong>On Time</strong> and <strong>Off Time</strong>. The studio starts at 3 pulses,
+   4 ms on and 500 ms off.</li>
+<li>Press <strong>Test</strong>. <strong>Stop</strong> ends that pin's test. <strong>Stop All</strong> ends every test.
+   <!-- src: definition/ecu.schema.yaml (pc_vars test_count 3, test_on_ms 4, test_off_ms 500); definition/boards/jaytek_v1.dashboard.gui (IGN1 Bench Test: Test / Stop / Stop All) -->
+</li>
+</ol>
+<p>What happens depends on the pin's <strong>Function</strong>. An Ignition pin charges its coil for the On Time and
+sparks when it releases. An Injector pin opens its injector for the On Time. Anything else is simply
+switched on. The ECU refuses to run a test while the engine turns, cancels one the moment it starts,
+and ends each test by itself, even if the studio is unplugged.</p>
+<!-- src: firmware/Engine/Modules/OutputTest.h, OutputTest.cpp -->
+
+<figure>
+<p><img alt="The IGN1 output page: connector CN2 pin 24, Function Ignition, Cylinder 1, Active High ticked" src="../img/studio/quick-start-output-test.png" />
+  </p>
+<figcaption>Figure 6.10 — The top of an output page. It shows the connector pin (CN2 pin 24 for
+  IGN1), what the pin does and which cylinder it serves. The <b>Bench Test</b> group is at the right
+  of the same page.</figcaption>
+</figure>
+<p>Check each coil with a spark tester or a plug laid on the head, and each injector by listening for the
+click. On wasted spark, a coil output fires both of its plugs.</p>
+<div class="admonition danger">
+<p class="admonition-title">An injector test sprays fuel</p>
+<p>With the rail pressurised, every injector click puts fuel in a cylinder. Test injectors with the
+fuel pump fuse or relay pulled. Keep the On Time short on coils: a coil held on for a long time
+overheats, and so can its driver.</p>
+</div>
+<p><strong>Done when:</strong> every coil and every injector answers from the right cylinder.</p>
+<h3 id="stage-6-crank-with-no-fuel">Stage 6 — Crank with no fuel<a class="headerlink" href="#stage-6-crank-with-no-fuel" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>This proves the trigger before any fuel goes in.</p>
+<ol>
+<li>
+<p>Set <strong>Injector Outputs</strong> to <strong>Off</strong> (on the Fuel System page). The coils still fire, but no
+   injector opens. This setting <strong>survives a reset</strong>, so remember to turn it back on.
+   <!-- src: definition/ecu.schema.yaml (engine.inj_enable) --></p>
+</li>
+<li>
+<p>Open <strong>Engine Configuration ▸ Trigger System ▸ Diagnostics</strong>.</p>
+</li>
+<li>Crank for a few seconds and watch:<ul>
+<li>the sync lamp goes from <strong>NO SYNC</strong> to <strong>CRANK SYNC</strong> (or <strong>PHASE SYNC</strong> with a cam), within a
+  revolution or two, and stays there;</li>
+<li><strong>Engine RPM</strong> shows a steady cranking speed, not 0;</li>
+<li><strong>Engine State</strong> reads <strong>Cranking</strong>;</li>
+<li><strong>Error Rate</strong> <code>trigger_error_pct</code> stays at <strong>0 %</strong>.</li>
+</ul>
+</li>
+</ol>
+<figure>
+<p><img alt="The Trigger Diagnostics page: the three sync lamps NO SYNC, CRANK SYNC and PHASE SYNC, with Sync Level, Crank Angle, Engine RPM and Engine State below" src="../img/studio/quick-start-trigger-diagnostics.png" />
+  </p>
+<figcaption>Figure 6.11 — Trigger Diagnostics with the engine stopped. While cranking, the lit lamp
+  should move right and stay lit, and Engine RPM should read the cranking speed.</figcaption>
+</figure>
+<p>If sync never comes, or comes and goes, stop here and go to <a href="../part3/16-trigger.html">chapter 16</a>. The
+<strong>Tools ▸ Trigger Log</strong> tool records the raw signal the ECU sees.</p>
+<p><strong>Done when:</strong> sync holds for the whole crank and the error rate stays at 0 %.</p>
+<h3 id="stage-7-first-start">Stage 7 — First start<a class="headerlink" href="#stage-7-first-start" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<ol>
+<li>Set <strong>Injector Outputs</strong> back to <strong>On</strong>.</li>
+<li>
+<p>On <strong>Ignition System</strong>, tick <strong>Fixed timing enabled</strong> and leave <strong>Fixed Advance</strong> at 10°. Fixed
+   timing replaces every table and correction with this one number. An ignition cut still cuts.
+   <!-- src: definition/ecu.schema.yaml (fixed timing, default 10.0°); firmware/Engine/Modules/Ignition.cpp --></p>
+</li>
+<li>
+<p>Check the <strong>Cranking</strong> fuel table (<strong>Fuel Tuning ▸ Cranking</strong>). It adds fuel by coolant
+   temperature until the engine passes <strong>Cranking Threshold</strong> (default 400 rpm). The default runs from
+   200 % when very cold to 50 % when hot.
+   <!-- src: definition/ecu.schema.yaml cranking_fuel_table default_row 200 %…50 % (cranking_rpm 400) --></p>
+</li>
+<li>
+<p>Crank. When it catches, let it idle. Point a timing light at the cylinder 1 mark.</p>
+</li>
+<li>If the light shows <strong>more</strong> advance than 10°, raise <strong>Trigger Offset BTDC</strong> (Trigger System page)
+   by the difference. If it shows <strong>less</strong>, lower it. The change applies straight away.</li>
+<li>When the light reads 10°, untick <strong>Fixed timing enabled</strong> and press <strong>Burn</strong>.
+   <!-- src: definition/ecu.schema.yaml (raising the offset makes events fire later); firmware/Scheduler/EnginePositionHal.cpp -->
+</li>
+</ol>
+<figure>
+<p><img alt="The Cranking page: Enabled, Cranking Threshold 400 RPM, and the cranking enrichment curve against coolant temperature from 200 percent at minus 40 degrees to 50 percent at 70 degrees and above" src="../img/studio/quick-start-cranking.png" />
+  </p>
+<figcaption>Figure 6.12 — The Cranking enrichment curve as shipped. If the engine fires but will not
+  catch, this curve and the injector data are the first places to look.</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">Cranking advance</p>
+<p>With <strong>Cranking Advance</strong> off (the default), the engine cranks on whatever the main advance table's
+lowest RPM column says. Switching it on uses the <strong>Cranking Advance</strong> curve instead: 4° cold down
+to 2° warm as shipped (<a href="../part3/20-ignition.html">chapter 20</a>).
+<!-- src: definition/ecu.schema.yaml (cranking_ign_enable, default off) (cranking_ign_table: 4.0° cold to 2.0° warm) --></p>
+</div>
+<p><strong>Done when:</strong> the engine runs, and the timing light agrees with Fixed Advance.</p>
+<h3 id="stage-8-first-fixes">Stage 8 — First fixes<a class="headerlink" href="#stage-8-first-fixes" title="Permanent link">&para;</a></h3>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>A running engine on a base tune is a starting point. Before you drive it:</p>
+<ol>
+<li><strong>Record a log</strong> of the start and warm-up (<strong>Logging ▸ Start Recording</strong>,
+   <a href="../part4/42-datalogging.html">chapter 42</a>).</li>
+<li><strong>Fuel near idle.</strong> With a wideband sensor, bring the VE table close around idle and light load
+   (<a href="../part4/38-tuning-fuel.html">chapter 38</a>, <a href="../part3/23-lambda.html">chapter 23</a>).</li>
+<li><strong>Warm-up and after-start</strong> enrichment, so it starts and idles cold as well as warm
+   (<a href="../part4/38-tuning-fuel.html">chapter 38</a>).</li>
+<li><strong>Idle control</strong>, so it holds its idle as it warms and as loads come on
+   (<a href="../part3/21-idle.html">chapter 21</a>).</li>
+<li><strong>Timing.</strong> Check the advance table is safe for your engine before any load
+   (<a href="../part4/39-tuning-ignition.html">chapter 39</a>).</li>
+<li><strong>Protection.</strong> Set the rev limiter and engine protection before the first drive
+   (<a href="../part3/27-speed-limiting.html">chapter 27</a>, <a href="../part3/29-protection.html">chapter 29</a>).</li>
+</ol>
+<p><strong>Done when:</strong> the engine starts and idles by itself, cold and warm, with no codes.</p>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — 2.0 L four-cylinder, crank sensor only</p>
+<p>A four-cylinder with a 36-1 crank wheel read by a VR sensor, no cam sensor, one wasted-spark coil
+pack and four port injectors. The screenshots in stage 3 are this engine.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cylinders / Displacement / Bore</td>
+<td>4 / 1998 cc / 86 mm</td>
+<td>the engine</td>
+</tr>
+<tr>
+<td>Firing Order</td>
+<td>1-3-4-2</td>
+<td>from <strong>Known Engines</strong></td>
+</tr>
+<tr>
+<td>Crank Primary</td>
+<td>VR1 (CN3-6 +, CN3-7 −), pattern 36-1</td>
+<td>the only trigger sensor</td>
+</tr>
+<tr>
+<td>Trigger Offset BTDC</td>
+<td>your engine's value, then the timing light</td>
+<td>the generic 36-1 wheel carries no offset of its own</td>
+</tr>
+<tr>
+<td>Ignition Mode</td>
+<td>Wasted Spark</td>
+<td>needs only crank sync</td>
+</tr>
+<tr>
+<td>Coil outputs</td>
+<td>IGN1 = cylinder 1 (fires 1 and 4), IGN2 = cylinder 2 (fires 2 and 3)</td>
+<td>how the studio lays out a 1-3-4-2 wasted-spark engine</td>
+</tr>
+<tr>
+<td>Stage 1 Mode</td>
+<td>Semi-Sequential</td>
+<td>no cam, so not Sequential</td>
+</tr>
+<tr>
+<td>Injector outputs</td>
+<td>LS1–LS4 = cylinders 1–4 (CN2-1, CN2-13, CN2-3, CN2-15)</td>
+<td>note the interleaved pins</td>
+</tr>
+<tr>
+<td>Fuel pump</td>
+<td>Fuel Pump template on a spare LS pin, through a relay</td>
+<td>3 s prime at key-on</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/ecu.schema.yaml (trigger_wheels "36-1", no tdc_offset); apps/studio-jf/src/model/EngineOutputLayout.cpp (wasted-spark pairing) (injector rows); definition/boards/jaytek_v1.board.yaml -->
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — 2JZ six-cylinder with a cam sensor</p>
+<p>A six-cylinder with a 36-2 crank wheel and a cam sensor, coil-on-plug and sequential injection.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cylinders / Firing Order</td>
+<td>6 / 1-5-3-6-2-4</td>
+<td>the engine</td>
+</tr>
+<tr>
+<td>Trigger</td>
+<td><strong>2JZ 36-2 +Rear Cam</strong> from the Trigger Library</td>
+<td>fills in Crank Primary and Cam Intake B1</td>
+</tr>
+<tr>
+<td>Trigger Offset BTDC</td>
+<td>155°</td>
+<td>written by the library wheel; confirm with the light</td>
+</tr>
+<tr>
+<td>Pickup Angle</td>
+<td>+105°</td>
+<td>draws the diagram as you see the engine; the ECU ignores it</td>
+</tr>
+<tr>
+<td>Cam Intake B1 Capture Input</td>
+<td>the pin the cam sensor is wired to (VR2 here)</td>
+<td>the library cannot know your wiring</td>
+</tr>
+<tr>
+<td>Min RPM for Full (PHASE) Sync</td>
+<td>about 1500 rpm</td>
+<td>the field's help suggests this for a VR cam sensor</td>
+</tr>
+<tr>
+<td>Ignition Mode</td>
+<td>Coil-on-Plug</td>
+<td>six coils, IGN1–IGN6</td>
+</tr>
+<tr>
+<td>Stage 1 Mode</td>
+<td>Sequential</td>
+<td>the cam gives phase</td>
+</tr>
+</tbody>
+</table>
+<p>Below 1500 rpm the cam is not trusted to find phase, so while cranking the coils fire in companion
+pairs and the injectors fire every revolution with half the fuel. The engine still starts. It
+switches to sequential once it runs above the band and the cam is seen.
+<!-- src: definition/ecu.schema.yaml (trigger_wheels "2JZ 36-2 + Rear Cam", tdc_offset 155, cam stream); definition/ecu.schema.yaml (sensor_angle +105, min_full_sync ~1500 for a VR cam) --></p>
+</div>
+<h2 id="pitfalls-and-troubleshooting">Pitfalls and troubleshooting<a class="headerlink" href="#pitfalls-and-troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Engine RPM</strong> stays 0 while cranking</td>
+<td>No sync: stream not enabled, wrong Capture Input, wrong pattern, sensor not wired</td>
+<td>Stage 6. The Crank Primary stream's <strong>Enabled</strong> and <strong>Capture Input</strong>; the pattern; <strong>P0338</strong> means no signal at all (<a href="../part3/16-trigger.html">chapter 16</a>)</td>
+</tr>
+<tr>
+<td>Sync comes and goes, error rate above 0 %</td>
+<td>Wrong wheel or edge; electrical noise; sensor gap</td>
+<td><strong>P0336</strong> (unexpected tooth count), <strong>P0337</strong> (gap not found), <strong>P0339</strong> (noise) (<a href="../part3/16-trigger.html">chapter 16</a>, <a href="../part2/09-wiring-practice.html">chapter 9</a>)</td>
+</tr>
+<tr>
+<td>Syncs, cranks, never fires</td>
+<td><strong>Ignition Outputs</strong> or <strong>Injector Outputs</strong> left Off (both survive a reset); config codes</td>
+<td>The two switches on Ignition System and Fuel System; P1650–P1654 (stage 3g)</td>
+</tr>
+<tr>
+<td>Fires but will not catch</td>
+<td>Trigger offset far out; injector data or cranking fuel wrong</td>
+<td>Stage 7 with the timing light; injector <strong>Dead Time</strong> and <strong>Flow Rate</strong>; the Cranking curve</td>
+</tr>
+<tr>
+<td>Starts, then a code for a missing sensor</td>
+<td>A sensor the fuel model needs is not enabled or not assigned</td>
+<td><strong>P1700</strong> (MAP), <strong>P1701</strong> (TPS), <strong>P1702</strong> (coolant) (<a href="../part3/17-sensors.html">chapter 17</a>)</td>
+</tr>
+<tr>
+<td>Flooded after many attempts</td>
+<td>Too much cranking fuel</td>
+<td>Switch on <strong>Flood clear enabled</strong> (<strong>Fuel Tuning ▸ Start &amp; Warmup</strong>, off by default). It cuts fuel while cranking with the throttle at or above 90 % (<a href="../part3/19-fuel.html">chapter 19</a>)</td>
+</tr>
+<tr>
+<td>A change "did not stick" after a reset</td>
+<td>Not burned</td>
+<td>Press <strong>Burn</strong> before any reset or power-off</td>
+</tr>
+<tr>
+<td>A change to cylinders, firing order, trigger or outputs seems ignored</td>
+<td>The engine was running</td>
+<td>These apply at the next engine stop</td>
+</tr>
+<tr>
+<td>One cylinder dead</td>
+<td>Coil or injector on the wrong pin; interleaved LS pins</td>
+<td>Stage 5 again, pin by pin</td>
+</tr>
+</tbody>
+</table>
+<!-- src: definition/ecu.schema.yaml (P0335-P0339) (P1700-P1702) (flood clear: off, 90 %) (ign_enable/inj_enable) -->
+
+<p>The full list of codes is in the <a href="../reference/dtc.html">trouble code reference</a>, and the full
+symptom-by-symptom guide is <a href="../part5/45-troubleshooting.html">chapter 45</a>.</p>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../part2/07-board.html">Chapter 7 — The jaytek_v1 board</a> (the pin-out)</li>
+<li><a href="../part2/10-power-grounds.html">Chapter 10 — Power, grounds and protection</a></li>
+<li><a href="../part3/15-engine-vehicle.html">Chapter 15 — Engine and vehicle basics</a></li>
+<li><a href="../part3/16-trigger.html">Chapter 16 — The trigger system</a></li>
+<li><a href="../part3/18-outputs.html">Chapter 18 — Outputs and the pin system</a></li>
+<li><a href="../part3/19-fuel.html">Chapter 19 — Fuel</a> and <a href="../part3/20-ignition.html">Chapter 20 — Ignition</a></li>
+<li><a href="../part5/43-bench-testing.html">Chapter 43 — Bench testing</a> (the output test and trigger log in depth)</li>
+<li><a href="../part5/45-troubleshooting.html">Chapter 45 — Troubleshooting guide</a></li>
+<li><a href="../reference/settings/engine.html">Every Engine setting</a> and <a href="../reference/settings/trigger.html">every Trigger setting</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="05-first-connection.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 5 First connection">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                5 First connection
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../part2/index.html" class="md-footer__link md-footer__link--next" aria-label="Next: Index">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Index
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

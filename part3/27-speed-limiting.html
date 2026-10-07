@@ -1,0 +1,3593 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The complete reference for the jayecu ECU and jayecu Studio — wiring, configuration, tuning, diagnostics.">
+      
+      
+      
+        <link rel="canonical" href="https://jaytektas.github.io/jayecu/part3/27-speed-limiting.html">
+      
+      
+        <link rel="prev" href="26-launch-shift-traction.html">
+      
+      
+        <link rel="next" href="28-power-adders.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/brand/studio.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>27 Speed limiting - jayecu User Manual</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="https://unpkg.com/iframe-worker/shim"></script>
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/manual.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#speed-limiting" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="jayecu User Manual" class="md-header__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jayecu User Manual
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              27 Speed limiting
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Light"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Dark"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="jayecu User Manual" class="md-nav__button md-logo" aria-label="jayecu User Manual" data-md-component="logo">
+      
+  <img src="../img/brand/studio.png" alt="logo">
+
+    </a>
+    jayecu User Manual
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jaytektas/jayecu" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jaytektas/jayecu
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part1/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part I — Getting started
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part I — Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/01-using-this-manual.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 How to use this manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/02-system-overview.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 The system at a glance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/03-installing-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 Installing jayecu Studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/04-studio-tour.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 A tour of the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/05-first-connection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 First connection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part1/06-quick-start.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 Quick start — box to first start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part2/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part II — Hardware and wiring
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part II — Hardware and wiring
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/07-board.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 The jaytek_v1 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/08-tools.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 Tools and materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/09-wiring-practice.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 Wiring practice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/10-power-grounds.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 Power, grounds and protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/11-wiring-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 Wiring sensors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/12-wiring-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Wiring outputs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/13-can-bus.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 CAN bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part2/14-vehicle-integration.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 Vehicle integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part III — Configuring the engine
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part III — Configuring the engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-engine-vehicle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 Engine and vehicle basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-trigger.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 The trigger system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-sensors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 Sensors and calibration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-outputs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 Outputs and the pin system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 Fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 Ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-idle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 Idle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-electronic-throttle.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 Electronic throttle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="23-lambda.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 Closed-loop lambda
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-boost.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 Boost
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="25-vvt-vvl.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 Cam and valve control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="26-launch-shift-traction.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 Launch, shift and traction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="27-speed-limiting.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 Speed limiting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-rev-limiter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 · Rev limiter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-pit-speed-limiter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 · Pit speed limiter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-cruise-control-what-it-drives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 · Cruise control: what it drives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-cruise-control-the-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 · Cruise control: the states
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-cruise-control-the-buttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 · Cruise control: the buttons
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-cruise-control-what-stops-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6 · Cruise control: what stops it
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-cruise-control-the-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7 · Cruise control: the loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-it-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting it up
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting it up">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-rev-limiter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Rev limiter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-pit-limiter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Pit limiter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-cruise-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Cruise control
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="28-power-adders.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 Power adders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="29-protection.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 Engine protection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="30-knock.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 Knock
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="31-misfire.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 Misfire detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="32-vehicle-functions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 Vehicle functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="33-can-config.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 CAN configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="34-tables-expressions.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 Generic tables and expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="35-lua.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 Lua scripting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="36-system.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 System settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part4/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part IV — Tuning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part IV — Tuning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/37-principles.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 Tuning principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/38-tuning-fuel.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 Tuning fuel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/39-tuning-ignition.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 Tuning ignition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/40-auto-tune.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 Auto tune
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/41-knock-tuning.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 Knock tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part4/42-datalogging.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 Datalogging and analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part5/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part V — Testing and troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part V — Testing and troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/43-bench-testing.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 Bench testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/44-diagnostics.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 Diagnostics and trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part5/45-troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 Troubleshooting guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part6/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VI — Firmware and maintenance
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VI — Firmware and maintenance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/46-updating-firmware.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 Updating firmware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/47-recovery.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 Recovering an ECU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/48-files-backups.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 Tunes, layouts and backups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part6/49-customising-studio.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 Customising the studio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../part7/index.html" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part VII — Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part VII — Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/settings/index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every setting, by module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/channels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output channels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/dtc.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trouble codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/trigger-wheels.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trigger wheel library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sensor-types.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/output-templates.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lua-api.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lua API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/specifications.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/proteus-f7.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix — Proteus F7 board
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="speed-limiting">Speed limiting<a class="headerlink" href="#speed-limiting" title="Permanent link">&para;</a></h1>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<blockquote>
+<p><strong>In one sentence:</strong> the rev limiter keeps engine speed under a ceiling, the pit limiter keeps road
+speed under a ceiling, and cruise control holds a road speed by opening an electronic throttle.</p>
+</blockquote>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Where</th>
+<th>Limits</th>
+<th>By</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rev Limiter</strong> (<code>rev_limiter</code>)</td>
+<td>Protection</td>
+<td>engine speed</td>
+<td>cutting fuel and/or ignition</td>
+</tr>
+<tr>
+<td><strong>Pit Speed Limiter</strong> (<code>pit_limiter</code>)</td>
+<td>Vehicle Functions</td>
+<td>road speed</td>
+<td>cutting fuel and/or ignition</td>
+</tr>
+<tr>
+<td><strong>Cruise Control</strong> (<code>cruise_control</code>)</td>
+<td>Vehicle Functions</td>
+<td>holds a road speed</td>
+<td>asking the electronic throttle for more</td>
+</tr>
+</tbody>
+</table>
+<p>The rev limiter is <strong>on</strong> by default (6500 / 7000 RPM). Check its numbers suit your engine before
+the first start.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="1-rev-limiter">1 · Rev limiter<a class="headerlink" href="#1-rev-limiter" title="Permanent link">&para;</a></h3>
+<p>Two limits:</p>
+<ul>
+<li><strong>Soft RPM Limit</strong> (default 6500) — from here a progressive cut starts. Between the soft and hard
+  limits the cut ramps from nothing to everything: halfway between them, half the firing events are
+  cut, spread evenly. The engine meets a growing wall rather than hitting one.</li>
+<li><strong>Hard RPM Limit</strong> (default 7000) — everything is cut, and stays cut until the speed falls
+  <strong>Resume Band</strong> (default 150 RPM) below it.</li>
+</ul>
+<p><strong>Cut Method</strong> (default <strong>Fuel</strong>) chooses fuel, ignition or both. Set the soft limit equal to the hard
+one to have no soft stage.</p>
+<!-- src: firmware/Engine/Modules/RevLimiter.cpp -->
+
+<p><img alt="The Rev Limiter page" src="../img/studio/revlimit-page.png" /></p>
+<p>Two more things act near the limit:</p>
+<ul>
+<li>The <strong>Rev Limiter</strong> ignition correction (chapter 20) can pull timing as the engine approaches the
+  hard limit, so it arrives gently.</li>
+<li>A <strong>protection level</strong> (chapter 29) can impose a lower limit when a fault is active. That limit is
+  enforced even with Rev Limiter switched off: a limp-home limit cannot be defeated by a tuning switch.
+  <!-- src: firmware/Engine/Modules/RevLimiter.cpp -->
+</li>
+</ul>
+<h3 id="2-pit-speed-limiter">2 · Pit speed limiter<a class="headerlink" href="#2-pit-speed-limiter" title="Permanent link">&para;</a></h3>
+<p>While <strong>Engage Signal</strong> is on (not assigned = always, while enabled), the limiter cuts when road speed
+goes above <strong>Speed Limit</strong> (default 60 km/h) and stops cutting when it falls <strong>Resume Band</strong> (default
+3 km/h) below. <strong>Cut Method</strong> defaults to <strong>Both</strong>. It uses the road speed, so it works in any gear.</p>
+<!-- src: firmware/Engine/Modules/PitLimiter.cpp -->
+
+<p><img alt="The Pit Speed Limiter page" src="../img/studio/pitlimit-page.png" /></p>
+<h3 id="3-cruise-control-what-it-drives">3 · Cruise control: what it drives<a class="headerlink" href="#3-cruise-control-what-it-drives" title="Permanent link">&para;</a></h3>
+<p>Cruise publishes <strong>Cruise Demand</strong> <code>cruise_demand</code>, a throttle percentage. The electronic throttle
+(chapter 22) uses it as a <strong>floor under the pedal</strong>: the plate opens to whichever is higher, so the
+driver can always go faster by pressing the pedal. Without an electronic throttle, cruise control has
+nothing to move.</p>
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp; firmware/Engine/Modules/CruiseControl.h -->
+
+<h3 id="4-cruise-control-the-states">4 · Cruise control: the states<a class="headerlink" href="#4-cruise-control-the-states" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Off</strong></td>
+<td>switched off in the tune</td>
+</tr>
+<tr>
+<td><strong>Disabled</strong></td>
+<td>the driver's main switch is off</td>
+</tr>
+<tr>
+<td><strong>Ready</strong></td>
+<td>armed; waiting for Set or Resume</td>
+</tr>
+<tr>
+<td><strong>Cruising</strong></td>
+<td>holding the set speed</td>
+</tr>
+<tr>
+<td><strong>Fault</strong></td>
+<td>something cannot be trusted; engagement is blocked</td>
+</tr>
+</tbody>
+</table>
+<p><strong>State At Power-On</strong> is Disabled by default (for a stalk with a main on/off). Choose <strong>Ready</strong> for
+controls that only have Set and Resume.</p>
+<h3 id="5-cruise-control-the-buttons">5 · Cruise control: the buttons<a class="headerlink" href="#5-cruise-control-the-buttons" title="Permanent link">&para;</a></h3>
+<p>Each action is a <strong>condition</strong> (an expression, chapter 34), so any switch, stalk position or CAN flag
+can drive it:</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Enable When</strong> / <strong>Disable When</strong></td>
+<td>Disabled → Ready / → Disabled (forgets the set speed)</td>
+</tr>
+<tr>
+<td><strong>Enable/Disable When</strong></td>
+<td>toggles between them (one main button)</td>
+</tr>
+<tr>
+<td><strong>Set When</strong></td>
+<td>from Ready: cruise at the current speed. While cruising: re-set to the current speed</td>
+</tr>
+<tr>
+<td><strong>Resume When</strong></td>
+<td>from Ready: go back to the speed Cancel kept</td>
+</tr>
+<tr>
+<td><strong>Cancel When</strong></td>
+<td>stop cruising, keep the set speed</td>
+</tr>
+<tr>
+<td><strong>Speed Up When</strong> / <strong>Speed Down When</strong></td>
+<td>tap: ± <strong>Speed +/- Increment</strong> (1.0 km/h). Hold longer than <strong>Long Press Time</strong> (500 ms): ramp at <strong>Accelerate Rate</strong> / <strong>Coast Rate</strong> (2.0 km/h/s)</td>
+</tr>
+</tbody>
+</table>
+<p>A tap acts when the button is <strong>released</strong>, so one press is never both a tap and a hold. The same
+condition can appear in two actions — for example the same stalk position in <strong>Set When</strong> and
+<strong>Speed Down When</strong> makes a Set/Coast button. For a multi-position cruise stalk on one analog input,
+set up the <strong>Cruise Control Switch</strong> sensor (chapter 17) and write conditions such as
+<code>cruise_sw == 2</code>.</p>
+<!-- src: firmware/Engine/Modules/CruiseControl.cpp -->
+
+<h3 id="6-cruise-control-what-stops-it">6 · Cruise control: what stops it<a class="headerlink" href="#6-cruise-control-what-stops-it" title="Permanent link">&para;</a></h3>
+<p><strong>Cancel</strong> (the set speed is kept, so Resume works) happens when:</p>
+<ul>
+<li>the <strong>Brake Signal</strong>, <strong>Clutch Signal</strong> or <strong>Handbrake Signal</strong> reads pressed — or reads <strong>invalid</strong>,
+  because a switch that has stopped reporting must not look like "not pressed". These drop the
+  throttle floor on the same frame.</li>
+<li>the speed leaves <strong>Minimum Speed</strong> … <strong>Maximum Speed</strong> (30–140 km/h), the engine speed leaves
+  <strong>Minimum RPM</strong> … <strong>Maximum RPM</strong> (1000–5000), or, with <strong>Require A Known Gear</strong>, the gear is below
+  <strong>Minimum Gear</strong>. A button cancel or a window exit bleeds the floor away over <strong>Cancel Decay Time</strong>
+  (0.5 s).</li>
+</ul>
+<p><strong>Fault</strong> (the set speed is forgotten, and cruise stays out until every cause has cleared and a button
+is pressed again) happens when:</p>
+<table>
+<thead>
+<tr>
+<th>Reason</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No road speed, or it stopped updating for longer than <strong>Speed Signal Timeout</strong> (250 ms)</td>
+<td>P17A0</td>
+</tr>
+<tr>
+<td>The road speed changes faster than <strong>Max Plausible Acceleration</strong> (30 km/h/s)</td>
+<td>P17A1</td>
+</tr>
+<tr>
+<td>The cruise stalk sensor is enabled but reads in no band for <strong>Switch Fault Time</strong> (300 ms)</td>
+<td>P17A2</td>
+</tr>
+<tr>
+<td>The speed stays more than <strong>Max Control System Error</strong> (5 km/h) from target for <strong>Max Error Time</strong> (3 s)</td>
+<td>P17A4</td>
+</tr>
+<tr>
+<td>The four wheel speeds differ by more than <strong>Max Wheel Speed Difference</strong> (10 km/h)</td>
+<td>P17A5</td>
+</tr>
+<tr>
+<td>The accelerator pedal has faulted (chapter 22)</td>
+<td>P17A6</td>
+</tr>
+<tr>
+<td>A button condition does not compile</td>
+<td>P17A7</td>
+</tr>
+<tr>
+<td>An assigned brake, clutch or handbrake sensor has no fault checks enabled</td>
+<td>P17A8</td>
+</tr>
+<tr>
+<td>No <strong>Brake Signal</strong> assigned at all</td>
+<td>P17A9</td>
+</tr>
+</tbody>
+</table>
+<p>Turning the key off is not a fault: cruise switches off with the key (the sensors are not read with the
+key off), and the next key-on starts it in <strong>State At Power-On</strong> with nothing to acknowledge.</p>
+<!-- src: firmware/Engine/Modules/CruiseControl.cpp; generated/module_dtc.h -->
+
+<p><strong>Why it will not engage</strong> on the <strong>Limits</strong> page lights the reason for each block.</p>
+<h3 id="7-cruise-control-the-loop">7 · Cruise control: the loop<a class="headerlink" href="#7-cruise-control-the-loop" title="Permanent link">&para;</a></h3>
+<p>While cruising, a PID controller (<strong>Cruise Proportional</strong>, <strong>Integral</strong> and <strong>Derivative Gain</strong>,
+curves by speed error) sets the demand, up to <strong>Maximum Throttle Demand</strong> (60 %), changing no faster
+than <strong>Max Throttle Ramp Rate</strong> (20 %/s). On engagement the demand starts where the pedal already is,
+so the car does not surge or dip. While the driver presses the pedal past the cruise demand, the
+integral part is frozen, so lifting off does not cause a dip.</p>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic</p>
+<ul>
+<li><strong>Rev limiter:</strong> know your engine's safe maximum speed.</li>
+<li><strong>Pit limiter and cruise:</strong> a road speed (chapter 32).</li>
+<li><strong>Cruise:</strong> an electronic throttle (chapter 22); a brake pedal switch set up as a sensor with its
+  fault checks enabled (chapter 17); your buttons or stalk set up as sensors.</li>
+</ul>
+<h2 id="setting-it-up">Setting it up<a class="headerlink" href="#setting-it-up" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<h3 id="step-1-rev-limiter">Step 1 — Rev limiter<a class="headerlink" href="#step-1-rev-limiter" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Configuration ▸ Protection ▸ Rev Limiter</strong>. Set the <strong>Hard RPM Limit</strong> below the engine's
+mechanical limit with real margin, and the <strong>Soft RPM Limit</strong> 300–500 RPM under it. Keep <strong>Cut
+Method</strong> Fuel for a road car; Ignition recovers faster but puts unburnt fuel into the exhaust.</p>
+<h3 id="step-2-pit-limiter">Step 2 — Pit limiter<a class="headerlink" href="#step-2-pit-limiter" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Pit Speed Limiter</strong>, tick <strong>Enabled</strong>, assign <strong>Engage Signal</strong> to your pit-lane button, and set
+<strong>Speed Limit</strong>.</p>
+<h3 id="step-3-cruise-control">Step 3 — Cruise control<a class="headerlink" href="#step-3-cruise-control" title="Permanent link">&para;</a></h3>
+<p>Open <strong>Configuration ▸ Vehicle Functions ▸ Cruise Control</strong> and tick <strong>Enabled</strong>.</p>
+<p><img alt="The Cruise Control page" src="../img/studio/cruise-page.png" /></p>
+<ol>
+<li>Write the button conditions for your controls (see the examples).</li>
+<li>On <strong>Limits</strong>, check <strong>Brake Signal</strong> is your brake switch, and assign the clutch on a manual.
+   On each of those sensors' pages, enable their fault checks.</li>
+<li>Drive on a quiet road above 30 km/h: enable, set, and watch <strong>Set Speed</strong>, <strong>Vehicle Speed</strong>,
+   <strong>Speed Error</strong> and <strong>Demand</strong>. Press the brake: cruise must cancel at once.</li>
+</ol>
+<p><img alt="The cruise Limits page" src="../img/studio/cruise-limits.png" /></p>
+<h2 id="worked-examples">Worked examples<a class="headerlink" href="#worked-examples" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<div class="admonition example">
+<p class="admonition-title">Example 1 — a four-position stalk on one analog input</p>
+<p>Cruise Control Switch sensor calibrated so position 1 = main, 2 = set/coast, 3 = resume/accel,
+4 = cancel.</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Enable/Disable When</td>
+<td><code>cruise_sw == 1</code></td>
+</tr>
+<tr>
+<td>Set When</td>
+<td><code>cruise_sw == 2</code></td>
+</tr>
+<tr>
+<td>Speed Down When</td>
+<td><code>cruise_sw == 2</code></td>
+</tr>
+<tr>
+<td>Resume When</td>
+<td><code>cruise_sw == 3</code></td>
+</tr>
+<tr>
+<td>Speed Up When</td>
+<td><code>cruise_sw == 3</code></td>
+</tr>
+<tr>
+<td>Cancel When</td>
+<td><code>cruise_sw == 4</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 2 — two steering-wheel buttons over CAN</p>
+<p>State At Power-On <strong>Ready</strong>; Set When and Resume When name your two CAN button channels (chapter
+33 shows how to receive them), for example <code>can_btn_set</code> and <code>can_btn_res</code>; Speed Up and Speed
+Down on the same two buttons held. No stalk sensor: the switch fault check does not apply.</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Example 3 — pit limiter on a button</p>
+<p>Engage Signal = the pit button sensor; Speed Limit 60 km/h; Resume Band 3 km/h; Cut Method Both.</p>
+</div>
+<h2 id="tuning-it">Tuning it<a class="headerlink" href="#tuning-it" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<ul>
+<li><strong>Rev limiter:</strong> if the engine bounces off the limit, widen the gap between soft and hard; if it
+  overshoots the hard limit on a fast gear, lower the soft limit.</li>
+<li><strong>Cruise:</strong> if the speed wanders slowly, raise the integral gain; if it surges up and down, lower
+  the proportional gain. Uphill, if it runs out of throttle, raise <strong>Maximum Throttle Demand</strong>.</li>
+</ul>
+<h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-intermediate"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Intermediate</p>
+<p>The cruise codes <strong>P17A0</strong>–<strong>P17A9</strong> are listed in section 6; all are severity 1 (warnings) and hold
+cruise off. The rev and pit limiters set no codes.</p>
+<p>Live channels: <code>soft_cut_pct</code>, <code>rpm_to_limit</code>, <code>pit_limit_active</code>, <code>cruise_state</code>, <code>cruise_active</code>,
+<code>cruise_target</code>, <code>cruise_demand</code>, <code>cruise_error_kph</code>, <code>cruise_inhibit</code>.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><span class="twemoji level-basic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Basic → <span class="twemoji level-advanced"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span> Advanced</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely causes</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engine stops revving well below the limit</td>
+<td>A protection level's limit is active</td>
+<td>Chapter 29; the active codes</td>
+</tr>
+<tr>
+<td>Pit limiter never cuts</td>
+<td>Engage Signal off; no road speed</td>
+<td><code>pit_limit_active</code>, <code>vehicle_spd</code></td>
+</tr>
+<tr>
+<td>Cruise sets but nothing happens</td>
+<td>No electronic throttle; Maximum Throttle Demand too low</td>
+<td>Chapter 22</td>
+</tr>
+<tr>
+<td>Cruise will not leave Disabled</td>
+<td>No Enable condition and power-on state Disabled</td>
+<td>State At Power-On Ready, or an Enable When</td>
+</tr>
+<tr>
+<td>Cruise shows Fault at once</td>
+<td>No brake assigned; brake sensor fault checks off; a condition does not compile</td>
+<td>The Limits page's reason lamps</td>
+</tr>
+<tr>
+<td>Cruise cancels on its own</td>
+<td>Speed or RPM outside the window; runaway error on a hill</td>
+<td>Minimum/Maximum Speed and RPM; Max Control System Error</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-reference">Settings reference<a class="headerlink" href="#settings-reference" title="Permanent link">&para;</a></h2>
+<p>Rev Limiter:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rev Limit Enabled</strong><br><code>rev_limiter.enabled</code><br>Range: Off or On<br>Default: On</td>
+<td>The engine's RPM ceiling. Turning it OFF does not remove every limit: the protection rev limit that EngineProtection asks for over the bus is still enforced, because a DTC-driven limp home cannot be defeated by a tuning switch. What this disables is the SOFT and HARD limits configured here.</td>
+</tr>
+<tr>
+<td><strong>Hard RPM Limit</strong><br><code>rev_limiter.hard_limit_rpm</code><br>Range: 0 to 12000<br>Default: 7000<br>Units: RPM</td>
+<td>The cut. At or above this RPM the configured cut is applied outright and held until the RPM falls into the resume band. This is the number that must be under the engine's mechanical limit with real margin — it is reached under load, in anger, with a heavy foot.</td>
+</tr>
+<tr>
+<td><strong>Soft RPM Limit</strong><br><code>rev_limiter.soft_limit_rpm</code><br>Range: 0 to 12000<br>Default: 6500<br>Units: RPM</td>
+<td>Where the progressive cut begins, below the hard limit. Between soft and hard the cut duty ramps from nothing to everything, so the engine meets a wall that grows rather than a wall that appears — better for the drivetrain and far more controllable at the top of a gear. Set it equal to or above the hard limit and there is no soft stage at all.</td>
+</tr>
+<tr>
+<td><strong>Cut Method</strong><br><code>rev_limiter.cut_method</code><br>Range: one of: Fuel, Ignition, Both<br>Default: Fuel</td>
+<td>What gets cut at the hard limit. FUEL is the kindest to the exhaust — no unburnt charge reaches it — but recovers slightly more slowly. IGNITION recovers instantly and is what makes the bang; sustained, it can melt a turbine or a catalyst. BOTH is the most positive.</td>
+</tr>
+<tr>
+<td><strong>Resume Band</strong><br><code>rev_limiter.resume_band_rpm</code><br>Range: 0 to 500<br>Default: 150<br>Units: RPM</td>
+<td>How far below the hard limit the RPM must fall before the cut releases. Without it the engine would sit exactly on the limit switching the cut on and off every cycle; this band converts that into a slower, survivable bounce.</td>
+</tr>
+</tbody>
+</table>
+<p>Pit Speed Limiter:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pit/Speed Limiter Enabled</strong><br><code>pit_limiter.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Hold the car at a set road speed by cutting — a pit-lane limiter. It acts on VEHICLE SPEED, not RPM, so the limit holds in whatever gear the driver happens to be in.</td>
+</tr>
+<tr>
+<td><strong>Engage Signal</strong><br><code>pit_limiter.arm_sig</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>Bus signal (button) that engages the limiter. Not assigned = always engaged when enabled.</td>
+</tr>
+<tr>
+<td><strong>Speed Limit</strong><br><code>pit_limiter.speed_kph</code><br>Range: 0 to 400<br>Default: 60<br>Units: km/h</td>
+<td>The speed being held. The cut engages ABOVE this and stays engaged until the speed falls a full Resume Band below it, so the limiter settles into a slow cycle around the limit rather than chattering on and off at it.</td>
+</tr>
+<tr>
+<td><strong>Resume Band</strong><br><code>pit_limiter.hyst_kph</code><br>Range: 0 to 50<br>Default: 3<br>Units: km/h</td>
+<td>How far below the limit the speed must fall before the cut releases. Too small and the limiter chatters at the threshold, which is unpleasant and hard on the exhaust; too large and the car slows noticeably below the limit before pulling again.</td>
+</tr>
+<tr>
+<td><strong>Cut Method</strong><br><code>pit_limiter.cut_method</code><br>Range: one of: Fuel, Ignition, Both<br>Default: Both</td>
+<td>What gets cut. FUEL is the gentler choice for a limiter that may be held for a long time — an ignition cut pumps unburnt fuel into a hot exhaust for the whole pit lane. IGNITION recovers faster. BOTH is the most positive and the harshest.</td>
+</tr>
+</tbody>
+</table>
+<p>Cruise Control:</p>
+<!-- GENERATED by manual/tools/gen_settings.py from shared/tuneit-meta.json — do not edit. -->
+
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cruise Enabled</strong><br><code>cruise_control.enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Hold a road speed by asking the throttle for it. It needs the drive-by-wire throttle to consume that request — this module never drives an output itself.</td>
+</tr>
+<tr>
+<td><strong>State At Power-On</strong><br><code>cruise_control.power_on_state</code><br>Range: one of: Disabled, Ready<br>Default: Disabled</td>
+<td>Where the system starts after a key cycle. Disabled needs an Enable condition to arm it, which is what a stalk with a main On/Off position gives you. Ready is for a stalk that has no main switch at all — without it, buttons that only Set and Resume could never leave Disabled.</td>
+</tr>
+<tr>
+<td><strong>Enable When</strong><br><code>cruise_control.enable_expr</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>Arms the system: Disabled becomes Ready. A stalk main switch is <code>cruise_sw == 1</code>. Read on the RELEASE of a press, so holding a button does not re-arm repeatedly.</td>
+</tr>
+<tr>
+<td><strong>Disable When</strong><br><code>cruise_control.disable_expr</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>Switches the system off from any state and throws away the set speed. A Resume after a Disable has nothing to resume to, deliberately.</td>
+</tr>
+<tr>
+<td><strong>Enable/Disable When</strong><br><code>cruise_control.enable_disable_expr</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>One momentary button that TOGGLES between Disabled and Ready, which is what most stalk main buttons actually are. Use this or the separate Enable/Disable pair, not both.</td>
+</tr>
+<tr>
+<td><strong>Set When</strong><br><code>cruise_control.set_expr</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>Engages at the road speed you are doing now, if nothing is inhibiting it. Pressed again while cruising it re-latches the set speed to the current speed.</td>
+</tr>
+<tr>
+<td><strong>Resume When</strong><br><code>cruise_control.resume_expr</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>Re-engages at the speed kept from the last Cancel. Does nothing when there is no kept speed.</td>
+</tr>
+<tr>
+<td><strong>Cancel When</strong><br><code>cruise_control.cancel_expr</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>Pauses cruise and KEEPS the set speed. This only ADDS reasons to cancel — the brake, clutch and handbrake inputs cancel on their own and cannot be switched off from here.</td>
+</tr>
+<tr>
+<td><strong>Speed Up When</strong><br><code>cruise_control.bump_up_expr</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>Tapped, raises the set speed by one increment. Held past the Long Press Time, accelerates continuously at the Accelerate Rate until released.</td>
+</tr>
+<tr>
+<td><strong>Speed Down When</strong><br><code>cruise_control.bump_down_expr</code><br>Range: 0 to 0<br>Default: 0</td>
+<td>Tapped, lowers the set speed by one increment. Held, coasts down at the Coast Rate.</td>
+</tr>
+<tr>
+<td><strong>Long Press Time</strong><br><code>cruise_control.long_press_ms</code><br>Range: 100 to 5000<br>Default: 500<br>Units: ms</td>
+<td>How long a press must be held before it counts as a hold rather than a tap. A tap is acted on when the button is RELEASED, which is what stops one press from being both.</td>
+</tr>
+<tr>
+<td><strong>Brake Signal</strong><br><code>cruise_control.brake_sig</code><br>Range: -1 to 32767<br>Default: 58</td>
+<td>Cancels the moment it reads pressed, and cancels if it goes INVALID — a brake switch that has stopped reporting must never be mistaken for a foot off the brake. Cruise will not arm at all with this unassigned: a system whose only way out is a button has no reflex behind it.</td>
+</tr>
+<tr>
+<td><strong>Clutch Signal</strong><br><code>cruise_control.clutch_sig</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>Cancels on clutch press, under the same fail-safe rule as the brake. Leave it unassigned on an automatic, or on anything with no clutch switch fitted: assigning an input that never reports reads as a pedal held down for ever, and cruise will not engage at all.</td>
+</tr>
+<tr>
+<td><strong>Handbrake Signal</strong><br><code>cruise_control.handbrake_sig</code><br>Range: -1 to 32767<br>Default: -1</td>
+<td>Optional, and unassigned by default for the same reason as the clutch: assign it only if the switch is actually there and reporting.</td>
+</tr>
+<tr>
+<td><strong>Minimum Speed</strong><br><code>cruise_control.min_speed_kph</code><br>Range: 0.0 to 400.0<br>Default: 30.0<br>Units: km/h</td>
+<td>Below this speed cruise cancels and will not engage. It keeps the system out of the range where holding a speed is a low-gear crawl and a small speed error is a large throttle error.</td>
+</tr>
+<tr>
+<td><strong>Maximum Speed</strong><br><code>cruise_control.max_speed_kph</code><br>Range: 0.0 to 400.0<br>Default: 140.0<br>Units: km/h</td>
+<td>Above this speed cruise cancels and will not engage. With the minimum it defines the only window the system may operate in; leaving that window is treated exactly like a brake press, except that the demand is bled out rather than dropped.</td>
+</tr>
+<tr>
+<td><strong>Speed +/- Increment</strong><br><code>cruise_control.speed_increment_kph</code><br>Range: 0.1 to 20.0<br>Default: 1.0<br>Units: km/h</td>
+<td>How far one tap of Speed Up or Speed Down moves the set speed.</td>
+</tr>
+<tr>
+<td><strong>Accelerate Rate</strong><br><code>cruise_control.accel_rate_kph_s</code><br>Range: 0.1 to 50.0<br>Default: 2.0<br>Units: km/h/s</td>
+<td>How fast the set speed climbs while Speed Up is HELD. This is the closest thing to an acceleration limit: the throttle chases the set speed, so how briskly that speed moves is how briskly the car does.</td>
+</tr>
+<tr>
+<td><strong>Coast Rate</strong><br><code>cruise_control.coast_rate_kph_s</code><br>Range: 0.1 to 50.0<br>Default: 2.0<br>Units: km/h/s</td>
+<td>How fast the set speed falls while Speed Down is HELD. Releasing leaves the set speed where the ramp had reached, rather than snapping it to the current speed.</td>
+</tr>
+<tr>
+<td><strong>Minimum RPM</strong><br><code>cruise_control.min_rpm</code><br>Range: 0 to 12000<br>Default: 1000<br>Units: RPM</td>
+<td>Cruise cancels and will not engage below this engine speed. 0 turns the RPM gate off.</td>
+</tr>
+<tr>
+<td><strong>Maximum RPM</strong><br><code>cruise_control.max_rpm</code><br>Range: 0 to 12000<br>Default: 5000<br>Units: RPM</td>
+<td>Cruise cancels and will not engage above this engine speed. 0 turns the RPM gate off.</td>
+</tr>
+<tr>
+<td><strong>Require A Known Gear</strong><br><code>cruise_control.gear_check_enabled</code><br>Range: Off or On<br>Default: Off</td>
+<td>Refuse to engage, and cancel, unless gear detection reports a real gear at or above the minimum. Neutral and "not known" both read as gear 0 and are treated the same, because holding a road speed with the box out of gear is holding an ENGINE speed, which is not what was asked for.</td>
+</tr>
+<tr>
+<td><strong>Minimum Gear</strong><br><code>cruise_control.min_gear</code><br>Range: 1 to 8<br>Default: 2</td>
+<td>The lowest gear cruise will hold a speed in, when Require A Known Gear is on.</td>
+</tr>
+<tr>
+<td><strong>Maximum Throttle Demand</strong><br><code>cruise_control.max_demand_pct</code><br>Range: 0.0 to 100.0<br>Default: 60.0<br>Units: %</td>
+<td>Ceiling on the cruise throttle floor, and also the limit of the integrator's authority — the anti-windup is set to exactly this, so the loop cannot quietly accumulate demand it will never be allowed to apply.</td>
+</tr>
+<tr>
+<td><strong>Max Throttle Ramp Rate</strong><br><code>cruise_control.max_ramp_pct_s</code><br>Range: 0.0 to 1000.0<br>Default: 20.0<br>Units: %/s</td>
+<td>How fast the cruise throttle floor may move. It does NOT apply at the instant of engagement — the floor starts exactly where the pedal already was, so the hand-over is seamless; this limits everything after that.</td>
+</tr>
+<tr>
+<td><strong>Cancel Decay Time</strong><br><code>cruise_control.cancel_decay_s</code><br>Range: 0.000 to 5.000<br>Default: 0.500<br>Units: s</td>
+<td>How long the throttle floor takes to bleed away after a button cancel or a speed-window exit. It does NOT apply to a brake, clutch or handbrake cancel, or to a fault: those go to zero on the same frame, because a residual throttle floor is the last thing a driver reaching for the brake wants.</td>
+</tr>
+<tr>
+<td><strong>Max Control System Error</strong><br><code>cruise_control.max_error_kph</code><br>Range: 0.0 to 50.0<br>Default: 5.0<br>Units: km/h</td>
+<td>How far the road speed may sit from the set speed before cruise gives up. A loop that cannot reach its target is a loop fighting something it does not know about, and holding the throttle open into that is how a cruise system runs away. 0 disables.</td>
+</tr>
+<tr>
+<td><strong>Max Error Time</strong><br><code>cruise_control.max_error_ms</code><br>Range: 0 to 20000<br>Default: 3000<br>Units: ms</td>
+<td>The error has to exceed the limit for THIS LONG before cruise gives up. Without a time, every steep hill and every headwind gust trips it — a magnitude on its own is a false-alarm generator, not a safety check.</td>
+</tr>
+<tr>
+<td><strong>Max Wheel Speed Difference</strong><br><code>cruise_control.max_wheel_diff_kph</code><br>Range: 0.0 to 50.0<br>Default: 10.0<br>Units: km/h</td>
+<td>Cancel when the four wheel speeds disagree by more than this — one wheel spinning or locked means the road speed is not what any single sensor says. Checked only when ALL FOUR wheel speeds are reading, so a car with fewer sensors skips the check rather than being permanently held off by it. 0 disables.</td>
+</tr>
+<tr>
+<td><strong>Speed Signal Timeout</strong><br><code>cruise_control.spd_max_age_ms</code><br>Range: 20 to 5000<br>Default: 250<br>Units: ms</td>
+<td>How stale the road-speed signal may be and still be believed. A speed that has stopped updating is not a speed of zero, and a controller that treats it as one holds the throttle exactly where it was.</td>
+</tr>
+<tr>
+<td><strong>Max Plausible Acceleration</strong><br><code>cruise_control.max_accel_kph_s</code><br>Range: 0.0 to 200.0<br>Default: 30.0<br>Units: km/h/s</td>
+<td>A road speed that changes faster than this did not come from a car. The reading is not believed and cruise cancels. 0 disables.</td>
+</tr>
+<tr>
+<td><strong>Switch Fault Time</strong><br><code>cruise_control.sw_fault_ms</code><br>Range: 0 to 5000<br>Default: 300<br>Units: ms</td>
+<td>How long the cruise switch may read in NO calibrated band before it counts as a fault. Checked only when the Cruise Control Switch sensor is enabled; cruise driven from separate buttons or CAN flags has no stalk to fault. The band decoder already allows time for crossing between positions, so this sits above that; it also covers the moment after power-up when nothing has settled yet.</td>
+</tr>
+<tr>
+<td><strong>Cruise Proportional Gain X Channel</strong><br><code>cruise_control.cruise_p_gain_x_src</code><br>Range: -1 to 32767<br>Default: 43</td>
+<td>WHICH SIGNAL the X axis of 'Cruise Proportional Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Cruise Integral Gain X Channel</strong><br><code>cruise_control.cruise_i_gain_x_src</code><br>Range: -1 to 32767<br>Default: 43</td>
+<td>WHICH SIGNAL the X axis of 'Cruise Integral Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Cruise Derivative Gain X Channel</strong><br><code>cruise_control.cruise_d_gain_x_src</code><br>Range: -1 to 32767<br>Default: 43</td>
+<td>WHICH SIGNAL the X axis of 'Cruise Derivative Gain' is looked up on. The axis holds the breakpoints; this says what is compared against them, so changing it re-points the table at a different quantity without moving a single cell — and the breakpoints, chosen for the old signal's range and units, will almost certainly need redrawing.</td>
+</tr>
+<tr>
+<td><strong>Gain X Axis (Cruise Speed Error) bins</strong><br><code>cruise_control.cruise_err_axis_n</code><br>Range: 2 to 16<br>Default: 8</td>
+<td>How many breakpoints of 'Gain X Axis (Cruise Speed Error)' are LIVE, out of 16 allocated. Shrinking the axis does not delete the values past the end — they stay in the tune and reappear if it is grown again. Every table sharing this axis is resized with it. Fewer, well-placed breakpoints beat many evenly-spaced ones: resolution is only worth spending where the surface actually bends.</td>
+</tr>
+<tr>
+<td><strong>Cruise Proportional Gain</strong><br><code>cruise_control.cruise_p_gain</code><br>Range: 0.00 to 30.00<br>Default: 8-point curve</td>
+<td>Throttle percent per kph of speed error, applied the moment the error appears. It sets how hard the system answers a hill arriving. Too much and the car surges: it overshoots, backs off, and does it again.</td>
+</tr>
+<tr>
+<td><strong>Cruise Integral Gain</strong><br><code>cruise_control.cruise_i_gain</code><br>Range: 0.00 to 30.00<br>Default: 8-point curve</td>
+<td>Throttle percent per kph of error per second, accumulating while the error refuses to go away. This is what removes the last of a steady error so the car settles ON the set speed rather than a little under it up a grade. Highest at zero error and falling away, because out at a large error the proportional term is already doing the work and this would only wind up.</td>
+</tr>
+<tr>
+<td><strong>Cruise Derivative Gain</strong><br><code>cruise_control.cruise_d_gain</code><br>Range: 0.00 to 30.00<br>Default: 8-point curve</td>
+<td>Throttle percent per kph-per-second of error CHANGE — the brake on an overshoot. It answers how fast the gap is opening or closing rather than how big it is, which is what lets the other two be set hard enough to actually hold a speed.</td>
+</tr>
+<tr>
+<td><strong>Gain X Axis (Cruise Speed Error)</strong><br><code>cruise_control.cruise_err_axis</code><br>Range: 0 to 0<br>Default: 8-point curve<br>Units: km/h</td>
+<td>Speed-error breakpoints for all three gain curves, as set speed MINUS road speed: positive means you are below the set speed and the system should add throttle. Zero must sit ON a breakpoint, or the gains either side of the target are an interpolation of two things nobody asked for.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="17-sensors.html">Chapter 17 — Sensors</a> (brake, clutch and cruise switches)</li>
+<li><a href="20-ignition.html">Chapter 20 — Ignition</a> (the rev-limit timing correction)</li>
+<li><a href="22-electronic-throttle.html">Chapter 22 — Electronic throttle</a> (what cruise drives)</li>
+<li><a href="29-protection.html">Chapter 29 — Engine protection</a> (protection rev limits)</li>
+<li><a href="32-vehicle-functions.html">Chapter 32 — Vehicle functions</a> (road speed)</li>
+<li><a href="34-tables-expressions.html">Chapter 34 — Generic tables and expressions</a> (the button conditions)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="26-launch-shift-traction.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: 26 Launch, shift and traction">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                26 Launch, shift and traction
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="28-power-adders.html" class="md-footer__link md-footer__link--next" aria-label="Next: 28 Power adders">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                28 Power adders
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "content.tabs.link", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

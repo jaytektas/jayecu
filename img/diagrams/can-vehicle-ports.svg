@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The two CAN ports of the jaytek_v1 board</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 2; fill: none; stroke-dasharray: 8 6; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .wH   { stroke: #6fbf5a; stroke-width: 3; fill: none; }
+    .wLs  { stroke: #1d1f23; stroke-width: 3; fill: none; stroke-dasharray: 5 7; }
+    .res  { fill: #ffffff; stroke: #1d1f23; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .dash { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .wLs { stroke: #e4e6ea; } .res { fill: #20232a; stroke: #e4e6ea; }
+    }
+  </style>
+
+  <!-- board outline -->
+  <rect x="10" y="30" width="700" height="420" rx="10" class="dash"/>
+  <text x="24" y="22" class="muted head">Inside the ECU (jaytek_v1 board)</text>
+  <text x="730" y="22" class="muted head">Where you connect</text>
+
+  <!-- ===== CAN1 ===== -->
+  <text x="30" y="62" class="fg head">CAN1</text>
+  <rect x="30" y="76" width="170" height="92" rx="6" class="box"/>
+  <text x="115" y="100" text-anchor="middle" class="fg head">Processor · CAN1</text>
+  <text x="115" y="124" text-anchor="middle" class="mono muted">PD0 = CAN1_RX</text>
+  <text x="115" y="144" text-anchor="middle" class="mono muted">PD1 = CAN1_TX</text>
+  <path d="M200 122 H238" class="line"/>
+  <rect x="240" y="76" width="170" height="92" rx="6" class="box"/>
+  <text x="325" y="100" text-anchor="middle" class="fg head">Transceiver U33</text>
+  <text x="325" y="124" text-anchor="middle" class="muted">TJA1051T/3</text>
+  <text x="325" y="144" text-anchor="middle" class="muted">always in normal mode</text>
+
+  <path d="M410 100 H760" class="wH"/>
+  <path d="M410 144 H760" class="wH"/><path d="M410 144 H760" class="wLs"/>
+  <!-- termination and protection -->
+  <path d="M470 100 V110 M470 134 V144" class="line"/>
+  <rect x="460" y="110" width="20" height="24" class="res"/>
+  <text x="488" y="127" class="mono fg">R115 · 120 Ω</text>
+  <path d="M600 100 V110 M600 134 V144" class="line"/>
+  <rect x="590" y="110" width="20" height="24" class="safe"/>
+  <text x="618" y="127" class="mono fg">D8</text>
+  <text x="535" y="185" text-anchor="middle" class="muted">the 120 Ω terminator is soldered in: always fitted</text>
+
+  <rect x="760" y="70" width="290" height="104" rx="6" class="pid"/>
+  <text x="905" y="94" text-anchor="middle" class="fg head">CN4 · black 23-pin</text>
+  <text x="776" y="120" class="fg">pin 10 · <tspan class="mono">CAN1_H</tspan> · Lg (light green)</text>
+  <text x="776" y="146" class="fg">pin 17 · <tspan class="mono">CAN1_L</tspan> · Lg/B</text>
+  <text x="776" y="164" class="muted">(light green / black)</text>
+
+  <!-- ===== CAN2 ===== -->
+  <text x="30" y="262" class="fg head">CAN2</text>
+  <rect x="30" y="276" width="170" height="92" rx="6" class="box"/>
+  <text x="115" y="300" text-anchor="middle" class="fg head">Processor · CAN2</text>
+  <text x="115" y="324" text-anchor="middle" class="mono muted">PB12 = CAN2_RX</text>
+  <text x="115" y="344" text-anchor="middle" class="mono muted">PB13 = CAN2_TX</text>
+  <path d="M200 322 H238" class="line"/>
+  <rect x="240" y="276" width="170" height="92" rx="6" class="box"/>
+  <text x="325" y="300" text-anchor="middle" class="fg head">Transceiver U35</text>
+  <text x="325" y="324" text-anchor="middle" class="muted">TJA1051T/3</text>
+  <text x="325" y="344" text-anchor="middle" class="muted">always in normal mode</text>
+
+  <path d="M410 300 H630" class="wH"/>
+  <path d="M410 344 H630" class="wH"/><path d="M410 344 H630" class="wLs"/>
+  <path d="M470 300 V310 M470 334 V344" class="line"/>
+  <rect x="460" y="310" width="20" height="24" class="res"/>
+  <text x="488" y="327" class="mono fg">R122 · 120 Ω</text>
+  <path d="M600 300 V310 M600 334 V344" class="line"/>
+  <rect x="590" y="310" width="20" height="24" class="safe"/>
+  <text x="600" y="366" text-anchor="middle" class="mono fg">D9</text>
+
+  <rect x="630" y="276" width="60" height="92" rx="4" class="tgt"/>
+  <text x="660" y="306" text-anchor="middle" class="mono fg">1 H</text>
+  <text x="660" y="350" text-anchor="middle" class="mono fg">2 L</text>
+  <text x="660" y="392" text-anchor="middle" class="fg head">H4</text>
+  <text x="660" y="410" text-anchor="middle" class="muted">2-pin</text><text x="660" y="428" text-anchor="middle" class="muted">header</text>
+
+  <rect x="760" y="270" width="290" height="104" rx="6" class="safe"/>
+  <text x="905" y="294" text-anchor="middle" class="fg head">Not on a harness connector</text>
+  <text x="905" y="318" text-anchor="middle" class="muted">CAN2 reaches only header H4</text>
+  <text x="905" y="338" text-anchor="middle" class="muted">on the board (2.54 mm pitch).</text>
+  <text x="905" y="358" text-anchor="middle" class="muted">Wiring it out is a board-level job.</text>
+</svg>
