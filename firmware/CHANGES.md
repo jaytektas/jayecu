@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- The trigger stream pages no longer have a wheel picker. It could show the wrong wheel (two wheels with the same crank pattern, like the 2JZ with and without its cam, looked the same to it) and it only set one stream. Install a wheel from the Trigger Library, which sets every stream at once.
 
 ## 0.4.7
 - A Lua script or a CAN template that writes 0 to Fuel Cut or Ignition Cut no longer cuts the engine, and it cannot switch off a cut the ECU is making either (rev limiter, engine protection): writing 0 there is ignored. Writing 1 still adds a cut. Before, any write counted as a cut, and a script write with no timeout held it until the script was reloaded.

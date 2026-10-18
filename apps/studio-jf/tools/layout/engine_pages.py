@@ -534,8 +534,8 @@ def page_trigger():
 #
 # The ORDER is the job, not the struct. Setting a stream up is: say where the wire comes in, say what
 # pattern that input carries, then crank the engine and see whether the ECU agrees. So the page reads
-# 1 Wiring, 2 Pattern, 3 Proof, left to right, and the pattern half leads with the WHEEL LIBRARY —
-# nobody should be typing "36" and "3" and a gap cell index for a wheel the meta already describes.
+# 1 Wiring, 2 Pattern, 3 Proof, left to right. The pattern is installed from the Trigger Library, which
+# applies a whole wheel to every stream at once; the fields here are for reading it and for fine edits.
 STREAM_NAMES = ['Crank Primary', 'Crank Secondary', 'Cam Intake B1', 'Cam Exhaust B1',
                 'Cam Intake B2', 'Cam Exhaust B2']
 
@@ -546,41 +546,6 @@ CELL_NOTES = [
     (1, 'SEQUENCE: each cell is one INTER-EVENT ANGLE in 0.1° — the step to the next event.'),
     (2, 'WIDTH reads no cells. The pulse is identified by its LENGTH, in the band below.'),
 ]
-
-
-def wheel_presets(rate):
-    """The wheel library as a preset list for ONE stream: every wheel that has a stream at this rate.
-
-    `rate` 0 is the crank-rate half of a wheel (Crank Primary/Secondary), 1 the cam-rate half. The same
-    wheel therefore appears on a crank page and a cam page, and picking it on each installs that half —
-    which is what the library is for. Only the fields the primitive READS are written, so a 36-2 does
-    not carry seven meaningless width numbers with it, and the dropdown still recognises the tune it is
-    looking at (the selector matches on the pairs an option writes).
-    """
-    lines = []
-    for w in A.Page._meta().get('trigger_wheels', []):
-        st = next((x for x in w.get('streams', []) if x.get('rate', 0) == rate), None)
-        if st is None:
-            continue
-        kind = st.get('kind', 'gap')
-        pr = {'gap': 0, 'seq': 1, 'width': 2}.get(kind)
-        if pr is None:
-            continue
-        pairs = [f'primitive={pr}']
-        if kind == 'gap':
-            gaps = st.get('gaps', [])
-            pairs += [f'slots={st.get("slots", 0)}', f'gap_ratio={max(1, st.get("ratio", 0) or 1)}',
-                      f'cell_len={len(gaps)}']
-            pairs += [f'cell[{k}].v={v}' for k, v in enumerate(gaps)]
-        elif kind == 'seq':
-            cells = st.get('cell', [])
-            pairs += [f'cell_len={len(cells)}']
-            pairs += [f'cell[{k}].v={v}' for k, v in enumerate(cells)]
-        else:
-            pairs += [f'width_min={st.get("width_min", 0)}', f'width_max={st.get("width_max", 7200)}',
-                      f'width_target={st.get("width_target", 0)}', 'cell_len=0']
-        lines.append((w['name'], pairs))
-    return lines
 
 
 def page_stream(i, name):
@@ -614,23 +579,16 @@ def page_stream(i, name):
            '1 for a cam).', w=390)
 
     # ---- 2 · Pattern --------------------------------------------------------------------------
+    # NO WHEEL PICKER HERE. A per-stream preset list sat at the top of this panel and it could not
+    # work: it showed whichever library wheel first matched the stream's fields, and wheels share
+    # halves (2JZ crank-only and 2JZ + cam are the same 36-2), so picking one displayed the other. It
+    # also wrote only the pattern fields of ONE stream, leaving edge, windows, the cam's phase band and
+    # the other slots as they were. The Trigger Library applies a WHOLE wheel; that is the one way in.
     y_pat = y0 + h_wire + 84
-    presets = wheel_presets(0 if not is_cam else 1)
-    lib_h = 96
     pat_rows = 9
-    pat_h = lib_h + A.panel_h(pat_rows, A.ROW, top=0, bottom=6)
+    pat_h = A.panel_h(pat_rows, A.ROW, top=12, bottom=6)
     pat = p.panel(10, y_pat, 400, pat_h, '2 · Pattern')
-    p.add(p._new('settingselector', 10, 12, 360, A.CTL_H,
-                 {'presets': '\n'.join(nm + '|' + ','.join(f'{e}.{q}' for q in pairs)
-                                       for nm, pairs in presets)}), into=pat)
-    # 380, not 360: at 360 this broke into three lines and ran down over the Primitive row below it. The
-    # panel is 400 wide and nothing else is on this row, so the words get the width.
-    p.wrapped(10, 50, 380,
-              'Pick the WHEEL this engine has and its ' +
-                               ('cam' if is_cam else 'crank') + ' half lands here. Pick the same wheel '
-                               'on the other stream\'s page for its half.',
-              into=pat)
-    y = lib_h
+    y = 12
     y = p.field(pat, 10, y, 'Primitive',   f'{e}.primitive',  'enum', 150)
     y = p.field(pat, 10, y, 'Base Teeth',  f'{e}.slots',      'configedit', 90, enable=GAP)
     y = p.field(pat, 10, y, 'Gap Ratio (missing + 1)', f'{e}.gap_ratio', 'configedit', 90, enable=GAP)
@@ -744,7 +702,8 @@ def page_streams_branch():
             'four cams. There is no role field, so two streams cannot claim the same job — an engine '
             'with phasers on both intakes enables Cam Intake B1 and Cam Intake B2 and leaves the '
             'exhaust slots off.\n\n'
-            'Each name opens that stream\'s own page, where the wheel library fills the pattern in.')
+            'Each name opens that stream\'s own page. Install a wheel from the Trigger Library: it sets '
+            'every stream at once.')
     nh = A.Page.wrapped_h(note, 324)
     side = p.panel(920, y0, 350, A.panel_h(1, nh + 2 * A.ROW + 12, top=10, bottom=8), 'Roles')
     p.wrapped(10, 10, 324,
