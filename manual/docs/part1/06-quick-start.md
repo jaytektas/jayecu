@@ -165,16 +165,17 @@ works out each cylinder's air from it.
 **3b. Trigger** (**Configuration ▸ Engine Configuration ▸ Trigger System**,
 [chapter 16](../part3/16-trigger.md)). Tick the stream for each sensor you wired (**Crank Primary**,
 and a **Cam** stream if you have one). On each stream's page, set **Capture Input** to the pin you
-wired and pick your wheel from the **Pattern** list, or from the Trigger Library
-([reference](../reference/trigger-wheels.md)). A library wheel also writes its **Trigger Offset BTDC**
-if it has one. Otherwise enter your engine's number on the Trigger System page.
+wired. Then install your wheel from the **Trigger Library** ([reference](../reference/trigger-wheels.md)):
+double-click it and press **Apply to ECU**. That sets the pattern of every stream at once. A library
+wheel also writes its **Trigger Offset BTDC** if it has one. Otherwise enter your engine's number on
+the Trigger System page.
 <!-- src: definition/ecu.schema.yaml (streams[].enabled, capture_index); apps/studio-jf/src/model/TriggerWheel.cpp -->
 
 <figure markdown>
-  ![The Crank Primary stream page: Capture Input VR1, Capture Edge Rising, Pattern 36-1, Primitive Gap, Base Teeth 36, Gap Ratio 2, Cell Length 1](../img/studio/quick-start-crank-stream.png)
-  <figcaption>Figure 6.4 — The Crank Primary stream for a 36-1 wheel on VR1. Choosing <b>36-1</b> in
-  the pattern list fills in Primitive, Base Teeth, Gap Ratio and the cell. Tick <b>Enabled</b> at the
-  top of the page, or the stream is not decoded at all.</figcaption>
+  ![The Crank Primary stream page: Capture Input VR1, Capture Edge Rising, Primitive Gap, Base Teeth 36, Gap Ratio 2, Cell Length 1](../img/studio/quick-start-crank-stream.png)
+  <figcaption>Figure 6.4 — The Crank Primary stream for a 36-1 wheel on VR1. Applying the
+  <b>36-1</b> wheel from the Trigger Library fills in Primitive, Base Teeth, Gap Ratio and the cell.
+  Tick <b>Enabled</b> at the top of the page, or the stream is not decoded at all.</figcaption>
 </figure>
 
 <figure markdown>

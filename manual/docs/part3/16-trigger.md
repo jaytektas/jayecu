@@ -369,7 +369,7 @@ The page, in the order it appears:
 Click **Crank Primary** to open its page.
 
 <figure markdown>
-  ![The Crank Primary page: 1 Wiring, 2 Pattern with the wheel picker set to 60-2, the Pattern Cells, 3 Proof with the dial and trace, and the Right Now readouts](../img/studio/trigger-crank-primary.png)
+  ![The Crank Primary page: 1 Wiring, 2 Pattern set for a 60-2, the Pattern Cells, 3 Proof with the dial and trace, and the Right Now readouts](../img/studio/trigger-crank-primary.png)
   <figcaption>Figure 16.12 — Crank Primary with a 60-2 wheel. The Proof panel draws this stream as it
   is set now.</figcaption>
 </figure>
@@ -388,11 +388,11 @@ Click **Crank Primary** to open its page.
 
 **2 · Pattern**
 
-1. Pick your wheel in the drop-down at the top of the panel. It lists every wheel in the library
-   that has a crank half. Picking one writes that half's pattern settings into this stream: the
-   primitive, teeth, gap ratio and cells, or the width band. It does not touch the input, the edge
-   or the offset.
-   <!-- src: apps/studio-jf/tools/layout/engine_pages.py -->
+1. Install your wheel from the Trigger Library with **Apply to ECU** (Step 5). It writes the pattern
+   of every stream at once, so this panel is already filled in. There is no wheel list on this page:
+   a list per stream could not tell apart wheels that share a crank pattern, such as the 2JZ with
+   and without its cam, and it set only one stream.
+   <!-- src: apps/studio-jf/tools/layout/engine_pages.py; apps/studio-jf/src/model/TriggerWheel.cpp:wheelPairs -->
 2. Check the fields it filled in:
     - **Primitive** `primitive`: Gap, Sequence or Width.
     - **Base Teeth** `slots` (Gap): the count with nothing missing. A 60-2 is **60**, not 58.
@@ -418,12 +418,12 @@ Level**, **RPM**, **Crank Angle** and **Error Rate** while you crank.
 Click **Cam Intake B1** (or open it from the Trigger System page).
 
 <figure markdown>
-  ![The Cam Intake B1 page with the wheel picker set to 60-2 + cam, Primitive Width, WIDTH min 0, max 720, target 0, and the Cam Phase panel with Nominal Angle, Cam Is Phased, Phaser Authority and Mech Allowance](../img/studio/trigger-cam.png)
+  ![The Cam Intake B1 page set for the cam of a 60-2 + cam: Primitive Width, WIDTH min 0, max 720, target 0, and the Cam Phase panel with Nominal Angle, Cam Is Phased, Phaser Authority and Mech Allowance](../img/studio/trigger-cam.png)
   <figcaption>Figure 16.13 — A one-pulse cam as a Width stream with a band that accepts any pulse.</figcaption>
 </figure>
 
-1. Set **Capture Input** (DIG1 in the example) and pick the **same wheel** in the Pattern drop-down,
-   so the cam half of it lands here.
+1. Set **Capture Input** (DIG1 in the example). The wheel you applied from the library has already
+   set this stream's pattern.
 2. For a one-pulse cam, the Width band is **0 to 720°**. It accepts any pulse, which is right when
    there is only one.
 3. **WIDTH target angle**: where the pulse's leading edge sits, in decoder degrees over the cycle
@@ -444,9 +444,10 @@ Click **Cam Intake B1** (or open it from the Trigger System page).
       gear lash may move the cam before it counts as a fault.
       <!-- src: definition/ecu.schema.yaml; firmware/Scheduler/GenericTrigger.h -->
 
-!!! tip "The designer does steps 3 and 4 in one go"
+!!! tip "The library fills in steps 3 and 4"
     Loading a wheel in the Trigger Designer and pressing **Apply to ECU** writes every stream, the
-    offset and the pickup angle at once. See the next section.
+    offset and the pickup angle at once. Steps 3 and 4 are then for checking what it wrote, and for
+    the input and the cam's phase settings. See the next section.
 
 ### Step 5 — The Trigger Library and the Trigger Designer
 
