@@ -348,7 +348,7 @@ If sync never comes, or comes and goes, stop here and go to [chapter 16](../part
 2. On **Ignition System**, tick **Fixed timing enabled** and leave **Fixed Advance** at 10°. Fixed
    timing replaces every table and correction with this one number. An ignition cut still cuts.
    <!-- src: definition/ecu.schema.yaml (fixed timing, default 10.0°); firmware/Engine/Modules/Ignition.cpp -->
-3. Check the **Cranking** fuel table (**Fuel Tuning ▸ Cranking**). It adds fuel by coolant
+3. Check the **Cranking** fuel table (**Fuel Tuning ▸ Corrections ▸ Cranking**). It adds fuel by coolant
    temperature until the engine passes **Cranking Threshold** (default 400 rpm). The default runs from
    200 % when very cold to 50 % when hot.
    <!-- src: definition/ecu.schema.yaml cranking_fuel_table default_row 200 %…50 % (cranking_rpm 400) -->

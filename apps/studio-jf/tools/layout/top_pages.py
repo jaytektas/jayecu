@@ -120,7 +120,7 @@ FUEL_ROWS = [
     # chosen. (Predicted MAP is MAP Prediction's table and is reached from the MAP Prediction row.)
     ('Alpha-N VE Table',   '',                                   f'{CFG}/Fuel Tuning/Alpha-N VE Table'),
     ('Prime Pulse',        'fuel_calculator.prime_enable',        f'{CFG}/Fuel Tuning/Fuel Prime Pulse'),
-    ('Cranking',           'fuel_calculator.enable_cranking',     f'{CFG}/Fuel Tuning/Cranking'),
+    ('Cranking',           'fuel_calculator.enable_cranking',     f'{CFG}/Fuel Tuning/Corrections/Cranking'),
     ('Warmup (Coolant)',   '',                                   f'{CFG}/Fuel Tuning/Corrections/Coolant Temp'),
     ('Post Start',         '',                                   f'{CFG}/Fuel Tuning/Corrections/Post Start'),
     ('Corrections',        '',                                   f'{CFG}/Fuel Tuning/Corrections/Air Temp'),

@@ -134,7 +134,7 @@ The default **Target Lambda** table is 1.00 at light load and richer at full loa
 
 Tune these from cold starts on different days: a cold engine only happens once a day.
 
-1. **Cranking**: **Fuel Tuning ▸ Cranking** — the enrichment against coolant temperature. Floods,
+1. **Cranking**: **Fuel Tuning ▸ Corrections ▸ Cranking** — the enrichment against coolant temperature. Floods,
    or starts only with the throttle opened: less. Cranks a long time before catching, or catches and
    dies: more.
 2. **Post-start**: on **Start & Warmup** — the extra fuel for the first seconds after starting. A

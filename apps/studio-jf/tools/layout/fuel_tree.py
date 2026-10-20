@@ -206,8 +206,9 @@ def page_corrections_branch():
                 'where you can see which is which.')
 
     ROWS = [(name, enable, live[0][1], live[0][0]) for name, _t, live, _n, _e, enable in CORRECTIONS]
-    # …plus the three that are corrections but have no table page of their own under this folder.
-    EXTRA = [('Cranking', FC + 'enable_cranking', 'fuel_corr_cranking', f'{ROOT}/Fuel Tuning/Cranking'),
+    # …plus the two that are not in CORRECTIONS: Cranking (its page, under this folder, is built by
+    # apply_fuel with its threshold beside it) and Overall (one number, on Fuel Setup).
+    EXTRA = [('Cranking', FC + 'enable_cranking', 'fuel_corr_cranking', f'{ROOT}/Fuel Tuning/Corrections/Cranking'),
              ('Overall',  FC + 'enable_overall',  'fuel_corr_overall',  f'{ROOT}/Engine Configuration/Fuel System/Fuel Setup')]
 
     grid = p.panel(10, y0, 620, A.panel_h(len(ROWS) + len(EXTRA), 30, top=34, bottom=8), 'In the Calculation')

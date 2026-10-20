@@ -34,4 +34,4 @@ EX2=(--set engine.cylinder_count=6 --set trigger.trigger_offset_btdc=155 --set t
 "$SHOOT" --crop 435x490+312+292  "${EX1[@]}" --set "outputs.output[0].function=1" --set "outputs.output[0].cylinder=1" \
                                   "Configuration/Electrical/Outputs/IGN1"                      quick-start-output-test
 "$SHOOT" --crop 670x215+318+290   "${EX1[@]}" "$CFG/Trigger System/Diagnostics"                quick-start-trigger-diagnostics
-"$SHOOT" --crop 1008x270+312+240  "${EX1[@]}" "Configuration/Fuel Tuning/Cranking"             quick-start-cranking
+"$SHOOT" --crop 1008x270+312+240  "${EX1[@]}" "Configuration/Fuel Tuning/Corrections/Cranking" quick-start-cranking

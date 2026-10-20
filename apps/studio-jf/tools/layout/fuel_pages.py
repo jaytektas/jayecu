@@ -193,7 +193,7 @@ def page_start_warmup():
     crank = p.panel(COL[1], A.TOP, COL_W, TOP_H, '2 — Cranking')
     y = p.check(crank, 10, 16, 'Cranking enrichment enabled', FC + 'enable_cranking')
     y = p.field(crank, 10, y + 4, 'Cranking Threshold', ENG + 'cranking_rpm', 'configedit', 110, 'RPM')
-    p.switch(crank, 10, y + 6, 'Cranking Fuel Table', '', link=f'{CFG}/Fuel Tuning/Cranking',
+    p.switch(crank, 10, y + 6, 'Cranking Fuel Table', '', link=f'{CFG}/Fuel Tuning/Corrections/Cranking',
              w=COL_W - 20)
     p.readout(crank, 10, y + 44, 'Cranking Corr', 'fuel_corr_cranking', '%.3f', w=140)
     p.readout(crank, 155, y + 44, 'Engine RPM', 'rpm', '%.0f', w=140)

@@ -90,13 +90,6 @@ def build():
                                   'Fired once per power-up, at first sync while cranking.',
                                   extra_fields=[('Prime Mode', FC + 'prime_mode', 'enum', '')],
                                   enable='[#fuel_calculator.prime_enable] == 1')))
-    tree.append(add(f'{B}/Cranking', 'Cranking',
-                    FT.table_page('Cranking', FC + 'cranking_fuel_table',
-                                  [('Cranking Corr', 'fuel_corr_cranking', '%.3f'),
-                                   ('Engine RPM', 'rpm', '%.0f'), ('Coolant', 'clt', '%.0f')],
-                                  'Applies below the cranking threshold, until the engine catches.',
-                                  extra_fields=[('Cranking Threshold', ENG + 'cranking_rpm', 'configedit', 'RPM')],
-                                  enable_path=FC + 'enable_cranking')))
 
     # Corrections: every multiplier that sits on top of the VE table, per-cylinder trims included. Each
     # carries its own enable now, so the page it lives on shows the tick and the folder gets a real
@@ -109,6 +102,17 @@ def build():
                 FT.table_page(name, table, live, note, extra, enable_path=flag),
                 cond=f'[#{flag}] == 1')
             for name, table, live, note, extra, flag in FT.CORRECTIONS]
+    # CRANKING IS A CORRECTION — a multiplier on the fuel mass while the engine cranks, composed with the
+    # rest — so it lives with them, first, ahead of Post Start and Coolant Temp, which follow it in time.
+    # It sat beside Start & Warmup, which still links here.
+    corr.insert(0, add(f'{B}/Corrections/Cranking', 'Cranking',
+                       FT.table_page('Cranking', FC + 'cranking_fuel_table',
+                                     [('Cranking Corr', 'fuel_corr_cranking', '%.3f'),
+                                      ('Engine RPM', 'rpm', '%.0f'), ('Coolant', 'clt', '%.0f')],
+                                     'Applies below the cranking threshold, until the engine catches.',
+                                     extra_fields=[('Cranking Threshold', ENG + 'cranking_rpm', 'configedit', 'RPM')],
+                                     enable_path=FC + 'enable_cranking'),
+                       cond=f'[#{FC}enable_cranking] == 1'))
     for n in range(1, 13):
         corr.append(add(f'{B}/Corrections/Cylinder {n}', f'Cylinder {n}',
                         FT.table_page(f'Cylinder {n}', f'{FC}cyl{n}_fuel_corr_table',

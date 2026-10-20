@@ -24,7 +24,7 @@ EX1=(--set engine.cylinder_count=4 --set engine.displacement=2000
 "$SHOOT" --crop 1275x390+315+262  "${EX1[@]}" --set fuel_calculator.prime_enable=1 \
          --set fuel_calculator.flood_clear_enabled=1 "$FT/Start & Warmup"             fuel-start-warmup
 "$SHOOT" --crop 800x165+308+236   "${EX1[@]}" --set fuel_calculator.prime_enable=1 "$FT/Fuel Prime Pulse" fuel-prime
-"$SHOOT" --crop 1015x275+308+236  "${EX1[@]}" "$FT/Cranking"                          fuel-cranking
+"$SHOOT" --crop 1015x275+308+236  "${EX1[@]}" "$FT/Corrections/Cranking"              fuel-cranking
 "$SHOOT" --crop 1285x565+308+262  "${EX1[@]}" "$FT/Corrections"                       fuel-corrections
 "$SHOOT" --crop 1285x520+308+262  "${EX1[@]}" "$FT/Transient Throttle"                fuel-transient
 "$SHOOT" --crop 555x330+308+236   "${EX1[@]}" "$FT/Transient Throttle/Enrich Rate"    fuel-transient-rate
