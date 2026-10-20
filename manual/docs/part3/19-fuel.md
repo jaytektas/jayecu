@@ -410,7 +410,10 @@ Open **Configuration ▸ Engine Configuration ▸ Fuel System ▸ Fuel Setup**.
 3. **Signal Sources**: the channel each input comes from. The defaults are the usual sensors. Change
    one only if yours reads on a different channel. **Assumed Baro** is used when there is no
    barometric sensor: set it to your local pressure if you live high up.
-4. **Fuel Properties**: **Overall Fuel Trim** is the Overall correction. **Tank Capacity** (litres)
+4. **Fuel Properties**: **Overall Fuel Trim** is the Overall correction: one percentage on all the
+   fuel. It applies only while **Overall Fuel Trim Enabled** above it is ticked (it is by default);
+   unticked, the trim greys out and is ignored, but keeps its number. It is the same switch as the
+   **Overall** row on **Fuel Tuning ▸ Corrections**. **Tank Capacity** (litres)
    only turns the fuel-level sender's percentage into litres. 0 means unknown. Stoich, ethanol and
    density are set per stage (Step 3).
    <!-- src: definition/ecu.schema.yaml -->

@@ -161,7 +161,16 @@ def page_fuel_top():
     model_y = A.TOP + A.panel_h(len(FUEL_ROWS), 25, top=12, bottom=8) + 10
     model = p.panel(10, model_y, 330, A.CANVAS_H - model_y - 14, 'Air Model')
     y = p.field(model, 10, 10, 'Air Model', 'fuel_calculator.fuel_model', 'enum', 240)
-    p.field(model, 10, y, 'Overall Fuel Trim', 'fuel_calculator.overall_corr_pct', 'configedit', 110, '%')
+    # THE TRIM WITH ITS SWITCH, on one row — there is no room for a second. The switch used to live only
+    # on the Corrections page, so a trim set here did nothing with it off and nothing here said so.
+    g = p.group()
+    p.add(p._new('checkbox', 10, y + 3, A.CHECK_H, A.CHECK_H, {'signalName': 'fuel_calculator.enable_overall'}, g),
+          into=model)
+    p.add(p._new('label', 10 + A.CHECK_H + A.CHECK_GAP, y + 4, 148, A.LBL_H,
+                 {'labelText': 'Overall Fuel Trim', 'align': 'Left', 'fontName': A.FONT_LBL}, g), into=model)
+    p.add(p._new('configedit', 194, y, 112, A.CTL_H,
+                 {'signalName': 'fuel_calculator.overall_corr_pct',
+                  'enableCondition': '[#fuel_calculator.enable_overall] == 1'}, g), into=model)
 
     live = p.panel(350, A.TOP, 920, 560, 'Live')
     cols = [('Engine RPM', 'rpm', '%.0f'), ('Fuel Load', 'fuel_load', '%.0f'), ('MAP', 'map', '%.0f'),

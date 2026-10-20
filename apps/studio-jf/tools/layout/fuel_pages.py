@@ -92,7 +92,12 @@ def page_setup():
     PER_STAGE = 'Stoich, ethanol and density are per stage: Fuel Tuning \u25b8 Stage N \u25b8 Setup.'
     p.wrapped(10, y, 280, PER_STAGE, into=fuel, colour=C_DIM)
     y += A.Page.wrapped_h(PER_STAGE, 280) + 8
-    y = p.field(fuel, 10, y, 'Overall Fuel Trim', FC + 'overall_corr_pct', 'configedit', 110, '%')
+    # THE TRIM AND ITS SWITCH, TOGETHER. The switch lived only on the Corrections page and the trim only
+    # here, so a trim set here did nothing with the switch off somewhere else, and nothing on this page
+    # said so. Now the tick is beside it and the trim greys while it is off.
+    y = p.check(fuel, 10, y, 'Overall Fuel Trim Enabled', FC + 'enable_overall')
+    y = p.field(fuel, 10, y, 'Overall Fuel Trim', FC + 'overall_corr_pct', 'configedit', 110, '%',
+                enable=f'[#{FC}enable_overall] == 1')
     # A fuel property like the ones above it, and the only thing that turns the level sender's
     # percentage of its own travel into a quantity anybody can act on. 0 leaves the litres
     # channel unpublished rather than reading zero on a full tank.
