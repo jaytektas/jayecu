@@ -68,7 +68,7 @@ endif()
 # The studio, on JFramework. Consumes the framework as an
 # installed SDK — nothing from the studio leaks back into the framework.
 #   cmake -S . -B build -DCMAKE_PREFIX_PATH=$HOME/jframework-sdk
-find_package(JFramework 0.1 CONFIG REQUIRED)
+find_package(JFramework 0.2 CONFIG REQUIRED)   # 0.2: the rebuilt file chooser — an older SDK is refused, not shipped
 
 # App source: the shell (main.cpp) + the ECU model/data backend (src/model/*).
 # The model is app code — it consumes the framework's
