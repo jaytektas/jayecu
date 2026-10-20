@@ -69,7 +69,9 @@ def page_setup():
     src = p.panel(320, A.TOP, 300, 430, 'Signal Sources')
     y = 10
     MODEL = '[#fuel_calculator.fuel_model]'
-    for lbl, path, en in (('Manifold Pressure', 'map_src', ''),          # SD load axis AND the density term
+    # 'MAP', not 'Manifold Pressure': the long name took the room its picker needs to show the channel
+    # it ships pointed at, and MAP is what the gauge strip already calls it.
+    for lbl, path, en in (('MAP', 'map_src', ''),                        # SD load axis AND the density term
                           ('Throttle Position', 'tps_src', f'{MODEL} == 1 || {MODEL} == 3'),
                           ('Coolant Temp', 'clt_src', ''),
                           ('Air Temp', 'iat_src', ''),
