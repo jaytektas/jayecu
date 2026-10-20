@@ -191,6 +191,8 @@ private:
     // Rebuild just the elements a write landed in — the range comes from the comms layer, which knows
     // the offset and length it was given (see update()). One rebuild instead of 134 fingerprints.
     void     recompute_range(uint8_t first, uint8_t last);
+    const ThermistorConfig* therm_row(uint8_t i) const;   // this sensor's thermistor row, or nullptr
+    uint32_t elem_crc(uint8_t i) const;                   // what its pipeline is built from, fingerprinted
     // The derivations that belong to the WHOLE array rather than one element: the engine-sync pin
     // list, the enabled-channel mask, the pin-conflict verdict. Both rebuild paths end here.
     void     rederive_shared();

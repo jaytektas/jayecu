@@ -36,6 +36,8 @@ CLT_DIAG=(--set "sensors.sensor[clt].diag_enable.raw_min=1"   --set "sensors.sen
 # A switch read through an ANALOG pin: the wiring row grows its two trip points (Switch On / Switch Off).
 "$SHOOT" --crop 330x305+312+238  --set "sensors.sensor[start_sw].enabled=1" --set "sensors.sensor[start_sw].source=4" \
          "$P/Chassis/Start Button"                                                         sensors-start-input
+# Thermistor calibration: the coolant sensor on AT1, read from the GM preset's three points.
+"$SHOOT" --crop 640x560+640+236 "${CAR[@]}" --set "sensors.thermistor[clt].mode=1" "$P/Engine/Coolant Temperature" sensors-clt-thermistor
 SHOOT_W=1800 "$SHOOT" --crop 1340x655+312+238 --set "sensors.sensor[flex_fuel].enabled=1" --set "sensors.sensor[flex_fuel].source=4" \
          "$P/Engine/Flex Fuel Composition & Temperature"                                  sensors-flex-page
 "$SHOOT" --crop 1000x245+312+238 --set "sensors.sensor[cruise_sw].enabled=1" --set "sensors.sensor[cruise_sw].source=3" \

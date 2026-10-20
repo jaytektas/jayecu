@@ -102,7 +102,7 @@ void Sensors::rebuild_one(uint8_t i) {
     // 118 pipelines composed for nothing. Torn down rather than merely skipped, so a sensor that has
     // just been switched off stops publishing instead of running on its last-built pipeline.
     if (!c.enabled) { pipelines_[i].n = 0; return; }
-    if (pipe::build_input(d, c, pools_[i], pipelines_[i])) return;
+    if (pipe::build_input(d, c, pools_[i], pipelines_[i], therm_row(i))) return;
     // build_input declined → CAN-interface (or unassigned). A CAN sensor reads the generic-CAN receive
     // FIELD it names by FRAME and START BIT — one decode, shared with the transmit side and editable
     // in the tune. The field supplies the reading and its own TTL; everything the sensor adds on top
@@ -147,6 +147,25 @@ void Sensors::retire_codes(uint8_t i) {
     }
 }
 
+// THIS SENSOR'S ROW OF THE THERMISTOR TABLE, or nullptr: only the temperature and generic analog inputs
+// have one (SENSOR_THERM_SLOT).
+const ThermistorConfig* Sensors::therm_row(uint8_t i) const {
+    const uint8_t slot = (i < SENSOR_COUNT) ? SENSOR_THERM_SLOT[i] : SENSOR_THERM_NONE;
+    return (cfg_ && slot < SENSOR_THERM_COUNT) ? &cfg_->thermistor[slot] : nullptr;
+}
+
+// WHAT A PIPELINE IS BUILT FROM, fingerprinted: the sensor's element and, for a sensor that has one, its
+// thermistor row. The row lives in its own small table, so a write to it reaches here as a full sweep —
+// and with only the element fingerprinted the sweep found nothing changed, and new thermistor points
+// did nothing until the ECU restarted.
+uint32_t Sensors::elem_crc(uint8_t i) const {
+    const SensorConfig& c = cfg_->sensor[i];
+    uint32_t crc = crc32_buf(reinterpret_cast<const uint8_t*>(&c), sizeof(c));
+    if (const ThermistorConfig* th = therm_row(i))
+        crc ^= crc32_buf(reinterpret_cast<const uint8_t*>(th), sizeof(*th)) * 2654435761u;
+    return crc;
+}
+
 void Sensors::recompute_range(uint8_t first, uint8_t last) {
     if (!cfg_) return;
     const reconfig::Time _t(reconfig::SENSORS);
@@ -154,7 +173,7 @@ void Sensors::recompute_range(uint8_t first, uint8_t last) {
     for (uint8_t i = first; i <= last && i < SENSOR_COUNT; i++) {
         const SensorConfig& c = cfg_->sensor[i];
         const bool on = c.enabled != 0;
-        const uint32_t crc = on ? crc32_buf(reinterpret_cast<const uint8_t*>(&c), sizeof(c)) : 0;
+        const uint32_t crc = on ? elem_crc(i) : 0;
         if (on == built_on_[i] && (!on || crc == built_crc_[i])) continue;   // written, but unchanged
         rebuild_one(i);
         if (!on && built_on_[i]) retire_codes(i);   // it was on a moment ago: take its codes down with it
@@ -197,7 +216,7 @@ void Sensors::recompute_live(bool all) {
         const SensorConfig& c = cfg_->sensor[i];
         const bool on = c.enabled != 0;
         uint32_t crc = 0;
-        if (on) crc = crc32_buf(reinterpret_cast<const uint8_t*>(&c), sizeof(c));
+        if (on) crc = elem_crc(i);
         const bool can_here = can_moved && on
                            && pipe::active_iface(SENSOR_CATALOG[i], c) == IFACE_CAN_DEVICE;
         if (!all && !can_here && on == built_on_[i] && (!on || crc == built_crc_[i])) continue;   // unchanged

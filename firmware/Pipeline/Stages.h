@@ -21,6 +21,7 @@
 #include "../Can/CanFieldValue.h"   // the seam: a decoded generic-CAN field
 #include "../Engine/TableEngine.h"   // tbl::interp — a cal curve IS a 1-axis table lookup
 #include "../../generated/boards/board.h"   // BOARD_ADC_FULL_SCALE — decode_bands' "no reading"
+#include <cmath>     // logf — the thermistor decode
 #include <cstdint>
 
 namespace pipe {
@@ -209,6 +210,70 @@ inline void decode_bands(Ctx& c, const void* cfg, State& st) {
     if (b->stuck_en && b->stuck_ms && c.value != 0.0f && (c.now_ms - s.acc_ms) >= b->stuck_ms) {
         c.valid = false; c.diag_tripped |= (1u << DIAG_SLOT_STUCK);
     }
+}
+
+// A THERMISTOR on an analog pin: volts -> ohms -> degrees, exactly, where a voltage curve is only as good
+// as where its sixteen points fall. The pin sits between a pull-up to the 5 V sensor supply and the
+// thermistor to ground, and that supply is the analog full scale — so the reading's fraction of full scale
+// IS the divider ratio, and the resistance follows from it and the pull-up. An AV pin also has the board's
+// own resistor to ground (BOARD_AV_PULLDOWN_OHM) in parallel with the sensor, and it is taken back out.
+// Then Steinhart-Hart, 1/T = a + b ln R + c (ln R)^3 with T in kelvin, from three points of the sensor's
+// data (thermistor_coeffs). 16 bytes, the size of the largest decode config it shares the union with.
+struct ThermCfg {
+    float    a, b, c;        // Steinhart-Hart coefficients (kelvin)
+    uint16_t pullup_ohm;     // to the 5 V sensor supply
+    uint8_t  on_av;          // an AV pin: its pull-down is in parallel with the sensor
+    uint8_t  _pad;
+};
+// It shares the decode union with BandCfg, the largest, in a pool multiplied by every sensor: it may not
+// make that union bigger on the ECU (where a pointer is 4 bytes; a host build's 8-byte pointers make
+// BandCfg the larger anyway).
+static_assert(sizeof(ThermCfg) <= 16, "ThermCfg would grow every sensor's pipeline pool");
+
+// The coefficients from three (degrees C, ohms) points of a sensor's data, as rusEFI's thermistor does
+// it (controllers/sensors/converters/thermistor_func.cpp). An NTC's resistance FALLS as it warms, so the
+// points must rise in temperature and fall in resistance; anything else, or a curve that does not give
+// the three temperatures back, is not a thermistor and is refused — the sensor builds nothing and its
+// config DTC says so, rather than reading a confident wrong temperature.
+inline bool thermistor_coeffs(float t1, float r1, float t2, float r2, float t3, float r3,
+                              float& a, float& b, float& c) {
+    if (!(r1 > 0.0f && r2 > 0.0f && r3 > 0.0f)) return false;
+    if (!(t1 < t2 && t2 < t3 && r1 > r2 && r2 > r3)) return false;
+    const float l1 = logf(r1), l2 = logf(r2), l3 = logf(r3);
+    const float y1 = 1.0f / (t1 + 273.15f), y2 = 1.0f / (t2 + 273.15f), y3 = 1.0f / (t3 + 273.15f);
+    const float u2 = (y2 - y1) / (l2 - l1), u3 = (y3 - y1) / (l3 - l1);
+    c = ((u3 - u2) / (l3 - l2)) / (l1 + l2 + l3);
+    b = u2 - c * (l1 * l1 + l1 * l2 + l2 * l2);
+    a = y1 - (b + l1 * l1 * c) * l1;
+    // It must give its own points back. Float rounding costs a few hundredths of a degree; a curve that
+    // misses by more did not come from three points of one thermistor.
+    const float l[3] = { l1, l2, l3 }, t[3] = { t1, t2, t3 };
+    for (int k = 0; k < 3; ++k) {
+        const float inv = a + b * l[k] + c * l[k] * l[k] * l[k];
+        if (!(inv > 0.0f)) return false;
+        const float back = 1.0f / inv - 273.15f;
+        if (!(back > t[k] - 0.5f && back < t[k] + 0.5f)) return false;
+    }
+    return true;
+}
+
+inline void decode_thermistor(Ctx& c, const void* cfg, State&) {
+    const auto* k = static_cast<const ThermCfg*>(cfg);
+    const float v = raw_as_float(c) / static_cast<float>(BOARD_ADC_FULL_SCALE);
+    // AT THE RAILS THERE IS NO RESISTANCE TO READ: 0 V is a short to ground, full scale an open circuit
+    // (nothing pulling against the pull-up). The raw-window check is where those are REPORTED; here they
+    // are simply not a temperature.
+    if (!(v > 0.0005f && v < 0.9995f)) { c.valid = false; return; }
+    float r = static_cast<float>(k->pullup_ohm) * v / (1.0f - v);
+    if (k->on_av && BOARD_AV_PULLDOWN_OHM) {
+        const float g = 1.0f / r - 1.0f / static_cast<float>(BOARD_AV_PULLDOWN_OHM);
+        if (!(g > 0.0f)) { c.valid = false; return; }   // no more than the pull-down alone: open circuit
+        r = 1.0f / g;
+    }
+    const float l = logf(r);
+    const float inv = k->a + k->b * l + k->c * l * l * l;
+    if (!(inv > 0.0f)) { c.valid = false; return; }
+    c.value = 1.0f / inv - 273.15f;
 }
 
 // Simple linear transform — e.g. a CAN device's fixed scale (raw / 1024 -> lambda).

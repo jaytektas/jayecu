@@ -45,6 +45,9 @@ def main():
     # …and, for an input that decodes to more than one, every reading with what it is read from (the
     # flex sensor: ethanol from the frequency, fuel temperature from the pulse width).
     readings_of = dict(zip(arr.get('element_ids', []), arr.get('element_readings', [])))
+    # …and which sensors can be a thermistor: those with a row in sensors.thermistor[] (temperature and
+    # generic analog inputs). Their pages offer the thermistor calibration; nobody else's does.
+    therm_ids = set(meta['config']['sensors'].get('thermistor', {}).get('element_ids', []))
 
     # THE TREE. Sensors -> GROUP -> the sensors in it. A hundred and twenty-two children on one node is a
     # list you scroll rather than a tree you navigate: nothing is ever more than a few rows from something
@@ -108,7 +111,8 @@ def main():
         # its own now. Written here, every `[*]` on the page resolves to THIS sensor however it is opened.
         extra = [(ch, tel[ch].get('label') or ch, raw) for ch, raw in readings_of.get(sid, []) if ch in tel]
         pg = SD.page(checks=checks, dtc=codes, type_label=type_label,
-                     diag_link=f'{base}/Diagnostics', extra=extra).to_json()
+                     diag_link=f'{base}/Diagnostics', extra=extra,
+                     therm=sid if sid in therm_ids else None).to_json()
         pg['title'] = name
         pg['elementScope'] = f'sensors.sensor[{sid}]'
         pages[base] = pg

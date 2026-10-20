@@ -57,6 +57,8 @@ adc_vref_mv: 3300
 # min_mv/max_mv calibration absorbs the difference — as it does on jaytek.
 analog_av_fullscale_mv: 5000
 analog_at_fullscale_mv: 5000   # AT bias resistor is 2.7k (PROTEUS_DEFAULT_AT_PULLUP)
+analog_at_pullup_ohm: 2700     # AT1-4: a 2.7 kΩ pull-up to the 5 V sensor supply — a thermistor pulls against it
+analog_av_pulldown_ohm: 470000 # AV1-16: 470 kΩ to ground, in parallel with anything fitted there
 
 # ===========================================================================
 # pins — control-relevant pins only. Role pools DERIVE from caps in declaration

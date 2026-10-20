@@ -52,6 +52,8 @@ adc_vref_mv: 3300
 # validated divider rather than this model.
 analog_av_fullscale_mv: 5000   # AV1-16: full scale 4095 counts = 5.000 V
 analog_at_fullscale_mv: 5000   # AT1-4:  full scale 4095 counts = 5.000 V
+analog_at_pullup_ohm: 2700     # AT1-4: a 2.7 kΩ pull-up to the 5 V sensor supply — a thermistor pulls against it
+analog_av_pulldown_ohm: 470000 # AV1-16: 470 kΩ to ground, in parallel with anything fitted there
 
 # ===========================================================================
 # Capability counts and fixed inputs are DERIVED, not declared (board_codegen.py):

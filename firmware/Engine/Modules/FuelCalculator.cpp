@@ -11,6 +11,7 @@
 #include "../../../generated/table_descs.h"   // <table>_desc(cfg) builders
 #include "../../Signal/EnginePosition.h"
 #include "../../Signal/SignalBus.h"
+#include "../../Signal/SignalRates.h"   // sigrate::need — the charge temperatures at the fuel's own rate
 #include "../EngineFrame.h"
 #include "../../../generated/ecu_config.h"   // g_config.engine.cylinder_count (live-read, like Ignition)
 #include <algorithm>
@@ -204,6 +205,18 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     bus.set(SIG_MAP_EST,    map_kpa, true, now, ttl());
     bus.set(SIG_MAP_SOURCE, static_cast<float>(map_source), true, now, ttl());
 
+    // THE CHARGE TEMPERATURE IS AS FRESH AS THE FUEL. This module runs once per engine cycle and the air
+    // density it fuels for rests on these two readings, but a temperature input samples at its type's
+    // leisurely floor — so at 6000 rpm nine fuel calculations in ten reused the same air temperature.
+    // Claimed at the rate this actually runs (cycles per second: rpm / 60 / revolutions per cycle), the
+    // sensors are read for every one; the claim lapses when the engine slows or this stops running.
+    {
+        const float revs = static_cast<float>(engine_cycle_angle(g_config.engine.cycle_type)) / ANGLE_360;
+        const float cyc  = (revs > 0.0f) ? pos.rpm / 60.0f / revs : 0.0f;
+        const uint16_t hz = static_cast<uint16_t>(std::clamp(cyc, 20.0f, 1000.0f));
+        sigrate::need(static_cast<SignalId>(cfg_->iat_src), hz);
+        sigrate::need(clt_id, hz);
+    }
     const float iat_c   = bus.get(static_cast<SignalId>(cfg_->iat_src), 20.0f);
     const float w_iat   = cfg_->charge_temp_iat_pct * 0.1f / 100.0f;
     const float t_charge_k = (w_iat * iat_c + (1.0f - w_iat) * clt_c) + 273.15f;   // IAT/CLT charge blend

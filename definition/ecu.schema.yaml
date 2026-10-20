@@ -470,7 +470,7 @@ value_autotune:
   - {name: "Above Atmosphere", channel: map,     op: '>', value: 102}
 
 sensor_types:
-- {id: temperature, units: C, decimals: 1, raw: volts, stages: [calibration, filter, diagnostics], diagnostics: [raw_min, raw_max, operating_min, operating_max], min: -40.0, max: 300.0, update_hz: 5}
+- {id: temperature, units: C, decimals: 1, raw: volts, stages: [calibration, filter, diagnostics], diagnostics: [raw_min, raw_max, operating_min, operating_max], min: -40.0, max: 300.0, update_hz: 50}  # 50: the floor for logs and gauges; the fuel model claims faster while it runs
 - {id: exhaust_temperature, units: C, decimals: 1, raw: volts, stages: [calibration, filter, diagnostics], diagnostics: [raw_min, raw_max, operating_min, operating_max], min: -40.0, max: 1500.0, update_hz: 5}  # EGT/turbine-side: a far wider domain than coolant/oil/air temp
 - {id: pressure, units: kPa, decimals: 1, raw: volts, stages: [calibration, filter, derivative, diagnostics], diagnostics: [raw_min, raw_max, operating_min, operating_max], min: -101.3, max: 3000.0, update_hz: 100}  # -101.3 = full vacuum referenced to atmosphere
 - {id: percent, units: '%', decimals: 1, raw: volts, stages: [calibration, filter, derivative, diagnostics], diagnostics: [raw_min, raw_max, operating_min, operating_max], min: -100.0, max: 200.0, update_hz: 200}
@@ -6509,6 +6509,30 @@ modules:
       # DTC: a broken gate must never silently switch detection off.
         - {name: precond_expr, type: expression, length: 64, label: Precondition, subcat: Diagnostics,
            help: "Expression that must hold for the reading checks (Reading Low/High) to raise a DTC. Empty = always armed. Reads bus channels and config settings, e.g. \"rpm > 2500 and (map > 50 or tps > 80)\". A None or stale channel reads as false, so a dead sensor cannot arm a fault."}
+      # THE THERMISTOR TABLE. A thermistor's data sheet gives resistance against temperature, and a
+      # voltage curve is only as good as where its sixteen points fall: evenly in temperature it is
+      # within a degree, evenly in volts it is twelve out at 116 C, and nobody places them by hand. So a
+      # sensor that IS a thermistor says so, and the firmware converts volts -> ohms -> degrees with
+      # Steinhart-Hart from three points of its data, exactly.
+      #
+      # ONE ROW PER SENSOR THAT CAN BE ONE, not one per sensor: codegen lists the temperature sensors
+      # on analog pins and the generic analog inputs (thermistor_inputs) — twenty rows, not 135. RAM is
+      # full; a gear switch has no business carrying a thermistor's settings.
+      - name: thermistor
+        label: Thermistor
+        count_from: thermistor_inputs   # codegen: type temperature or generic, readable on an analog pin
+        element:
+        # Floats first: the config packs, and codegen pads each float to a 4-byte boundary — in the
+        # natural order (temperature, resistance, ...) that padding cost 7 bytes a row. The page shows them
+        # in reading order whatever the order here.
+        - {name: res_1, type: float, label: Resistance 1, units: 'Ω', scale: 1.0, digits: 0, min: 1, max: 10000000, default: 100000, help: 'The sensor''s resistance at Temperature 1, in ohms.'}
+        - {name: res_2, type: float, label: Resistance 2, units: 'Ω', scale: 1.0, digits: 0, min: 1, max: 10000000, default: 1459, help: 'The sensor''s resistance at Temperature 2, in ohms.'}
+        - {name: res_3, type: float, label: Resistance 3, units: 'Ω', scale: 1.0, digits: 0, min: 1, max: 10000000, default: 70, help: 'The sensor''s resistance at Temperature 3, in ohms.'}
+        - {name: temp_1, type: int16, label: Temperature 1, units: C, scale: 0.1, min: -600, max: 3000, default: -400, help: 'The first of three points from the sensor''s data: a temperature and its resistance. Take them from the cold end, the middle and the hot end of the range it works in — the three points fix the curve between them and beyond.'}
+        - {name: temp_2, type: int16, label: Temperature 2, units: C, scale: 0.1, min: -600, max: 3000, default: 400, help: 'The middle point: a temperature and its resistance, from the sensor''s data.'}
+        - {name: temp_3, type: int16, label: Temperature 3, units: C, scale: 0.1, min: -600, max: 3000, default: 1300, help: 'The hot point: a temperature and its resistance, from the sensor''s data.'}
+        - {name: pullup, type: uint16, label: Pull-up, units: 'Ω', scale: 1.0, min: 0, max: 65535, default: board_at_pullup, help: 'The resistor from this input to the 5 V sensor supply, which the thermistor pulls against. An AT input has one on the board (2.7 kΩ on jaytek_v1 and proteus_f7), which is the default. An AV input has none: fit one in the loom and enter its value here. An AV input''s own 470 kΩ to ground is accounted for by the ECU. 0 is no pull-up, and a thermistor cannot be read without one.'}
+        - {name: mode, type: enum, label: Calibration, options: ["Voltage Curve", "Thermistor"], default: 0, help: 'How this input turns volts into a temperature. VOLTAGE CURVE: the sixteen-point curve on the page, for a sensor whose output is already a voltage (an amplified probe, a linear sender). THERMISTOR: the sensor is a resistor that changes with temperature, and the ECU works out its resistance from the voltage and the pull-up, then the temperature from the three points below (Steinhart-Hart). Exact, where a curve is only as good as where its points were put.'}
     provides:
     - map
     - tps

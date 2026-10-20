@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Temperature sensors can be calibrated as thermistors: pick the sensor (GM, Bosch/Hella NTC, Chrysler/Dodge, Ford, Toyota, Mazda Miata, Mercedes M111) or enter three temperature/resistance points from its data sheet, and the ECU converts every reading exactly. Offered on temperature sensors and Aux inputs on analogue pins; existing voltage curves are kept until you switch.
+- Temperature inputs are read at 50 Hz instead of 5 Hz, and the fuel model reads air and coolant temperature as often as it calculates fuel (every engine cycle).
 
 ## 0.4.9
 - Cranking fuel moved to Fuel Tuning ▸ Corrections ▸ Cranking, beside Post Start and Coolant Temp: it is a correction like them. Like them, it shows in the tree only while it is switched on.

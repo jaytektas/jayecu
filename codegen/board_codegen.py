@@ -65,6 +65,11 @@ def emit_header(board: dict, out_path: Path) -> None:
     # for boards with no front-end (direct ADC connection).
     av_fs_mv = int(board.get("analog_av_fullscale_mv", vref_mv))
     at_fs_mv = int(board.get("analog_at_fullscale_mv", vref_mv))
+    # What each analog input has FITTED, which a thermistor's resistance is worked out against: the AT
+    # inputs' pull-up to the 5 V sensor supply, and the AV inputs' resistor to ground (in parallel with
+    # whatever is fitted to the pin). 0 = none, which a board with no front-end has.
+    at_pullup_ohm   = int(board.get("analog_at_pullup_ohm", 0))
+    av_pulldown_ohm = int(board.get("analog_av_pulldown_ohm", 0))
 
     # ADC resolution is per-board — NOT every board is a 12-bit / 4095-count part.
     # `adc_bits` (default 12) drives the top count = 2^bits - 1.
@@ -125,6 +130,8 @@ def emit_header(board: dict, out_path: Path) -> None:
         "// Analog front-end full-scale at the connector (MCP6004 gain removed)",
         f"static constexpr uint32_t    BOARD_AV_FULLSCALE_MV  = {av_fs_mv}u;",
         f"static constexpr uint32_t    BOARD_AT_FULLSCALE_MV  = {at_fs_mv}u;",
+        f"static constexpr uint32_t    BOARD_AT_PULLUP_OHM    = {at_pullup_ohm}u;   // AT inputs: pull-up to 5 V",
+        f"static constexpr uint32_t    BOARD_AV_PULLDOWN_OHM  = {av_pulldown_ohm}u;   // AV inputs: to ground",
         "",
         "// Output counts (derived from resources.output_pool / resources.hbridge)",
         f"static constexpr uint8_t     BOARD_LOW_SIDE_COUNT   = {ls_count}u;",

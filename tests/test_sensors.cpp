@@ -405,17 +405,20 @@ int main() {
         SensorsConfig cfg{};
         SensorConfig& c = cfg.sensor[CLT];
         c.enabled = 1; c.interface = IFSEL_ANALOG_VOLTAGE; c.source = 0;
-        lin(c, 5000, 1000);              // period 100 ms, ttl 300 ms
+        lin(c, 5000, 1000);
         Sensors s; s.init(cfg);
         SignalBus bus;
+        // The period is the TYPE's, read from the catalogue rather than written here: it has been 100,
+        // 200 and now 20 ms, and a test that hard-codes it tests the number instead of the decimation.
+        const uint32_t P = 1000u / SENSOR_TYPE_CATALOG[SENSOR_TYPE_TEMPERATURE].update_hz;
 
         g_ain[0] = 2500; g_tick = 1000; pump(s, bus);   // due -> 50
         assert(approx(bus.get(SIG_CLT), 50.0f));
-        g_ain[0] = 4000; g_tick = 1050; pump(s, bus);   // 50ms < 100ms period -> skipped
+        g_ain[0] = 4000; g_tick = 1000 + P / 2; pump(s, bus);   // half a period -> skipped
         assert(approx(bus.get(SIG_CLT), 50.0f));                     // value held, not 80
-        g_tick = 1100; pump(s, bus);                    // now due -> 80
+        g_tick = 1000 + P; pump(s, bus);                // now due -> 80
         assert(approx(bus.get(SIG_CLT), 80.0f));
-        printf("ok  decimation: 10 Hz holds value between updates\n");
+        printf("ok  decimation: a %u Hz input holds its value between updates\n", 1000u / P);
 
         // PHASE. Two sensors at the same rate must publish in the SAME pass, whenever each was started:
         // the ETB reads tps_a and tps_b off the bus and faults on their difference, so a pair sampled
@@ -426,7 +429,7 @@ int main() {
             SensorsConfig two{};
             SensorConfig& a = two.sensor[CLT];
             a.enabled = 1; a.interface = IFSEL_ANALOG_VOLTAGE; a.source = 0;
-            lin(a, 5000, 1000);   // 100 ms
+            lin(a, 5000, 1000);
             Sensors sp; sp.init(two);
             SignalBus b2;
 
@@ -445,8 +448,7 @@ int main() {
 
             g_ain[0] = 4000; g_ain[1] = 4000;
             bool sawTogether = false;
-            // `temperature` samples at 5 Hz -> a 200 ms slot (this used to be forced to 100 ms via the
-            // removed `update_hz`), so walk far enough to cross several slot boundaries.
+            // Walk far enough to cross several of the temperature type's slots whatever its rate.
             for (uint32_t t = 1100; t <= 2400; t += 10) {     // walk a few periods
                 g_tick = t; pump(sp, b2);
                 const bool aM = approx(b2.get(SIG_CLT), 80.0f), bM = approx(b2.get(SIG_IAT), 80.0f);
@@ -465,7 +467,7 @@ int main() {
             for (int idx : { CLT, IAT2 }) {
                 SensorConfig& sc = many.sensor[idx];
                 sc.enabled = 1; sc.interface = IFSEL_ANALOG_VOLTAGE; sc.source = (idx == CLT) ? 0 : 1;
-                lin(sc, 5000, 1000);   // 100 ms period
+                lin(sc, 5000, 1000);
             }
             Sensors sp2; sp2.init(many);
             SignalBus b3;
@@ -492,8 +494,8 @@ int main() {
             SensorsConfig cfg2{};
             // A PERCENT sensor paired with a generic set to percent — the real ETB pairing, and the
             // only way the two share a rate. A sensor's cadence now comes from its TYPE (percent 200 Hz,
-            // temperature 5 Hz), so pairing tps with clt as this once did aligns nothing: they cannot
-            // refresh on the same frames when one runs forty times slower. That used to be masked by
+            // temperature 50 Hz), so pairing tps with clt as this once did aligns nothing: they cannot
+            // refresh on the same frames when one runs four times slower. That used to be masked by
             // the removed per-sensor `update_hz`, which let a tune force both to one rate.
             for (int idx : { TPS_, AUX1 }) {
                 SensorConfig& sc = cfg2.sensor[idx];
@@ -535,7 +537,7 @@ int main() {
             SensorsConfig late{};
             SensorConfig& c2 = late.sensor[CLT];
             c2.enabled = 1; c2.interface = IFSEL_ANALOG_VOLTAGE; c2.source = 0;
-            lin(c2, 5000, 1000);   // 100 ms
+            lin(c2, 5000, 1000);
             Sensors sl; sl.init(late);
             SignalBus b4;
             g_ain[0] = 2500; g_tick = 3000; pump(sl, b4);

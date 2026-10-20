@@ -54,7 +54,7 @@ MEANS = {
 }
 
 
-def page(checks=None, dtc=None, type_label='', diag_link='', extra=None):
+def page(checks=None, dtc=None, type_label='', diag_link='', extra=None, therm=None):
     """One sensor, read left to right the way the signal travels: INPUT -> CALIBRATION -> OUTPUT.
 
     That is the whole page in one sentence. A pin carries a number; a curve says what that number means;
@@ -76,13 +76,14 @@ def page(checks=None, dtc=None, type_label='', diag_link='', extra=None):
     for the 108 sensors whose type the catalogue decides; `diag_link` — the node its checks live on;
     `extra` — what else this one input decodes to, [(channel, its name, raw it is read from)], with the
     sensor's own reading first (the flex sensor: ethanol from the frequency, temperature from the pulse
-    width). All are per-sensor facts.
+    width); `therm` — this sensor's id in sensors.thermistor[] when it can be a thermistor (a temperature
+    or generic analog input), else None. All are per-sensor facts.
     """
     p = A.Page(title='Sensor')
     y0 = p.head('What this input is wired to, and what its curve makes of it.', enable=f'{S}.enabled')
     h = A.CANVAS_H - y0 - 8
     _input(p, y0, h, extra)
-    _calibration(p, y0, h)
+    _calibration(p, y0, h, therm)
     _output(p, y0, h, type_label, diag_link, checks or [c[0] for c in CHECKS], extra)
     return p
 
@@ -156,7 +157,7 @@ def _input(p, y, h, extra=None):
               'the sensor publishing it too would put two producers on one channel.', into=box, colour=C_DIM)
 
 
-def _calibration(p, y, h):
+def _calibration(p, y, h, therm=None):
     """2 — what it means: the curve that turns the raw number into a reading.
 
     The table and the curve are the same points, because a calibration is numbers before it is a shape:
@@ -166,14 +167,26 @@ def _calibration(p, y, h):
     """
     cal = p.panel(320, y, 630, h, '2 · Calibration', enable=ON)
     inner = h - A.PANEL_TITLE - 4
-    p.add(p._new('table', 10, 10, 600, 96,
-                 {'signalName': f'{S}.cal', 'axisMode': '1', 'displayUnit': 'Auto',
-                  'displayUnitX': 'Auto', 'displayUnitY': 'Auto', 'cellTrace': '2'}), into=cal)
+    # A SENSOR THAT CAN BE A THERMISTOR CHOOSES HOW IT IS READ, above everything else in the panel: the
+    # voltage curve below, or the sensor's own resistance data (_thermistor). The curve, its table and
+    # its note show only in curve mode, so each mode shows exactly what it uses.
+    top, curve_cond = 10, ''
+    if therm:
+        T = f'sensors.thermistor[{therm}]'
+        p.field(cal, 10, 10, 'Calibration', f'{T}.mode', 'enum', 220, lbl_w=120)
+        curve_cond = f'[#{T}.mode] == 0'
+        _thermistor(p, cal, 50, T, f'[#{T}.mode] == 1')
+        top = 50
+    tbl = p.add(p._new('table', 10, top, 600, 96,
+                       {'signalName': f'{S}.cal', 'axisMode': '1', 'displayUnit': 'Auto',
+                        'displayUnitX': 'Auto', 'displayUnitY': 'Auto', 'cellTrace': '2'}), into=cal)
+    if curve_cond: tbl['props']['condition'] = curve_cond
     # The curve stops where the note starts. It used to claim down to inner-44 while the note began at
     # inner-68, so the note's first line was drawn across the curve's own bottom axis.
-    p.add(p._new('curve', 10, 114, 600, inner - 114 - 72,
-                 {'signalName': f'{S}.cal', 'displayUnit': 'Auto', 'axisUnit': 'Auto',
-                  'valueUnit': 'Auto'}), into=cal)
+    crv = p.add(p._new('curve', 10, top + 104, 600, inner - (top + 104) - 72,
+                       {'signalName': f'{S}.cal', 'displayUnit': 'Auto', 'axisUnit': 'Auto',
+                        'valueUnit': 'Auto'}), into=cal)
+    if curve_cond: crv['props']['condition'] = curve_cond
     note = p.wrapped(10, inner - 68, 600,
                      'Raw in along the top, reading out underneath. Right-click either for insert, delete, '
                      'linearise — or to save this curve to a file and load it into the next car with the '
@@ -182,10 +195,88 @@ def _calibration(p, y, h):
     # calibration it describes (CanvasWidget::showsCalibrationOf) only if it says which one it describes;
     # unbound, this sentence about a curve stayed on screen over a switch that has no curve.
     note['props']['signalName'] = f'{S}.cal'
+    if curve_cond: note['props']['condition'] = curve_cond
     # A MULTI-POSITION SWITCH'S BANDS, in the same place. Its calibration is one voltage band per
     # position, not a curve; the band editor shows for that calibration and the table, curve and note
     # above hide for it, so the two never share the panel.
-    p.add(p._new('bands', 10, 10, 600, inner - 20, {'signalName': f'{S}.cal'}), into=cal)
+    bands = p.add(p._new('bands', 10, top, 600, inner - top - 10, {'signalName': f'{S}.cal'}), into=cal)
+    # A generic input made a multi-position switch is read by its bands, never as a thermistor (the
+    # firmware decodes bands first), so on such an input the bands show only in curve mode.
+    if curve_cond: bands['props']['condition'] = curve_cond
+
+
+# Presets: three points of real sensors' data, as rusEFI ships them (controllers/sensors/thermistors.cpp and
+# its engine configurations), each checked to give its own points back. (name, ((C, ohm) x 3)).
+THERMISTOR_PRESETS = [
+    ('GM (open and closed element)', ((-40, 100000), (40, 1459), (130, 70))),
+    ('Bosch / Hella NTC',            ((-20, 18000), (23.9, 2100), (120, 100))),
+    ('Chrysler / Dodge',             ((-40, 336660), (30, 7550), (120, 390))),
+    ('Ford EEC-IV',                  ((-10, 160310), (60, 7700), (120, 1180))),
+    ('Toyota',                       ((-20, 15000), (40, 1200), (120, 200))),
+    ('Mazda Miata',                  ((-20, 16150), (40, 1150), (80, 330))),
+    ('Mercedes M111 (air)',          ((0, 7400), (22, 2180), (100, 180))),
+]
+
+
+def _thermistor(p, cal, y, T, cond):
+    """THERMISTOR MODE: the sensor's own data, three points of it, and the pull-up it reads against.
+
+    A preset fills the points from a known sensor; the points stay editable, because a data sheet is the
+    better source for the one actually fitted. The live resistance is there to hold against a multimeter
+    reading of the sensor — the one check that says the pull-up and the points describe this wiring.
+    """
+    def put(kind, x, yy, w, h, props):
+        props = dict(props, condition=cond)
+        return p.add(p._new(kind, x, yy, w, h, props), into=cal)
+    lines = []
+    for name, pts in THERMISTOR_PRESETS:
+        writes = []
+        for k, (t, r) in enumerate(pts, 1):
+            writes += [f'{T}.temp_{k}={int(round(t * 10))}', f'{T}.res_{k}={r}']
+        lines.append(name + '|' + ','.join(writes))
+    put('label', 10, y + 4, 120, A.LBL_H, {'labelText': 'Sensor', 'align': 'Left', 'fontName': A.FONT_LBL})
+    put('settingselector', 136, y, 300, A.CTL_H, {'presets': '\n'.join(lines),
+        'toolTip': 'Fill the three points from a known sensor. The points stay editable.'})
+    yy = y + 44
+    for cx, cw, text in ((136, 130, 'Temperature'), (276, 150, 'Resistance')):
+        put('label', cx, yy, cw, 18, {'labelText': text, 'align': 'Left', 'fontName': '|15|1|0', 'fgColor': C_DIM})
+    yy += 22
+    for k in (1, 2, 3):
+        g = p.group()
+        p.add(p._new('label', 10, yy + 4, 120, A.LBL_H, {'labelText': f'Point {k}', 'align': 'Left',
+                     'fontName': A.FONT_LBL, 'condition': cond}, g), into=cal)
+        p.add(p._new('configedit', 136, yy, 130, A.CTL_H, {'signalName': f'{T}.temp_{k}', 'displayUnit': 'Auto',
+                     'condition': cond}, g), into=cal)
+        p.add(p._new('configedit', 276, yy, 150, A.CTL_H, {'signalName': f'{T}.res_{k}', 'displayUnit': 'Auto',
+                     'condition': cond}, g), into=cal)
+        yy += 36
+    yy += 8
+    g = p.group()
+    p.add(p._new('label', 10, yy + 4, 120, A.LBL_H, {'labelText': 'Pull-up', 'align': 'Left',
+                 'fontName': A.FONT_LBL, 'condition': cond}, g), into=cal)
+    p.add(p._new('configedit', 136, yy, 130, A.CTL_H, {'signalName': f'{T}.pullup', 'displayUnit': 'Auto',
+                 'condition': cond}, g), into=cal)
+    yy += 44
+    # THE RESISTANCE NOW, from the pin's counts and the pull-up — what a multimeter on the sensor should
+    # read. On an AV pin the board's own resistor to ground is in parallel, so it reads a little low there
+    # at the cold end; the ECU corrects for that, this check does not.
+    g = p.group()
+    p.add(p._new('label', 10, yy + 4, 120, A.LBL_H, {'labelText': 'Resistance now', 'align': 'Left',
+                 'fontName': A.FONT_LBL, 'condition': cond}, g), into=cal)
+    p.add(p._new('value', 136, yy, 130, A.CTL_H, {
+        'signalName': f'[#{T}.pullup] * [$~] / (4095 - [$~])', 'format': '%.0f Ω', 'fontName': A.FONT_LBL,
+        'align': 'Right', 'borderWidth': '1', 'borderRadius': '3', 'condition': cond}, g), into=cal)
+    put('label', 276, yy + 6, 320, 18, {'labelText': 'Hold it against a multimeter on the sensor.',
+        'align': 'Left', 'fontName': A.FONT_SMALL, 'fgColor': C_DIM})
+    yy += 48
+    note = p.wrapped(10, yy, 600,
+        'The sensor is a resistor that changes with temperature. The ECU works out its resistance from the '
+        'pin\'s voltage and the pull-up, then the temperature from the three points (Steinhart-Hart) — '
+        'exactly, where a voltage curve is only as good as where its points were put. Take the points from '
+        'the sensor\'s data, cold, middle and hot. An AT input has a 2.7 kΩ pull-up on the board; on an AV '
+        'input fit one to the 5 V sensor supply and enter its value. The ECU allows for an AV input\'s own '
+        '470 kΩ to ground.', into=cal)
+    note['props']['condition'] = cond
 
 
 def _output(p, y, h, type_label, diag_link, checks, extra=None):

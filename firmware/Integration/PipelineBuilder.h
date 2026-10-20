@@ -58,11 +58,18 @@ constexpr uint8_t DIAG_MAX_DERIV = 0x20;
 // Storage for one input's pipeline stage configs.  The builder fills the used members and
 // points the Pipeline's stages at them; lives in a static pool alongside the Pipeline.
 struct InputCfgPool {
-    PinAcquireCfg    analog;
-    FreqAcquireCfg   freq;
-    PulseAcquireCfg  pulse;
-    SentAcquireCfg   sent;
-    SwitchAcquireCfg sw;
+    // ONE ACQUIRE PER INPUT, for the same reason as the decode below: a sensor is read through exactly one
+    // interface, and changing it rebuilds the pipeline. These were six members side by side — every pool,
+    // all 135 of them and the aux ones, carried a pin, a frequency, a pulse, a SENT, a switch and a CAN
+    // acquire config to use one.
+    union {
+        PinAcquireCfg      analog;
+        FreqAcquireCfg     freq;
+        PulseAcquireCfg    pulse;
+        SentAcquireCfg     sent;
+        SwitchAcquireCfg   sw;
+        CanFieldAcquireCfg can_acq;   // CAN-interface inputs: a generic-CAN field
+    };
     // ONE DECODE PER INPUT, so the decode configs share storage: an input is a curve, a two-point switch
     // or a band switch, never two of them. The pool is multiplied by 128 sensors, which is why this is a
     // union rather than a member apiece.
@@ -70,13 +77,13 @@ struct InputCfgPool {
         CurveCfg         curve;
         SwitchThreshCfg  thresh;   // a switch read through an analog pin: the two trip points
         BandCfg          bands;    // a multi-position switch: one voltage band per position
+        ThermCfg         therm;    // a thermistor: volts -> ohms -> degrees (Steinhart-Hart)
     };
     RawWindowCfg     raw_win;
     OpWindowCfg      op_win;
     StuckCfg         stuck;
     DerivCfg         deriv;
     PublishCfg       pub;
-    CanFieldAcquireCfg can_acq;   // CAN-interface inputs: a generic-CAN field
     // A linear raw->engineering decode. Named for what it does rather than for who first needed it:
     // this was `can_lin`, and the aux-output path had quietly borrowed the CAN slot for its own
     // decode, which is why removing the CAN one broke a pipeline that has nothing to do with CAN.
@@ -121,8 +128,10 @@ inline SignalId dig_hw_sig(const SignalId* map, uint8_t source) {
 
 // Compose the pipeline for one input into `p`, with stage configs in `pool`.  Returns
 // false if the input produces nothing this config (unassigned / CAN-device not yet bound).
+// `th` is this sensor's row of sensors.thermistor[] — only the sensors that can be thermistors have one
+// (SENSOR_THERM_SLOT); nullptr for every other sensor, and for a caller that has none to give.
 inline bool build_input(const SensorDescriptor& d, const SensorConfig& c,
-                        InputCfgPool& pool, Pipeline& p) {
+                        InputCfgPool& pool, Pipeline& p, const ThermistorConfig* th = nullptr) {
     p.signal = d.primary_channel;
     p.n = 0;
     p.reset_state();
@@ -228,6 +237,17 @@ inline bool build_input(const SensorDescriptor& d, const SensorConfig& c,
         // added byte cost half a kilobyte.
         pool.thresh = { c.cal_raw[1], c.cal_raw[0], (c.flags & FLAG_INVERT) != 0 };
         add(decode_switch_thresh, &pool.thresh);
+    } else if (analog_in && th && th->mode == 1) {
+        // A THERMISTOR: the sensor's own data instead of a voltage curve. Three points that do not make a
+        // thermistor, or no pull-up to read it against, build nothing — the sensor goes silent and its
+        // config DTC names it, rather than publishing a temperature from a curve nobody meant.
+        if (th->pullup == 0) return false;
+        float ka = 0.0f, kb = 0.0f, kc = 0.0f;
+        if (!thermistor_coeffs(th->temp_1 * 0.1f, th->res_1, th->temp_2 * 0.1f, th->res_2,
+                               th->temp_3 * 0.1f, th->res_3, ka, kb, kc))
+            return false;
+        pool.therm = { ka, kb, kc, th->pullup, static_cast<uint8_t>(src < BOARD_ANALOG_T_BASE ? 1 : 0), 0 };
+        add(decode_thermistor, &pool.therm);
     } else if (numeric_raw) {
         // Resizable N-point curve: cal_raw/cal_val are the breakpoint + value arrays; cal_n is the
         // live point count (clamped to the SENSOR_CAL_POINTS max), so the cal edits as a 1D curve.

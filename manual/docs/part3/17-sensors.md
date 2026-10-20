@@ -130,6 +130,11 @@ end value. The raw axis must go upwards from point to point.
   catch the readings the curve cannot tell from real ones.</figcaption>
 </figure>
 
+A **thermistor** need not use the curve either: a temperature sensor can be calibrated from three
+points of its own resistance data instead, which is exact where a curve is only as good as where its
+points were put. See **Calibrating a thermistor** under Step 2.
+<!-- src: firmware/Pipeline/Stages.h (decode_thermistor) -->
+
 A **switch on an analogue pin** does not use a curve. The first two calibration points become two
 trip points: the reading turns **on** when the voltage rises past the higher one and **off** when it
 falls below the lower one. Between them it keeps its last state, so a noisy pin cannot chatter.
@@ -273,16 +278,32 @@ there, so a sensor you calibrate once can be applied to the next car in one clic
 if it has the same name as a shipped one.
 <!-- src: apps/studio-jf/src/surface/Surface.cpp (calibrationDir, shippedCalibrationDir, rebuildPresetMenu); apps/studio-jf/calibrations/ -->
 
-**Calibrating a thermistor.** The temperature inputs AT1–AT4 each have a **2.7 kΩ pull-up** to 5 V
-sensor supply 1. So a thermistor of resistance *R* reads:
+**Calibrating a thermistor.** Most temperature sensors are thermistors: resistors whose resistance
+falls as they warm. Their data sheets give resistance against temperature, not volts, so for these set
+**Calibration** to **Thermistor** instead of using the curve:
 
-**volts = 5 × R ÷ (R + 2700)**
+1. **Sensor**: pick the sensor if it is in the list (GM, Bosch/Hella NTC, Chrysler/Dodge, Ford EEC-IV,
+   Toyota, Mazda Miata, Mercedes M111). This fills the three points. If yours is not there, enter the
+   points yourself.
+2. **Point 1–3**: three temperatures and the sensor's resistance at each, from its data sheet. Take
+   one cold, one in the middle and one hot. The ECU fits the sensor's curve through them
+   (Steinhart–Hart) and converts every reading exactly.
+3. **Pull-up**: the resistor the sensor pulls against. AT1–AT4 have a **2.7 kΩ** pull-up to 5 V on
+   the board, which is the default. An AV input has none: fit a resistor from the pin to the 5 V
+   sensor supply and enter its value. The ECU allows for the AV input's own 470 kΩ to ground.
+4. **Resistance now** shows the resistance the ECU sees. Check it against a multimeter on the sensor
+   (disconnected) at the same temperature.
 
-Take the resistance at several temperatures from the sensor's data sheet, work out the volts for each,
-and enter them as points: for example, 2500 Ω at 20 °C reads 5 × 2500 ÷ 5200 = **2.40 V**. A
-thermistor's curve is far from straight, so use as many points as you can, closer together where the
-engine spends its time (60–110 °C).
-<!-- src: hardware/PDF_JAYTEK_2026-04-29/Temperature (R13-R16 2.7 kΩ to CON_5V_SENSOR1) -->
+<figure markdown>
+  ![The Calibration panel set to Thermistor: Sensor GM, three temperature and resistance points, Pull-up 2700 Ω, and Resistance now](../img/studio/sensors-clt-thermistor.png)
+  <figcaption>Figure 17.8 — Coolant read as a thermistor from the GM sensor's data.</figcaption>
+</figure>
+
+Three points that do not describe a thermistor (temperatures not rising, or resistances not falling),
+or a pull-up of 0, stop the sensor and raise its configuration code rather than read a wrong
+temperature. Thermistor calibration is offered on the temperature sensors that read an analogue pin and
+on the Aux inputs.
+<!-- src: definition/ecu.schema.yaml (Sensors thermistor); firmware/Pipeline/Stages.h (decode_thermistor, thermistor_coeffs); apps/studio-jf/tools/layout/sensor_detail.py (THERMISTOR_PRESETS); hardware/PDF_JAYTEK_2026-04-29/Temperature (R13-R16 2.7 kΩ to CON_5V_SENSOR1) -->
 
 ### Step 3 — Diagnostics
 
@@ -290,7 +311,7 @@ Open the sensor's **Diagnostics** page (under the sensor in the navigation).
 
 <figure markdown>
   ![Coolant Temperature Diagnostics: Detect Raw Low at Level 1 with P0117, Detect Raw High at Level 1 with P0118, Detect Reading Low off, Detect Reading High at Level 2 with P13F3; DTC Delay 250 ms; Precondition](../img/studio/sensors-clt-diag.png)
-  <figcaption>Figure 17.8 — Coolant Temperature ▸ Diagnostics, set up as in Example 2.</figcaption>
+  <figcaption>Figure 17.9 — Coolant Temperature ▸ Diagnostics, set up as in Example 2.</figcaption>
 </figure>
 
 For each check: tick it, set where it trips, choose its severity. The code it raises is shown on the
@@ -306,7 +327,7 @@ a voltage input (Hz for a frequency input, µs for a pulse width).
 
 <figure markdown>
   ![The Manifold Pressure page: Engine Sync Voltage on AV1, CN3 pin 27, and the calibration](../img/studio/sensors-map-page.png)
-  <figcaption>Figure 17.9 — Manifold Pressure, read engine-synchronously.</figcaption>
+  <figcaption>Figure 17.10 — Manifold Pressure, read engine-synchronously.</figcaption>
 </figure>
 
 MAP is set up like any other sensor, but its Interface is **Engine Sync Voltage**. Enter the two points
@@ -315,7 +336,7 @@ Trigger System**:
 
 <figure markdown>
   ![Engine-Sync Sampling: Averaging Window 360°](../img/studio/sensors-sync-window.png){ width="400" }
-  <figcaption>Figure 17.10 — The window every engine-sync input is averaged over.</figcaption>
+  <figcaption>Figure 17.11 — The window every engine-sync input is averaged over.</figcaption>
 </figure>
 
 A window of one cylinder's firing interval (720 ÷ cylinders on a four-stroke) or a whole number of
@@ -329,12 +350,12 @@ the voltage when the switch is active, and Off a little above the voltage when i
 
 <figure markdown>
   ![Left: Clutch Pedal Switch on a digital pin DIG3 with Invert; right: Start Button on an analogue pin AV5 with Switch On and Switch Off voltages](../img/studio/sensors-clutch-input.png)
-  <figcaption>Figure 17.11 — A switch on a digital pin.</figcaption>
+  <figcaption>Figure 17.12 — A switch on a digital pin.</figcaption>
 </figure>
 
 <figure markdown>
   ![Start Button on analogue pin AV5, with Switch On (V) 5.000 and Switch Off (V) 0.000](../img/studio/sensors-start-input.png)
-  <figcaption>Figure 17.12 — A switch on an analogue pin. The defaults (5 V and 0 V) must be set to
+  <figcaption>Figure 17.13 — A switch on an analogue pin. The defaults (5 V and 0 V) must be set to
   your switch.</figcaption>
 </figure>
 
@@ -344,7 +365,7 @@ reads. **+ Band** adds a position. Position 0 is rest, the one position that may
 
 <figure markdown>
   ![Cruise Control Switch calibration: a Position row with Low, High and Capture, and + Band](../img/studio/sensors-cruise-bands.png)
-  <figcaption>Figure 17.13 — Capturing the bands of a multi-position switch.</figcaption>
+  <figcaption>Figure 17.14 — Capturing the bands of a multi-position switch.</figcaption>
 </figure>
 
 ### Step 6 — Frequency, flex fuel, wideband
@@ -363,19 +384,19 @@ reads. **+ Band** adds a position. Position 0 is rest, the one position that may
 
 <figure markdown>
   ![Flex Fuel Composition & Temperature: Frequency interface on DIG5, the calibration from Hz to %, and both readings](../img/studio/sensors-flex-page.png)
-  <figcaption>Figure 17.14 — Flex fuel. The default calibration shown is a placeholder.</figcaption>
+  <figcaption>Figure 17.15 — Flex fuel. The default calibration shown is a placeholder.</figcaption>
 </figure>
 
 - A **Wideband O2** read as an analogue voltage needs the controller's mapping: its manual gives the
   lambda at 0 V and at 5 V. The default is 0.50–1.50. Different controllers disagree by a lot at the
-  same voltage (Figure 17.15), so never guess it. A controller on CAN avoids the question entirely.
+  same voltage (Figure 17.16), so never guess it. A controller on CAN avoids the question entirely.
   There are 15 wideband inputs: one per cylinder, two per bank and one overall. Which one closed loop
   uses is chosen on O2 Control (chapter 23).
   <!-- src: definition/ecu.schema.yaml (lambda default_cal, per_cylinder, extra: 3) -->
 
 <figure markdown>
   ![Four wideband controller mappings: at 2.5 V they read λ 1.00, 1.01, 0.91 and 1.02](../img/plots/sensors-wideband-presets.svg)
-  <figcaption>Figure 17.15 — The same voltage, four different lambdas. The calibration must match the
+  <figcaption>Figure 17.16 — The same voltage, four different lambdas. The calibration must match the
   controller.</figcaption>
 </figure>
 
@@ -467,7 +488,7 @@ blank on the group pages and on gauges, which is the first sign something is wro
 | MAP swings with engine speed at steady load | Averaging window too short | Averaging Window on the Trigger System page |
 | A reading-high fault on a healthy sensor | Threshold set too close to normal readings | The threshold against logged readings |
 | A switch never changes | Wrong pin; needs Invert; analogue trip points not set | Raw input while you press it; Switch On/Off voltages |
-| Wideband reads a steady wrong lambda | Controller mapping wrong | The controller's manual; Figure 17.15 |
+| Wideband reads a steady wrong lambda | Controller mapping wrong | The controller's manual; Figure 17.16 |
 
 ## Settings reference
 

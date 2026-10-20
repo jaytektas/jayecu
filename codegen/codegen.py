@@ -717,6 +717,32 @@ def resolve_channel_name_defaults(schema: dict) -> None:
         for arr in mod.get("config_arrays", []):
             _resolve(arr.get("element", []), f"{mname}.{arr.get('name')}")
 
+def derive_thermistor_inputs(schema: dict, board: str | None) -> None:
+    """The sensors that can be a thermistor, as `schema["thermistor_inputs"]` — what the Sensors
+    `thermistor` array is sized and named from (count_from: thermistor_inputs). A sensor qualifies if it
+    is read on an analog pin and is a temperature, or is a generic input the tune may make one. Every
+    other sensor — a gear switch, a brake pedal, a MAP — carries no thermistor settings at all: RAM is
+    full, and one row per catalogue entry would be 135 rows to serve twenty.
+
+    Also resolves the `default: board_at_pullup` of that array's pull-up to the board's AT pull-up
+    (analog_at_pullup_ohm), so the default is the resistor this board really has. Idempotent; needs the
+    catalogue already expanded per cylinder."""
+    import yaml
+    schema["thermistor_inputs"] = [
+        {"id": x["id"], "name": x.get("name", x["id"])}
+        for x in schema.get("sensors", [])
+        if "analog_voltage" in (x.get("interfaces") or []) and x.get("type") in ("temperature", "generic")]
+    pullup = 0
+    p = Path(__file__).resolve().parent.parent / "definition" / "boards" / f"{board}.board.yaml"
+    if board and p.is_file():
+        pullup = int((yaml.safe_load(p.read_text()) or {}).get("analog_at_pullup_ohm", 0))
+    for mod in (schema.get("modules") or {}).values():
+        cfg = mod.get("config") if isinstance(mod.get("config"), dict) else {}
+        for arr in (mod.get("config_arrays") or []) + (cfg.get("arrays") or []):
+            for f in arr.get("element", []) or []:
+                if f.get("default") == "board_at_pullup":
+                    f["default"] = pullup
+
 def resolve_array_counts(schema: dict, board: str | None = None) -> None:
     """Resolve every config_array's `count_from: <schema key>` into a literal `count`
     = len(schema[key]) (e.g. Sensors sizes itself from the catalog), and
@@ -3524,6 +3550,19 @@ def gen_sensors_catalog_h(sensor_types: list, sensors: list, channel_ids: set,
             f'0x{SENSOR_DTC_CONFIG_BASE + i:04X}, '
             f'0x{d.get("no_band", 0):04X}, '
             f'}},')
+    # WHICH THERMISTOR ROW IS EACH SENSOR'S, if any (sensors.thermistor[], see derive_thermistor_inputs).
+    # A const table in flash rather than a field on every descriptor: twenty sensors have one.
+    therm_ids = [t["id"] for t in ((schema or {}).get("thermistor_inputs") or [])]
+    if len(therm_ids) > 254:
+        raise SystemExit("codegen: more than 254 thermistor inputs cannot be addressed by a uint8 slot")
+    slots = [str(therm_ids.index(x["id"])) if x["id"] in therm_ids else "SENSOR_THERM_NONE" for x in sensors]
+    lines += ["};", "",
+              "// The sensors.thermistor[] row a sensor's thermistor settings live in, or SENSOR_THERM_NONE",
+              "// for a sensor that cannot be a thermistor (only temperature and generic analog inputs can).",
+              "static constexpr uint8_t SENSOR_THERM_NONE = 0xFF;",
+              f"static constexpr uint8_t SENSOR_THERM_COUNT = {len(therm_ids)};",
+              "static const uint8_t SENSOR_THERM_SLOT[SENSOR_COUNT] = {"]
+    lines += ["    " + ", ".join(slots[k:k+16]) + "," for k in range(0, len(slots), 16)]
     lines += ["};", "",
               "// The type a sensor is actually read as. A catalogued sensor's type is fixed and the",
               "// tune's `type` byte is ignored for it — only a `generic` input (one with no type yet)",
@@ -4842,7 +4881,10 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
                         "units": f.get("units", ""),
                         "help": f.get("help", ""),         # hover tooltip
                         "scale": f.get("scale", 1.0),
-                        "digits": scalar_digits(f.get("scale", 1.0), datatype(typ)),
+                        # The schema's own `digits` wins: float storage holding whole numbers (ohms) would
+                        # otherwise show three decimals nobody can measure.
+                        "digits": (int(f["digits"]) if f.get("digits") is not None
+                                   else scalar_digits(f.get("scale", 1.0), datatype(typ))),
                         "min": f.get("min", 0),
                         "max": f.get("max", 0),
                         # WHEN IT TAKES EFFECT, where that is not at once and the module's shadow cannot say
@@ -4890,8 +4932,12 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
             # sensors that name a canonical channel (boost_pressure -> boost_kpa) or emit several
             # (flex_fuel -> ethanol). Surfacing it lets a templated gauge's "$*" resolve to the right
             # channel for EVERY sensor, not just the ones whose id happens to equal their signal.
-            a["element_signals"] = [str((cat[i].get("provides") or [cat[i].get("id") or i])[0])
-                                    for i in range(min(a["count"], len(cat)))]
+            # ONLY THE SENSOR TABLE PUBLISHES. Another table sized from a list of sensors (the thermistor
+            # rows) is settings ABOUT those sensors, not a second set of them: given element_signals too, the
+            # studio found two "sensors" publishing clt and resolved the channel to the wrong one.
+            if cf == "sensors":
+                a["element_signals"] = [str((cat[i].get("provides") or [cat[i].get("id") or i])[0])
+                                        for i in range(min(a["count"], len(cat)))]
             # EVERY READING ONE INPUT DECODES TO, when it is more than one — each with the raw quantity it
             # is read from. A flex sensor is one frequency input giving ethanol (the frequency) AND fuel
             # temperature (the pulse width). Without this its page showed one reading under an interface
@@ -4907,7 +4953,8 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
                 outs = st.get("outputs") or []
                 raws = [st.get("raw", "")] + [(o or {}).get("raw", "") for o in outs]
                 return [[str(ch), str(raws[k]) if k < len(raws) else ""] for k, ch in enumerate(prov)]
-            a["element_readings"] = [_readings(cat[i]) for i in range(min(a["count"], len(cat)))]
+            if cf == "sensors":
+                a["element_readings"] = [_readings(cat[i]) for i in range(min(a["count"], len(cat)))]
             # Which TYPE each element is, when the catalog settles one at build time. null = the
             # element has no type of its own (a `generic` input) and takes one from the tune's own
             # `type` byte — the only rows where that byte is read, and the only rows whose channel
@@ -5861,6 +5908,7 @@ def main():
                          f"{len(schema['signals'])}-signal catalog: {', '.join(_narrow)} — use uint16")
 
     normalize_module_config(schema)  # accept nested `config: {scalars,tables,arrays}`
+    derive_thermistor_inputs(schema, active_board)   # thermistor_inputs + the board's pull-up default
     learned_blocks_as_tables(schema, modules)   # a learned block is a TABLE — same pipeline, different segment
     expand_inline_axes(modules)      # inline `x_axis: {signal,max,values}` -> owned <table>_<ax>_axis
     auto_table_channels(modules)     # synthesize per-axis <table>_<ax>_src/_en from each table's axes

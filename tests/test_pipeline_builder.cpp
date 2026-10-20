@@ -65,7 +65,7 @@ int main() {
         CHECK(pool.curve.ys == c.cal_val);
         CHECK(pool.curve.n == SENSOR_CAL_POINTS);   // fixed-size cal curve (codegen)
         CHECK_NEAR(pool.curve.val_scale, 0.1f, 0.0001f);
-        CHECK(pool.pub.ttl_ms == 600);          // 3000 / 5 Hz
+        CHECK(pool.pub.ttl_ms == 3000u / SENSOR_TYPE_CATALOG[SENSOR_TYPE_TEMPERATURE].update_hz);   // three periods
 
         // run it: HardwareInput publishes the pin's raw counts as SIG_HW_AV1 (source 0); Acquire reads
         // them off the bus -> curve(0) -> 0.0, published valid.
@@ -74,6 +74,72 @@ int main() {
         p.run(bus, 1000, 100.0f);
         CHECK(bus.valid(SIG_CLT));
         CHECK_NEAR(bus.get(SIG_CLT), 0.0f, 0.01f);
+    }
+
+    SECTION("a thermistor: volts -> ohms -> degrees from three points of the sensor's data");
+    {
+        // GM coolant, rusEFI's setGmCltSensor: -40 C 100 kohm, 40 C 1459 ohm, 130 C 70 ohm.
+        auto gm = [](uint16_t pullup) {
+            ThermistorConfig t{};
+            t.mode = 1; t.pullup = pullup;
+            t.temp_1 = -400; t.res_1 = 100000.0f;
+            t.temp_2 =  400; t.res_2 = 1459.0f;
+            t.temp_3 = 1300; t.res_3 = 70.0f;
+            return t;
+        };
+        // The count a sensor of resistance r reads through pull-up rp (and, on an AV pin, the board's
+        // pull-down in parallel) — worked out here in double, independently of the decode.
+        auto count_for = [](double r, double rp, bool av) {
+            const double node = av ? 1.0 / (1.0 / r + 1.0 / double(BOARD_AV_PULLDOWN_OHM)) : r;
+            return uint32_t(node / (node + rp) * double(BOARD_ADC_FULL_SCALE) + 0.5);
+        };
+        auto run = [](const ThermistorConfig& t, int8_t src, uint32_t counts, bool& valid) {
+            SensorDescriptor d = temp_desc();
+            SensorConfig c = analog_cfg(); c.source = src;
+            InputCfgPool pool{}; Pipeline p{};
+            const bool built = build_input(d, c, pool, p, &t);
+            if (!built) { valid = false; return -999.0f; }
+            SignalBus bus;
+            bus.set_u32(HW_POOL_SIG[uint8_t(src)], counts, true, 1000, 5);
+            p.run(bus, 1000, 100.0f);
+            valid = bus.valid(SIG_CLT);
+            return bus.get(SIG_CLT);
+        };
+        const int8_t AT1 = int8_t(BOARD_ANALOG_T_BASE), AV1 = 0;
+        bool v = false;
+
+        {   // the pipeline is the thermistor decode, not the curve
+            SensorDescriptor d = temp_desc(); SensorConfig c = analog_cfg(); c.source = AT1;
+            const ThermistorConfig t = gm(2700);
+            InputCfgPool pool{}; Pipeline p{};
+            CHECK(build_input(d, c, pool, p, &t));
+            CHECK(p.stages[1].fn == decode_thermistor);
+            CHECK(pool.therm.on_av == 0);
+        }
+        // AT pin, the board's 2.7 k pull-up: at the sensor's own 40 C point it reads 40 C.
+        CHECK_NEAR(run(gm(2700), AT1, count_for(1459.0, 2700.0, false), v), 40.0f, 0.2f);
+        CHECK(v);
+        CHECK_NEAR(run(gm(2700), AT1, count_for(100000.0, 2700.0, false), v), -40.0f, 0.5f);
+        CHECK_NEAR(run(gm(2700), AT1, count_for(70.0, 2700.0, false), v), 130.0f, 0.5f);
+        // AV pin with a 2.7 k pull-up fitted in the loom: the board's 470 k to ground sits in parallel.
+        // At -40 C that is 100 k against 470 k — left in, it reads several degrees warm.
+        CHECK_NEAR(run(gm(2700), AV1, count_for(100000.0, 2700.0, true), v), -40.0f, 0.5f);
+        CHECK(v);
+        // The rails are no reading: open circuit and short both publish nothing.
+        run(gm(2700), AT1, BOARD_ADC_FULL_SCALE, v); CHECK(!v);
+        run(gm(2700), AT1, 0u, v);                   CHECK(!v);
+        // Data that is not a thermistor, or no pull-up, builds nothing (the config DTC's job to say).
+        { ThermistorConfig t = gm(2700); t.temp_2 = -500; run(t, AT1, 2000u, v); CHECK(!v); }
+        { ThermistorConfig t = gm(2700); t.res_3 = 2000.0f; run(t, AT1, 2000u, v); CHECK(!v); }
+        { ThermistorConfig t = gm(0);                       run(t, AT1, 2000u, v); CHECK(!v); }
+        // Mode Voltage Curve keeps the curve, thermistor row or not.
+        {
+            SensorDescriptor d = temp_desc(); SensorConfig c = analog_cfg(); c.source = AT1;
+            ThermistorConfig t = gm(2700); t.mode = 0;
+            InputCfgPool pool{}; Pipeline p{};
+            CHECK(build_input(d, c, pool, p, &t));
+            CHECK(p.stages[1].fn == decode_curve);
+        }
     }
 
     SECTION("raw-window + EMA + op-window appear only when their config is enabled");
