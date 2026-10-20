@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.9
 - Cranking fuel moved to Fuel Tuning ▸ Corrections ▸ Cranking, beside Post Start and Coolant Temp: it is a correction like them. Like them, it shows in the tree only while it is switched on.
 - The Overall Fuel Trim now has its on/off switch beside it on Fuel Setup and on the Fuel Tuning page, and greys out while it is off. The switch used to be only on the Corrections page, so a trim set on Fuel Setup could be silently ignored.
 - Two more tachometer set-ups: fixed pulse width (for tachos that read a coil-style pulse) and RPM as duty on a fixed carrier (for dashes and converters). The plain tachometer now asks for its duty. Needs studio 0.3.16.
