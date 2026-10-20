@@ -340,7 +340,7 @@ public:
     // tree). A newer one is refused like a too-new min_studio, whatever min_studio says: the format is
     // checked by the build, so it cannot be forgotten the way a hand-raised version can. Raise this in
     // the same change that teaches the studio the new structure.
-    static constexpr int kMetaFormat = 1;
+    static constexpr int kMetaFormat = 2;   // 2: output templates carry duty_expr and fixed_from
     const std::string &needsStudio() const { return needsStudio_; }
 
     // ---- PcVariables: host-side values declared PER PROJECT ------------------------------------------

@@ -61,6 +61,10 @@ struct OutputTemplate {
     // Empty leaves the slot on its fixed frequency; set, it is compiled into freq_expr and the slot's
     // Frequency From becomes Expression.
     std::string freqExpr;
+    // The DUTY, computed — compiled into duty_expr, with Value From set to Expression. A tachometer that
+    // wants a fixed PULSE WIDTH rather than a fixed duty is this: the duty that keeps the on-time
+    // constant as the carrier follows rpm.
+    std::string dutyExpr;
     std::vector<Param>       params;
     std::vector<Option>      options;
     std::vector<Candidate>   candidates;
@@ -77,6 +81,7 @@ struct OutputTemplate {
     // A parameter may drive a timing instead of appearing in a condition (a starter's crank limit is
     // the gate's max-on, not part of any expression). These name which one, in seconds.
     std::string maxOnFrom, rearmFrom;
+    std::string fixedFrom;              // the parameter that IS the Fixed value (a tacho's duty %), if any
     // WHICH TABLE a table-driven template leaves the slot reading, by registry NAME
     // ("generic_tables_table_1"). A slot naming none falls to its failsafe, so a template that says
     // "your duty comes from a table" and points at nothing configures a fan that never runs.
@@ -143,7 +148,13 @@ struct TemplateWrites {
     std::string name;                                     // the slot's name field
     std::string onSource, offSource;                      // ready to compile
     std::string freqSource;                               // …and the carrier, when the template computes one
+    std::string dutySource;                               // …and the duty, when it computes that
 };
 TemplateWrites templateWrites(const OutputTemplate& t, const std::string& slotPath,
                               const std::vector<double>& paramValues,
                               const TemplateChoice& chosen);
+
+// Does `slotPath` already hold THIS template, and WITH WHICH OPTIONS? Compared on the compiled programs,
+// which is why the parameters are referenced rather than baked. `chosen` comes back as the matching
+// choice and is left alone when nothing matches.
+bool templateSlotMatches(const OutputTemplate& t, const std::string& slotPath, TemplateChoice& chosen);

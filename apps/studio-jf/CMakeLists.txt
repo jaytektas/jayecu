@@ -1160,7 +1160,8 @@ add_dependencies(studio_tests viewport_paste_test)
 # Every output personality the firmware ships compiles, and asks only for what a slot can hold.
 add_executable(output_templates_test EXCLUDE_FROM_ALL tests/test_output_templates.cpp)
 target_link_libraries(output_templates_test PRIVATE studio_model)
-target_include_directories(output_templates_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(output_templates_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../firmware ${CMAKE_CURRENT_SOURCE_DIR}/../../generated)
 target_link_libraries(output_templates_test PRIVATE JFramework::platform ${STUDIO_TLS_LIBS})
 target_compile_definitions(output_templates_test PRIVATE
     META_PATH="${CMAKE_CURRENT_SOURCE_DIR}/../../shared/tuneit-meta.json")
@@ -1585,6 +1586,7 @@ add_dependencies(studio_tests meta_text_test)
 #   cmake --build build --target firmware_kits_test && ./build/firmware_kits_test
 add_executable(firmware_kits_test EXCLUDE_FROM_ALL tests/test_firmware_kits.cpp)
 target_link_libraries(firmware_kits_test PRIVATE studio_model JFramework::platform)
+target_compile_definitions(firmware_kits_test PRIVATE TEST_STUDIO_VERSION="${STUDIO_VERSION_TEXT}")
 add_test(NAME firmware_kits COMMAND firmware_kits_test)
 add_dependencies(studio_tests firmware_kits_test)
 

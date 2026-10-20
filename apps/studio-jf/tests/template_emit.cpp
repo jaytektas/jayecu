@@ -65,12 +65,13 @@ int main(int argc, char** argv) {
         std::fputs(",\"off\":", stdout); emitJsonStr(w.offSource);
         std::fputs("},\"code\":{", stdout);
         bool firstC = true;
-        for (const char* f : {"on_expr", "off_expr", "freq_expr"}) {
+        for (const char* f : {"on_expr", "off_expr", "freq_expr", "duty_expr"}) {
             int off = 0, size = 0;
             std::string hex, err;
             // A TEMPLATE THAT COMPUTES ITS CARRIER (the tachometer) compiles it too; the rest emit "".
             const std::string src = std::string(f) == "on_expr"  ? w.onSource
-                                  : std::string(f) == "off_expr" ? w.offSource : w.freqSource;
+                                  : std::string(f) == "off_expr" ? w.offSource
+                                  : std::string(f) == "freq_expr" ? w.freqSource : w.dutySource;
             if (!src.empty() && M.resolveBlob(slot + "." + f, off, size)) {
                 const auto r = ExprCompiler::compile(src, M, uint32_t(M.configSize()), uint16_t(size));
                 if (r.ok) { char b[4]; for (uint8_t x : r.code) { std::snprintf(b, sizeof b, "%02x", x); hex += b; } }

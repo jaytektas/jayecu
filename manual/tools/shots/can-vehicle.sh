@@ -28,13 +28,13 @@ WB=(--set 'can.bus[0].bitrate=3'
 
 # ---- Chapter 14: the example car's outputs and inputs ----------------------------------------------
 # LS9 fuel pump relay, LS10 fan relay, LS11 A/C clutch relay (all Generic, Digital); LS12 tachometer
-# (Generic, PWM, fixed 50 % duty, frequency from an expression, 2 pulses per rev, squelch 60 rpm).
+# (Generic, PWM, fixed 50 % duty, frequency from an expression, 2 pulses per rev, squelch 60 rpm, duty 50).
 OUTS=(--set 'outputs.output[20].function=3' --set 'outputs.output[20].kind=1' --set 'outputs.output[20].value_source=2'
       --set 'outputs.output[21].function=3' --set 'outputs.output[21].kind=1' --set 'outputs.output[21].value_source=2'
       --set 'outputs.output[22].function=3' --set 'outputs.output[22].kind=1' --set 'outputs.output[22].value_source=2'
       --set 'outputs.output[23].function=3' --set 'outputs.output[23].kind=0' --set 'outputs.output[23].value_source=2'
       --set 'outputs.output[23].fixed_x10=50' --set 'outputs.output[23].freq_source=2'
-      --set 'outputs.output[23].param_a=2' --set 'outputs.output[23].param_b=60')
+      --set 'outputs.output[23].param_a=2' --set 'outputs.output[23].param_b=60' --set 'outputs.output[23].param_c=50')
 
 "$SHOOT" --crop 1070x640+310+236 "${OUTS[@]}" "Configuration/Electrical/Outputs"            can-vehicle-outputs
 "$SHOOT" --crop 900x656+310+236  "${OUTS[@]}" "Configuration/Electrical/Outputs/LS12"       can-vehicle-tacho

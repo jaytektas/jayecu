@@ -11,6 +11,7 @@
 #include "../src/model/MetaModel.h"
 #include "../src/model/ExprCompiler.h"
 #include "../src/model/OutputTemplate.h"
+#include "Signal/Expr.h"              // the FIRMWARE's VM: what the ECU will compute from these bytes
 
 #include <j/config/Json.h>
 
@@ -211,7 +212,7 @@ int main(int argc, char** argv) {
                 const double sc = C.configScale(p2);
                 if (sc == 1.0 || sc == 0.0) continue;               // unscaled fields say nothing here
                 double eng = 0.0;
-                if (p2 == slot + ".fixed_x10") eng = t2.fixedPct;
+                if (p2 == slot + ".fixed_x10") eng = t2.fixedFrom.empty() ? t2.fixedPct : 3.0;   // or its parameter
                 else if (p2.size() > 8 && p2.compare(p2.size() - 8, 8, ".param_a") == 0) {
                     if (t2.params.empty()) continue;               // asks for nothing; param_a stays 0
                     eng = 3.0;
@@ -243,6 +244,114 @@ int main(int argc, char** argv) {
             const ExprCompiler::Result r = ExprCompiler::compile(w.freqSource, meta,
                                                                  uint32_t(C.configImage().size()), uint16_t(fsize));
             check(blob && r.ok, "…and its carrier compiles: " + w.freqSource, r.ok ? "" : r.error);
+        }
+    }
+
+    // THREE TACHOMETERS, ONE CONDITION. They differ only in how much — a fixed duty, a duty that holds the
+    // pulse WIDTH, a duty that IS the rpm — so each must write its own value source and programs, and the
+    // wizard must recognise each as itself rather than as whichever tacho was listed first.
+    {
+        auto find = [&](const char* id) {
+            const auto it = std::find_if(ts.begin(), ts.end(), [&](const OutputTemplate& t) { return t.id == id; });
+            return it == ts.end() ? nullptr : &*it;
+        };
+        const OutputTemplate* tachs[3] = { find("tachometer"), find("tachometer_pulse"), find("tachometer_duty") };
+        const char* names[3] = { "fixed duty", "fixed pulse", "rpm as duty" };
+        for (int k = 0; k < 3; ++k) check(tachs[k] != nullptr, std::string("the firmware ships a tachometer: ") + names[k]);
+        if (tachs[0] && tachs[1] && tachs[2]) {
+            // Fixed duty takes its duty from a PARAMETER, and writes it as the slot's Fixed value.
+            {
+                const TemplateWrites w = templateWrites(*tachs[0], slot, { 2.0, 60.0, 40.0 }, templateDefaultChoice(*tachs[0]));
+                double fx = -1.0;
+                for (const auto& v : w.values) if (v.first == slot + ".fixed_x10") fx = v.second;
+                const double sc = C.configScale(slot + ".fixed_x10");
+                check(std::abs(fx * (sc ? sc : 1.0) - 40.0) < 1e-6, "fixed duty: the Duty parameter IS the fixed value",
+                      std::to_string(fx));
+            }
+            for (int k = 1; k < 3; ++k) {
+                const OutputTemplate& t = *tachs[k];
+                std::vector<double> vals;
+                for (const auto& p : t.params) vals.push_back(p.def);
+                const TemplateWrites w = templateWrites(t, slot, vals, templateDefaultChoice(t));
+                double vs = -1.0;
+                for (const auto& v : w.values) if (v.first == slot + ".value_source") vs = v.second;
+                check(vs == 3.0, std::string(names[k]) + ": Value From is Expression", std::to_string(vs));
+                int doff = 0, dsize = 0;
+                const bool blob = meta.resolveBlob(slot + ".duty_expr", doff, dsize);
+                const ExprCompiler::Result r = ExprCompiler::compile(w.dutySource, meta,
+                                                                     uint32_t(C.configImage().size()), uint16_t(dsize));
+                check(blob && r.ok, std::string(names[k]) + ": its duty compiles: " + w.dutySource, r.ok ? "" : r.error);
+            }
+            // RECOGNITION: apply each in turn to the slot, exactly as the wizard does, and ask which of the
+            // three the slot now holds. Exactly one may answer, and it must be the one applied.
+            for (int k = 0; k < 3; ++k) {
+                const OutputTemplate& t = *tachs[k];
+                std::vector<double> vals;
+                for (const auto& p : t.params) vals.push_back(p.def);
+                const TemplateWrites w = templateWrites(t, slot, vals, templateDefaultChoice(t));
+                for (const auto& [path, v] : w.values) C.setConfigValue(path, v);
+                auto write = [&](const char* f, const std::string& src) {
+                    int off = 0, size = 0;
+                    if (!meta.resolveBlob(slot + "." + f, off, size)) return;
+                    const ExprCompiler::Result r = ExprCompiler::compile(src, meta, uint32_t(C.configImage().size()),
+                                                                         uint16_t(size));
+                    C.setConfigBlob(slot + "." + f, r.ok ? r.code : std::vector<uint8_t>(size, 0));
+                };
+                write("on_expr", w.onSource);
+                write("off_expr", w.offSource);
+                write("freq_expr", w.freqSource);
+                write("duty_expr", w.dutySource);
+                std::string held;
+                for (int j = 0; j < 3; ++j) {
+                    TemplateChoice c;
+                    if (templateSlotMatches(*tachs[j], slot, c)) held += std::string(held.empty() ? "" : ", ") + names[j];
+                }
+                check(held == names[k], std::string("a slot set up as ") + names[k] + " is recognised as exactly that",
+                      held.empty() ? "nothing" : held);
+            }
+        }
+    }
+
+    // …AND THE NUMBERS ARE RIGHT. Compiling proves the programs are well formed; this runs them on the
+    // firmware's own VM against a config image holding the wizard's writes, at known engine speeds.
+    {
+        auto find = [&](const char* id) {
+            const auto it = std::find_if(ts.begin(), ts.end(), [&](const OutputTemplate& t) { return t.id == id; });
+            return it == ts.end() ? nullptr : &*it;
+        };
+        // Apply `t` with `vals`, then run the program built from `src` at `rpm`.
+        auto run = [&](const OutputTemplate& t, const std::vector<double>& vals, const std::string& which,
+                       float rpm) {
+            const TemplateWrites w = templateWrites(t, slot, vals, templateDefaultChoice(t));
+            for (const auto& [path, v] : w.values) C.setConfigValue(path, v);
+            const std::string& src = which == "duty" ? w.dutySource : w.freqSource;
+            const ExprCompiler::Result r = ExprCompiler::compile(src, meta, uint32_t(C.configImage().size()));
+            if (!r.ok) return -1.0f;
+            SignalBus bus;
+            bus.set(SIG_RPM, rpm, true, 1000);
+            const std::vector<uint8_t>& img = C.configImage();
+            expr::Ctx ctx;
+            ctx.bus = &bus; ctx.cfg = img.data(); ctx.cfg_size = uint32_t(img.size()); ctx.now_ms = 1000;
+            const expr::Result x = expr::exec(r.code.data(), uint16_t(r.code.size()), ctx);
+            return (x.ran && x.v.ok) ? x.v.value : -1.0f;
+        };
+        auto near = [&](float got, float want, const std::string& what) {
+            check(std::fabs(got - want) < 0.01f, what, "got " + std::to_string(got) + ", want " + std::to_string(want));
+        };
+        if (const OutputTemplate* t = find("tachometer")) {
+            near(run(*t, { 2.0, 60.0, 50.0 }, "freq", 3000.f), 100.f, "fixed duty: 3000 rpm at 2 pulses/rev is 100 Hz");
+        }
+        if (const OutputTemplate* t = find("tachometer_pulse")) {
+            // ppr 2, squelch 60, 2 ms, ceiling 80 %.
+            near(run(*t, { 2.0, 60.0, 2.0, 80.0 }, "freq", 3000.f), 100.f, "fixed pulse: 3000 rpm is 100 Hz…");
+            near(run(*t, { 2.0, 60.0, 2.0, 80.0 }, "duty", 3000.f), 20.f,  "…and a 2 ms pulse in its 10 ms period is 20 %");
+            near(run(*t, { 2.0, 60.0, 2.0, 80.0 }, "duty", 9000.f), 60.f,  "…and still 2 ms at 9000 rpm: 60 % of 3.33 ms");
+            // A V8 tacho (4 pulses/rev) at 7000 rpm wants 93 %: held at the 80 % ceiling.
+            near(run(*t, { 4.0, 60.0, 2.0, 80.0 }, "duty", 7000.f), 80.f,  "…and a pulse longer than the ceiling allows stops at it");
+        }
+        if (const OutputTemplate* t = find("tachometer_duty")) {
+            near(run(*t, { 8000.0, 100.0, 0.0 }, "duty", 4000.f), 50.f,  "rpm as duty: half the full scale is 50 %");
+            near(run(*t, { 8000.0, 100.0, 0.0 }, "freq", 4000.f), 100.f, "…on the fixed carrier");
         }
     }
 

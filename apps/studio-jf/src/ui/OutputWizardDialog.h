@@ -383,29 +383,7 @@ private:
     // to compile to the same bytecode reports the choice the wizard would itself have written rather
     // than whichever the loop reached first.
     bool _slotMatches(const OutputTemplate& t, TemplateChoice& chosen) const {
-        const MetaModel* meta = Cache::instance().meta();
-        if (!meta) return false;
-        int off = 0, size = 0;
-        if (!meta->resolveBlob(m_slot + ".on_expr", off, size)) return false;
-        const std::vector<uint8_t> have = Cache::instance().configBlob(m_slot + ".on_expr");
-
-        for (const TemplateChoice& c : templateChoiceCandidates(t)) {
-            const std::string src = templateSource(t, t.onWhen, m_slot, c);
-            ExprCompiler::Result r = ExprCompiler::compile(src, *meta,
-                                                           uint32_t(Cache::instance().configImage().size()),
-                                                           uint16_t(size));
-            if (!r.ok) continue;
-            // THE BLOCK IS FIXED AND THE PROGRAM IS NOT: everything past the END must be zero for the
-            // stored program to BE this one, rather than this one with something else after it.
-            if (have.size() < r.code.size()) continue;
-            bool tail_clean = true;
-            for (size_t k = r.code.size(); k < have.size(); ++k) if (have[k]) { tail_clean = false; break; }
-            if (!tail_clean) continue;
-            if (!std::equal(r.code.begin(), r.code.end(), have.begin())) continue;
-            chosen = c;
-            return true;
-        }
-        return false;
+        return templateSlotMatches(t, m_slot, chosen);
     }
 
     void _apply() {
@@ -438,6 +416,7 @@ private:
         writeExpr("on_expr",  w.onSource);
         writeExpr("off_expr", w.offSource);
         if (!w.freqSource.empty()) writeExpr("freq_expr", w.freqSource);
+        if (!w.dutySource.empty()) writeExpr("duty_expr", w.dutySource);
     }
 
     void _render(jf::JPrimitiveBuffer& buf, float mx, float my, float listY, float listH, float colX) {
@@ -566,6 +545,17 @@ private:
             const float tw = W - colX - kPad;
             cy = _wrapped(&buf, colX, cy, tw, "on:  " + _pretty(t, t.onWhen),  Colors::TextPrimary);
             cy = _wrapped(&buf, colX, cy, tw, "off: " + _pretty(t, t.offWhen), Colors::TextPrimary);
+            // …and HOW MUCH and HOW FAST, when the template computes them: for a tachometer those are
+            // the whole of it, and the conditions alone say nothing a tacho reader cares about.
+            if (!t.freqExpr.empty()) cy = _wrapped(&buf, colX, cy, tw, "Hz:   " + _pretty(t, t.freqExpr), Colors::TextPrimary);
+            if (!t.dutyExpr.empty()) cy = _wrapped(&buf, colX, cy, tw, "duty: " + _pretty(t, t.dutyExpr), Colors::TextPrimary);
+            else if (t.valueSource == 2) {
+                double pct = t.fixedPct;
+                for (size_t i = 0; i < t.params.size() && i < m_spin.size(); ++i)
+                    if (t.params[i].name == t.fixedFrom) pct = m_spin[i]->value();
+                char b[32]; std::snprintf(b, sizeof b, "%g %%", pct);
+                if (t.kind == 0) cy = _wrapped(&buf, colX, cy, tw, std::string("duty: ") + b, Colors::TextPrimary);
+            }
         }
         if (m_box) m_box->populateRenderPrimitives(buf);
     }

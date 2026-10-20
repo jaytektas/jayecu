@@ -88,8 +88,8 @@ int main() {
     check(!fwkits::isNewerThan("0.1.0", "0.1.0"), "the same version is not an update");
     check(!fwkits::isNewerThan("0.2.0", "garbage"), "an ECU version that is not a version offers nothing");
 
-    // A META THAT NEEDS A NEWER STUDIO is refused, and says which studio. The shipped meta, which
-    // needs 0.1.0, still loads for a 0.1.0 studio.
+    // A META THAT NEEDS A NEWER STUDIO is refused, and says which studio. The shipped meta still loads
+    // for the studio built beside it.
     {
         std::string body = "{\"meta\":{\"board\":\"jaytek_v1\",\"layout_hash\":\"abcd1234\",\"min_studio\":\"9.0.0\"}}";
         const uint32_t crc = crc32_ieee::compute(body.data(), int(body.size()));
@@ -102,13 +102,16 @@ int main() {
               "a meta needing studio 9.0.0 is refused by studio 0.1.0, and says so");
         // The shipped meta, from the firmware tree beside this repo. It used to be looked for at
         // ../../shared, which from build/ is not the firmware tree, so this check skipped itself.
+        // Asked as THIS studio — the one the firmware tree is built with — not as 0.1.0: the meta's
+        // min_studio rises with each format, and "loads for the first studio ever" stops being true.
+        MetaModel::setStudioVersion(TEST_STUDIO_VERSION);
         MetaModel shipped;
         std::string shippedPath;
         for (const char* c : { "../../../shared/tuneit-meta.json", "../../shared/tuneit-meta.json" })
             if (fs::exists(c)) { shippedPath = c; break; }
         check(!shippedPath.empty(), "the shipped meta is found (the firmware tree beside the studio)");
         check(shippedPath.empty() || (shipped.loadFile(shippedPath) && shipped.needsStudio().empty()),
-              "the shipped meta loads for studio 0.1.0: its min_studio and meta_format are ones this studio reads");
+              (std::string("the shipped meta loads for studio ") + TEST_STUDIO_VERSION + ": its min_studio and meta_format are ones it reads").c_str());
 
         // A META IN A NEWER FORMAT is refused even when its min_studio does not ask for a newer studio:
         // the format is what the build checks, so it cannot be forgotten the way a version can.

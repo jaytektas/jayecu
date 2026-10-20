@@ -37,7 +37,9 @@ timing for a common job. The ones used in this chapter:
 | **Thermo Fan with A/C** | as Thermo Fan, or while the A/C is requested | the two temperatures |
 | **Variable-Speed Fan** | a PWM fan: on above a temperature, duty from a table | |
 | **A/C Compressor Clutch** | while A/C is requested, the engine is running (above the Cranking Threshold) and the throttle is below **Cut Above Throttle** (default 90 %); minimum 5 s on, 10 s off | Cut Above Throttle |
-| **Tachometer** | a square wave at rpm ÷ 60 × **Pulses per Rev** (default 2), 50 % duty; off below **Squelch Below** (default 60 rpm) | Pulses per Rev, Squelch Below |
+| **Tachometer (fixed duty)** | a square wave at rpm ÷ 60 × **Pulses per Rev** (default 2) at a fixed **Duty** (default 50 %); off below **Squelch Below** (default 60 rpm) | Pulses per Rev, Squelch Below, Duty |
+| **Tachometer (fixed pulse)** | the same frequency, but every pulse is **Pulse Width** long (default 2 ms) — for tachos that read a coil-style pulse; the duty stops at **Duty Ceiling** (default 80 %) | Pulses per Rev, Squelch Below, Pulse Width, Duty Ceiling |
+| **RPM as Duty (gauge / converter)** | a fixed **Carrier** (default 100 Hz) whose duty is the rpm: 0 % stopped, 100 % at **Full Scale** (default 8000 rpm) | Full Scale, Carrier, Squelch Below |
 | **Main Relay** | whenever the ECU is awake | |
 | **Shift Light** | above an rpm, off a little below it (defaults 6500 / 6300) | the two speeds |
 
@@ -87,8 +89,15 @@ nuisance and a fan that will not run is a head gasket.
    to ground; check the tacho's own documentation) or to an IGN output (every output pin can be a tacho
    output).
    <!-- src: definition/boards/jaytek_v1.board.yaml (TACH_OUTPUT caps on IGN, LS, HS) -->
-2. **Set up this output…** ▸ **Tachometer**. **Pulses per Rev** is usually half the cylinder count on a
-   four-stroke: 2 for a four, 3 for a six, 4 for an eight.
+2. **Set up this output…** ▸ **Tachometer (fixed duty)**. **Pulses per Rev** is usually half the
+   cylinder count on a four-stroke: 2 for a four, 3 for a six, 4 for an eight. 50 % **Duty** suits
+   almost every tacho.
+   - A tacho built to read the coil negative usually wants a short pulse of a set length instead:
+     choose **Tachometer (fixed pulse)** and set **Pulse Width** from its documentation (1–3 ms is
+     typical). The duty is worked out every update so the pulse stays that long; at high rpm it
+     stops at **Duty Ceiling** and the pulse shortens, rather than the output staying on.
+   - A dash or converter that reads engine speed as a **duty** rather than a frequency: choose
+     **RPM as Duty**, and set **Full Scale** to the rpm it shows at 100 %.
 
 <figure markdown>
   ![An output pin page with numbered markers: 1 Function, 2 Set up this output…, 3 Kind, 4 Value From, 5 Fixed Value, 6 Turn on and off when, 7 Template Numbers](../img/studio/can-vehicle-tacho-annotated.svg)
@@ -98,7 +107,7 @@ nuisance and a fan that will not run is a head gasket.
 
 1. **Function**: Generic. 2. **Set up this output…** applies the template. 3. **Kind**: PWM. 4–5. **Value From**
 Fixed, 50 %. 6. The conditions (the template writes them). 7. **Template Numbers**: A is Pulses per
-Rev, B is Squelch Below.
+Rev, B is Squelch Below, C is Duty.
 
 The carrier frequency is on the pin's **Frequency** page, where the template sets it from an expression:
 

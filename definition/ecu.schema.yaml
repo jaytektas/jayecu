@@ -7660,18 +7660,58 @@ output_templates:
   on_when:  'uptime_s < {bulb_s} or dtc_active > 0 or prot_level == 3 or (prot_level == 2 and blink_fast) or (prot_level == 1 and blink_slow)'
   off_when: ''
 
+# THREE TACHOMETERS, one slot. A tacho reads a square wave whose FREQUENCY is engine speed; what differs
+# between gauges is the pulse SHAPE they want (a fixed duty, or a fixed on-time like a coil signal), and
+# some dashes and converters want the speed as a DUTY on a fixed carrier instead. Each is the generic
+# slot with its duty and carrier sources set differently — no tacho mode in the firmware. They share the
+# squelch condition, so the wizard tells them apart by their value source and their duty and carrier
+# programs, not by the condition alone.
 - id: tachometer
-  name: Tachometer
-  blurb: 'The square wave an analog tacho reads: a frequency that follows engine speed.'
-  detail: 'Nothing about a tacho is special to the ECU — it is a PWM output whose CARRIER is the signal. The frequency is rpm / 60 x Pulses per Rev, computed every frame; the duty is the pulse shape, and 50 % suits almost every tacho. Most four-stroke tachos want half the cylinder count in pulses per rev. Below the squelch rpm the output is off rather than crawling at a frequency the gauge cannot read.'
+  name: Tachometer (fixed duty)
+  blurb: 'The square wave an analog tacho reads: a frequency that follows engine speed, at a fixed duty.'
+  detail: 'Nothing about a tacho is special to the ECU — it is a PWM output whose CARRIER is the signal. The frequency is rpm / 60 x Pulses per Rev, computed every frame; the duty is the pulse shape, and 50 % suits almost every tacho. Most four-stroke tachos want half the cylinder count in pulses per rev. Below the squelch rpm the output is off rather than crawling at a frequency the gauge cannot read. A gauge that wants a fixed pulse WIDTH instead is the next template.'
   kind: 0
   value_source: 2
-  fixed_pct: 50
+  fixed_from: duty
   on_invalid: 0
   freq_expr: 'rpm * {ppr} / 60'
   params:
   - {name: ppr, label: Pulses per Rev, units: '', default: 2, min: 0.5, max: 24, digits: 1, help: 'Pulses the tacho expects per crank revolution. A four-stroke tacho is usually wired for half the cylinder count — 2 for a four, 3 for a six, 4 for an eight.'}
   - {name: min_rpm, label: Squelch Below, units: RPM, default: 60, min: 0, max: 2000, digits: 0, help: 'Below this the output stays off. The carrier cannot go below 1 Hz, so a tacho asked for less would otherwise hold the last frequency it could make.'}
+  - {name: duty, label: Duty, units: '%', default: 50, min: 1, max: 99, digits: 0, help: 'The share of each pulse the output is on. 50 % suits almost every tacho; one that reads low or flickers may want more or less.'}
+  on_when:  'rpm > {min_rpm}'
+  off_when: 'rpm <= {min_rpm}'
+
+- id: tachometer_pulse
+  name: Tachometer (fixed pulse)
+  blurb: 'A tacho signal whose every pulse is the same LENGTH, for gauges that read a coil-style pulse.'
+  detail: 'Some tachos — and most that were built to read the coil negative — want a short pulse of a set length rather than a square wave. The frequency is rpm / 60 x Pulses per Rev as before; the duty is worked out every frame so the on-time stays at Pulse Width (duty % = width in ms x frequency / 10). At high rpm a long pulse would fill the whole period and the output would sit on, so the duty stops at the ceiling and the pulse shortens from there.'
+  kind: 0
+  value_source: 3
+  on_invalid: 0
+  freq_expr: 'rpm * {ppr} / 60'
+  duty_expr: 'min({pulse_ms} * rpm * {ppr} / 600, {max_duty})'
+  params:
+  - {name: ppr, label: Pulses per Rev, units: '', default: 2, min: 0.5, max: 24, digits: 1, help: 'Pulses the tacho expects per crank revolution. A four-stroke tacho is usually wired for half the cylinder count — 2 for a four, 3 for a six, 4 for an eight.'}
+  - {name: min_rpm, label: Squelch Below, units: RPM, default: 60, min: 0, max: 2000, digits: 0, help: 'Below this the output stays off. The carrier cannot go below 1 Hz, so a tacho asked for less would otherwise hold the last frequency it could make.'}
+  - {name: pulse_ms, label: Pulse Width, units: ms, default: 2, min: 0.1, max: 20, digits: 2, help: 'How long each pulse is on. Take it from the gauge or the tacho adapter; 1 to 3 ms covers most that read a coil signal.'}
+  - {name: max_duty, label: Duty Ceiling, units: '%', default: 80, min: 10, max: 95, digits: 0, help: 'The most of each period the pulse may take. Past it the pulse shortens rather than filling the period — an output that never switches off is a tacho reading nothing.'}
+  on_when:  'rpm > {min_rpm}'
+  off_when: 'rpm <= {min_rpm}'
+
+- id: tachometer_duty
+  name: RPM as Duty (gauge / converter)
+  blurb: 'Engine speed as a PWM duty on a fixed carrier: 0 % stopped, 100 % at the full-scale rpm.'
+  detail: 'For a dash, a gauge or a converter that reads engine speed as a DUTY rather than a frequency. The carrier is fixed at Carrier; the duty is rpm / Full Scale x 100, clamped to 100 % above it. Below the squelch rpm the output is off, which reads as 0 %.'
+  kind: 0
+  value_source: 3
+  on_invalid: 0
+  freq_expr: '{carrier_hz}'
+  duty_expr: 'rpm * 100 / {full_rpm}'
+  params:
+  - {name: full_rpm, label: Full Scale, units: RPM, default: 8000, min: 1000, max: 20000, digits: 0, help: 'The rpm that reads as 100 % duty. Take it from the gauge or converter: it is usually the top of its dial.'}
+  - {name: carrier_hz, label: Carrier, units: Hz, default: 100, min: 1, max: 5000, digits: 0, help: 'The PWM frequency the gauge reads. The duty carries the speed; this only has to be what the gauge expects.'}
+  - {name: min_rpm, label: Squelch Below, units: RPM, default: 0, min: 0, max: 2000, digits: 0, help: 'Below this the output stays off (0 %). Leave it at 0 to follow the engine all the way down.'}
   on_when:  'rpm > {min_rpm}'
   off_when: 'rpm <= {min_rpm}'
 

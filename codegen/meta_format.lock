@@ -1,6 +1,6 @@
 {
- "format": 1,
- "min_studio": "0.1.0",
+ "format": 2,
+ "min_studio": "0.3.16",
  "entries": [
   "autotune.delay_table:str",
   "autotune.ego_channels.[]:str",
@@ -289,7 +289,9 @@
   "output_templates.[].candidates.[].role:num",
   "output_templates.[].candidates.[].signal:str",
   "output_templates.[].detail:str",
+  "output_templates.[].duty_expr:str",
   "output_templates.[].duty_table:str",
+  "output_templates.[].fixed_from:str",
   "output_templates.[].fixed_pct:num",
   "output_templates.[].freq_expr:str",
   "output_templates.[].id:str",

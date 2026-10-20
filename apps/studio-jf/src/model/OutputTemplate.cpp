@@ -2,6 +2,10 @@
 
 #include "Cache.h"
 #include "MetaModel.h"
+#include "ExprCompiler.h"
+
+#include <algorithm>
+#include <cmath>
 
 #include <cstdio>
 
@@ -20,6 +24,7 @@ std::vector<OutputTemplate> outputTemplatesFromMeta(const jf::JJson& root) {
         t.onWhen  = tv["on_when"].str();
         t.offWhen = tv["off_when"].str();
         t.freqExpr = tv["freq_expr"].str();
+        t.dutyExpr = tv["duty_expr"].str();
         t.kind        = tv["kind"].number<int>(1);
         t.valueSource = tv["value_source"].number<int>(2);
         t.onInvalid   = tv["on_invalid"].number<int>(0);
@@ -31,6 +36,7 @@ std::vector<OutputTemplate> outputTemplatesFromMeta(const jf::JJson& root) {
         t.rearmMs     = tv["rearm_ms"].number<int>(0);
         t.maxOnFrom   = tv["max_on_from"].str();
         t.rearmFrom   = tv["rearm_from"].str();
+        t.fixedFrom   = tv["fixed_from"].str();
         t.dutyTable   = tv["duty_table"].str();
         for (const jf::JJson& cv : tv["candidates"].arr())
             t.candidates.push_back({ cv["signal"].str(), cv["role"].number<int>(0) });
@@ -186,7 +192,12 @@ TemplateWrites templateWrites(const OutputTemplate& t, const std::string& slotPa
     put("kind",           t.kind);
     put("value_source",   t.valueSource);
     put("on_invalid",     t.onInvalid);
-    put("fixed_x10",      t.fixedPct);          // per cent, as a person says it (put() scales)
+    // per cent, as a person says it (put() scales) — or the parameter that says it, when the template
+    // asks for one (a tacho's duty: 50 % suits most gauges, and the ones it does not are why it is asked).
+    double fixedPct = t.fixedPct;
+    for (size_t i = 0; i < t.params.size() && i < paramValues.size(); ++i)
+        if (!t.fixedFrom.empty() && t.params[i].name == t.fixedFrom) fixedPct = paramValues[i];
+    put("fixed_x10",      fixedPct);
     if (t.pwmFreqHz) put("pwm_freq_hz", t.pwmFreqHz);
     put("freq_source",    t.freqExpr.empty() ? 0 : 2);   // Fixed, or Expression
     put("min_on_ms",      t.minOnMs);
@@ -238,5 +249,43 @@ TemplateWrites templateWrites(const OutputTemplate& t, const std::string& slotPa
     w.onSource  = templateSource(t, t.onWhen,  slotPath, chosen);
     w.offSource = templateSource(t, t.offWhen, slotPath, chosen);
     if (!t.freqExpr.empty()) w.freqSource = templateSource(t, t.freqExpr, slotPath, chosen);
+    if (!t.dutyExpr.empty()) w.dutySource = templateSource(t, t.dutyExpr, slotPath, chosen);
     return w;
 }
+
+bool templateSlotMatches(const OutputTemplate& t, const std::string& slotPath, TemplateChoice& chosen) {
+    const MetaModel* meta = Cache::instance().meta();
+    if (!meta) return false;
+    const Cache& C = Cache::instance();
+    // Does the slot's stored program in `field` compile from `src`?
+    auto holds = [&](const char* field, const std::string& src) {
+        int off = 0, size = 0;
+        if (!meta->resolveBlob(slotPath + "." + field, off, size)) return false;
+        const std::vector<uint8_t> have = C.configBlob(slotPath + "." + field);
+        ExprCompiler::Result r = ExprCompiler::compile(src, *meta, uint32_t(C.configImage().size()),
+                                                       uint16_t(size));
+        if (!r.ok) return false;
+        // THE BLOCK IS FIXED AND THE PROGRAM IS NOT: everything past the END must be zero for the
+        // stored program to BE this one, rather than this one with something else after it.
+        if (have.size() < r.code.size()) return false;
+        for (size_t k = r.code.size(); k < have.size(); ++k) if (have[k]) return false;
+        return std::equal(r.code.begin(), r.code.end(), have.begin());
+    };
+    // THE CONDITION IS NOT ALWAYS THE WHOLE TEMPLATE. Three tachometers share "rpm > squelch" and
+    // differ in HOW MUCH: a fixed duty, a duty that keeps the pulse width fixed, a duty that is the
+    // rpm. So the value source has to agree, and so must any duty or carrier the template computes —
+    // otherwise a fixed-pulse tacho reopens in the wizard as whichever tacho was listed first.
+    if (std::lround(C.configValue(slotPath + ".value_source")) != t.valueSource) return false;
+    if (!t.dutyExpr.empty() && !holds("duty_expr", templateSource(t, t.dutyExpr, slotPath, templateDefaultChoice(t))))
+        return false;
+    if (!t.freqExpr.empty() && !holds("freq_expr", templateSource(t, t.freqExpr, slotPath, templateDefaultChoice(t))))
+        return false;
+
+    for (const TemplateChoice& c : templateChoiceCandidates(t)) {
+        if (!holds("on_expr", templateSource(t, t.onWhen, slotPath, c))) continue;
+        chosen = c;
+        return true;
+    }
+    return false;
+}
+
