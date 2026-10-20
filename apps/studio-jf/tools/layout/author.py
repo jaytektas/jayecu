@@ -69,6 +69,15 @@ CHECK_H  = 22    # JStyle::checkHeight — a tick box is its own size, never squ
 CHECK_GAP = 8
 BUTTON_H = 32    # JStyle::buttonHeight
 
+
+def names_tick(w, b):
+    """Is label `w` the name of tick box `b` — same group, just right of it, ON ITS LINE. Beside is not
+    enough: a sensor check's note sits under its tick, two pixels right of the box and in the same group,
+    and was snapped up onto the row, drawn straight through the check's name, threshold and severity.
+    One test for the builder (centre_ticks) and the checker (check_doc), so they cannot disagree again."""
+    return (b['groupId'] == w['groupId'] and 0 <= w['x'] - (b['x'] + b['w']) <= 16
+            and w['y'] < b['y'] + b['h'] and b['y'] < w['y'] + w['h'])
+
 # Colours picked from the pages already in the document, so new pages match what is there.
 C_DIM   = '#8a8f98'
 C_RED   = '#ff453a'
@@ -910,7 +919,7 @@ class Page:
                 if w.get('type') != 'label' or not w.get('groupId') or w.get('h', 0) > LBL_H:
                     continue
                 for b in boxes:
-                    if b['groupId'] == w['groupId'] and 0 <= w['x'] - (b['x'] + b['w']) <= 16:
+                    if names_tick(w, b):
                         w['y'] = b['y'] + (b['h'] - w['h']) // 2
                         break
             return ws

@@ -112,14 +112,16 @@ def page_knock():
                       'enableCondition': ON}, g), into=grid)
         y += 26
 
-    p.note(860, y0 + A.panel_h(CYLS + 1, 26, top=34, bottom=8) + 6,
-           'Auto takes the input from the cylinder\'s BANK, which is right whenever sensors and banks '
-           'line up. Set it by hand for an inline engine with two sensors, or a V with one.', w=400)
+    auto = ('Auto takes the input from the cylinder\'s BANK, which is right whenever sensors and banks '
+            'line up. Set it by hand for an inline engine with two sensors, or a V with one.')
+    y_auto = y0 + A.panel_h(CYLS + 1, 26, top=34, bottom=8) + 6
+    p.note(860, y_auto, auto, w=400)
 
     # ---- Sensor health -------------------------------------------------------------------------------
     # OPT-IN, because a quiet engine at idle can sit below any fixed level. One row in the free space
     # under the sensor grid: the switch and the level read as one sentence.
-    sh = p.panel(860, 506, 410, A.panel_h(1, A.ROW, top=12, bottom=8), 'Sensor Health')
+    # UNDER THE NOTE, measured from it. A fixed 506 put the panel's title bar across the note's last line.
+    sh = p.panel(860, y_auto + A.Page.note_h(auto, 400) + 6, 410, A.panel_h(1, A.ROW, top=12, bottom=8), 'Sensor Health')
     p.add(p._new('checkbox', 10, 15, A.CHECK_H, A.CHECK_H,
                  {'signalName': K + 'quiet_check_en', 'enableCondition': ON}), into=sh)
     p.add(p._new('label', 40, 16, 230, A.LBL_H,

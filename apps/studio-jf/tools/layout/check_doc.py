@@ -283,7 +283,7 @@ def main():
         for w in ws:
             if w.get('type') == 'label' and w.get('groupId') and w.get('h', 0) <= A.LBL_H:
                 for b in boxes:
-                    if b['groupId'] == w['groupId'] and 0 <= w['x'] - (b['x'] + b['w']) <= 16:
+                    if A.names_tick(w, b):
                         want_y = b['y'] + (b['h'] - w['h']) // 2
                         if w['y'] != want_y:
                             bad['tick box label is not centred on its box'].append(
@@ -293,6 +293,31 @@ def main():
             tick_rows(_kids(w), name)
     for name, pan in sorted(lib.items()):
         tick_rows(pan.get('widgets') or [], name)
+
+    # NO WORDS DRAWN ON ANYTHING ELSE. Every sibling pair where one is a caption, measured on the INK
+    # (author.ink_box), in every sibling list on the page. Same-group pairs too: the builders' own check
+    # (author.child_overlaps) lets a group touch itself, and a group is exactly where a sensor check's
+    # note lived while it was drawn through that check's name, threshold and severity on 135 pages.
+    def text_overlaps(ws, name, managed):
+        if not managed:
+            ws = [dict(w, props=w.get('props') or {}) for w in ws]
+            boxes = [A.ink_box(w) for w in ws]
+            for i, a_ in enumerate(ws):
+                for j in range(i + 1, len(ws)):
+                    b_ = ws[j]
+                    if 'label' not in (a_['type'], b_['type']) or A.never_together(a_, b_):
+                        continue
+                    ax, ay, aw, ah = boxes[i]
+                    bx, by, bw, bh = boxes[j]
+                    if (ax + A.SLACK < bx + bw and bx + A.SLACK < ax + aw
+                            and ay + A.SLACK < by + bh and by + A.SLACK < ay + ah):
+                        bad['text drawn over another widget'].append(
+                            f'{name}: {a_["type"]} "{a_["props"].get("labelText", "")[:30]}" and '
+                            f'{b_["type"]} "{b_["props"].get("labelText", "")[:30]}"')
+        for w in ws:
+            text_overlaps(_kids(w), name, (w.get('props') or {}).get('layoutMode', '0') not in ('', '0'))
+    for name, pan in sorted(lib.items()):
+        text_overlaps(pan.get('widgets') or [], name, False)
 
     total = sum(len(v) for v in bad.values())
     print(f'{len(lib)} pages, {len(surfaces)} surfaces, {len(nodes)} tree nodes, {widgets} widgets')

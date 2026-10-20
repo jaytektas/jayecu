@@ -168,8 +168,12 @@ void PanelWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
         }
         any = true;
     }
-    if (!any && jf::JTextHelper::hasAtlas())
-        wraptext::drawCentred(buf, content.x + 4.f, content.y + (content.height - wraptext::height("(empty panel)", content.width - 8.f)) * 0.5f,
+    // A HINT FOR THE AUTHOR, NOT THE USER. An empty panel on a page is a rule or a swatch — the line under a
+    // table's column heads is a 1px panel — and drawing the placeholder there left a clipped sliver of it
+    // through the middle of every such line.
+    const float hintH = wraptext::height("(empty panel)", content.width - 8.f);
+    if (!any && s_editMode && jf::JTextHelper::hasAtlas() && hintH <= content.height)
+        wraptext::drawCentred(buf, content.x + 4.f, content.y + (content.height - hintH) * 0.5f,
                               content.width - 8.f, "(empty panel)", jf::Colors::TextSecondary);   // wraps in a narrow panel
 }
 

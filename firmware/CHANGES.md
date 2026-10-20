@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Sensor Diagnostics pages: each check's explanation now sits under its row instead of being drawn over the check's name, threshold and severity.
+- Boost Control Correction pages: Applies To is no longer hidden behind the Reads picker. Knock Control: the Auto note no longer runs into the Sensor Health panel.
 
 ## 0.4.8
 - The trigger stream pages no longer have a wheel picker. It could show the wrong wheel (two wheels with the same crank pattern, like the 2JZ with and without its cam, looked the same to it) and it only set one stream. Install a wheel from the Trigger Library, which sets every stream at once.

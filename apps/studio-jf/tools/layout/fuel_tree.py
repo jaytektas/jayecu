@@ -60,9 +60,11 @@ def table_page(title, table, live, note='', extra_fields=None, enable='', enable
         # (SystemComposer.cpp:94) — greying it because cranking ENRICHMENT is off would be the same
         # fault in the opposite direction, and a worse one: a live setting the page says is dead.
         owner = table.split('.', 1)[0]
+        # 410 APART: a field with no panel is laid out to 400px (field()'s avail), so at the old 330 the
+        # second row's name sat under the first row's dropdown — "Applies To" behind the Reads picker.
         for i, (label, path, kind, unit) in enumerate(extra_fields):
             mine = path.split('.', 1)[0] == owner
-            p.field(None, 10 + i * 330, top, label, path, kind, 150 if kind != 'enum' else 200, unit,
+            p.field(None, 10 + i * 410, top, label, path, kind, 150 if kind != 'enum' else 200, unit,
                     enable=enable if mine else '')
         top += A.ROW + 8
 

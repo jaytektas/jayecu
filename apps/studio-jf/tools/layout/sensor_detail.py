@@ -262,8 +262,9 @@ def _diagnostics(p, y, checks, dtc):
                           'fgColor': C_DIM, 'enableCondition': on}, g), into=dia)
         # 515, not 480: the longest of these (Detect Stuck's) is 494px of text, so at 480 it lost its
         # last two words. There is room to 554 before the second column starts, and one line is all this
-        # row has — the next check's tick is 46px below it.
-        p.add(p._new('label', 34, ry + 25, 515, 16,
+        # row has — the next check's tick is 46px below it. Under the CONTROLS, not under the tick: at
+        # +25 the words ran 4px into the bottom of the threshold and severity boxes.
+        p.add(p._new('label', 34, ry + A.CTL_H, 515, 16,
                      {'labelText': MEANS[bit], 'align': 'Left', 'fontName': A.FONT_SMALL,
                       'fgColor': C_DIM}, g), into=dia)
         ry += 46
