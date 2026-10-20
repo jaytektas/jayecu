@@ -399,6 +399,8 @@ public:
     // Test access: a signal row's picker field. Handed over whole rather than as "what does it say"
     // and "clear it", because the claim being tested is that the ✕ is THERE AND REACHABLE — and a
     // signal emitted by hand would pass whether or not anything could ever press it.
+    jf::JLineEdit* nameFieldForTest() { return m_name; }
+    jf::JCheckBox* enabledBoxForTest() { return m_on; }
     jf::JPickerField* rowSignalFieldForTest(int k) {
         return (k >= 0 && k < kRows) ? m_row[k].sig : nullptr;
     }
@@ -849,42 +851,51 @@ private:
     void _commit() {
         if (m_loading) return;
         Cache& c = Cache::instance();
+        // ONE EDIT, AND ONLY WHAT MOVED. Every keystroke in the name box came here and wrote all 96 frame
+        // slots and every field — about 800 writes, each its own transaction (a copy and a compare of the
+        // whole tune) and each a change notice the app answers by re-evaluating the navigation tree. Typing
+        // crawled. Now the repack is one transaction, so one undo step, and a value already in the tune is
+        // not written again, so it says nothing changed because nothing did.
+        c.beginEdit();
+        auto put = [&c](const std::string& p, double v) { if (c.configValue(p) != v) c.setConfigValue(p, v); };
+        auto putS = [&c](const std::string& p, const std::string& v) { if (c.configString(p) != v) c.setConfigString(p, v); };
         int fi = 0;
         for (int i = 0; i < kMaxFrames; i++) {
             if (i < int(m_all.size())) {
                 Frame& f = m_all[size_t(i)];
                 const int flags = M_USED | (f.tx ? M_TX : 0) | (f.ext ? M_EXT : 0) | (f.off ? M_OFF : 0);
-                c.setConfigValue(_fr(i, "flags"), flags);
-                c.setConfigValue(_fr(i, "bus"), f.bus);
-                c.setConfigValue(_fr(i, "id"), f.id);
-                c.setConfigValue(_fr(i, "dlc"), f.dlc);
-                c.setConfigValue(_fr(i, "period_ms"), f.periodMs);
-                c.setConfigValue(_fr(i, "first_field"), fi);
-                c.setConfigValue(_fr(i, "field_count"), int(f.fields.size()));
-                c.setConfigString(_fr(i, "name"), f.name);
+                put(_fr(i, "flags"), flags);
+                put(_fr(i, "bus"), f.bus);
+                put(_fr(i, "id"), f.id);
+                put(_fr(i, "dlc"), f.dlc);
+                put(_fr(i, "period_ms"), f.periodMs);
+                put(_fr(i, "first_field"), fi);
+                put(_fr(i, "field_count"), int(f.fields.size()));
+                putS(_fr(i, "name"), f.name);
                 for (Field& d : f.fields) {
                     if (fi >= kMaxFields) break;
-                    c.setConfigValue(_fl(fi, "sig"), d.sig);
-                    c.setConfigValue(_fl(fi, "bit_off"), d.bitOff);
-                    c.setConfigValue(_fl(fi, "width"), d.width);
-                    c.setConfigValue(_fl(fi, "flags"), d.flags);
-                    c.setConfigValue(_fl(fi, "scale"), d.scale);
-                    c.setConfigValue(_fl(fi, "offset"), d.offset);
-                    c.setConfigValue(_fl(fi, "ttl_ms"), d.ttlMs);
-                    c.setConfigValue(_fl(fi, "policy"), d.policy);
-                    c.setConfigValue(_fl(fi, "priority"), d.priority);
-                    c.setConfigValue(_fl(fi, "sentinel"), double(d.sentinel));
+                    put(_fl(fi, "sig"), d.sig);
+                    put(_fl(fi, "bit_off"), d.bitOff);
+                    put(_fl(fi, "width"), d.width);
+                    put(_fl(fi, "flags"), d.flags);
+                    put(_fl(fi, "scale"), d.scale);
+                    put(_fl(fi, "offset"), d.offset);
+                    put(_fl(fi, "ttl_ms"), d.ttlMs);
+                    put(_fl(fi, "policy"), d.policy);
+                    put(_fl(fi, "priority"), d.priority);
+                    put(_fl(fi, "sentinel"), double(d.sentinel));
                     d.index = fi;
                     fi++;
                 }
             } else {
                 // A freed slot is CLEARED, not merely unflagged: a frame left behind with a live id
                 // would be invisible here and still on the wire if the used bit were ever set again.
-                c.setConfigValue(_fr(i, "flags"), 0);
-                c.setConfigValue(_fr(i, "id"), 0);
-                c.setConfigValue(_fr(i, "field_count"), 0);
+                put(_fr(i, "flags"), 0);
+                put(_fr(i, "id"), 0);
+                put(_fr(i, "field_count"), 0);
             }
         }
+        c.endEdit("Edit CAN frames");
         _rebuildLists();
     }
 

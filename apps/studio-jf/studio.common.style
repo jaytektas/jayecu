@@ -26,7 +26,7 @@ titleBarHeight: 24
 controlHeight: 22      # combo / spin / line-edit / text-area / colour+font button (orig combo/lineedit = 22)
 buttonHeight:  22      # push + toggle buttons (orig PushButton = 22)
 labelHeight:   14      # text labels (orig QLabel = 14)
-checkHeight:   15      # checkbox / radio (orig = 15)
+checkHeight:   22      # checkbox / radio — the size every page's tick box is authored at (layout CHECK_H)
 sliderHeight:  15      # slider (orig = 15)
 menuItemHeight: 20     # menu rows, list/tree rows (orig QTreeView::item min-height = 20)
 itemPadding:   6       # inner control padding

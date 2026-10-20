@@ -436,6 +436,20 @@ target_compile_definitions(gc_signal_clear_test PRIVATE
 add_dependencies(studio_tests gc_signal_clear_test)
 add_test(NAME gc_signal_clear COMMAND gc_signal_clear_test)
 
+# Typing a CAN frame's name is one transaction and one change notice per keystroke, not a pool rewrite.
+#   cmake --build build --target gc_typing_test && ./build/gc_typing_test
+add_executable(gc_typing_test EXCLUDE_FROM_ALL tests/test_gc_typing.cpp)
+target_link_libraries(gc_typing_test PRIVATE studio_surface studio_model)
+target_include_directories(gc_typing_test PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../firmware
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../generated)
+target_link_libraries(gc_typing_test PRIVATE JFramework::platform ${STUDIO_TLS_LIBS})
+target_compile_definitions(gc_typing_test PRIVATE
+    REAL_META="${CMAKE_CURRENT_SOURCE_DIR}/../../shared/tuneit-meta.json")
+add_dependencies(studio_tests gc_typing_test)
+add_test(NAME gc_typing COMMAND gc_typing_test)
+
 # The CAN field picker: the list it builds out of the tune's frames, and that a stored choice survives
 # the pool being repacked and reads as broken when its field is gone.
 #   cmake --build build --target can_field_picker_test && ./build/can_field_picker_test

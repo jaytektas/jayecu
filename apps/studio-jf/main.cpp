@@ -6231,13 +6231,26 @@ int main(int argc, char** argv) {
     g_refilterTree = applyNodeConditions;      // tree rebuilds re-apply the filter through this
     applyNodeConditions();                     // and the tree standing right now gets it too
     Cache::instance().configLoaded.connect(applyNodeConditions);
-    Cache::instance().configValueChanged.connect([applyNodeConditions](const std::string&) { applyNodeConditions(); });
     // The notice strip reads the OUTPUT GATEWAYS, which are config and not telemetry: a toggle changes
     // them between frames, and a config load brings a whole tune's worth at once. Refreshing only on
     // frameUpdated would have left the strip a frame behind on a live link and permanently wrong on a
     // quiet one — the tune says the outputs are off and the banner still says nothing.
     Cache::instance().configLoaded.connect([] { refreshLinkOverlay(link.isOpen()); });
-    Cache::instance().configValueChanged.connect([](const std::string&) { refreshLinkOverlay(link.isOpen()); });
+    // ONCE PER PASS, NOT ONCE PER WRITE. Both of these answered every config write as it happened: the
+    // tree re-evaluated all its node conditions and the notice strip re-read the gateways. A bulk writer
+    // — a CAN frame list repacked on each keystroke, a template applied, a table pasted — makes hundreds
+    // of writes in one go, and typing a frame's name crawled under it. The answer only matters once the
+    // writes are done, so the first write books one refresh on the main loop and the rest ride on it.
+    static bool cfgRefreshPending = false;
+    Cache::instance().configValueChanged.connect([applyNodeConditions](const std::string&) {
+        if (cfgRefreshPending) return;
+        cfgRefreshPending = true;
+        jf::JMainThreadDispatcher::instance().post([applyNodeConditions] {
+            cfgRefreshPending = false;
+            applyNodeConditions();
+            refreshLinkOverlay(link.isOpen());
+        });
+    });
     // THE STUDIO LAYS OUT THE COILS AND INJECTORS — never the firmware. An edit to a setting that decides them
     // (cylinder count, cycle, ignition mode, stages) rewrites those output rows in the same undo step.
     engine_outputs::install(Cache::instance());
