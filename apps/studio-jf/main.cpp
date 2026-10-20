@@ -7071,6 +7071,12 @@ int main(int argc, char** argv) {
     space.left().addDock(&tree);
     bootMark("entering the run loop");
     const int rc = win.run();
+    // LET GO OF THE ECU FIRST. The port is held exclusively (flock + TIOCEXCL), and the link is a static, so
+    // it used to close only when main() returned — AFTER installStaged() below had already started the new
+    // copy of an updated studio. The new copy reconnecting to the last ECU found the port busy, and stayed
+    // locked out for as long as this process took to finish exiting. Closed here, the port is free before
+    // anything else happens on the way out, update or not. (emit=false: the UI is on its way down.)
+    link.close(false);
     // The document (tree + surface + node pages) is NOT auto-saved on exit — it's governed entirely by the
     // unsaved-changes prompt (Save routes to saveAll; Discard leaves dashboard.gui untouched).
     // Only UI PREFERENCES persist here — window geometry, dock visibility, tree expansion —
