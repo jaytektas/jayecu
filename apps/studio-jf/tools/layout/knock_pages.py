@@ -90,7 +90,10 @@ def page_knock():
     # A per-cylinder assignment, which no list of scalars can express: an inline four with two sensors
     # and a V6 with one are both normal, and only this grid can say which is which.
     grid = p.panel(860, y0, 410, A.panel_h(CYLS + 1, 26, top=34, bottom=8), 'Sensor per Cylinder')
-    for cx, cw, text in ((10, 90, 'Cylinder'), (110, 150, 'Knock Input'), (270, 120, 'Gain')):
+    # The Knock Input heading sits over its pickers, which end at the Gain column and are as wide as their
+    # longest choice needs (see the rows below) — so it starts where they do.
+    kw = max(150, A.Page.choice_w(f'{K}cyl_sensor[0].input'))
+    for cx, cw, text in ((10, 240 - kw, 'Cylinder'), (260 - kw, kw, 'Knock Input'), (270, 120, 'Gain')):
         p.add(p._new('label', cx, 8, cw, 18,
                      {'labelText': text, 'align': 'Left', 'fontName': '|15|1|0', 'fgColor': C_DIM}),
               into=grid)
