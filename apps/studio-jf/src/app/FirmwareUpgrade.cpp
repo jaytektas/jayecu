@@ -14,7 +14,10 @@
 #include <j/io/SerialPort.h>
 #include <j/platform/JUdevRule.h>
 
+#include <algorithm>
+#include <cctype>
 #include <chrono>
+#include <cstdio>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
@@ -49,11 +52,41 @@ bool writeAll(const std::string& path, const std::vector<uint8_t>& data) {
     return static_cast<bool>(f);
 }
 
-// The ECU's serial port, if it is on the bus: the jayecu CDC (0483:5740). `prefer` wins when present.
-std::string findEcuPort(const std::string& prefer) {
+// The USB serial the firmware gives a board with this device uid (the identity reply's 24 hex chars):
+// "JE-" + (uid0 ^ uid2) + uid1, each as 8 upper-case hex digits (usbd_desc.c,
+// USBD_VCP_SerialStrDescriptor). Empty when the uid is not 24 hex digits.
+std::string usbSerialForUid(const std::string& uid) {
+    if (uid.size() != 24 || uid.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos) return "";
+    const auto word = [&](int i) { return static_cast<uint32_t>(std::stoul(uid.substr(i * 8, 8), nullptr, 16)); };
+    char out[3 + 16 + 1];
+    std::snprintf(out, sizeof out, "JE-%08X%08X", word(0) ^ word(2), word(1));
+    return out;
+}
+
+bool sameText(const std::string& a, const std::string& b) {
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(),
+        [](char x, char y) { return std::toupper(static_cast<unsigned char>(x)) == std::toupper(static_cast<unsigned char>(y)); });
+}
+
+// The serial port of THIS ECU — the one being upgraded — if it is on the bus.
+//
+// 0483:5740 is ST's generic CDC id, not jayecu's: rusEFI boards use it too, and on a bench with a
+// rusEFI ECU beside the one being flashed, "the first 0483:5740 port" was the rusEFI one. The wait
+// after a flash then opened (or tried to open) the wrong ECU for ever, and once a rusEFI console let
+// go of a port, it sent jayecu identity frames to a rusEFI ECU — which ignored them, but nothing
+// should be talking to a device it was not asked to. The board's own USB serial is stable across
+// flashes (it is derived from the chip uid), so when the uid is known only that serial is accepted.
+// Without a uid, only a port that names itself a jayecu ("JayECU", or a "JE-" serial) is.
+std::string findEcuPort(const std::string& prefer, const std::string& uid) {
+    const std::string want = usbSerialForUid(uid);
     std::string any;
     for (const auto& p : jf::JSerialPort::availablePorts()) {
         if (!p.hasVidPid || p.vendorId != 0x0483 || p.productId != 0x5740) continue;
+        if (!want.empty()) {
+            if (sameText(p.serialNumber, want)) return p.port;
+            continue;
+        }
+        if (p.manufacturer != "JayECU" && p.serialNumber.rfind("JE-", 0) != 0) continue;
         if (p.port == prefer) return p.port;
         if (any.empty()) any = p.port;
     }
@@ -476,7 +509,7 @@ void FirmwareUpgrade::waitForEcu(Step next) {
     auto tick = std::make_shared<std::function<void()>>();
     *tick = [this, alive, tick, next] {
         if (!alive.lock()) return;
-        const std::string port = findEcuPort(port_);
+        const std::string port = findEcuPort(port_, uid_);
         if (!port.empty()) {
             // A just-appeared port can take a moment to be given to the user (the udev ACL).
             std::weak_ptr<std::atomic<bool>> a2 = alive_;
@@ -495,6 +528,15 @@ void FirmwareUpgrade::waitForEcu(Step next) {
                     JLOGC("firmware", jf::JLogLevel::Info) << "no identity on " << port_ << " yet; looking again";
                     link_.close();
                     waitTicks_ += 15;                          // the 3.8 s just spent counts against the limit
+                    // ...and the limit has to be checked HERE too. It used to be checked only when no
+                    // port was found, so a port that was found but never answered (another program
+                    // holding it, or a device that is not this ECU) retried every 4 s for ever, behind a
+                    // progress window that said it was waiting for the ECU.
+                    if (waitTicks_ > 80) {
+                        fail(next == Step::Rebooting ? "The ECU did not come back after the firmware was written."
+                                                     : "The ECU did not come back after it was reset.", true);
+                        return;
+                    }
                     (*tick)();
                 });
             });

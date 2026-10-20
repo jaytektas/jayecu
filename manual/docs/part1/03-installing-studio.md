@@ -74,9 +74,10 @@ Inside the data folder:
 | `ini/` | TunerStudio `.ini` files you have imported or downloaded. |
 | `can_templates/` | CAN templates. |
 | `help/` | The Lua API page the studio writes when you open **Help ▸ Lua API Reference**. |
+| `logs/` | The studio's own log, one file a day (`studio-YYYY-MM-DD.log`), kept for 14 days. Send it with a bug report: it records what the studio did and why, for example which port it tried after a firmware update. |
 | `trigger_wheels.json` | Your trigger-wheel library. |
 
-<!-- src: apps/studio-jf/src/model/Ecu.cpp (ecus/<uid>/tunes, restore, dashboard.gui, ecu.json); apps/studio-jf/src/app/FirmwareUpgrade.cpp (backups); apps/studio-jf/main.cpp (firmware, meta, dashboards, ini); apps/studio-jf/src/model/DatalogRecorder.cpp and apps/studio-jf/src/ui/PreferencesDialog.h (datalogs, Folder); apps/studio-jf/src/surface/Surface.cpp (calibrations); apps/studio-jf/src/ui/CanTemplates.h (can_templates); apps/studio-jf/src/app/HelpPages.cpp (help); apps/studio-jf/src/model/TriggerWheel.cpp (trigger_wheels.json) -->
+<!-- src: apps/studio-jf/src/model/Ecu.cpp (ecus/<uid>/tunes, restore, dashboard.gui, ecu.json); apps/studio-jf/src/app/FirmwareUpgrade.cpp (backups); apps/studio-jf/main.cpp (firmware, meta, dashboards, ini); apps/studio-jf/src/model/DatalogRecorder.cpp and apps/studio-jf/src/ui/PreferencesDialog.h (datalogs, Folder); apps/studio-jf/src/surface/Surface.cpp (calibrations); apps/studio-jf/src/ui/CanTemplates.h (can_templates); apps/studio-jf/src/app/HelpPages.cpp (help); apps/studio-jf/main.cpp (openStudioLog: logs); apps/studio-jf/src/model/TriggerWheel.cpp (trigger_wheels.json) -->
 
 !!! tip "Back up the data folder"
     Your tunes are in the data folder, not in the program. Copy the whole folder to back them up.

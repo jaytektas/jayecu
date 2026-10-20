@@ -82,7 +82,11 @@ this ECU. Burn any unburned changes before using it.
    (chapter 3). Asked once, and before the ECU is put into its bootloader.
 5. **Back up** the tune beside the ECU's other tunes (chapter 48).
 6. **Flash**: the ECU restarts into its USB bootloader, and the studio erases, writes and verifies.
-7. **Check**: reconnect; the ECU must report the new version and layout.
+7. **Check**: reconnect; the ECU must report the new version and layout. The studio looks for **this
+   ECU's own USB serial number** (`JE-` and 16 characters, which it works out from the ECU's unique ID),
+   so other boards plugged in at the same time are never opened, including rusEFI boards, which use the
+   same USB ids. If this ECU does not answer within about 20 seconds, the studio stops and says so.
+   <!-- src: apps/studio-jf/src/app/FirmwareUpgrade.cpp (usbSerialForUid, findEcuPort, waitForEcu limit); firmware/Platform/stm32f7xx/usbd_desc.c (USBD_VCP_SerialStrDescriptor) -->
 8. **Put the tune back**: write the converted tune, read it back and compare, burn, restart. If the
    ECU had **no tune** before the update (a new board, or a tune it had refused), there is nothing to
    convert or back up: the new firmware's default tune goes on instead, and the studio says so when it
@@ -130,6 +134,7 @@ this ECU. Burn any unburned changes before using it.
 | Said Not now, want it back | The offer is made once per connection | **Tools ▸ Check for ECU Firmware Update…** |
 | Linux: cannot open the bootloader | The USB permission rule | Chapter 3 |
 | Windows: "the USB driver … is not installed" or "has another driver" | The administrator prompt was declined; another program's driver (for example ST's) is bound to the bootloader | Run **Install the jayecu USB driver** from the Start menu, then connect again |
+| "The ECU did not come back after the firmware was written" | Its port is held by another program (TunerStudio, a rusEFI console, a serial terminal); the USB cable was moved | The new firmware is already on the ECU, but the tune has not been put back. Close the other program, press **Connect**, and check the tune: if settings are missing or at defaults, open the backup with **File ▸ Open Tune…**, marked *(firmware backup)*, and burn it (chapter 48). The studio's log (`logs/`, chapter 3) names the port it tried |
 | Flash failed part-way | USB unplugged or disturbed | The ECU waits in its bootloader: answer **Try again**, or press Connect later (chapter 47) |
 | Tune values missing after the update | They were in **Going out** | The backup: **File ▸ Open Tune…**, marked *(firmware backup)* (chapter 48) |
 | "It had no tune, so it now has the firmware's default tune" | The ECU had no usable tune before the update | Set the tune up, or open a saved one with **File ▸ Open Tune…** (chapter 47, section 2) |

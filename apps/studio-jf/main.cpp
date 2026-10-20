@@ -934,8 +934,28 @@ static void installScriptedRun(jf::JAppWindow& win, jf::JTreeView& nodeTree,
     }
 }
 
+// The log goes to <dataRoot>/logs/studio-YYYY-MM-DD.log, one file a day, the last 14 days kept.
+//
+// Left to the framework it went to "genesis.log" in the CURRENT DIRECTORY: for a studio started from
+// the desktop that is $HOME, so the log was a 66 MB ~/genesis.log nobody knew to look for, and a
+// studio started from anywhere else logged somewhere else again. When a firmware upgrade hung waiting
+// for the ECU, the only record of why ("open /dev/ttyACM0 failed ... in use") was in that file.
+static void openStudioLog() {
+    namespace fs = std::filesystem;
+    const std::string dir = StudioPaths::dataDir("logs");
+    const std::time_t now = std::time(nullptr);
+    char day[16];
+    std::strftime(day, sizeof day, "%Y-%m-%d", std::localtime(&now));
+    jf::JLog::instance().setLogFile((fs::path(dir) / ("studio-" + std::string(day) + ".log")).string());
+    std::error_code ec;
+    const auto cutoff = fs::file_time_type::clock::now() - std::chrono::hours(24 * 14);
+    for (const auto& e : fs::directory_iterator(dir, ec))
+        if (e.path().extension() == ".log" && e.last_write_time(ec) < cutoff) fs::remove(e.path(), ec);
+}
+
 int main(int argc, char** argv) {
     g_bootT0 = std::chrono::steady_clock::now();
+    openStudioLog();
     for (int i = 1; i < argc; ++i) {
         const std::string a = argv[i];
         auto next = [&]() -> std::string { return (i + 1 < argc) ? argv[++i] : std::string(); };
