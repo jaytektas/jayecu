@@ -352,15 +352,17 @@ reads. **+ Band** adds a position. Position 0 is rest, the one position that may
 - A **Frequency** sensor's default calibration is 1:1 (Hz in, Hz out). Turning wheel pulses into road
   speed is the vehicle speed module's job (chapter 32).
   <!-- src: definition/ecu.schema.yaml -->
-- **Flex Fuel Composition & Temperature** reads a flex-fuel sensor on a digital pin as a frequency.
-  The frequency gives the ethanol content: enter your sensor's figures in the calibration (most read
-  50 Hz for 0 % and 150 Hz for 100 %; check yours). The **pulse width** of the same signal gives the
-  fuel temperature, fixed at 1.000 ms = −40 °C to 5.000 ms = 125 °C, published as `fuel_temp_flex`.
+- **Flex Fuel Composition & Temperature** reads a flex-fuel sensor on a digital pin. Set its
+  Interface to **Frequency**, not Pulse Width: the sensor sends one signal that carries two readings,
+  and Frequency reads both. The frequency gives **Flex Fuel Ethanol** (`ethanol`): enter your sensor's
+  figures in the calibration (most read 50 Hz for 0 % and 150 Hz for 100 %; check yours). The **pulse
+  width** of the same signal gives **Flex Fuel Temperature** (`fuel_temp_flex`), fixed at
+  1.000 ms = −40 °C to 5.000 ms = 125 °C. Both readings are on the sensor's page, under Output.
   A temperature outside −40…125 °C raises **P0182** or **P0183**.
   <!-- src: definition/ecu.schema.yaml (composition outputs) -->
 
 <figure markdown>
-  ![Flex Fuel Composition & Temperature: Frequency interface on DIG5, and the calibration from Hz to %](../img/studio/sensors-flex-page.png)
+  ![Flex Fuel Composition & Temperature: Frequency interface on DIG5, the calibration from Hz to %, and both readings](../img/studio/sensors-flex-page.png)
   <figcaption>Figure 17.14 — Flex fuel. The default calibration shown is a placeholder.</figcaption>
 </figure>
 

@@ -75,6 +75,7 @@
   "config.*.*.element_interfaces.[].[]:str",
   "config.*.*.element_labels.[]:str",
   "config.*.*.element_options.*.[].[]:num",
+  "config.*.*.element_readings.[].[].[]:str",
   "config.*.*.element_signals.[]:str",
   "config.*.*.element_types.[]:null",
   "config.*.*.element_types.[]:str",

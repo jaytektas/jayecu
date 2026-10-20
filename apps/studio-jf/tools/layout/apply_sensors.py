@@ -42,6 +42,9 @@ def main():
     # id -> the channel that sensor publishes. Not always its id (boost_pressure publishes boost_kpa),
     # which is why the meta carries the mapping and nothing here guesses it.
     sig_of = dict(zip(arr.get('element_ids', []), arr.get('element_signals', [])))
+    # …and, for an input that decodes to more than one, every reading with what it is read from (the
+    # flex sensor: ethanol from the frequency, fuel temperature from the pulse width).
+    readings_of = dict(zip(arr.get('element_ids', []), arr.get('element_readings', [])))
 
     # THE TREE. Sensors -> GROUP -> the sensors in it. A hundred and twenty-two children on one node is a
     # list you scroll rather than a tree you navigate: nothing is ever more than a few rows from something
@@ -103,8 +106,9 @@ def main():
         # THE ELEMENT RIDES ON THE PAGE. One body serves all 128 sensors, written with `[*]`; the sensor
         # it is about used to be carried by the viewport that showed it, and a page opens in a window of
         # its own now. Written here, every `[*]` on the page resolves to THIS sensor however it is opened.
+        extra = [(ch, tel[ch].get('label') or ch, raw) for ch, raw in readings_of.get(sid, []) if ch in tel]
         pg = SD.page(checks=checks, dtc=codes, type_label=type_label,
-                     diag_link=f'{base}/Diagnostics').to_json()
+                     diag_link=f'{base}/Diagnostics', extra=extra).to_json()
         pg['title'] = name
         pg['elementScope'] = f'sensors.sensor[{sid}]'
         pages[base] = pg

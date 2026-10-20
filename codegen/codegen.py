@@ -4892,6 +4892,22 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
             # channel for EVERY sensor, not just the ones whose id happens to equal their signal.
             a["element_signals"] = [str((cat[i].get("provides") or [cat[i].get("id") or i])[0])
                                     for i in range(min(a["count"], len(cat)))]
+            # EVERY READING ONE INPUT DECODES TO, when it is more than one — each with the raw quantity it
+            # is read from. A flex sensor is one frequency input giving ethanol (the frequency) AND fuel
+            # temperature (the pulse width). Without this its page showed one reading under an interface
+            # called "Frequency", beside a list that also offers "Pulse Width", and the temperature half
+            # of the sensor was on no page at all. [[signal, raw], ...] per element; [] for a sensor with
+            # one reading, which is nearly all of them.
+            st_of = {t["id"]: t for t in schema.get("sensor_types", []) or []}
+            def _readings(sen):
+                prov = sen.get("provides") or []
+                if len(prov) < 2:
+                    return []
+                st = st_of.get(sen.get("type")) or {}
+                outs = st.get("outputs") or []
+                raws = [st.get("raw", "")] + [(o or {}).get("raw", "") for o in outs]
+                return [[str(ch), str(raws[k]) if k < len(raws) else ""] for k, ch in enumerate(prov)]
+            a["element_readings"] = [_readings(cat[i]) for i in range(min(a["count"], len(cat)))]
             # Which TYPE each element is, when the catalog settles one at build time. null = the
             # element has no type of its own (a `generic` input) and takes one from the tune's own
             # `type` byte — the only rows where that byte is read, and the only rows whose channel

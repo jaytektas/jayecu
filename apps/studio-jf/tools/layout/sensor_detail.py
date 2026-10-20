@@ -54,7 +54,7 @@ MEANS = {
 }
 
 
-def page(checks=None, dtc=None, type_label='', diag_link=''):
+def page(checks=None, dtc=None, type_label='', diag_link='', extra=None):
     """One sensor, read left to right the way the signal travels: INPUT -> CALIBRATION -> OUTPUT.
 
     That is the whole page in one sentence. A pin carries a number; a curve says what that number means;
@@ -73,15 +73,17 @@ def page(checks=None, dtc=None, type_label='', diag_link=''):
     duplicates, and the number is already there. Dials earn their place on a dashboard, at dashboard size.
 
     `checks` — the bit names this sensor has a DTC for; `dtc` — {bit: code}; `type_label` — the fixed type
-    for the 108 sensors whose type the catalogue decides; `diag_link` — the node its checks live on. All
-    are per-sensor facts.
+    for the 108 sensors whose type the catalogue decides; `diag_link` — the node its checks live on;
+    `extra` — what else this one input decodes to, [(channel, its name, raw it is read from)], with the
+    sensor's own reading first (the flex sensor: ethanol from the frequency, temperature from the pulse
+    width). All are per-sensor facts.
     """
     p = A.Page(title='Sensor')
     y0 = p.head('What this input is wired to, and what its curve makes of it.', enable=f'{S}.enabled')
     h = A.CANVAS_H - y0 - 8
-    _input(p, y0, h)
+    _input(p, y0, h, extra)
     _calibration(p, y0, h)
-    _output(p, y0, h, type_label, diag_link, checks or [c[0] for c in CHECKS])
+    _output(p, y0, h, type_label, diag_link, checks or [c[0] for c in CHECKS], extra)
     return p
 
 
@@ -94,7 +96,12 @@ def diag_page(checks=None, dtc=None):
     return p
 
 
-def _input(p, y, h):
+# What a raw quantity is called on this page, and the interface that reads it.
+RAW_NAME = {'hz': ('frequency', 'Frequency'), 'pulse_us': ('pulse width', 'Pulse Width'),
+            'volts': ('voltage', 'Analogue Voltage')}
+
+
+def _input(p, y, h, extra=None):
     """1 — what arrives: the pin, how it is read, and the number on it."""
     box = p.panel(10, y, 300, h, '1 · Input', enable=ON)
     # NO FORMAT, and now that actually means something. '%.0f' was authored when this could only be ADC
@@ -125,6 +132,21 @@ def _input(p, y, h):
                  cond=f'[#{S}.interface] == {IF_CAN}')
     ry = p.check(box, 10, ry + 6, 'Invert  (switch inputs)', f'{S}.flags.invert',
                  cond=f'[#{S}.interface] == {IF_SWITCH}')
+    # ONE SIGNAL, SEVERAL READINGS. A flex sensor sends one square wave: its frequency is the ethanol
+    # content and its pulse width the fuel temperature. The list offers both "Frequency" and "Pulse
+    # Width", and with nothing else said either looks like the half you want — so the page says which
+    # interface reads the whole sensor, and what each part of the signal becomes.
+    if extra:
+        raw0 = extra[0][2]
+        parts = [f'its {RAW_NAME.get(r, (r,))[0]} is the {l}' for _c, l, r in extra]
+        iface = RAW_NAME.get(raw0, ('', raw0))[1]
+        n = {2: 'two', 3: 'three'}.get(len(extra), str(len(extra)))
+        txt = (f'Choose {iface}. This sensor sends one signal that carries {n} readings: '
+               + ', '.join(parts[:-1]) + ' and ' + parts[-1] + f'. {iface} reads '
+               + ('both' if len(extra) == 2 else 'all of them') + ' from the one pin.')
+        # In the page's own text colour, not the dim of the general note under it: this is the answer.
+        said = p.wrapped(10, ry + 6, 274, txt, into=box, colour='', font=A.FONT_LBL)
+        ry = said['y'] + said['h'] + 4
     p.wrapped(10, ry + 6, 274,
               'Interface says HOW the pin is read, and decides which inputs the picker offers — a '
               'frequency sensor cannot be wired to an analogue pin. Two sensors on one pin is a '
@@ -166,42 +188,55 @@ def _calibration(p, y, h):
     p.add(p._new('bands', 10, 10, 600, inner - 20, {'signalName': f'{S}.cal'}), into=cal)
 
 
-def _output(p, y, h, type_label, diag_link, checks):
+def _output(p, y, h, type_label, diag_link, checks, extra=None):
     """3 — what the ECU acts on: the reading, the type that gives it its units and domain, and the way to
     the checks that watch it."""
     out = p.panel(960, y, 310, h, '3 · Output', enable=ON)
     p.add(p._new('value', 12, 10, 284, 62,
                  {'signalName': '[$*]', 'format': '%.2f', 'fontName': '|30|0|0', 'align': 'Center',
                   'borderWidth': '1', 'borderRadius': '4'}), into=out)
+    # A SENSOR WITH SEVERAL READINGS NAMES EACH ONE, and shows the others under it: the flex sensor's
+    # temperature is half of what it reports, and it was on no page at all.
+    many = bool(extra) and len(extra) > 1
     p.add(p._new('label', 12, 74, 284, 18,
-                 {'labelText': 'Reading  (what everything downstream sees)', 'align': 'Center',
-                  'fontName': A.FONT_SMALL, 'fgColor': C_DIM}), into=out)
+                 {'labelText': f'{extra[0][1]}  (from the {RAW_NAME.get(extra[0][2], (extra[0][2],))[0]})'
+                               if many else 'Reading  (what everything downstream sees)',
+                  'align': 'Center', 'fontName': A.FONT_SMALL, 'fgColor': C_DIM}), into=out)
+    dy = 0
+    for ch, lbl, raw in (extra[1:] if many else []):
+        p.add(p._new('value', 12, 100 + dy, 284, 44,
+                     {'signalName': f'[${ch}]', 'fontName': '|24|0|0', 'align': 'Center',
+                      'borderWidth': '1', 'borderRadius': '4'}), into=out)
+        p.add(p._new('label', 12, 146 + dy, 284, 18,
+                     {'labelText': f'{lbl}  (from the {RAW_NAME.get(raw, (raw,))[0]})', 'align': 'Center',
+                      'fontName': A.FONT_SMALL, 'fgColor': C_DIM}), into=out)
+        dy += 72
     if type_label:
         g = p.group()
-        p.add(p._new('label', 10, 106, 90, A.LBL_H,
+        p.add(p._new('label', 10, 106 + dy, 90, A.LBL_H,
                      {'labelText': 'Type', 'align': 'Left', 'fontName': A.FONT_LBL}, g), into=out)
-        p.add(p._new('label', 106, 106, 190, A.LBL_H,
+        p.add(p._new('label', 106, 106 + dy, 190, A.LBL_H,
                      {'labelText': type_label, 'align': 'Left', 'fontName': A.FONT_LBL}, g), into=out)
         note = ("This input's type is fixed by the ECU — it is what the sensor IS. Only the generic "
                 "inputs (aux, rotary trim) can be re-typed.")
     else:
-        p.field(out, 10, 102, 'Type', f'{S}.type', 'enum', 150, lbl_w=90)
+        p.field(out, 10, 102 + dy, 'Type', f'{S}.type', 'enum', 150, lbl_w=90)
         note = ('The type decides the units, the sensible domain and how many points the curve needs. '
                 'Changing it re-seeds the curve.')
-    p.wrapped(10, 142, 284, note, into=out)
-    p.wrapped(10, 214, 284,
+    p.wrapped(10, 142 + dy, 284, note, into=out)
+    p.wrapped(10, 214 + dy, 284,
               'Input and output are both on screen because a calibration is a claim about how one '
               'becomes the other: watch the pair move together and a wrong curve shows itself '
               'immediately.', into=out)
     # THE WAY TO THE CHECKS. The tree has them as this sensor's child, and a page that sends the reader
     # somewhere should say where from — here, under the value the checks are watching.
     if diag_link:
-        p.add(p._new('panel', 10, 308, 284, 1, {'bgColor': C_DIM, 'padding': '0'}), into=out)
-        p.add(p._new('label', 10, 318, 284, A.LBL_H,
+        p.add(p._new('panel', 10, 308 + dy, 284, 1, {'bgColor': C_DIM, 'padding': '0'}), into=out)
+        p.add(p._new('label', 10, 318 + dy, 284, A.LBL_H,
                      {'labelText': f'Diagnostics  ({len(checks)} check'
                                    f'{"" if len(checks) == 1 else "s"})',
                       'align': 'Left', 'fontName': A.FONT_LBL, 'link': diag_link}), into=out)
-        p.wrapped(10, 342, 284,
+        p.wrapped(10, 342 + dy, 284,
                   'What this input must complain about, when, and with which code.', into=out)
 
 

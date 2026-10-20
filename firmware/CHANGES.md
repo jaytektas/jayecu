@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- The flex fuel sensor's two readings have their own names: Flex Fuel Ethanol and Flex Fuel Temperature. Its page shows both, and says to set the interface to Frequency (it reads both from the one pin).
 - Sensor Diagnostics pages: each check's explanation now sits under its row instead of being drawn over the check's name, threshold and severity.
 - Boost Control Correction pages: Applies To is no longer hidden behind the Reads picker. Knock Control: the Auto note no longer runs into the Sensor Health panel.
 - Drop-downs that cut off their longest choice are wider: Knock Input ("Auto (from cylinder bank)"), pedal Track Sense, Boost Output Mode, Traction Cap, Coolant source on Fuel Setup, and the Transient Throttle pressure source.

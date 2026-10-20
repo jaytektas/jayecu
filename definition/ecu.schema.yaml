@@ -954,7 +954,7 @@ signals:
 - {id: egt, per_cylinder: true, label: "Exhaust Gas Temperature", category: "Sensors - Engine", bus_type: float, owner: firmware}
 - {id: electrical_load_sw, label: "Electrical Load Switch", category: "Sensors - Other", bus_type: float}
 - {id: engine_state, label: "Engine State", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 2.0, category: "Engine", bus_type: float, datalog: true, enum: engine_run_state, owner: firmware}
-- {id: ethanol, label: "Flex Fuel Composition & Temperature (ethanol)", category: "Sensors - Engine", bus_type: float}
+- {id: ethanol, label: "Flex Fuel Ethanol", category: "Sensors - Engine", bus_type: float}
 - {id: ethanol_2, label: "Flex Fuel Composition", category: "Sensors - Engine", bus_type: float}
 # THE ETHANOL CONTENT FUELLING USES — the sensor while it reads, the last good reading if it drops out
 # (a tank's content does not change mid-drive), the configured fallback if it has never read. A dead
@@ -1030,7 +1030,7 @@ signals:
 - {id: fuel_pressure_pre, label: "Fuel Pressure Pre Filter", category: "Sensors - Engine", bus_type: float}
 - {id: fuel_tank_pressure, label: "Fuel Tank Pressure", category: "Sensors - Other", bus_type: float}
 - {id: fuel_temp, label: "Fuel Temperature", category: "Sensors - Engine", bus_type: float}
-- {id: fuel_temp_flex, label: "Flex Fuel Composition & Temperature (fuel_temp_flex)", category: "Sensors - Engine", bus_type: float}
+- {id: fuel_temp_flex, label: "Flex Fuel Temperature", category: "Sensors - Engine", bus_type: float}
 - {id: gear, label: "Gear", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 100.0, category: "Sensors - Derived", bus_type: float, datalog: true, owner: firmware}
 - {id: handbrake_sw, label: "Handbrake Switch", category: "Sensors - Chassis", bus_type: float}
 - {id: humidity, label: "Humidity", category: "Sensors - Atmospheric", bus_type: float, gauge: {min: 0, max: 100}}   # relative humidity reads 0..100; percent's DOMAIN is wider
