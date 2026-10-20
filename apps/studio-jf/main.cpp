@@ -54,6 +54,7 @@
 #include "model/AirModelLoad.h"         // the load axis each air model wants its lambda + timing maps on
 #include "surface/widgets/ComboBoxWidget.h"   // …and filters a row's Cylinder picker (optionFilter)
 #include "surface/widgets/LabelWidget.h"      // the audit measures a caption the way its paint does
+#include <j/core/JPickerField.h>              // …and a drop-down's choices the way ITS paint does
 #include "model/CardLogs.h"
 #include "ui/CardLogsDialog.h"        // Logging▸Logs on Card… → import the ECU's own logs
 #include "ui/OnboardLoggingDialog.h"    // Logging▸Onboard Logging… → the card's channels + gate
@@ -805,6 +806,36 @@ static void installScriptedRun(jf::JAppWindow& win, jf::JTreeView& nodeTree,
                         // label's own text metrics (LabelWidget::naturalSize / wrappedHeight, the same
                         // arithmetic its paint uses).
                         auto rectOf = [](CanvasWidget* w) { const auto b = w->getBoundingBox(); return jf::JRect{ b.x, b.y, b.width, b.height }; };
+                        // EVERY CHOICE FITS ITS BOX. A drop-down shows one option at a time and cuts it at its text
+                        // room with no ellipsis (JComboBox::render: width - 0.75*height arrow well - padding - 6;
+                        // a picker field gives a second well to its clear mark while it has text), so one too
+                        // narrow looks fine until the long option is picked: Knock Input read "Auto (from
+                        // cylinder ba". Asked of the LIVE control, in its own units, of every item it holds.
+                        auto checkChoices = [&](CanvasWidget* cw, const std::string& where) {
+                            auto* hw = dynamic_cast<HostedControlWidget*>(cw);
+                            if (!hw) return;
+                            jf::JControl* jc = hw->controlForTest();
+                            if (!jc) return;
+                            const jf::JRect b = jc->bounds();
+                            if (b.width <= 0.f || b.height <= 0.f) return;
+                            float avail = b.width - b.height * 0.75f - jc->textPadding() - 6.0f;
+                            std::vector<std::string> texts;
+                            if (auto* cb = dynamic_cast<jf::JComboBox*>(jc)) texts = cb->items();
+                            else if (auto* pf = dynamic_cast<jf::JPickerField*>(jc)) {
+                                if (!pf->text().empty()) texts.push_back(pf->text());
+                                if (pf->clearable() && !pf->text().empty()) avail -= b.height * 0.75f;
+                            }
+                            for (const std::string& t : texts) {
+                                const float tw = jf::JTextHelper::measureWidth(t);
+                                if (tw > avail + 0.5f) {
+                                    ++bad; JLOGC("ui.audit", jf::JLogLevel::Info) << "  " << path << ": "
+                                        << cw->element()->type << where << " " << cw->element()->prop("signalName")
+                                        << " cuts \"" << t << "\" (" << tw << " > " << avail << " of a "
+                                        << b.width << "x" << b.height << " box)";
+                                    break;
+                                }
+                            }
+                        };
                         auto checkFit = [&](CanvasWidget* parent, const std::string& where) {
                             const jf::JRect pr = rectOf(parent);
                             std::vector<std::pair<CanvasWidget*, jf::JRect>> kids;
@@ -814,6 +845,7 @@ static void installScriptedRun(jf::JAppWindow& win, jf::JTreeView& nodeTree,
                                 const jf::JRect r = rectOf(c);
                                 if (r.width <= 0.f || r.height <= 0.f) continue;
                                 kids.emplace_back(c, r);
+                                checkChoices(c, " in a " + where);
                                 if (r.x + r.width > pr.x + pr.width + 2.f || r.y + r.height > pr.y + pr.height + 2.f
                                     || r.x < pr.x - 2.f || r.y < pr.y - 2.f) {
                                     ++bad; JLOGC("ui.audit", jf::JLogLevel::Info) << "  " << path << ": " << ce->type
@@ -891,6 +923,7 @@ static void installScriptedRun(jf::JAppWindow& win, jf::JTreeView& nodeTree,
                         for (const PanelElement& e : els) {
                             CanvasWidget* w = pageSurface->widgetById(e.id);
                             if (w && w->isContainer() && w->visibleNow()) descend(w, e.type);
+                            else if (w && w->visibleNow()) checkChoices(w, "");
                         }
                     }
 

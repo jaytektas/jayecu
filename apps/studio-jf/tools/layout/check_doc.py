@@ -319,6 +319,53 @@ def main():
     for name, pan in sorted(lib.items()):
         text_overlaps(pan.get('widgets') or [], name, False)
 
+    # EVERY CHOICE FITS ITS BOX. A drop-down shows one option at a time, cut at the box's text room with no
+    # ellipsis (JComboBox::render: width - 0.75*height arrow well - field padding - 6), so one that is too
+    # narrow looks fine until somebody picks the long option — Knock Input read "Auto (from cylinder ba".
+    # Asked of EVERY option the field offers, since any of them can be the one on screen. A signal picker
+    # (JPickerField) has a second well for its clear mark; its text is a channel's name, so the one it
+    # ships with is what is asked. A pin picker's names come from its sets.
+    from ruler import ruler
+    rl, pad = ruler(), 8.0                                 # JStyle::fieldPadding
+
+    def choices(path):
+        try:
+            fd = A.Page._field_def(path)
+        except Exception:
+            return None, []
+        if not isinstance(fd, dict):
+            return None, []
+        if fd.get('kind') == 'signal':
+            ch = (meta.get('telemetry') or {})
+            ch = ch if isinstance(ch, dict) else {c['id']: c for c in ch}
+            dflt = fd.get('default')
+            ids = list(ch)
+            if isinstance(dflt, int) and 0 <= dflt < len(ids):
+                e = ch[ids[dflt]]
+                return 'picker', [e.get('label') or ids[dflt]]
+            return 'picker', []
+        opts = list(fd.get('options') or [])
+        for s in fd.get('picker_sets') or []:
+            opts += list((s or {}).get('options') or [])
+        return 'combo', [str(o) for o in opts]
+
+    def fit_choices(ws, name):
+        for w in ws:
+            if w.get('type') in ('enum', 'combobox'):
+                path = (w.get('props') or {}).get('signalName', '')
+                kind, opts = choices(path) if path else (None, [])
+                room = w['w'] - 0.75 * w['h'] * (2 if kind == 'picker' else 1) - pad - 6
+                if opts:
+                    t = max(opts, key=rl.base_width)
+                    over = rl.base_width(t) - room
+                    if over > 0.5:
+                        bad['choice wider than its drop-down'].append(
+                            f'{name}: {path} "{t[:40]}" is {over:.0f}px wider than the '
+                            f'{room:.0f}px a {w["w"]}x{w["h"]} box shows')
+            fit_choices(_kids(w), name)
+    for name, pan in sorted(lib.items()):
+        fit_choices(pan.get('widgets') or [], name)
+
     total = sum(len(v) for v in bad.values())
     print(f'{len(lib)} pages, {len(surfaces)} surfaces, {len(nodes)} tree nodes, {widgets} widgets')
     for kind in sorted(bad):

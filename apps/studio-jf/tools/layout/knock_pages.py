@@ -101,10 +101,13 @@ def page_knock():
         # exist is not a setting you are not allowed to change, it is not a setting.
         vis = f'[#engine.cylinder_count] >= {i + 1}'
         g = p.group()
-        p.add(p._new('label', 10, y + 4, 90, A.LBL_H,
+        # The picker ends where the gain starts, and is as wide as "Auto (from cylinder bank)" needs:
+        # the cylinder number gives up the width — it is one or two digits in a 90px box.
+        cw = max(150, A.Page.choice_w(f'{K}cyl_sensor[{i}].input'))
+        p.add(p._new('label', 10, y + 4, 240 - cw, A.LBL_H,
                      {'labelText': str(i + 1), 'align': 'Left', 'fontName': A.FONT_LBL,
                       'condition': vis}, g), into=grid)
-        p.add(p._new(A.Page.enum_control(f'{K}cyl_sensor[{i}].input'), 110, y + 2, 150, A.CTL_H,
+        p.add(p._new(A.Page.enum_control(f'{K}cyl_sensor[{i}].input'), 260 - cw, y + 2, cw, A.CTL_H,
                      {'signalName': f'{K}cyl_sensor[{i}].input', 'condition': vis,
                       'enableCondition': ON}, g), into=grid)
         p.add(p._new('configedit', 270, y + 2, 90, A.CTL_H,

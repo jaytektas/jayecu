@@ -566,6 +566,38 @@ class Page:
         return d.get('min') == 0 and d.get('max') == 1
 
     @staticmethod
+    def choice_w(path, h=CTL_H):
+        """The width a drop-down needs to show its WIDEST choice whole — 0 when it offers none.
+
+        JComboBox cuts its one visible option at (width - 0.75*height arrow well - 8 padding - 6) with no
+        ellipsis, so a box sized for the option it ships with reads "Auto (from cylinder ba" the day
+        somebody picks the long one. A signal picker (JPickerField) gives a second well to its clear mark,
+        and its text is a channel's name, so the channel it ships pointed at is the one asked.
+        check_doc's "choice wider than its drop-down" is this same arithmetic.
+        """
+        try:
+            d = Page._field_def(path)
+        except Exception:
+            return 0
+        if not isinstance(d, dict):
+            return 0
+        if d.get('kind') == 'signal':
+            tel = Page._meta()['telemetry']
+            ids = list(tel)
+            dv = d.get('default')
+            if not (isinstance(dv, int) and 0 <= dv < len(ids)):
+                return 0
+            texts, wells = [tel[ids[dv]].get('label') or ids[dv]], 2
+        else:
+            texts = [str(o) for o in d.get('options') or []]
+            for ps in d.get('picker_sets') or []:
+                texts += [str(o) for o in (ps or {}).get('options') or []]
+            wells = 1
+        if not texts:
+            return 0
+        return int(max(ruler().base_width(t) for t in texts) + 0.75 * h * wells + 8 + 6 + 1.999)
+
+    @staticmethod
     def widest_value_w(path):
         """How wide the longest number this field can hold prints, in the app's font.
 
@@ -653,6 +685,9 @@ class Page:
         # row height, the suffix is its text plus an 8px gap, the number is the widest its RANGE can print
         # plus 10px of field padding, and 6px of air on top so a box is not sitting on the limit. A flat
         # 100px was fine for "RPM" and not for "pulses/km", which fitted by six pixels.
+        # A DROP-DOWN IS AS WIDE AS ITS WIDEST CHOICE (choice_w); the name gives way, down to its own width.
+        if kind in ('combobox', 'enum'):
+            ctl_w = max(ctl_w, Page.choice_w(path))
         if prints_own_unit and unit:
             ctl_w = max(ctl_w, int(CTL_H * 0.7 + ruler().width(unit.strip()) + 8
                                    + Page.widest_value_w(path) + 10 + 6))
@@ -677,6 +712,10 @@ class Page:
             lbl_w = min(lbl_w, max(20, panel['w'] - x - 4))
         # …and if the CONTROL is what does not fit (a wide enum in a narrow panel), the control gives way
         # too. A row that overflows its panel is clipped, and a clipped enum shows half a signal name.
+        # A drop-down's floor is its widest choice, and the name's is its own words: a column wider than
+        # the name (the caller's lbl_w) is spare, and goes to the choice before the choice is cut.
+        if kind in ('combobox', 'enum') and lbl_w + ctl_w + uw + 20 > avail:
+            lbl_w -= min(lbl_w - name_w, lbl_w + ctl_w + uw + 20 - avail)
         if lbl_w + ctl_w + uw + 20 > avail:
             ctl_w = max(60, avail - lbl_w - uw - 20)
         g = self.group()

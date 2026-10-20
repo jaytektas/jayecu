@@ -11,6 +11,7 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 ## Unreleased
 - Sensor Diagnostics pages: each check's explanation now sits under its row instead of being drawn over the check's name, threshold and severity.
 - Boost Control Correction pages: Applies To is no longer hidden behind the Reads picker. Knock Control: the Auto note no longer runs into the Sensor Health panel.
+- Drop-downs that cut off their longest choice are wider: Knock Input ("Auto (from cylinder bank)"), pedal Track Sense, Boost Output Mode, Traction Cap, Coolant source on Fuel Setup, and the Transient Throttle pressure source.
 
 ## 0.4.8
 - The trigger stream pages no longer have a wheel picker. It could show the wrong wheel (two wheels with the same crank pattern, like the 2JZ with and without its cam, looked the same to it) and it only set one stream. Install a wheel from the Trigger Library, which sets every stream at once.
