@@ -344,7 +344,9 @@ run. With this firmware they are:
 | **Main Relay** | Digital | Fixed 100 % | On | nothing: on whenever the ECU is awake |
 | **Shift Light** | Digital | Fixed 100 % | Off | **Light On Above** (6500 rpm), **Light Off Below** (6300 rpm) |
 | **Check Engine Light** | Digital | Fixed 100 % | On | **Bulb Check** (3 s): lit at key-on; then on for any current code or level 3, fast flash for level 2 and slow flash for level 1 once their codes have cleared |
-| **Tachometer** | PWM | Fixed 50 % | Off | **Pulses per Rev** (2), **Squelch Below** (60 rpm); frequency = rpm × pulses ÷ 60 |
+| **Tachometer (fixed duty)** | PWM | Fixed, **Duty** (50 %) | Off | **Pulses per Rev** (2), **Squelch Below** (60 rpm), **Duty**; frequency = rpm × pulses ÷ 60 |
+| **Tachometer (fixed pulse)** | PWM | Expression: the duty that keeps each pulse **Pulse Width** long | Off | **Pulses per Rev** (2), **Squelch Below** (60 rpm), **Pulse Width** (2 ms), **Duty Ceiling** (80 %); frequency as above |
+| **RPM as Duty (gauge / converter)** | PWM, **Carrier** (100 Hz) | Expression: rpm ÷ **Full Scale** × 100 | Off | **Full Scale** (8000 rpm), **Carrier**, **Squelch Below** (0) |
 | **Boost Solenoid (Wastegate)** | PWM 30 Hz | Candidate `wastegate_duty` | Off | **Stop Below RPM** (200) |
 | **VVT Solenoid (Intake Bank 1)** … **(Exhaust Bank 2)** | PWM 250 Hz | Candidate `vvt_duty_1` … `vvt_duty_4` | Off | **Stop Below RPM** (200); four templates, one per cam (chapter 25) |
 | **Power Steering Pump** | PWM 200 Hz | Fixed 100 % | Off | **Stop Below RPM** (200); 2 s min on, 1 s min off |
@@ -585,8 +587,8 @@ These are the settings as the page shows them. Check each against your own wirin
     <!-- src: firmware/Engine/Modules/Nitrous.cpp; firmware/Integration/OutputManager.cpp -->
 
 !!! example "Example 4 — tachometer on LS7"
-    From the **Tachometer** template: Pulses per Rev **2** (a 4-cylinder tacho), Squelch Below
-    **60 rpm**.
+    From the **Tachometer (fixed duty)** template: Pulses per Rev **2** (a 4-cylinder tacho), Squelch
+    Below **60 rpm**, Duty **50 %**.
 
     It writes: Kind *PWM*, Value From *Fixed* **50 %**, **Frequency From** *Expression*
     `rpm * pulses / 60`, on above 60 rpm and off at or below it. At 3000 rpm the output runs at
