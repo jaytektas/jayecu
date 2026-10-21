@@ -82,6 +82,15 @@ stays valid only for its **Valid For** time; if the frame stops arriving, the ch
 instead of freezing at its last value.
 <!-- src: definition/ecu.schema.yaml (gc_frame, gc_field) -->
 
+**With the key off the ECU is quiet.** The rest of a car's bus sleeps with the ignition, so with the
+key off (the ECU kept awake by USB) nothing is transmitted, OBD replies included, and anything still
+queued is dropped. The ECU still listens. It starts transmitting again at key-on.
+
+The ECU raises **P1657** (CAN1) or **P1658** (CAN2) when it transmits and nothing on the bus completes
+a frame: no other device, or one at a different bit rate. It is judged only with the key on, and not in
+the first two seconds after key-on, while the other devices are still starting up.
+<!-- src: firmware/Can/CanBroker.cpp (set_key_on, send_frame, publish_stats); firmware/Can/CanBroker.h (KEY_ON_SETTLE_MS) -->
+
 ## Procedure
 
 :material-circle:{ .level-basic } Basic
@@ -189,6 +198,7 @@ so the reading goes through the sensor's own diagnostics:
 | Symptom | Likely cause | Check |
 |---|---|---|
 | Nothing received, TX errors climbing | Wrong bit rate; the other device off; H and L swapped | Every device's rate; power; swap H and L |
+| **P1657** / **P1658** with the key on | No other device on that bus, or one at a different bit rate | Last Error: stuff or form = bit rate, ACK = nobody there |
 | Errors that come and go | Termination wrong; a star wiring; long stubs | 60 Ω between H and L; the topology |
 | Meter reads 120 Ω | Far end not terminated | The far device's terminator switch |
 | Meter reads 40 Ω | Three terminators | A terminated device in the middle |

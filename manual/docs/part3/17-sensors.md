@@ -391,7 +391,7 @@ reads. **+ Band** adds a position. Position 0 is rest, the one position that may
   <!-- src: definition/ecu.schema.yaml (composition outputs, Sensors aux_output); firmware/Platform/AcquireHal.h (acquire_pulse_part); firmware/Pipeline/Stages.h (cond_curve_ends) -->
 
 <figure markdown>
-  ![Flex Fuel Composition & Temperature: Frequency interface on DIG5, the calibration from Hz to %, and both readings](../img/studio/sensors-flex-page.png)
+  ![Flex Fuel Composition & Temperature: Frequency interface on DIG5, the calibration from Hz to %, the Fuel Temperature section (Measure Low Time, Raw now, the 1000–5000 µs to −40–125 °C curve), and both readings](../img/studio/sensors-flex-page.png)
   <figcaption>Figure 17.15 — Flex fuel. The default calibration shown is a placeholder.</figcaption>
 </figure>
 
