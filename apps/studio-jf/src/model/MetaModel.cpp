@@ -769,6 +769,7 @@ bool MetaModel::loadFile(const std::string &path)
                         t.typeScaled = vl["type_scaled"].boolean();
                         for (const jf::JJson &sv : vl["element_scales"].arr()) t.cellElemScales.push_back(sv.number());
                         for (const jf::JJson &uv : vl["element_units"].arr())  t.cellElemUnits.push_back(uv.str());
+                        if (vl.contains("digits")) t.cellDigits = vl["digits"].number<int>();
                         t.xAxis.rel      = ax["rel_offset"].number<int>();
                         t.xAxis.datatype = ax["datatype"].str();
                         t.xAxis.scale    = ax["scale"].number(1.0);
@@ -1156,6 +1157,11 @@ TableImage MetaModel::resolveTable(const std::string &path) const
         // rather than the table's own schema. Cache turns that into real units/precision/bounds; the
         // meta cannot, because a generic input's type lives in the tune.
         ti.cellTypeScaled = et->typeScaled;
+        // Not type-scaled: the cells' units and precision are the schema's, per element (see ElemTable).
+        if (!et->typeScaled) {
+            if (idx >= 0 && idx < int(et->cellElemUnits.size())) ti.cellUnits = et->cellElemUnits[idx];
+            if (et->cellDigits >= 0) ti.cellDigits = et->cellDigits;
+        }
         ti.elemArray = arr->module.empty() ? arr->name : (arr->module + "." + arr->name);
         ti.elemIndex = idx;
         auto addAxis = [&](const ElemAxis &ax) {
@@ -1475,7 +1481,8 @@ MetaModel::Location MetaModel::locateUncached(const std::string &path) const
                 L.label = et.label.empty() ? et.name : et.label;
                 // A type-scaled cal takes its UNITS from the type occupying this slot, exactly as it takes
                 // its scale — the same per-element vector, read at the same index.
-                L.units = (et.typeScaled && idx >= 0 && idx < static_cast<int>(et.cellElemUnits.size()))
+                // …and any other element table takes them from the same vector, by its own schema.
+                L.units = (idx >= 0 && idx < static_cast<int>(et.cellElemUnits.size()))
                               ? et.cellElemUnits[idx] : std::string{};
                 return L;
             }

@@ -6,6 +6,7 @@
 #include "../../model/Cache.h"
 #include "../../model/MathEvaluator.h"
 #include "../../model/Keymap.h"
+#include "../../model/UnitManager.h"
 #include <j/graphics/VectorGraphics.h>
 #include <cstdio>
 #include <algorithm>
@@ -21,6 +22,29 @@ int CurveWidget::curveRow(const Cache& c, const TableImage& t, const std::string
     const double v = rowExpr.empty() ? 0.0 : evalSource(rowExpr).v;
     const int idx = std::isfinite(v) ? static_cast<int>(std::lround(v)) : 0;   // NaN (bad expr) -> row 0
     return std::clamp(idx, 0, std::max(0, rows - 1));
+}
+
+// THE UNITS A CURVE IS DRAWN IN, the same ones its table beside it shows. A curve plotted the stored
+// numbers whatever the units menu said, so a fuel temperature in °F read 257 in the table and 125 on the
+// curve above it. The raw axis goes through the axis view (counts / mV / V, Hz…), the values through the
+// unit converter, both chosen as the table chooses them: the widget's own pin, else the user's preference.
+// Drawing converts to display; a drag or a nudge converts back before it is written.
+namespace {
+struct CurveUnits {
+    Cache::AxisView x;
+    std::string     from, to;   // the cells' unit and the one they are shown in ("" = as stored)
+    double show(double v) const  { return to.empty() || to == from ? v : UnitManager::instance().convert(v, from, to); }
+    double store(double v) const { return to.empty() || to == from ? v : UnitManager::instance().convert(v, to, from); }
+};
+CurveUnits curveUnits(const PanelElement& el, const Cache& c, const TableImage& t, const std::string& bind) {
+    CurveUnits u;
+    u.x = c.axisView(t, 0, el.prop("axisUnit"));
+    u.from = t.cellUnits.empty() ? c.unit(bind) : t.cellUnits;
+    const std::string pin = el.prop("valueUnit");
+    if (u.from.empty() || pin == "Raw") return u;
+    u.to = (!pin.empty() && pin != "Auto") ? pin : UnitManager::instance().displayUnitFor(u.from);
+    return u;
+}
 }
 
 bool CurveWidget::declRange(const std::string& s, double& lo, double& hi) {
@@ -111,9 +135,11 @@ void CurveWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
     if (bind.empty() || n < 2) { vg.flush(buf); placeholder(); return; }
 
     const int row = curveRow(c, t, el.prop("row"));
-    const std::vector<double> xs = c.tiBins(t, 0);
+    const CurveUnits u = curveUnits(el, c, t, bind);
+    std::vector<double> xs = c.tiBins(t, 0);
+    for (double& x : xs) x = u.x.toDisplay(x);
     std::vector<double> ys(n);
-    for (int i = 0; i < n; ++i) ys[i] = c.tiCell(t, i, row, 0);
+    for (int i = 0; i < n; ++i) ys[i] = u.show(c.tiCell(t, i, row, 0));
     const Plot p = plotOf(r, xs, ys, el.prop("xRange"), el.prop("yRange"));
     if (!p.ok) { vg.flush(buf); placeholder(); return; }
     const double xlo = p.xlo, xhi = p.xhi, ylo = p.ylo, yhi = p.yhi;
@@ -188,9 +214,11 @@ bool CurveWidget::handleControlInput(const jf::JRect& r, const ControlInput& in)
     const int n = c.tiLiveN(t, 0);
     if (n < 2) return false;
     const int row = curveRow(c, t, el.prop("row"));
+    const CurveUnits u = curveUnits(el, c, t, bindPath());   // the units it was DRAWN in
     std::vector<double> xs = c.tiBins(t, 0);
+    for (double& x : xs) x = u.x.toDisplay(x);
     std::vector<double> ys(n);
-    for (int i = 0; i < n; ++i) ys[i] = c.tiCell(t, i, row, 0);
+    for (int i = 0; i < n; ++i) ys[i] = u.show(c.tiCell(t, i, row, 0));
     const Plot p = plotOf(r, xs, ys, el.prop("xRange"), el.prop("yRange"));   // SAME geometry the render drew the handles with
     if (!p.ok) return false;
     const float px = p.px, py = p.py, pw = p.pw, ph = p.ph;
@@ -223,7 +251,7 @@ bool CurveWidget::handleControlInput(const jf::JRect& r, const ControlInput& in)
         const double ym  = std::max(std::fabs(yhi), std::fabs(ylo));
         const int    dec = ym >= 100.0 ? 0 : (ym >= 10.0 ? 1 : 2);   // same resolution the Y labels use
         const double step = std::pow(10.0, -dec);
-        c.tiSetCell(t, k, row, 0, ys[k] + mult * step);
+        c.tiSetCell(t, k, row, 0, u.store(ys[k] + mult * step));
         return true;
     }
     if (in.kind == ControlInput::Kind::Move) {
@@ -239,8 +267,9 @@ bool CurveWidget::handleControlInput(const jf::JRect& r, const ControlInput& in)
         if (k > 0)     x = std::max(x, xs[k - 1]);
         if (k < n - 1) x = std::min(x, xs[k + 1]);
         xs[k] = std::clamp(x, flx, fhx);
+        for (double& b : xs) b = u.x.toStorage(b);
         c.tiWriteBins(t, 0, xs);
-        c.tiSetCell(t, k, row, 0, y);
+        c.tiSetCell(t, k, row, 0, u.store(y));
         return true;
     }
     if (in.kind == ControlInput::Kind::Release) { setCurveDragIndex(el.uid, -1); curveDragRanges().erase(el.uid); return true; }

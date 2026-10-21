@@ -188,7 +188,11 @@ public:
         // element's slot), driven by the sensor type occupying that slot; empty ⇒ use the single cellScale.
         bool                     typeScaled = false;
         std::vector<double>      cellElemScales;
+        // Per-element units. A type-scaled cal takes them from the sensor type (Cache); any other 1-D
+        // element table — a secondary reading's curve, the flex fuel temperature in °C — has them here,
+        // and with its digits they are what lets the unit converter show it like any other setting.
         std::vector<std::string> cellElemUnits;
+        int                      cellDigits = -1;   // the schema's precision (-1 = unstated)
     };
 
     struct ElemSubField {      // one field of an element's nested sub-struct array (precond/cand)
