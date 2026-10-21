@@ -44,7 +44,14 @@ def real(raw, f):
     return f"{v:.{digits}f}"
 
 
-def describe(name, f):
+def signal_names(meta):
+    """Signal index -> the label the studio shows for it, so a signal default reads '231 — Instant
+    Manifold Pressure' rather than a bare index."""
+    tele = meta["telemetry"]
+    return {i: tele.get(n, {}).get("label") or n for n, i in meta["signals"].items()}
+
+
+def describe(name, f, signals):
     kind = f.get("type")
     units = f.get("units", "")
     if f.get("options"):
@@ -63,17 +70,20 @@ def describe(name, f):
     else:
         rng = f"{real(f['min'], f)} to {real(f['max'], f)}" if "min" in f and "max" in f else ""
         default = real(f["default"], f) if isinstance(f.get("default"), (int, float)) else ""
+        if f.get("kind") == "signal" and isinstance(f.get("default"), int):
+            d = f["default"]
+            default = f"{d} — {signals[d]}" if d in signals else f"{d} — none" if d < 0 else default
     return rng, default, units
 
 
-def settings_of(group, fields):
+def settings_of(group, fields, signals):
     rows = []
     for name, f in fields.items():
         if not isinstance(f, dict) or f.get("type") not in ("scalar", "table", "array", "bits"):
             continue
         if f.get("hidden"):
             continue
-        rng, default, units = describe(name, f)
+        rng, default, units = describe(name, f, signals)
         rows.append((f.get("label") or name, f"{group}.{name}", units, rng, default, f.get("help", "")))
     return rows
 
@@ -99,6 +109,7 @@ def main():
     meta = load_meta()
     OUT.mkdir(parents=True, exist_ok=True)
     groups = meta["config"]
+    signals = signal_names(meta)
     index = ["# Every setting, by module", "",
              "Generated from the definition the studio loads, so it always matches the firmware it was built "
              "with. Each group lists every setting with its path, units, range, default and the same "
@@ -109,7 +120,7 @@ def main():
         fields = groups[group]
         if not isinstance(fields, dict):
             continue
-        rows = settings_of(group, fields)
+        rows = settings_of(group, fields, signals)
         if not rows:
             continue
         total += len(rows)
