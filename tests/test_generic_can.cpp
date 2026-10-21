@@ -539,16 +539,21 @@ int main() {
         ch.err.state = 2; ch.err.last_err = 3;             // error passive, ACK error: nobody there
         const uint16_t NO_ACK = 0x1657;
 
-        br.set_key_on(false);
-        for (uint32_t ms = 0; ms <= 2100; ms += 10) br.update(ms);
+        auto run = [&](uint32_t from, uint32_t to, bool key) {
+            for (uint32_t ms = from; ms <= to; ms += 10) { br.set_key_on(key, ms); br.update(ms); }
+        };
+        run(0, 2100, false);
         CHECK(dtc.code_severity(NO_ACK) == 0);             // key off: silence is expected
 
-        br.set_key_on(true);
-        for (uint32_t ms = 2110; ms <= 4200; ms += 10) br.update(ms);
-        CHECK(dtc.code_severity(NO_ACK) != 0);             // key on: it is a fault
+        // POWER-UP: the first window judged after key-on is mostly key-off silence, and the rest of the
+        // bus is still booting. No verdict until it has had KEY_ON_SETTLE_MS.
+        run(2110, 2110 + CanBroker::KEY_ON_SETTLE_MS - 20, true);
+        CHECK(dtc.code_severity(NO_ACK) == 0);
 
-        br.set_key_on(false);
-        for (uint32_t ms = 4210; ms <= 5300; ms += 10) br.update(ms);
+        run(2110 + CanBroker::KEY_ON_SETTLE_MS, 6000, true);
+        CHECK(dtc.code_severity(NO_ACK) != 0);             // key on and settled: it is a fault
+
+        run(6010, 7100, false);
         CHECK(dtc.code_severity(NO_ACK) == 0);             // and goes the moment the key does
     }
 

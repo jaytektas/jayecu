@@ -444,7 +444,7 @@ static void can_task(void* /*pv*/) {
     uint32_t can_crc_seen = crc32_buf(reinterpret_cast<const uint8_t*>(&g_config.can), sizeof(g_config.can));
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(1));
-        g_can_broker.set_key_on(g_system_active);   // no-acknowledgement is only a fault with the key on
+        g_can_broker.set_key_on(g_system_active, platform_get_tick_ms());   // no-ACK is a fault only with the key on
         // A tune edit that moves OBD to the other bus (or switches it off) takes effect NOW. The
         // responder's RX subscriptions are registered per bus, so without this the change sat in the
         // config doing nothing until the next reset — the tune said one thing and the ECU did another.

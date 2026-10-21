@@ -108,8 +108,16 @@ public:
     // that is deliberately silent rather than reporting it as a fault every second.
     void set_bus_listen_only(uint8_t idx, bool on) { if (idx < MAX_BUSES) listen_only_[idx] = on; }
     // …and whether the key is on, because with it off nobody is expected to answer: the rest of a car's
-    // bus sleeps with the ignition, and an ECU held up by USB still transmits into it.
-    void set_key_on(bool on) { key_on_ = on; }
+    // bus sleeps with the ignition, and an ECU held up by USB still transmits into it. `now_ms` dates
+    // the key-on edge, so the bus is given KEY_ON_SETTLE_MS to come up before it is judged.
+    void set_key_on(bool on, uint32_t now_ms) {
+        if (on && !key_on_) key_on_ms_ = now_ms;
+        key_on_ = on;
+    }
+    // Long enough for the rest of a car's bus to boot after the ignition, AND for one whole stats window
+    // (a second) to lie after that: the window that straddles key-on is mostly key-off silence, and
+    // judging it raised P1657 on every power-up.
+    static constexpr uint32_t KEY_ON_SETTLE_MS = 2000;
 
     // Publish per-bus health to the signal bus. Called once per update(); the window is a second, so
     // this does real work about once in a thousand ticks.
@@ -144,6 +152,7 @@ private:
     uint32_t bitrate_[MAX_BUSES]  = { 500000u, 500000u };
     bool     listen_only_[MAX_BUSES] = { false, false };   // a silent bus cannot ACK-fail
     bool     key_on_ = true;                                // see set_key_on()
+    uint32_t key_on_ms_ = 0;                                // when it last came on
     uint32_t tx_fail_seen_[MAX_BUSES] = { 0, 0 };          // last window's refusal total
     uint32_t stats_window_ms_     = 0;
 

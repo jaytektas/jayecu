@@ -133,6 +133,8 @@ void CanBroker::publish_stats(SignalBus& bus, uint32_t now_ms) {
         if (dtc_ && !listen_only_[b]) {
             if (!key_on_)
                 dtc_->heal(P_CAN_NO_ACK + b);
+            else if (now_ms - key_on_ms_ < KEY_ON_SETTLE_MS)
+                ;                                      // the bus is still coming up: no verdict yet
             else if (offering && mute && st.tx_frames == 0)
                 dtc_->raise(P_CAN_NO_ACK + b, DtcSource::CONFIG, DTC_SEV_LEVEL1, now_ms, DTC_TTL_DEFAULT);
             else if (st.tx_frames > 0)
