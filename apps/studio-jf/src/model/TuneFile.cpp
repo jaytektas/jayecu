@@ -125,9 +125,15 @@ bool isEnumRef  (const std::string &kind, const std::vector<std::string> &opts)
 
 // value -> name. Returns false when the value names nothing (an out-of-range ordinal, a catalog gap),
 // leaving the caller to write the raw number so no information is lost on the way out.
+//
+// AN OPTION IS NAMED BY ITS ID when the meta gives one, not by its label. A label is for reading, and it
+// changes: the flex sensor's "Flex Fuel Composition & Temperature (ethanol)" became "Flex Fuel Ethanol",
+// and a CAN field saved under the old label came out of a firmware update as "could not be resolved".
+// The id ("ethanol") is what the definition keeps stable.
 bool refToName(const MetaModel &meta, const std::string &kind,
                const std::vector<std::string> &opts, double raw, std::string &out,
-               const std::vector<MetaModel::PickerSet> &pins = {})
+               const std::vector<MetaModel::PickerSet> &pins = {},
+               const std::vector<std::string> &ids = {})
 {
     if (pinToLabel(pins, raw, out)) return true;
     if (isSignalRef(kind)) {
@@ -140,7 +146,8 @@ bool refToName(const MetaModel &meta, const std::string &kind,
     if (isEnumRef(kind, opts)) {
         const long v = std::lround(raw);
         if (v < 0 || v >= static_cast<long>(opts.size())) return false;
-        out = opts[static_cast<size_t>(v)];
+        out = (ids.size() == opts.size() && !ids[static_cast<size_t>(v)].empty())
+                ? ids[static_cast<size_t>(v)] : opts[static_cast<size_t>(v)];
         return !out.empty();
     }
     return false;
@@ -148,9 +155,12 @@ bool refToName(const MetaModel &meta, const std::string &kind,
 
 // name -> value. False when this firmware has no such signal/option: the caller reports that ONE
 // field rather than failing the load, because the rest of the tune is still perfectly good.
+// An enum is looked up by id first, then by label — a tune written before ids were stored names its
+// options by label, and those still load wherever the label has not changed.
 bool nameToRef(const MetaModel &meta, const std::string &kind,
                const std::vector<std::string> &opts, const std::string &name, double &out,
-               const std::vector<MetaModel::PickerSet> &pins = {})
+               const std::vector<MetaModel::PickerSet> &pins = {},
+               const std::vector<std::string> &ids = {})
 {
     if (labelToPin(pins, name, out)) return true;
     if (isSignalRef(kind)) {
@@ -162,8 +172,20 @@ bool nameToRef(const MetaModel &meta, const std::string &kind,
         return true;
     }
     if (isEnumRef(kind, opts)) {
+        if (ids.size() == opts.size())
+            for (size_t i = 0; i < ids.size(); ++i)
+                if (!ids[i].empty() && ids[i] == name) { out = static_cast<double>(i); return true; }
         for (size_t i = 0; i < opts.size(); ++i)
             if (opts[i] == name) { out = static_cast<double>(i); return true; }
+        // A sensor's channel used to be labelled "<sensor> (<id>)" — "Flex Fuel Composition & Temperature
+        // (ethanol)" — and a tune saved then holds that label. The id in the brackets still names it.
+        if (ids.size() == opts.size() && name.size() > 2 && name.back() == ')') {
+            const size_t open = name.rfind('(');
+            const std::string id = open == std::string::npos ? std::string()
+                                 : name.substr(open + 1, name.size() - open - 2);
+            for (size_t i = 0; !id.empty() && i < ids.size(); ++i)
+                if (ids[i] == id) { out = static_cast<double>(i); return true; }
+        }
         return false;
     }
     return false;
@@ -225,7 +247,7 @@ std::vector<uint8_t> TuneFile::serialise(const std::vector<uint8_t> &image, cons
         }
         const double rawv = MetaModel::decodeRaw(f.datatype, img + f.offset);
         std::string nm;
-        if (refToName(meta, f.kind, f.options, rawv, nm)) scalars[key] = jf::JJson(nm);
+        if (refToName(meta, f.kind, f.options, rawv, nm, {}, f.optionIds)) scalars[key] = jf::JJson(nm);
         else                                              scalars[key] = jf::JJson(rawv);
     }
 
@@ -346,7 +368,7 @@ std::vector<uint8_t> TuneFile::serialise(const std::vector<uint8_t> &image, cons
                 if (base + f.relOffset + elemSz > sz) continue;
                 const double av = MetaModel::decodeRaw(f.datatype, img + base + f.relOffset);
                 std::string anm;
-                if (refToName(meta, f.kind, f.options, av, anm, f.pickerSets)) arrays[k] = jf::JJson(anm);
+                if (refToName(meta, f.kind, f.options, av, anm, f.pickerSets, f.optionIds)) arrays[k] = jf::JJson(anm);
                 else                                             arrays[k] = jf::JJson(av);
             }
         }
@@ -415,7 +437,7 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
                 } else if (val.isString() && !f.isText()) {
                     // Format 2: a reference stored by name. Resolve it against THIS firmware.
                     double rv = 0.0;
-                    if (nameToRef(meta, f.kind, f.options, val.str(), rv))
+                    if (nameToRef(meta, f.kind, f.options, val.str(), rv, {}, f.optionIds))
                         MetaModel::encodeRaw(f.datatype, img + f.offset, rv);
                     else
                         report.unresolved.push_back(key + " -> " + val.str());
@@ -540,7 +562,7 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
             if (L.offset >= 0 && L.offset + esz <= sz) {
                 if (val.isString()) {                    // a reference, stored by name
                     double rv = 0.0;
-                    if (nameToRef(meta, L.valueKind, L.options, val.str(), rv, L.pickerSets)) {
+                    if (nameToRef(meta, L.valueKind, L.options, val.str(), rv, L.pickerSets, L.optionIds)) {
                         MetaModel::encodeRaw(L.datatype, img + L.offset, rv);
                         ++report.migrated;
                     } else {

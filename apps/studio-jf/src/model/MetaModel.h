@@ -101,6 +101,7 @@ public:
         // about what text is — they each used to re-test kind themselves.
         bool isText() const { return kind == "string"; }
         std::vector<std::string> options;   // enum option labels (kind == "enum")
+        std::vector<std::string> optionIds; // their stable ids, where the meta gives them (see ArrayField)
         // Packed field: flags are stored several to a word (a TS `bits, U32, 1356, [0:0]`), so without the
         // range they all decode to the same number and writing one CLOBBERS its neighbours.
         BitRange    bits;
@@ -746,6 +747,7 @@ public:
         // scalar/run/table — so the field's own kind needs its own name.)
         std::string valueKind;
         std::vector<std::string> options;
+        std::vector<std::string> optionIds;   // the options' stable ids: what the tune stores, when known
         // A board-pin selector: its number is an index into the BOARD's pool, so it ages exactly like a
         // SignalId — change the pool and a sensor quietly reads a different physical pin. It carries no
         // `kind`, only these gated option lists, so the tune names it by the option's label.

@@ -197,6 +197,42 @@ int main() {
     }
 
     std::puts("");
+    std::puts("=== an option is named by its ID, which a relabel cannot break ===");
+    {
+        // A CAN field's signal is an enum over the catalog's labels. Saved by label, it broke the day the
+        // flex sensor's "Flex Fuel Composition & Temperature (ethanol)" became "Flex Fuel Ethanol".
+        const std::string SIG = "can.gc_field[0].sig";
+        const MetaModel::Location L = m.locate(SIG);
+        int eth = -1;
+        for (size_t i = 0; i < L.optionIds.size(); ++i) if (L.optionIds[i] == "ethanol") eth = int(i);
+        ck(eth >= 0 && L.optionIds.size() == L.options.size(), "the CAN field's options carry their ids");
+        Cache& c4 = Cache::instance();
+        c4.setConfigImage(m.defaultImage());
+        c4.setConfigValue(SIG, eth);
+        const std::vector<uint8_t> d = TuneFile::serialise(c4.configImage(), m, nullptr);
+        jf::JJson root = jf::JJson::parse(std::string(d.begin(), d.end()));
+        const jf::JJson& v = root["arrays"][SIG];
+        ck(v.isString() && v.str() == "ethanol", "the CAN field is stored as 'ethanol'",
+           v.isString() ? v.str() : "number");
+
+        // The label still reads: every tune written before ids were stored names its options that way.
+        // And the label it had before that: "<sensor> (<id>)", which the bench's tune held across 0.4.9.
+        for (const std::string& stored : { std::string("ethanol"), L.options[size_t(eth)],
+                                           std::string("Flex Fuel Composition & Temperature (ethanol)") }) {
+            std::string t(d.begin(), d.end());
+            const std::string from = "\"" + SIG + "\":\"ethanol\"";
+            const auto at = t.find(from);
+            if (at != std::string::npos) t.replace(at, from.size(), "\"" + SIG + "\":\"" + stored + "\"");
+            MigrationReport rep;
+            std::vector<uint8_t> img =
+                TuneFile::deserialise(std::vector<uint8_t>(t.begin(), t.end()), m, rep, nullptr);
+            c4.setConfigImage(img);
+            ck(int(c4.configValue(SIG)) == eth && rep.unresolved.empty(),
+               "…and '" + stored + "' loads back to it", std::to_string(int(c4.configValue(SIG))));
+        }
+    }
+
+    std::puts("");
     std::puts("=== a name this firmware does not have is REPORTED, not guessed ===");
     {
         std::string t = text;

@@ -560,6 +560,8 @@ bool MetaModel::loadFile(const std::string &path)
                 cf.bitGroups = parseBitGroups(e);          // named groups packed into this scalar
                 for (const jf::JJson &ov : e["options"].arr())
                     cf.options.push_back(ov.str());
+                for (const jf::JJson &ov : e["option_ids"].arr())
+                    cf.optionIds.push_back(ov.str());
                 config_[key] = cf;
             // A table is a table whether it has 1 axis (a curve's worth of data — 1 row) or 2/3 (a map).
             // 2D/3D maps carry "rows"; a 1-axis table has an `axes` ref but no "rows" (it's a single row).
@@ -1330,7 +1332,7 @@ MetaModel::Location MetaModel::locateUncached(const std::string &path) const
         L.offset = f.offset; L.datatype = f.datatype; L.scale = f.scale;
         L.minV = f.minV; L.maxV = f.maxV; L.bits = f.bits;
         L.units = f.units; L.label = f.label; L.help = f.help; L.digits = f.digits;
-        L.valueKind = f.kind; L.options = f.options;
+        L.valueKind = f.kind; L.options = f.options; L.optionIds = f.optionIds;
         return L;
     }
 
@@ -1490,7 +1492,8 @@ MetaModel::Location MetaModel::locateUncached(const std::string &path) const
                 L.size = f.size;
                 L.minV = f.minV; L.maxV = f.maxV;
                 L.units = f.units; L.label = f.label; L.help = f.help; L.digits = f.digits;
-                L.valueKind = f.kind; L.options = f.options; L.pickerSets = f.pickerSets;
+                L.valueKind = f.kind; L.options = f.options; L.optionIds = f.optionIds;
+                L.pickerSets = f.pickerSets;
                 return L;
             }
     }
