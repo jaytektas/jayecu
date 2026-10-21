@@ -97,8 +97,11 @@ itself (long-term trims, for example), or when you edited the tune offline.
       <figcaption>Figure 5.3 — The landing page. Connect to an ECU is the first card.</figcaption>
     </figure>
 
-3. If several ECUs are connected, pick one from **Select an ECU**. Each is listed by board, the end of
-   its serial number, and port.
+3. If several ECUs are connected, pick one from **Connect to which ECU?**. Each is listed by the car
+   its tune names (when the tune's **Vehicle Identity** is filled in), its board, its full ECU id and
+   its port. The panel under the list shows the selected ECU's vehicle, tune, firmware and when it was
+   last seen.
+   <!-- src: apps/studio-jf/main.cpp (connect: several ECUs answer); apps/studio-jf/src/ui/EcuPickRows.h -->
 4. Answer the firmware question if it appears (**Not now** is fine for a first connection).
 5. Wait for the chip to turn green, and answer the compare report if it opens.
 

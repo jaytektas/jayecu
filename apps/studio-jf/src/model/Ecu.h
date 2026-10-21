@@ -20,11 +20,22 @@
 // Multiple tunes can coexist; current_tune is a pointer to whichever was last pushed to hardware.
 class Ecu {
 public:
+    // WHAT A PERSON TELLS THEIR ECUS APART BY. The uid and the board are the same on every ECU of a kind;
+    // the car is not. The tune's Vehicle Identity (Name, Make, Model, …) is read from the ECU's current
+    // tune, and is empty wherever nobody filled it in.
+    struct Vehicle {
+        std::string name, make, model, engine, vin, notes;
+        bool empty() const { return name.empty() && make.empty() && model.empty() && engine.empty()
+                                    && vin.empty() && notes.empty(); }
+    };
     struct Summary {
         std::string uid;
-        std::string board;
-        std::string currentTune;
+        std::string board;         // the board id ("jaytek_v1"; "ts" for an imported definition)
+        std::string label;         // label(): the board, or an import's own signature
+        std::string currentTune;   // the tune the vehicle details came from
         std::string lastSeen;
+        std::string lastPort;
+        Vehicle     vehicle;
     };
 
     // Root of the on-disk ECU store (created on demand).
@@ -32,6 +43,8 @@ public:
 
     // List all known ECUs, most-recently-seen first.
     static std::vector<Summary> list();
+    // One entry's summary, for an ECU found on a port (empty uid when it is not in the library).
+    static Summary summary(const std::string &uid);
 
     // Open an existing ECU entry. Returns nullptr if the UID is unknown.
     static Ecu *open(const std::string &uid);

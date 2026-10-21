@@ -37,7 +37,11 @@ own folder, so two cars never mix. One ECU can have several **named tunes** — 
 tune — and one of them is the one open.
 
 - **File ▸ Open ECU…** and **Recent ECUs**: the ECUs this studio has met, with or without one
-  connected.
+  connected. Each ECU is named by the car in its tune's **Vehicle Identity** (Name, else Make and
+  Model), then its board and full ECU id. In **Open ECU…** the panel under the list shows the selected
+  ECU's vehicle, engine, VIN, notes, tune and when it was last seen. Filling in Vehicle Identity is
+  what makes two ECUs of the same board easy to tell apart. The dialog can be resized from its edges.
+  <!-- src: apps/studio-jf/src/ui/EcuPickRows.h; apps/studio-jf/src/ui/ListPickerDialog.h; apps/studio-jf/src/model/Ecu.cpp (vehicle from the current tune) -->
 - **File ▸ Open Tune…**: the tunes of the open ECU, **its connect points** (restore points) and the
   tunes saved **before each firmware update**, newest first. A firmware backup is marked
   *(firmware backup)*; opening one copies it in as a named tune and converts it to the firmware the

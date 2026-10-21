@@ -97,6 +97,7 @@ static std::function<void()> g_trackDockHomes, g_syncViewToggles;
 #include "ui/TuneDiffDialog.h"      // …and the same question with the evidence in front of it
 #include "model/TuneDiff.h"
 #include "ui/ListPickerDialog.h"
+#include "ui/EcuPickRows.h"
 #include "ui/CanTemplateDialog.h"
 #include "ui/ChannelPickerDialog.h"
 #include "ui/ChannelPropsDialog.h"
@@ -2174,11 +2175,9 @@ int main(int argc, char** argv) {
     std::function<void()> openEcuFn = [&win, &openEcuByIdBoard]{
         auto ecus = Ecu::list();
         if (ecus.empty()) { win.showStatus("No ECUs in the library", 3000); return; }
-        std::vector<std::string> labels;
-        for (const auto& e : ecus)
-            labels.push_back(e.board + "  \xC2\xB7  uid \xE2\x80\xA6" + (e.uid.size() > 6 ? e.uid.substr(e.uid.size() - 6) : e.uid)
-                             + (e.lastSeen.empty() ? "" : "  \xC2\xB7  " + e.lastSeen));
-        win.openModal<ListPickerDialog>(std::string("Open an existing ECU"), labels, false,
+        std::vector<ListPickerDialog::Row> rows;
+        for (const auto& e : ecus) rows.push_back(ecurows::row(e, e.uid, e.board));
+        win.openModal<ListPickerDialog>(std::string("Open an existing ECU"), rows, false,
             std::function<void(int, std::string)>([&win, ecus, &openEcuByIdBoard](int idx, std::string) {
                 if (idx >= 0 && idx < static_cast<int>(ecus.size())) openEcuByIdBoard(ecus[idx].uid, ecus[idx].board);
             }));
@@ -2196,7 +2195,8 @@ int main(int argc, char** argv) {
           if (tab == std::string::npos) continue;
           const std::string board = line.substr(0, tab), uid = line.substr(tab + 1);
           if (uid.empty()) continue;
-          recentMenu.add(g, board + " \xC2\xB7 \xE2\x80\xA6" + (uid.size() > 6 ? uid.substr(uid.size() - 6) : uid))
+          const std::string car = ecurows::carName(Ecu::summary(uid).vehicle);
+          recentMenu.add(g, (car.empty() ? "" : car + " \xC2\xB7 ") + board + " \xC2\xB7 " + uid)
               ->onTriggered.connect([&openEcuByIdBoard, uid, board]{ openEcuByIdBoard(uid, board); });
           ++n;
       } }
@@ -3177,13 +3177,16 @@ int main(int argc, char** argv) {
         }
         if (devs.size() == 1)  { openPort(devs.front().port); return; }
         // More than one ECU on the bus → let the user pick which to connect to (label = board · uid (port)).
-        std::vector<std::string> labels, ports;
+        std::vector<ListPickerDialog::Row> rows;
+        std::vector<std::string> ports;
         for (const auto& d : devs) {
-            labels.push_back(d.board + "  \xC2\xB7  " + (d.uid.size() > 6 ? d.uid.substr(d.uid.size() - 6) : d.uid) + "  (" + d.port + ")");
+            rows.push_back(ecurows::row(Ecu::summary(d.uid), d.uid, d.board, d.port, d.fwVersion));
             ports.push_back(d.port);
         }
-        win.openModal<ListPickerDialog>(std::string("Select an ECU"), labels, false,
-            [ports, openPort](int idx, std::string) { if (idx >= 0 && idx < (int)ports.size()) openPort(ports[idx]); });
+        win.openModal<ListPickerDialog>(std::string("Connect to which ECU?"), rows, false,
+            std::function<void(int, std::string)>([ports, openPort](int idx, std::string) {
+                if (idx >= 0 && idx < (int)ports.size()) openPort(ports[idx]);
+            }));
     };
     connectBtn.onClicked.connect([&]{ if (connectFn) connectFn(); });
     static jf::JButton verifyBtn(g, "Verify \xE2\x86\x94 ECU", 0.f, 22.f);   // a widget, so the gate can grey it

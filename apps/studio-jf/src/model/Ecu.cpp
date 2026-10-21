@@ -149,24 +149,57 @@ Ecu *Ecu::openOrCreate(const std::string &uid, const std::string &board)
     return e;
 }
 
+namespace {
+
+// The summary of the entry in `dir`, from its ecu.json and the vehicle fields of its tune: the current
+// tune, else the last active one, else any. Empty uid when the entry cannot be read.
+Ecu::Summary readSummary(const fs::path &dir)
+{
+    Ecu::Summary s;
+    auto parsed = jf::JJson::tryParseFile((dir / "ecu.json").string());
+    if (!parsed || !parsed->isObject() || parsed->empty()) return s;
+    const jf::JJson &o = *parsed;
+    s.uid      = dir.filename().string();
+    s.board    = o["board"].str();
+    s.label    = o["label"].str().empty() ? s.board : o["label"].str();
+    s.lastSeen = o["last_seen"].str();
+    s.lastPort = o["last_port"].str();
+    std::string tune = o["current_tune"].str();
+    if (tune.empty() || !fs::exists(dir / "tunes" / (tune + ".tune"))) tune = o["last_active_tune"].str();
+    if (tune.empty() || !fs::exists(dir / "tunes" / (tune + ".tune"))) {
+        tune.clear();
+        std::error_code ec;
+        for (const auto &t : fs::directory_iterator(dir / "tunes", ec))
+            if (t.path().extension() == ".tune") { tune = t.path().stem().string(); break; }
+    }
+    s.currentTune = tune;
+    if (tune.empty()) return s;
+    auto t = jf::JJson::tryParseFile((dir / "tunes" / (tune + ".tune")).string());
+    if (!t || !t->isObject()) return s;
+    const jf::JJson &sc = (*t)["scalars"];
+    s.vehicle = { sc["vehicle.Name"].str(), sc["vehicle.Make"].str(), sc["vehicle.Model"].str(),
+                  sc["vehicle.Engine"].str(), sc["vehicle.VIN"].str(), sc["vehicle.Notes"].str() };
+    return s;
+}
+
+} // namespace
+
 std::vector<Ecu::Summary> Ecu::list()
 {
     std::vector<Summary> out;
     std::error_code ec;
     for (const auto &entry : fs::directory_iterator(ecuRoot(), ec)) {
         if (!entry.is_directory()) continue;
-        auto parsed = jf::JJson::tryParseFile(entry.path().string() + "/ecu.json");
-        if (!parsed || !parsed->isObject() || parsed->empty()) continue;
-        const jf::JJson &o = *parsed;
-        // The label if the entry has one, the board otherwise — see Ecu::label(). Open ECU… lists these,
-        // and "ts" in that list names a protocol rather than any particular ECU.
-        const std::string lbl = o["label"].str();
-        out.push_back({entry.path().filename().string(),
-                       lbl.empty() ? o["board"].str() : lbl,
-                       o["current_tune"].str(),
-                       o["last_seen"].str()});
+        Summary s = readSummary(entry.path());
+        if (!s.uid.empty()) out.push_back(std::move(s));
     }
     std::sort(out.begin(), out.end(),
               [](const Summary &a, const Summary &b) { return a.lastSeen > b.lastSeen; });
     return out;
+}
+
+Ecu::Summary Ecu::summary(const std::string &uid)
+{
+    if (uid.empty()) return {};
+    return readSummary(fs::path(ecuRoot()) / uid);
 }

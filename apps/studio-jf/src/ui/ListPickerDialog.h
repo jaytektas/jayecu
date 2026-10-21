@@ -37,19 +37,28 @@ public:
     // different question: "we have no template for that controller", when the truth is "we have one
     // and this bus is not set up for it". The row stays, dimmed, with its reason in the text, so the
     // fix (change the bus rate) is the obvious next move rather than a guess.
+    //
+    // `facts` say more about a row than one line can: shown, label and value, in a panel under the list
+    // for the selected row. Open ECU uses them for the car, the tune and the ECU's full id — the things a
+    // person tells two ECUs of the same board apart by.
     struct Row {
         std::string text;
         bool        enabled = true;
+        std::vector<std::pair<std::string, std::string>> facts;
     };
 
-    static constexpr uint32_t kW = 420, kH = 460;
+    // The opening size; the window resizes from its edges (and the list and its panel with it).
+    static constexpr uint32_t kW = 520, kH = 460;
+    static constexpr uint32_t kMinW = 360, kMinH = 260;
     static constexpr float kBtnW = 84.f, kPad = 12.f, kRowH = 22.f;
     static float kBtnH() { return jf::JStyle::current().buttonHeight; }   // HEIGHT from JStyle (single source of truth)
     // Title-bar height is the framework's ONE canonical value (JStyle::titleBarHeight) — never hardcoded.
     static float kHeader() { return jf::JStyle::current().titleBarHeight; }
     static float kBtnY()   { return (kHeader() - kBtnH()) * 0.5f; }   // Cancel/OK centred in the header
     // Close [x] rect derived by the framework from the header (OK sits just left of it).
-    static jf::JRect _closeRect() { return jf::JCloseButton::rectFor({0.f, 0.f, static_cast<float>(kW), kHeader()}); }
+    jf::JRect _closeRect() const { return jf::JCloseButton::rectFor({0.f, 0.f, _w(), kHeader()}); }
+    float _w() const { return static_cast<float>(m_window->width()); }
+    float _h() const { return static_cast<float>(m_window->height()); }
     static bool _inRect(const jf::JRect& r, float mx, float my) {
         return mx >= r.x && mx < r.x + r.width && my >= r.y && my < r.y + r.height;
     }
@@ -73,6 +82,7 @@ public:
         std::vector<uint8_t> flags;
         flags.reserve(rows.size());
         for (const Row& r : rows) flags.push_back(r.enabled ? 1 : 0);
+        for (const Row& r : rows) m_facts.push_back(r.facts);
         m_list->setEnabledFlags(std::move(flags));
         // Opening ON a disabled row would put the highlight somewhere Return does nothing. The list
         // moves the selection to the first row that can be chosen; if none can, there is no selection
@@ -128,6 +138,9 @@ public:
         , m_window(std::make_unique<PlatformWinType>("Pick", kW, kH, sx, sy, jf::JPlatformWindowStyle::Borderless, parent))
         , m_surface(hal.createSurface(m_window->nativeHandle(), kW, kH)) {
         using namespace jf;
+        m_window->setResizable(true);
+        m_window->setResizeTopInset(kHeader());   // the title bar drags; it does not resize
+        m_window->setMinSize(kMinW, kMinH);
         m_list = std::make_unique<JListView>(m_graph, std::move(items));
         if (!m_list->items().empty()) m_list->setSelectedIndex(0);
         if (m_wantName) { m_name = std::make_unique<JLineEdit>(m_graph, "Tune name…"); m_name->setFocused(true); }
@@ -162,6 +175,11 @@ public:
         using namespace jf;
         m_window->pollNativeEvents();
         if (m_window->shouldClose()) return false;
+        if (m_window->width() != m_lastW || m_window->height() != m_lastH) {
+            m_lastW = m_window->width(); m_lastH = m_window->height();
+            hal.resizeSurface(m_surface, m_lastW, m_lastH);
+        }
+        const float W = _w(), H = _h();
         const float mx = m_window->mouseX(), my = m_window->mouseY();
         const bool pressed = m_window->consumePress(), released = m_window->consumeRelease(), held = m_window->isLeftButtonDown();
 
@@ -183,16 +201,19 @@ public:
         float y = kHeader() + kPad;
         // Wrapped every frame against the live atlas (a first frame can measure 0 — WrapText.h), and the
         // list starts below however many lines it took.
-        m_wrapped = wraptext::wrap(m_message, static_cast<float>(kW) - 2.f * kPad);
+        m_wrapped = wraptext::wrap(m_message, W - 2.f * kPad);
         m_msgY = y;
         if (m_wrapped.lines > 0) y += m_wrapped.height + kPad;
-        if (m_name) { m_name->setBounds({ kPad, y, static_cast<float>(kW) - 2.f * kPad, kRowH }); y += kRowH + kPad; }
-        // The list stops above the footer, which now sits at the bottom where a dialog's buttons belong.
+        if (m_name) { m_name->setBounds({ kPad, y, W - 2.f * kPad, kRowH }); y += kRowH + kPad; }
+        // The list stops above the footer, which now sits at the bottom where a dialog's buttons belong —
+        // and above the facts panel when the rows have facts. The panel is as tall as the TALLEST row's
+        // facts, so moving through the list changes what it says and not where the list ends.
         const float footerH = kBtnH() + 2.f * kPad;
-        m_list->setBounds({ kPad, y, static_cast<float>(kW) - 2.f * kPad,
-                            static_cast<float>(kH) - y - footerH });
-        m_box->setBounds({ kPad, static_cast<float>(kH) - kPad - kBtnH(),
-                           static_cast<float>(kW) - 2.f * kPad, kBtnH() });
+        _layoutFacts(W);
+        const float factsH = m_factsH > 0.f ? m_factsH + kPad : 0.f;
+        m_list->setBounds({ kPad, y, W - 2.f * kPad, std::max(kRowH, H - y - footerH - factsH) });
+        m_factsY = H - footerH - m_factsH;
+        m_box->setBounds({ kPad, H - kPad - kBtnH(), W - 2.f * kPad, kBtnH() });
 
         _refreshFocusRoots();
         if (pressed) jf::jRouteMouse(mx, my, m_focus);                        // click-to-focus
@@ -226,6 +247,44 @@ private:
         if (m_accept) m_accept->setEnabled(ok);
     }
 
+    // Every row's facts laid out at this width: the label column as wide as the widest label, each value
+    // wrapped into what is left. m_factsH is the tallest row's panel.
+    static constexpr float kFactPad = 8.f;
+    void _layoutFacts(float W) {
+        m_factsH = 0.f;
+        m_factLabelW = 0.f;
+        bool any = false;
+        for (const auto& fs : m_facts)
+            for (const auto& f : fs) { any = true; m_factLabelW = std::max(m_factLabelW, jf::JTextHelper::measureWidth(f.first)); }
+        if (!any) return;
+        const float valueW = std::max(40.f, W - 2.f * kPad - 2.f * kFactPad - m_factLabelW - kPad);
+        m_factWraps.assign(m_facts.size(), {});
+        for (size_t i = 0; i < m_facts.size(); ++i) {
+            float h = 0.f;
+            for (const auto& f : m_facts[i]) {
+                m_factWraps[i].push_back(wraptext::wrap(f.second.empty() ? std::string("\xE2\x80\x94") : f.second, valueW));
+                h += m_factWraps[i].back().height;
+            }
+            m_factsH = std::max(m_factsH, h + 2.f * kFactPad);
+        }
+    }
+    void _renderFacts(jf::JPrimitiveBuffer& buf, float W) const {
+        using namespace jf;
+        if (m_factsH <= 0.f) return;
+        buf.pushRectangle(kPad, m_factsY, W - 2.f * kPad, m_factsH, Colors::Surface0,
+                          JStyle::current().cornerRadius, 1.f, Colors::Border);
+        const int i = m_list->selectedIndex();
+        if (i < 0 || i >= static_cast<int>(m_facts.size())) return;
+        float y = m_factsY + kFactPad;
+        const float vx = kPad + kFactPad + m_factLabelW + kPad;
+        for (size_t k = 0; k < m_facts[i].size() && k < m_factWraps[i].size(); ++k) {
+            JTextHelper::pushText(buf, kPad + kFactPad, y, m_facts[i][k].first, Colors::TextSecondary);
+            JTextHelper::pushText(buf, vx, y, m_factWraps[i][k].text,
+                                  m_facts[i][k].second.empty() ? Colors::TextSecondary : Colors::TextPrimary);
+            y += m_factWraps[i][k].height;
+        }
+    }
+
     static std::vector<std::string> _texts(const std::vector<Row>& rows) {
         std::vector<std::string> out;
         out.reserve(rows.size());
@@ -244,7 +303,7 @@ private:
     void _render(jf::JPrimitiveBuffer& buf, float mx, float my) {
         using namespace jf;
         buf.clear();
-        const float W = static_cast<float>(kW), H = static_cast<float>(kH), lh = JTextHelper::lineHeight();
+        const float W = _w(), H = _h();
         const float r = JStyle::current().cornerRadius;
         buf.pushRectangle(0.f, 0.f, W, H, Colors::Surface1, r, 1.f, Colors::Border);
         JTitleBar::draw(buf, 0.f, 0.f, W, kHeader(), m_title, r, 1, 0.f, _closeRect().width + 14.f);   // framework title bar
@@ -254,6 +313,7 @@ private:
         if (m_wrapped.lines > 0) JTextHelper::pushText(buf, kPad, m_msgY, m_wrapped.text, Colors::TextSecondary);
         if (m_name) m_name->populateRenderPrimitives(buf);
         m_list->populateRenderPrimitives(buf);
+        _renderFacts(buf, W);
     }
 
     std::unique_ptr<jf::JDialogButtonBox> m_box;               // the standard footer
@@ -278,4 +338,8 @@ private:
     std::unique_ptr<jf::JListView> m_list;
     bool m_drag{false};
     float m_ax{0}, m_ay{0};
+    uint32_t m_lastW = kW, m_lastH = kH;   // the surface's size, followed when the window resizes
+    std::vector<std::vector<std::pair<std::string, std::string>>> m_facts;   // per row (Row constructor)
+    std::vector<std::vector<wraptext::Wrapped>> m_factWraps;                // their values, wrapped
+    float m_factsH = 0.f, m_factsY = 0.f, m_factLabelW = 0.f;
 };
