@@ -69,7 +69,7 @@ ssh "$BENCH" "cp -r ~/Desktop/test-kit/$BOARD-$VERSION ~/.local/share/jayecu/jay
 
 # 6. the studio, if asked and closed
 if [ "${STUDIO:-0}" = "1" ]; then
-    if ssh "$BENCH" "pgrep -f 'mount_jayecu.*/usr/bin/studio' >/dev/null"; then
+    if ssh "$BENCH" "pgrep -f '[m]ount_jayecu.*/usr/bin/studio' >/dev/null"; then
         say "the studio is OPEN on $BENCH — close it and run again with STUDIO=1 (the kit is installed already)"
     else
         make -s studio-appimage > /tmp/bench_beta_studio.log 2>&1 || { tail -20 /tmp/bench_beta_studio.log >&2; die "studio build failed"; }
