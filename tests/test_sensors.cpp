@@ -40,6 +40,7 @@ static uint16_t g_ain[64]  = {};
 static bool     g_din[32]  = {};
 static uint32_t g_freq[32] = {};
 static uint32_t g_pulse[32]= {};
+static uint32_t g_period[32]= {};
 static float    g_batt     = 12.0f;
 static uint32_t g_tick     = 0;
 static uint16_t g_cap_disabled = 0;   // pins platform_capture_disable() was called for (teardown test)
@@ -54,6 +55,7 @@ extern "C" uint32_t platform_read_sent(uint8_t, bool)  { return 0; }
 extern "C" bool     platform_pulse_enable(uint8_t pin) { return pin < 8; }
 extern "C" bool     platform_capture_disable(uint8_t pin) { if (pin < 8) g_cap_disabled |= (1u << pin); return pin < 8; }
 extern "C" uint32_t platform_read_pulse_us(uint8_t pin) { return pin < 32 ? g_pulse[pin] : 0; }
+extern "C" uint32_t platform_read_pulse_period_us(uint8_t pin) { return pin < 32 ? g_period[pin] : 0; }
 extern "C" float    platform_read_battery_v()         { return g_batt; }
 extern "C" float    platform_read_baro_kpa()          { return 101.3f; }
 // Ambient from the same part + cache freshness. Deliberately a DIFFERENT value from the pressure:
@@ -728,51 +730,102 @@ int main() {
     }
 
     // ---- 15. composition (flex): ONE input -> ethanol% (frequency) + fuel temp (pulse width) ----
+    // The temperature is the LOW time by default (a GM/Continental sensor pulls the line down for it),
+    // so every case sets the high time as period - low. 10 ms period throughout.
     {
         const int FLEX = idx_of("flex_fuel");
-        auto base = [&](SensorConfig& c) {
+        const int AUX  = SENSOR_CATALOG[FLEX].aux_off;
+        auto base = [&](SensorsConfig& cfg) {
+            SensorConfig& c = cfg.sensor[FLEX];
             c.enabled = 1; c.interface = IFSEL_DIGITAL_FREQ; c.source = 0;
             lin(c, 100, 1000);              // 0..100 Hz -> 0..100% ethanol (val_scale 0.1)
+            AuxOutputConfig& ac = cfg.aux_output[AUX];      // the schema default: low time, 1..5 ms
+            ac.measure = pipe::MEASURE_LOW; ac.cal_n = 2;
+            ac.cal_raw[0] = 1000; ac.cal_val[0] = -400; ac.cal_raw[1] = 5000; ac.cal_val[1] = 1250;
         };
+        auto low = [&](uint32_t us) { g_period[0] = 10000; g_pulse[0] = 10000 - us; };
         g_freq[0] = 50;                     // 50 Hz -> 50% ethanol throughout
 
-        // (a) unfiltered: both outputs publish off one input. 3.000 ms -> 42.5 C (1ms=-40, 5ms=125).
+        // (a) both outputs publish off one input. 3.000 ms low -> 42.5 C (1ms=-40, 5ms=125), and the
+        // timed raw is published beside it.
         {
-            SensorsConfig cfg{}; base(cfg.sensor[FLEX]);
-            g_pulse[0] = 3000;
+            SensorsConfig cfg{}; base(cfg);
+            low(3000);
             Sensors s; s.init(cfg); SignalBus bus;
             g_tick = 5000; pump(s, bus);
             assert(approx(bus.get(SIG_ETHANOL), 50.0f));          // primary: frequency -> ethanol%
-            assert(approx(bus.get(SIG_FUEL_TEMP_FLEX), 42.5f));   // side output: pulse width -> temp
+            assert(approx(bus.get(SIG_FUEL_TEMP_FLEX), 42.5f));   // side output: low time -> temp
+            assert(approx(bus.get(SIG_FUEL_TEMP_FLEX_RAW), 3000.0f));
         }
-        // (b) the side output tracks its input with NO lag — the per-sensor EMA is gone, so a step
-        // lands where it lands. This used to assert half a step of filter lag.
+        // (b) the side output tracks its input with NO lag — a step lands where it lands.
         {
-            SensorsConfig cfg{}; base(cfg.sensor[FLEX]);
+            SensorsConfig cfg{}; base(cfg);
             Sensors s; s.init(cfg); SignalBus bus;
-            g_pulse[0] = 3000; g_tick = 6000; pump(s, bus);
+            low(3000); g_tick = 6000; pump(s, bus);
             assert(approx(bus.get(SIG_FUEL_TEMP_FLEX), 42.5f));
-            g_pulse[0] = 5000; g_tick = 6400; pump(s, bus);   // step to 125 C
+            low(5000); g_tick = 6400; pump(s, bus);           // step to 125 C
             assert(approx(bus.get(SIG_FUEL_TEMP_FLEX), 125.0f));           // arrives immediately
         }
         // (c) out-of-range diagnostic: 6.000 ms -> 166 C, past the valid band. The temp pipeline's
         // cond_op_window KEEPS the publish valid (the reading is real, just unhealthy) AND raises the
         // output's OWN high P-code (P0183) via the standard DTC path; ethanol stays valid; heals on recovery.
         {
-            SensorsConfig cfg{}; base(cfg.sensor[FLEX]);
+            SensorsConfig cfg{}; base(cfg);
             DtcManager dtc; dtc.init(1);
             Sensors s; s.init(cfg); s.set_dtc(&dtc); SignalBus bus;
-            const uint16_t aux_hi = SENSOR_AUX_OUTPUTS[SENSOR_CATALOG[FLEX].aux_off].dtc_op_max;
-            g_pulse[0] = 6000; g_tick = 7000; pump(s, bus);
+            const uint16_t aux_hi = SENSOR_AUX_OUTPUTS[AUX].dtc_op_max;
+            low(6000); g_tick = 7000; pump(s, bus);
             assert(bus.valid(SIG_FUEL_TEMP_FLEX));               // op-range keeps it valid (DTC carries the fault)
             assert(bus.valid(SIG_ETHANOL));                       // primary unaffected
             assert(dtc.active_count() == 1);
             uint16_t codes[4]; dtc.list_active(codes, 4);
             assert(codes[0] == aux_hi && aux_hi == 0x0183);       // fuel-temp circuit high (P0183)
-            g_pulse[0] = 3000; g_tick = 7400; pump(s, bus);  // back in range
+            low(3000); g_tick = 7400; pump(s, bus);          // back in range
             assert(dtc.active_count() == 0);                      // healed
         }
-        printf("ok  composition: flex ethanol+temp; temp pipeline EMA + op-window + P0183 DTC\n");
+        // (d) THE CAR THAT FOUND THIS: 130 Hz, 5211 us high, 2481 us low, at 20 C. As the low time it is
+        // the 21 C it really was; timed as the high time it is past the curve's 5 ms end, so it holds
+        // 125 C and raises P0183 — what the car showed.
+        {
+            SensorsConfig cfg{}; base(cfg);
+            DtcManager dtc; dtc.init(1);
+            g_period[0] = 7692; g_pulse[0] = 5211;
+            Sensors s; s.init(cfg); s.set_dtc(&dtc); SignalBus bus;
+            g_tick = 8000; pump(s, bus);
+            assert(std::fabs(bus.get(SIG_FUEL_TEMP_FLEX) - 21.1f) < 0.1f);
+            assert(dtc.active_count() == 0);
+            cfg.aux_output[AUX].measure = pipe::MEASURE_HIGH; g_config_generation++;
+            g_tick = 8400; pump(s, bus);
+            assert(approx(bus.get(SIG_FUEL_TEMP_FLEX), 125.0f));
+            uint16_t codes[4];
+            assert(dtc.list_active(codes, 4) == 1 && codes[0] == 0x0183);
+        }
+        // (e) DUTY, on its own curve: 0.1 % units, 20 % = 0 C .. 80 % = 120 C. 50 % duty -> 60 C.
+        {
+            SensorsConfig cfg{}; base(cfg);
+            AuxOutputConfig& ac = cfg.aux_output[AUX];
+            ac.measure = pipe::MEASURE_DUTY;
+            ac.cal_raw[0] = 200; ac.cal_val[0] = 0; ac.cal_raw[1] = 800; ac.cal_val[1] = 1200;
+            g_period[0] = 10000; g_pulse[0] = 5000;
+            Sensors s; s.init(cfg); SignalBus bus;
+            g_tick = 9000; pump(s, bus);
+            assert(approx(bus.get(SIG_FUEL_TEMP_FLEX_RAW), 500.0f));
+            assert(approx(bus.get(SIG_FUEL_TEMP_FLEX), 60.0f));
+            // …and a curve edited live takes without a restart (the row is in the fingerprint).
+            ac.cal_val[1] = 600; g_config_generation++;
+            g_tick = 9400; pump(s, bus);
+            assert(approx(bus.get(SIG_FUEL_TEMP_FLEX), 30.0f));
+        }
+        // (f) no full cycle yet: a low-time reading has nothing to measure, and says so.
+        {
+            SensorsConfig cfg{}; base(cfg);
+            g_period[0] = 0; g_pulse[0] = 4000;
+            Sensors s; s.init(cfg); SignalBus bus;
+            g_tick = 10000; pump(s, bus);
+            assert(!bus.valid(SIG_FUEL_TEMP_FLEX));
+        }
+        g_period[0] = 0; g_pulse[0] = 0; g_freq[0] = 0;
+        printf("ok  composition: flex ethanol+temp; low/high/duty timing, tunable curve, op-window + P0183 DTC\n");
     }
 
     // ---- 16. input pin-conflict detection (two sensors claiming one physical pin) ----

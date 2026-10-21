@@ -196,8 +196,8 @@ A wideband sensor needs a controller; the ECU reads the controller, not the sens
   with its 5 V and ground as usual. The ECU checks every message's checksum and ignores a message that
   fails it.
   <!-- src: firmware/Sensors/SentDecoder.h; firmware/Platform/AcquireHal.h -->
-- A **flex-fuel** sensor puts out a frequency (the ethanol content) whose pulse width is the fuel
-  temperature. Wire its output to a **DIG** pin; one pin gives both readings (chapter 17). Power it
+- A **flex-fuel** sensor puts out a frequency (the ethanol content) whose pulse width (the low time,
+  on a GM/Continental sensor) is the fuel temperature. Wire its output to a **DIG** pin; one pin gives both readings (chapter 17). Power it
   as its maker specifies.
 - **Wheel speed**, **turbo speed** and other frequency sensors go to DIG pins, or to a VR input — a
   two-wire magnetic sensor on VR+ and VR−, a Hall sensor on VR+ as in section 4.

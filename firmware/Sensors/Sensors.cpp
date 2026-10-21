@@ -82,18 +82,22 @@ void Sensors::init(const SensorsConfig& cfg) {
     recompute_live(/*all=*/true);
 }
 
+// sensors.aux_output[a] is SENSOR_AUX_OUTPUTS[a]'s tune row: both are listed by codegen in one order.
+static_assert(SENSOR_AUX_COUNT == SENSORS_AUX_OUTPUT_COUNT, "one aux_output row per secondary output");
+
 // One input's pipeline and its secondary outputs, from the live config. An unbuilt pipeline
 // (disabled, unassigned source, unbound CAN) has n==0 and the update loop skips it.
 void Sensors::rebuild_one(uint8_t i) {
     const SensorDescriptor& d = SENSOR_CATALOG[i];
     const SensorConfig&     c = cfg_->sensor[i];
     // Secondary outputs (e.g. flex fuel temp): each declared sensor_type output is its own full
-    // pipeline, sharing the parent sensor's source pin. Built from the catalog spec; the parent's
-    // element is what they read, so they are rebuilt exactly when it is.
+    // pipeline, sharing the parent sensor's source pin. Built from the catalog spec and the output's
+    // own tune row (what to time, its curve); the parent's element and that row are what they read,
+    // so they are rebuilt exactly when either is (elem_crc).
     for (uint8_t a = 0; a < SENSOR_AUX_COUNT; a++) {
         const SensorAuxOutput& ao = SENSOR_AUX_OUTPUTS[a];
         if (ao.sensor_index != i) continue;
-        if (!pipe::build_aux_output(ao, d, c, aux_pools_[a], aux_pipelines_[a]))
+        if (!pipe::build_aux_output(ao, d, c, cfg_->aux_output[a], aux_pools_[a], aux_pipelines_[a]))
             aux_pipelines_[a].n = 0;
     }
     // A DISABLED sensor gets no pipeline. build_input() does not check `enabled` — it composes
@@ -163,6 +167,12 @@ uint32_t Sensors::elem_crc(uint8_t i) const {
     uint32_t crc = crc32_buf(reinterpret_cast<const uint8_t*>(&c), sizeof(c));
     if (const ThermistorConfig* th = therm_row(i))
         crc ^= crc32_buf(reinterpret_cast<const uint8_t*>(th), sizeof(*th)) * 2654435761u;
+    // …and its secondary outputs' rows, for the same reason: a new curve must take without a restart.
+    const SensorDescriptor& d = SENSOR_CATALOG[i];
+    for (uint8_t k = 0; k < d.aux_count; k++) {
+        const AuxOutputConfig& ac = cfg_->aux_output[d.aux_off + k];
+        crc ^= crc32_buf(reinterpret_cast<const uint8_t*>(&ac), sizeof(ac)) * (2246822519u + k);
+    }
     return crc;
 }
 

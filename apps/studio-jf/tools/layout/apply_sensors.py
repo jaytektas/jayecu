@@ -48,6 +48,11 @@ def main():
     # …and which sensors can be a thermistor: those with a row in sensors.thermistor[] (temperature and
     # generic analog inputs). Their pages offer the thermistor calibration; nobody else's does.
     therm_ids = set(meta['config']['sensors'].get('thermistor', {}).get('element_ids', []))
+    # …and each sensor's secondary readings with a curve of their own (sensors.aux_output[]): a row id is
+    # its sensor's id and the output's role, so the flex sensor's is flex_fuel_temperature.
+    ax = meta['config']['sensors'].get('aux_output', {})
+    aux_rows = list(zip(ax.get('element_ids', []), ax.get('element_labels', []),
+                        ax.get('element_raw_channels', [])))
 
     # THE TREE. Sensors -> GROUP -> the sensors in it. A hundred and twenty-two children on one node is a
     # list you scroll rather than a tree you navigate: nothing is ever more than a few rows from something
@@ -112,7 +117,9 @@ def main():
         extra = [(ch, tel[ch].get('label') or ch, raw) for ch, raw in readings_of.get(sid, []) if ch in tel]
         pg = SD.page(checks=checks, dtc=codes, type_label=type_label,
                      diag_link=f'{base}/Diagnostics', extra=extra,
-                     therm=sid if sid in therm_ids else None).to_json()
+                     therm=sid if sid in therm_ids else None,
+                     aux=[(rid, lbl.split(' · ')[-1], raw) for rid, lbl, raw in aux_rows
+                          if rid.startswith(sid + '_')]).to_json()
         pg['title'] = name
         pg['elementScope'] = f'sensors.sensor[{sid}]'
         pages[base] = pg

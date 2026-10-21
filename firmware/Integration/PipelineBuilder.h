@@ -48,6 +48,8 @@ namespace pipe {
 
 // Wiring-flag + diag-enable bits in SensorConfig (mirrored from the schema Sensors element).
 constexpr uint8_t FLAG_INVERT   = 0x01;   // switch: invert the raw level
+// Points allocated to a secondary reading's curve (sensors.aux_output[].cal).
+constexpr uint8_t AUX_CAL_POINTS = sizeof(AuxOutputConfig::cal_raw) / sizeof(AuxOutputConfig::cal_raw[0]);
 constexpr uint8_t DIAG_RAW_MIN  = 0x01;
 constexpr uint8_t DIAG_RAW_MAX  = 0x02;
 constexpr uint8_t DIAG_OP_MIN   = 0x04;
@@ -66,6 +68,7 @@ struct InputCfgPool {
         PinAcquireCfg      analog;
         FreqAcquireCfg     freq;
         PulseAcquireCfg    pulse;
+        PulsePartCfg       part;      // a secondary reading timed off part of the wave
         SentAcquireCfg     sent;
         SwitchAcquireCfg   sw;
         CanFieldAcquireCfg can_acq;   // CAN-interface inputs: a generic-CAN field
@@ -345,11 +348,13 @@ inline bool build_can_input(const GenericCanFieldValue* field, uint16_t stale_ms
 }
 
 // Compose a SECONDARY output's pipeline (e.g. flex fuel temp from the same input's pulse width).
-// It's a full, ordinary pipeline reusing the standard stages — acquire -> decode_linear ->
-// cond_op_window (always armed) -> publish — built entirely from the catalog spec
-// (transform + range + codes), with the source pin + filter taken from the parent SensorConfig.
+// It's a full, ordinary pipeline reusing the standard stages — acquire -> decode_curve ->
+// cond_curve_ends + cond_op_window (always armed) -> publish. The catalog spec gives the range and
+// codes, its tune row `ac` (sensors.aux_output[]) what to time and the curve, and the parent
+// SensorConfig the source pin.
 inline bool build_aux_output(const SensorAuxOutput& a, const SensorDescriptor& parent,
-                             const SensorConfig& c, InputCfgPool& pool, Pipeline& p) {
+                             const SensorConfig& c, const AuxOutputConfig& ac,
+                             InputCfgPool& pool, Pipeline& p) {
     p.signal = a.signal;
     p.n = 0;
     p.reset_state();
@@ -358,19 +363,27 @@ inline bool build_aux_output(const SensorAuxOutput& a, const SensorDescriptor& p
     auto add = [&](StageFn fn, const void* cfg) {
         if (p.n < MAX_PIPELINE_STAGES) p.stages[p.n++] = Stage{fn, cfg};
     };
-    // Acquire: read the SAME pin in the secondary's capture mode (pulse width / frequency).
-    if (a.acquire == 1) { pool.freq  = {src, dig_hw_sig(HW_DIG_FREQ_SIG,  src)}; add(acquire_freq,  &pool.freq); }
-    else                { pool.pulse = {src, dig_hw_sig(HW_DIG_PULSE_SIG, src)}; add(acquire_pulse, &pool.pulse); }
-    // Decode: linear raw -> engineering (scale/offset derived from the type's two cal points).
-    pool.lin = {a.scale, a.offset};
-    add(decode_linear, &pool.lin);
-    // EMA — shares the parent sensor's filter time constant (before the window, like the primary).
-    // Operating-range Condition — always armed (min_rpm 0, no precondition); out-of-range trips
-    // DIAG_OP_MIN/MAX, which the manager maps to this output's low/high P-codes.
+    const uint16_t hz  = SENSOR_TYPE_CATALOG[parent.type].update_hz;
+    const uint16_t ttl = static_cast<uint16_t>(hz ? 3000u / hz : 0u);
+    // Acquire: read the SAME pin in the secondary's capture mode — a frequency, or the part of the
+    // pulse its tune row says to time (high, low, duty).
+    if (a.acquire == 1) { pool.freq = {src, dig_hw_sig(HW_DIG_FREQ_SIG, src)}; add(acquire_freq, &pool.freq); }
+    else {
+        pool.part = {src, ac.measure, dig_hw_sig(HW_DIG_PULSE_SIG, src), static_cast<SignalId>(a.raw_signal), ttl};
+        add(acquire_pulse_part, &pool.part);
+    }
+    // Decode: the row's own curve. cal_val is stored at the schema's 0.1 (sensors.aux_output[].cal).
+    const uint8_t pts = ac.cal_n < 2 ? 2 : (ac.cal_n > AUX_CAL_POINTS ? AUX_CAL_POINTS : ac.cal_n);
+    pool.curve = {ac.cal_raw, ac.cal_val, pts, 0.1f};
+    add(decode_curve, &pool.curve);
+    // Operating-range Conditions — always armed (min_rpm 0, no precondition); out-of-range trips
+    // DIAG_OP_MIN/MAX, which the manager maps to this output's low/high P-codes. A raw beyond the
+    // curve's ends is out of range too: the curve holds its end value there, so the window alone
+    // would read a 6 ms pulse as exactly 125 C and say nothing.
+    add(cond_curve_ends, &pool.curve);
     pool.op_win = {a.range_min, a.range_max, true, true};   // aux outputs are always armed (no precond)
     add(cond_op_window, &pool.op_win);
-    const uint16_t hz = SENSOR_TYPE_CATALOG[parent.type].update_hz;
-    pool.pub = { static_cast<uint16_t>(hz ? 3000u / hz : 0u) };
+    pool.pub = { ttl };
     add(publish, &pool.pub);
     return true;
 }

@@ -18,6 +18,7 @@ extern "C" void     platform_pulse_on_edge(uint8_t, uint32_t, bool) {}         /
 extern "C" bool     platform_pulse_enable(uint8_t /*pin*/) { return false;  }  // no capture HW
 extern "C" bool     platform_capture_disable(uint8_t /*pin*/) { return false; } // no capture HW
 extern "C" uint32_t platform_read_pulse_us(uint8_t /*pin*/) { return 0;     }  // no signal
+extern "C" uint32_t platform_read_pulse_period_us(uint8_t /*pin*/) { return 0; }  // no signal
 
 extern "C" float platform_read_map_kpa()  { return 101.3f; }  // ~sea level
 extern "C" float platform_read_baro_kpa() { return 101.3f; }  // ~sea level

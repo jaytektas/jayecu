@@ -743,6 +743,48 @@ def derive_thermistor_inputs(schema: dict, board: str | None) -> None:
                 if f.get("default") == "board_at_pullup":
                     f["default"] = pullup
 
+def derive_sensor_aux_outputs(schema: dict) -> None:
+    """The secondary outputs the catalogue binds, as `schema["sensor_aux_outputs"]` — what the Sensors
+    `aux_output` array is sized and named from (count_from: sensor_aux_outputs), in SENSOR_AUX_OUTPUTS[]
+    order: sensors in catalogue order, each sensor's type's `outputs:` in declared order, an output only
+    where the sensor's `provides` binds a channel for it. Each row is that output's own measure and
+    calibration, so a flex sensor's temperature curve is the tune's to set.
+
+    Also seeds the array's `measure` and `cal` defaults from the output's declaration. One element struct
+    serves every row, so every declared output must agree on them — two that differ would need per-row
+    defaults this does not do, and it refuses rather than quietly giving one the other's curve.
+    Idempotent; needs the catalogue already expanded per cylinder."""
+    type_outputs = {t["id"]: (t.get("outputs") or []) for t in schema.get("sensor_types", [])}
+    rows, specs = [], []
+    for s in schema.get("sensors", []):
+        chans = s.get("provides", [s["id"]])
+        for k, out in enumerate(type_outputs.get(s.get("type"), [])):
+            if 1 + k >= len(chans):
+                break
+            rows.append({"id": f"{s['id']}_{out['role']}",
+                         "name": f"{s.get('name', s['id'])} · {out.get('label', out['role'].title())}",
+                         "raw_channel": out.get("raw_channel", ""), "units": out.get("units", "")})
+            specs.append(out)
+    schema["sensor_aux_outputs"] = rows
+    if not specs:
+        return
+    seeds = {(int(o.get("measure", 0)), json.dumps(o.get("cal"))) for o in specs}
+    if len(seeds) > 1:
+        raise SystemExit("codegen: secondary outputs with different measure/cal defaults need per-row "
+                         "defaults in sensors.aux_output[]")
+    measure, cal = int(specs[0].get("measure", 0)), specs[0].get("cal") or [[0, 0], [1, 1]]
+    for mod in (schema.get("modules") or {}).values():
+        cfg = mod.get("config") if isinstance(mod.get("config"), dict) else {}
+        for arr in (mod.get("config_arrays") or []) + (cfg.get("arrays") or []):
+            if arr.get("count_from") != "sensor_aux_outputs":
+                continue
+            for f in arr.get("element", []) or []:
+                if f.get("name") == "measure":
+                    f["default"] = measure
+                elif f.get("name") == "cal":
+                    vs = float((f.get("value") or {}).get("scale", 1.0)) or 1.0
+                    f["default"] = [[int(x), int(round(float(y) / vs))] for x, y in cal]
+
 def resolve_array_counts(schema: dict, board: str | None = None) -> None:
     """Resolve every config_array's `count_from: <schema key>` into a literal `count`
     = len(schema[key]) (e.g. Sensors sizes itself from the catalog), and
@@ -3471,10 +3513,11 @@ def gen_sensors_catalog_h(sensor_types: list, sensors: list, channel_ids: set,
     lines += ["};", ""]
 
     # Secondary outputs: a sensor_type may declare `outputs:` — extra signals derived from the SAME
-    # input, each its own full pipeline (acquire -> decode_linear -> cond_op_window ->
-    # publish). The k-th declared output binds provides[1+k]. Each row is fully type-defined (acquire
-    # kind, linear transform derived from the two `cal` points, operating range + P-codes); the
-    # parent sensor supplies the source pin + filter via SensorConfig.
+    # input, each its own full pipeline (acquire -> decode_curve -> cond_op_window -> publish). The
+    # k-th declared output binds provides[1+k]. The row here is what the TYPE fixes (acquire kind,
+    # operating range + P-codes, the raw channel); what to time and the curve are the tune's, in the
+    # same-index row of sensors.aux_output[] (derive_sensor_aux_outputs). The parent sensor supplies
+    # the source pin via SensorConfig.
     aux_acq = {"pulse_us": 0, "freq": 1}        # AuxAcquireKind
     type_outputs = {t["id"]: (t.get("outputs") or []) for t in sensor_types}
     aux_rows: list[str] = []
@@ -3488,31 +3531,29 @@ def gen_sensors_catalog_h(sensor_types: list, sensors: list, channel_ids: set,
                 break                            # sensor doesn't bind this secondary output
             sig = chans[1 + k]
             sig_c = f"SIG_{sig.upper()}" if sig in channel_ids else "SIG_NONE"
-            (x0, y0), (x1, y1) = (out.get("cal") or [[0, 0], [1, 1]])[:2]
-            scale  = (float(y1) - float(y0)) / (float(x1) - float(x0)) if x1 != x0 else 0.0
-            offset = float(y0) - float(x0) * scale
+            rc    = out.get("raw_channel")
+            raw_c = f"SIG_{rc.upper()}" if rc in channel_ids else "SIG_NONE"
             rng = out.get("range") or {}
             od  = out.get("dtc") or {}
             aux_rows.append(
-                f'    {{ {si}, {sig_c}, {aux_acq.get(out.get("raw", "pulse_us"), 0)}, '
-                f'{repr(scale)}f, {repr(offset)}f, '
+                f'    {{ {si}, {sig_c}, {raw_c}, {aux_acq.get(out.get("raw", "pulse_us"), 0)}, '
                 f'{repr(float(rng.get("min", 0.0)))}f, {repr(float(rng.get("max", 0.0)))}f, '
                 f'0x{_dtc_to_u16(od.get("operating_min")):04X}, 0x{_dtc_to_u16(od.get("operating_max")):04X}, '
                 f'{int(out.get("severity", 1))} }},  // {s["id"]} -> {sig}')
         aux_span.append((off, len(aux_rows) - off))
     lines += ["// One secondary output: its own pipeline, reusing the standard stages.",
               "struct SensorAuxOutput {",
-              "    uint8_t  sensor_index;   // parent sensor (source pin + filter come from its config)",
+              "    uint8_t  sensor_index;   // parent sensor (its source pin is this output's too)",
               "    uint16_t signal;         // SignalId published",
+              "    uint16_t raw_signal;     // the timed raw it is calibrated from, published beside it (or SIG_NONE)",
               "    uint8_t  acquire;        // AuxAcquireKind (0 = pulse width, 1 = frequency)",
-              "    float    scale, offset;  // raw -> engineering (decode_linear)",
               "    float    range_min, range_max;   // operating-window (always armed)",
               "    uint16_t dtc_op_min, dtc_op_max;",
               "    uint8_t  severity;       // raised severity for an out-of-range fault",
               "};",
               f"static constexpr uint8_t SENSOR_AUX_COUNT = {len(aux_rows)};",
               "static const SensorAuxOutput SENSOR_AUX_OUTPUTS[SENSOR_AUX_COUNT ? SENSOR_AUX_COUNT : 1] = {"]
-    lines += aux_rows or ["    { 0, SIG_NONE, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0x0000, 0x0000, 0 },"]
+    lines += aux_rows or ["    { 0, SIG_NONE, SIG_NONE, 0, 0.0f, 0.0f, 0x0000, 0x0000, 0 },"]
     lines += ["};", "",
               "// Calibration breakpoints per sensor — FIXED (the TS curve editor binds all of them).",
               "// The decode curve interpolates over exactly this many cal_raw_*/cal_val_* points.",
@@ -4408,6 +4449,12 @@ def synthesize_sensor_defaults(schema: dict, modules: dict, board: str | None = 
     elem_units  = [type_units.get(s.get("type"), "") for s in sensors]
 
     for arr in mod.get("config_arrays", []):
+        # A secondary reading's curve reads in its OUTPUT's units (the flex temperature's °C), per row
+        # like the sensor cal below — the studio takes a 1-D element table's value units only per element.
+        if arr.get("count_from") == "sensor_aux_outputs":
+            for td in arr.get("_element_tables", []):
+                td["value"]["element_units"] = [r.get("units", "") for r in schema.get("sensor_aux_outputs", [])]
+            continue
         if arr.get("name") != "sensor":
             continue
         for td in arr.get("_element_tables", []):
@@ -4935,6 +4982,11 @@ def gen_tuneit_meta(schema: dict, active_board=None, *, product: str = "jayecu",
             # ONLY THE SENSOR TABLE PUBLISHES. Another table sized from a list of sensors (the thermistor
             # rows) is settings ABOUT those sensors, not a second set of them: given element_signals too, the
             # studio found two "sensors" publishing clt and resolved the channel to the wrong one.
+            # A secondary reading's row says which channel carries the raw it is calibrated from, so its
+            # page can show that number beside the curve that is set against it.
+            if cf == "sensor_aux_outputs":
+                a["element_raw_channels"] = [str(cat[i].get("raw_channel") or "")
+                                             for i in range(min(a["count"], len(cat)))]
             if cf == "sensors":
                 a["element_signals"] = [str((cat[i].get("provides") or [cat[i].get("id") or i])[0])
                                         for i in range(min(a["count"], len(cat)))]
@@ -5909,6 +5961,7 @@ def main():
 
     normalize_module_config(schema)  # accept nested `config: {scalars,tables,arrays}`
     derive_thermistor_inputs(schema, active_board)   # thermistor_inputs + the board's pull-up default
+    derive_sensor_aux_outputs(schema)                # sensor_aux_outputs + its measure/cal defaults
     learned_blocks_as_tables(schema, modules)   # a learned block is a TABLE — same pipeline, different segment
     expand_inline_axes(modules)      # inline `x_axis: {signal,max,values}` -> owned <table>_<ax>_axis
     auto_table_channels(modules)     # synthesize per-axis <table>_<ax>_src/_en from each table's axes

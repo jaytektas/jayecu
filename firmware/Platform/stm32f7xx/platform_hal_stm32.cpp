@@ -228,6 +228,10 @@ extern "C" uint32_t platform_read_pulse_us(uint8_t pin) {
     return (pin < PULSE_PIN_COUNT) ? g_pulse[pin].high_us(TIM5->CNT) : 0;
 }
 
+extern "C" uint32_t platform_read_pulse_period_us(uint8_t pin) {
+    return (pin < PULSE_PIN_COUNT) ? g_pulse[pin].period_us(TIM5->CNT) : 0;
+}
+
 // Named sensor reads are stubs — actual signal values flow through
 // platform_read_ain_raw() + InputMapper + SignalBus at runtime.
 extern "C" float platform_read_map_kpa()  { return 101.3f; }

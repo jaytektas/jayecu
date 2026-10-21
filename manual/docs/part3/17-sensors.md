@@ -377,10 +377,18 @@ reads. **+ Band** adds a position. Position 0 is rest, the one position that may
   Interface to **Frequency**, not Pulse Width: the sensor sends one signal that carries two readings,
   and Frequency reads both. The frequency gives **Flex Fuel Ethanol** (`ethanol`): enter your sensor's
   figures in the calibration (most read 50 Hz for 0 % and 150 Hz for 100 %; check yours). The **pulse
-  width** of the same signal gives **Flex Fuel Temperature** (`fuel_temp_flex`), fixed at
-  1.000 ms = −40 °C to 5.000 ms = 125 °C. Both readings are on the sensor's page, under Output.
-  A temperature outside −40…125 °C raises **P0182** or **P0183**.
-  <!-- src: definition/ecu.schema.yaml (composition outputs) -->
+  width** of the same signal gives **Flex Fuel Temperature** (`fuel_temp_flex`). It has its own
+  section under the calibration, **Fuel Temperature**:
+    - **Measure** is which part of the wave carries the temperature: **High Time** or **Low Time** in
+      microseconds, or **Duty Cycle** in tenths of a percent (500 = 50 %). A GM/Continental sensor pulls
+      the line low for its temperature, so it is **Low Time**, the default.
+    - **Raw now** is that measurement, live (`fuel_temp_flex_raw`).
+    - The **curve** turns it into °C. The default is GM/Continental: 1000 µs = −40 °C, 5000 µs = 125 °C.
+      Up to 8 points.
+
+  Both readings are on the sensor's page, under Output. A temperature outside −40…125 °C, or a raw
+  past either end of the curve, raises **P0182** (low) or **P0183** (high).
+  <!-- src: definition/ecu.schema.yaml (composition outputs, Sensors aux_output); firmware/Platform/AcquireHal.h (acquire_pulse_part); firmware/Pipeline/Stages.h (cond_curve_ends) -->
 
 <figure markdown>
   ![Flex Fuel Composition & Temperature: Frequency interface on DIG5, the calibration from Hz to %, and both readings](../img/studio/sensors-flex-page.png)
@@ -468,7 +476,7 @@ teaches everyone to ignore it.
 | **P1650** | One pin claimed by two functions | Chapter 18 |
 | **P0641** / **P0651** | 5 V sensor supply 1 / 2 down | A sensor or harness shorting its 5 V to ground (chapter 10) |
 | **P0562** / **P0563** | Battery voltage low / high | Charging system, battery |
-| **P0182** / **P0183** | Flex fuel temperature out of range | Flex sensor wiring |
+| **P0182** / **P0183** | Flex fuel temperature out of range | Measure set to the wrong part of the wave (Raw now against the curve); flex sensor wiring |
 
 <!-- src: definition/ecu.schema.yaml (dtc per sensor); firmware/Sensors/Sensors.cpp -->
 
@@ -489,6 +497,7 @@ blank on the group pages and on gauges, which is the first sign something is wro
 | A reading-high fault on a healthy sensor | Threshold set too close to normal readings | The threshold against logged readings |
 | A switch never changes | Wrong pin; needs Invert; analogue trip points not set | Raw input while you press it; Switch On/Off voltages |
 | Wideband reads a steady wrong lambda | Controller mapping wrong | The controller's manual; Figure 17.16 |
+| Flex fuel temperature far off, and it moves with the ethanol content | Measure times the wrong part of the wave | Fuel Temperature ▸ Measure: Low Time for a GM/Continental sensor |
 
 ## Settings reference
 

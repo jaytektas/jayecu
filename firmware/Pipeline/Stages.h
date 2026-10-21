@@ -140,6 +140,17 @@ inline float curve_eval(const CurveCfg* k, float raw) {
 inline void decode_curve(Ctx& c, const void* cfg, State&) {
     c.value = curve_eval(static_cast<const CurveCfg*>(cfg), raw_as_float(c));
 }
+// A RAW PAST EITHER END OF THE CURVE, reported as the reading being out of range. The curve holds its
+// end value beyond its last point, so a pulse longer than the calibration covers reads as the top of
+// it rather than above it — and the operating window, looking at that value, would never trip. The
+// value stays valid (the window's own rule: real but unhealthy); only the slot is reported.
+inline void cond_curve_ends(Ctx& c, const void* cfg, State&) {
+    const auto* k = static_cast<const CurveCfg*>(cfg);
+    if (!c.valid || k->n == 0) return;
+    const float r = raw_as_float(c);
+    if (r < static_cast<float>(k->xs[0]))        c.diag_tripped |= (1u << DIAG_SLOT_OP_MIN);
+    if (r > static_cast<float>(k->xs[k->n - 1])) c.diag_tripped |= (1u << DIAG_SLOT_OP_MAX);
+}
 
 // Decode a switch wired to an ANALOG input: raw counts -> 0/1, with the deadband holding the state
 // between the two trip points. It stands in for decode_curve (never beside it) — a switch has no

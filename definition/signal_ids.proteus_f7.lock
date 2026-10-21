@@ -494,6 +494,7 @@
     "fuel_sg_4": 490,
     "prot_level": 491,
     "blink_slow": 492,
-    "blink_fast": 493
+    "blink_fast": 493,
+    "fuel_temp_flex_raw": 494
   }
 }

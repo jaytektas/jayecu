@@ -39,6 +39,12 @@ public:
         return stopped(now_us) ? 0u : high_us_;
     }
 
+    // Period (µs, rising→rising) of the most recent cycle, or 0 if stopped. With the high time it
+    // gives the LOW time and the duty exactly — the rounded Hz below would put ±30 µs on them at 130 Hz.
+    uint32_t period_us(uint32_t now_us) const {
+        return stopped(now_us) ? 0u : period_us_;
+    }
+
     // Frequency in Hz (rising→rising), or 0 if stopped.
     uint32_t hz(uint32_t now_us) const {
         if (stopped(now_us) || period_us_ == 0u) return 0u;

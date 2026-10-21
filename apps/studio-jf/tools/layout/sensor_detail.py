@@ -54,7 +54,7 @@ MEANS = {
 }
 
 
-def page(checks=None, dtc=None, type_label='', diag_link='', extra=None, therm=None):
+def page(checks=None, dtc=None, type_label='', diag_link='', extra=None, therm=None, aux=None):
     """One sensor, read left to right the way the signal travels: INPUT -> CALIBRATION -> OUTPUT.
 
     That is the whole page in one sentence. A pin carries a number; a curve says what that number means;
@@ -77,13 +77,15 @@ def page(checks=None, dtc=None, type_label='', diag_link='', extra=None, therm=N
     `extra` — what else this one input decodes to, [(channel, its name, raw it is read from)], with the
     sensor's own reading first (the flex sensor: ethanol from the frequency, temperature from the pulse
     width); `therm` — this sensor's id in sensors.thermistor[] when it can be a thermistor (a temperature
-    or generic analog input), else None. All are per-sensor facts.
+    or generic analog input), else None; `aux` — this sensor's rows of sensors.aux_output[], the
+    secondary readings with a calibration of their own, [(row id, its name, raw channel)]. All are
+    per-sensor facts.
     """
     p = A.Page(title='Sensor')
     y0 = p.head('What this input is wired to, and what its curve makes of it.', enable=f'{S}.enabled')
     h = A.CANVAS_H - y0 - 8
     _input(p, y0, h, extra)
-    _calibration(p, y0, h, therm)
+    _calibration(p, y0, h, therm, aux)
     _output(p, y0, h, type_label, diag_link, checks or [c[0] for c in CHECKS], extra)
     return p
 
@@ -157,7 +159,7 @@ def _input(p, y, h, extra=None):
               'the sensor publishing it too would put two producers on one channel.', into=box, colour=C_DIM)
 
 
-def _calibration(p, y, h, therm=None):
+def _calibration(p, y, h, therm=None, aux=None):
     """2 — what it means: the curve that turns the raw number into a reading.
 
     The table and the curve are the same points, because a calibration is numbers before it is a shape:
@@ -177,17 +179,20 @@ def _calibration(p, y, h, therm=None):
         curve_cond = f'[#{T}.mode] == 0'
         _thermistor(p, cal, 50, T, f'[#{T}.mode] == 1')
         top = 50
+    # A SENSOR WITH A SECONDARY READING calibrates both here: its own curve on top, then each secondary
+    # one under it (_aux_calibration). The main curve gives up the room they take.
+    aux_h = AUX_H * len(aux or [])
     tbl = p.add(p._new('table', 10, top, 600, 96,
                        {'signalName': f'{S}.cal', 'axisMode': '1', 'displayUnit': 'Auto',
                         'displayUnitX': 'Auto', 'displayUnitY': 'Auto', 'cellTrace': '2'}), into=cal)
     if curve_cond: tbl['props']['condition'] = curve_cond
     # The curve stops where the note starts. It used to claim down to inner-44 while the note began at
     # inner-68, so the note's first line was drawn across the curve's own bottom axis.
-    crv = p.add(p._new('curve', 10, top + 104, 600, inner - (top + 104) - 72,
+    crv = p.add(p._new('curve', 10, top + 104, 600, inner - (top + 104) - 72 - aux_h,
                        {'signalName': f'{S}.cal', 'displayUnit': 'Auto', 'axisUnit': 'Auto',
                         'valueUnit': 'Auto'}), into=cal)
     if curve_cond: crv['props']['condition'] = curve_cond
-    note = p.wrapped(10, inner - 68, 600,
+    note = p.wrapped(10, inner - 68 - aux_h, 600,
                      'Raw in along the top, reading out underneath. Right-click either for insert, delete, '
                      'linearise — or to save this curve to a file and load it into the next car with the '
                      'same sensor.', into=cal)
@@ -199,10 +204,44 @@ def _calibration(p, y, h, therm=None):
     # A MULTI-POSITION SWITCH'S BANDS, in the same place. Its calibration is one voltage band per
     # position, not a curve; the band editor shows for that calibration and the table, curve and note
     # above hide for it, so the two never share the panel.
-    bands = p.add(p._new('bands', 10, top, 600, inner - top - 10, {'signalName': f'{S}.cal'}), into=cal)
+    bands = p.add(p._new('bands', 10, top, 600, inner - top - 10 - aux_h, {'signalName': f'{S}.cal'}), into=cal)
     # A generic input made a multi-position switch is read by its bands, never as a thermistor (the
     # firmware decodes bands first), so on such an input the bands show only in curve mode.
     if curve_cond: bands['props']['condition'] = curve_cond
+    for k, row in enumerate(aux or []):
+        _aux_calibration(p, cal, inner - aux_h + AUX_H * k, row)
+
+
+AUX_H = 300   # the height one secondary reading's section takes at the foot of the calibration panel
+
+
+def _aux_calibration(p, cal, y, row):
+    """A SECONDARY READING'S OWN CURVE: which part of the wave it times, the number that gives, and the
+    curve from that number to the reading. The flex sensor's fuel temperature is the one there is — its
+    pulse is 1 to 5 ms of LOW time on a GM/Continental sensor, but not every sensor that sends one."""
+    rid, name, raw_ch = row
+    X = f'sensors.aux_output[{rid}]'
+    p.add(p._new('panel', 10, y, 600, 1, {'bgColor': C_DIM, 'padding': '0'}), into=cal)
+    p.add(p._new('label', 10, y + 14, 150, 18,
+                 {'labelText': name, 'align': 'Left', 'fontName': '|15|1|0', 'fgColor': C_DIM}), into=cal)
+    p.field(cal, 170, y + 8, 'Measure', f'{X}.measure', 'enum', 150, lbl_w=80)
+    if raw_ch:
+        g = p.group()
+        p.add(p._new('label', 420, y + 12, 80, A.LBL_H, {'labelText': 'Raw now', 'align': 'Right',
+                     'fontName': A.FONT_LBL}, g), into=cal)
+        p.add(p._new('value', 510, y + 8, 100, A.CTL_H, {'signalName': f'[${raw_ch}]', 'format': '%.0f',
+                     'fontName': A.FONT_LBL, 'align': 'Right', 'borderWidth': '1', 'borderRadius': '3'}, g),
+              into=cal)
+    p.add(p._new('table', 10, y + 44, 600, 66,
+                 {'signalName': f'{X}.cal', 'axisMode': '1', 'displayUnit': 'Auto',
+                  'displayUnitX': 'Auto', 'displayUnitY': 'Auto'}), into=cal)
+    p.add(p._new('curve', 10, y + 114, 600, 140,
+                 {'signalName': f'{X}.cal', 'displayUnit': 'Auto', 'axisUnit': 'Auto',
+                  'valueUnit': 'Auto'}), into=cal)
+    p.wrapped(10, y + 258, 600,
+              'High and Low Time in microseconds, Duty in tenths of a percent. A GM/Continental flex sensor '
+              'is Low Time, 1000 = -40 C to 5000 = 125 C. A raw past the curve\'s ends raises a code.',
+              into=cal, colour=C_DIM)
 
 
 # Presets: three points of real sensors' data, as rusEFI ships them (controllers/sensors/thermistors.cpp and

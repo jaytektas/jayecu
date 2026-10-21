@@ -488,13 +488,19 @@ sensor_types:
   max: 100.0
   update_hz: 5
   # Secondary outputs: extra signals this type derives from the SAME input. Each becomes its
-  # OWN full pipeline (acquire -> decode_linear -> cond_op_window -> cond_ema -> publish) reusing
-  # the standard stages — not a bolt-on. A flex sensor encodes fuel temperature in the pulse
-  # WIDTH (GM/Continental: 1.000 ms = -40 C, 5.000 ms = 125 C). `cal` gives two raw->eng points
-  # (codegen derives the linear scale/offset); `range` feeds cond_op_window (always armed);
+  # OWN full pipeline (acquire -> decode_curve -> cond_op_window -> publish) reusing the standard
+  # stages — not a bolt-on. A flex sensor encodes fuel temperature in the pulse WIDTH (GM/Continental:
+  # 1.000 ms = -40 C, 5.000 ms = 125 C), and that width is the LOW part of the wave: the sensor pulls
+  # the line down for it. Measured on a car at 20 C ambient: 130 Hz, 5211 us high, 2481 us low — the
+  # high time read 133.7 C and raised P0183, the low time reads 21 C.
+  #
+  # THE CURVE IS THE TUNE'S, not this file's: each output has a row of sensors.aux_output[] holding what
+  # to time (`measure`: high time, low time or duty) and its own calibration curve. `measure` and `cal`
+  # here are that row's DEFAULTS (cal in raw units -> engineering units). `raw_channel` publishes the
+  # timed raw so the curve can be set against it. `range` feeds cond_op_window (always armed);
   # out-of-range raises the operating_min/max P-code (low/high split, free from the op-window).
   outputs:
-  - {role: temperature, raw: pulse_us, units: C, cal: [[1000, -40], [5000, 125]], range: {min: -40, max: 125}, severity: 1, dtc: {operating_min: P0182, operating_max: P0183}}
+  - {role: temperature, label: Fuel Temperature, raw: pulse_us, measure: 1, units: C, cal: [[1000, -40], [5000, 125]], raw_channel: fuel_temp_flex_raw, range: {min: -40, max: 125}, severity: 1, dtc: {operating_min: P0182, operating_max: P0183}}
 # A FREQUENCY SENSOR IS 1:1 BY DEFAULT, and it has to be said here or the generic fallback applies —
 # [[0, 0], [5000, 1000]], a 0.2 slope, which is right for nothing and quietly wrong for this: 1200 Hz
 # at the pin came out as 240. Hz in, Hz out. Nothing about a tooth passing a pickup needs a curve, and
@@ -1031,6 +1037,9 @@ signals:
 - {id: fuel_tank_pressure, label: "Fuel Tank Pressure", category: "Sensors - Other", bus_type: float}
 - {id: fuel_temp, label: "Fuel Temperature", category: "Sensors - Engine", bus_type: float}
 - {id: fuel_temp_flex, label: "Flex Fuel Temperature", category: "Sensors - Engine", bus_type: float}
+# What the flex sensor's temperature is calibrated FROM: the part of the wave sensors.aux_output[].measure
+# times — microseconds of high or low time, or duty in tenths of a percent.
+- {id: fuel_temp_flex_raw, label: "Flex Fuel Temperature Raw", units: '', scale: 1.0, telem_type: uint16, min: 0.0, max: 65535.0, category: "Sensors - Engine", bus_type: float, owner: firmware}
 - {id: gear, label: "Gear", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 100.0, category: "Sensors - Derived", bus_type: float, datalog: true, owner: firmware}
 - {id: handbrake_sw, label: "Handbrake Switch", category: "Sensors - Chassis", bus_type: float}
 - {id: humidity, label: "Humidity", category: "Sensors - Atmospheric", bus_type: float, gauge: {min: 0, max: 100}}   # relative humidity reads 0..100; percent's DOMAIN is wider
@@ -6518,6 +6527,23 @@ modules:
       # ONE ROW PER SENSOR THAT CAN BE ONE, not one per sensor: codegen lists the temperature sensors
       # on analog pins and the generic analog inputs (thermistor_inputs) — twenty rows, not 135. RAM is
       # full; a gear switch has no business carrying a thermistor's settings.
+      # A SECONDARY READING'S OWN CALIBRATION. One row per secondary output a sensor declares (its type's
+      # `outputs:`) — on this firmware one, the flex sensor's fuel temperature — so the curve that turns
+      # its pulse into degrees is in the tune rather than compiled in. Row order is SENSOR_AUX_OUTPUTS[].
+      - name: aux_output
+        label: Secondary Reading
+        count_from: sensor_aux_outputs   # codegen: every declared secondary output a catalogue sensor binds
+        element:
+        - {name: measure, type: enum, label: Measure, options: ["High Time", "Low Time", "Duty Cycle"], default: 1, help: 'Which part of the square wave carries this reading. HIGH TIME is how long the line sits high each cycle and LOW TIME how long it sits low, both in microseconds; DUTY CYCLE is the high time as a share of the cycle, in tenths of a percent (500 = 50 %). A GM/Continental flex sensor pulls the line low for its fuel temperature, 1 ms at -40 C to 5 ms at 125 C, so it is Low Time. Timing the wrong half reads the rest of the cycle instead, and the temperature changes with the ethanol content.'}
+        - name: cal
+          type: table
+          display: curve
+          label: Calibration
+          points: 8
+          axis:  {name: cal_raw, type: uint16, units: '', label: Raw, min: 0, max: 65535}
+          value: {name: cal_val, type: int16, scale: 0.1, label: Reading, min: -1000, max: 3000}
+          default: [[1000, -400], [5000, 1250]]
+          help: 'The curve turning the timed part of the wave into the reading: raw on the axis (microseconds for high or low time, tenths of a percent for duty), the reading at each point. The default is the GM/Continental flex sensor, 1 ms = -40 C and 5 ms = 125 C. The raw axis must ascend across the live points.'
       - name: thermistor
         label: Thermistor
         count_from: thermistor_inputs   # codegen: type temperature or generic, readable on an analog pin
@@ -6559,6 +6585,7 @@ modules:
     - fuel_temp
     - ethanol
     - fuel_temp_flex
+    - fuel_temp_flex_raw
     - ethanol_2
     - maf
     - fuel_flow

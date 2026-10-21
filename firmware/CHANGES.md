@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- The flex fuel sensor's temperature can be calibrated: its page has a Fuel Temperature section with Measure (High Time, Low Time or Duty Cycle), the raw value live, and its own curve. The default is now Low Time, which is how a GM/Continental sensor sends it — reading the high time instead gave a temperature that was wrong and moved with the ethanol content (one car read 134 °C at 20 °C and raised P0183). A raw past either end of the curve raises P0182/P0183.
 
 ## 0.4.11
 - The Trigger Library has 2JZ 36-2 + Front Cam, for a 2JZ whose cam signal comes from the front (G1) sensor instead of the rear (G2) one. It is the rear-cam wheel with the cam a crank revolution on, as Toyota places G1.

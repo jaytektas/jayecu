@@ -89,6 +89,7 @@ extern "C" uint32_t platform_read_sent(uint8_t pin, bool enforce_crc);    // lat
 extern "C" void     platform_pulse_on_edge(uint8_t pin, uint32_t now_us, bool rising);
 extern "C" bool     platform_pulse_enable(uint8_t pin);                   // wire both-edge EXTI
 extern "C" uint32_t platform_read_pulse_us(uint8_t pin);                  // high-time µs, 0 if none
+extern "C" uint32_t platform_read_pulse_period_us(uint8_t pin);           // its period µs, 0 if none
 
 // Tear down a DIG pin's freq/pulse/SENT capture — the symmetric half of the *_enable calls, invoked
 // when the pin is no longer assigned to any capture sensor, so a leaked EXTI can't keep firing its

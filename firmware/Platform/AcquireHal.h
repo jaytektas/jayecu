@@ -27,6 +27,10 @@ struct PinAcquireCfg    { uint8_t source; bool engine_sync; SignalId hw_sig; };
 // (all J2716/GM variants tried; see gen_hw_input_publish + SentDecoder) — there is no per-sensor knob.
 struct FreqAcquireCfg   { uint8_t source; SignalId hw_sig; };                       // frequency (Hz)
 struct PulseAcquireCfg  { uint8_t source; SignalId hw_sig; };                       // pulse high-time (µs)
+// A secondary reading timed off part of the wave (sensors.aux_output[].measure): which part, and the
+// channel the timed raw is published on so its curve can be set against it.
+enum PulseMeasure : uint8_t { MEASURE_HIGH = 0, MEASURE_LOW = 1, MEASURE_DUTY = 2 };
+struct PulsePartCfg     { uint8_t source; uint8_t measure; SignalId hw_sig; SignalId raw_sig; uint16_t ttl_ms; };
 struct SentAcquireCfg   { uint8_t source; SignalId hw_sig; };                       // SENT fast-channel
 struct SwitchAcquireCfg { uint8_t source; bool invert; uint8_t debounce; SignalId hw_sig; };  // debounce 0 -> 3
 
@@ -66,6 +70,33 @@ inline void acquire_pulse(Ctx& c, const void* cfg, State&) {
     c.raw.u = c.bus->get_u32(a->hw_sig, 0);
     c.raw_kind = RAW_U32;
     c.valid = c.bus->valid(a->hw_sig);
+}
+
+// --- part of a pulse train: high time, low time (µs) or duty (0.1 %) -> raw u32 ---
+// The high time comes off the bus like every other digital read; the period is read beside it from
+// the same counter, because the bus carries only the rounded frequency. A flex sensor carries its fuel
+// temperature in the LOW time, which is why this is not just acquire_pulse.
+//
+// It also PUBLISHES THE RAW it timed (raw_sig): a curve is set against the number it is fed, and
+// without this that number was on no channel at all.
+inline void acquire_pulse_part(Ctx& c, const void* cfg, State&) {
+    const auto* a = static_cast<const PulsePartCfg*>(cfg);
+    if (a->source == SOURCE_NONE) { c.abort = true; return; }
+    platform_pulse_enable(a->source);
+    const uint32_t high   = c.bus->get_u32(a->hw_sig, 0);
+    const uint32_t period = platform_read_pulse_period_us(a->source);
+    c.valid = c.bus->valid(a->hw_sig);
+    uint32_t raw = high;
+    if (a->measure != MEASURE_HIGH) {
+        if (period == 0u || high > period) c.valid = false;   // no full cycle yet: nothing to divide
+        else raw = (a->measure == MEASURE_LOW) ? period - high
+                                               : static_cast<uint32_t>((static_cast<uint64_t>(high) * 1000u + period / 2u) / period);
+        if (!c.valid) raw = 0;
+    }
+    c.raw.u = raw;
+    c.raw_kind = RAW_U32;
+    if (a->raw_sig != SIG_NONE)
+        c.bus->set(a->raw_sig, static_cast<float>(raw), c.valid, c.now_ms, a->ttl_ms);
 }
 
 // --- SENT (J2716) fast channel: 12-bit value OFF THE BUS -> raw u32 ---
