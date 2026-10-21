@@ -1028,14 +1028,34 @@ int main() {
         // key used to be decided a phase LATER, in EngineTask, so this very pass ran with the gate
         // still false and skipped CLT -- and any module reading it that frame found nothing there and
         // raised "signal missing" for exactly one frame, on every key-on and every boot.
-        // Advance past the battery's own 20 Hz period, or it is decimated out of this pass and the key
-        // would be decided from the stale 4.8 V still on the bus. The key can only be recognised on a
-        // frame the battery actually runs -- up to its period late, which is what a 20 Hz key costs.
-        g_tick += 100;
+        // ONE MILLISECOND LATER, not past the battery's 20 Hz period: the battery runs every frame now,
+        // because the key is decided from it and a 20 Hz key turned up to 50 ms late.
+        g_tick += 1;
         g_ain[11] = 2232;                         // 13.5 V: key on
         pump(s, bus);                             // ONE pump: the key turns AND the rest publish
         assert(bus.valid(SIG_CLT));               // alive in the SAME pass the key turned
         assert(bus.valid(SIG_HW_AV1));            // ...and its raw pin is back with it, same pass
+
+        // …AND KEY-OFF ON THE FRAME THE IGNITION DROPS. Found on a car with USB holding the ECU up: the
+        // 5 V references fell with the ignition, the battery still read 12.68 V from its last 20 Hz
+        // sample, so for that window the key was on with every sensor invalid, and Boost and Transient
+        // Throttle logged MAP missing at every other key-off. One frame after a running one, the key
+        // must already be off.
+        g_tick += 1; pump(s, bus);                // a running frame, mid-period for a 20 Hz sensor
+        assert(g_system_active);
+        g_tick += 1;
+        g_ain[11] = 50;                           // ignition gone: 0.3 V
+        pump(s, bus);
+        assert(!g_system_active);                 // off in the same frame, not up to 50 ms later
+        assert(bus.get(SIG_KEY_ON_S) == 0.0f);    // time since key-on reads 0 while it is off
+
+        // TIME SINCE KEY-ON counts from the key, not from boot: a prime timed off uptime never ran with
+        // USB holding the ECU awake before the ignition came on.
+        g_tick += 5000; pump(s, bus);             // five seconds awake, key still off
+        g_ain[11] = 2232; g_tick += 1; pump(s, bus);
+        assert(g_system_active && bus.get(SIG_KEY_ON_S) < 0.01f);
+        g_tick += 2500; pump(s, bus);
+        assert(std::fabs(bus.get(SIG_KEY_ON_S) - 2.5f) < 0.01f);
         g_key_override = 1;                       // restore for anything after this section
         printf("ok  system-active gate: bench=battery-only, key-on=all sensors\n");
     }

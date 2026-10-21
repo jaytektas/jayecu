@@ -517,6 +517,7 @@
     "prot_level": 513,
     "blink_slow": 514,
     "blink_fast": 515,
-    "fuel_temp_flex_raw": 516
+    "fuel_temp_flex_raw": 516,
+    "key_on_s": 517
   }
 }

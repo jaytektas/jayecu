@@ -1350,6 +1350,10 @@ signals:
 - {id: frame_load_pct, label: "Engine Frame Load", units: '%', scale: 1.0, telem_type: uint8, min: 0.0, max: 255.0, category: "Engine", bus_type: float, datalog: true, owner: firmware, gauge: {min: 0, max: 100, hi_warn: 70, hi_bad: 90}}   # how much of the 1 kHz frame the frame body used (smoothed)
 - {id: frame_load_max_pct, label: "Engine Frame Load Peak", units: '%', scale: 1.0, telem_type: uint8, min: 0.0, max: 255.0, category: "Engine", bus_type: float, datalog: true, owner: firmware, gauge: {min: 0, max: 100, hi_warn: 70, hi_bad: 90}}   # the worst single frame since boot — what decides whether one is ever late
 - {id: uptime_s, label: "ECU Uptime", units: 's', scale: 1.0, telem_type: uint32, min: 0.0, max: 4000000.0, category: "Engine", bus_type: float, datalog: false, owner: firmware}
+# HOW LONG THE KEY HAS BEEN ON, 0 while it is off — what a key-on action (a pump prime, a bulb check)
+# times itself from. Not uptime: with USB plugged in the ECU is awake long before the key turns, so a
+# prime on "uptime_s < 3" had already run out by the time the ignition came on, and the pump never primed.
+- {id: key_on_s, label: "Time Since Key On", units: 's', scale: 0.1, telem_type: uint16, min: 0.0, max: 6500.0, category: "Engine", bus_type: float, datalog: false, owner: firmware}
 # A COUNT, so no units — and deliberately: what a condition asks of this channel is its AGE, and
 # age() answers in milliseconds whatever it was asked about (expr_units::unitOf). Giving the count
 # itself a time unit would make "age(trigger_teeth) < 1500ms" convert against the wrong thing.
@@ -6803,7 +6807,7 @@ modules:
         # so the STATE belongs here, on the slot: minimum on and off times, a maximum on time with a
         # re-arm delay (a starter motor must not be cranked forever), and what to do when the question
         # cannot be answered at all.
-        - {name: on_expr, type: expression, length: 64, label: Turn On When, help: 'The condition that turns this output ON. Empty means the slot is driven by its candidate value alone, exactly as before. Reads any bus channel and any config setting: "clt > 95" for a fan, "uptime_s < 3 or age(trigger_teeth) < 1500" for a fuel pump (prime, then run while the wheel turns).'}
+        - {name: on_expr, type: expression, length: 64, label: Turn On When, help: 'The condition that turns this output ON. Empty means the slot is driven by its candidate value alone, exactly as before. Reads any bus channel and any config setting: "clt > 95" for a fan, "key_on_s < 3 or age(trigger_teeth) < 1500" for a fuel pump (prime, then run while the wheel turns).'}
         - {name: off_expr, type: expression, length: 64, label: Turn Off When, help: 'The condition that turns it OFF again. Empty means "when Turn On When stops being true", which is right for a plain switch; a separate condition is how hysteresis is written — on above 95, off below 90 — and it is the difference between a fan that settles and one that chatters at the threshold.'}
         # ---- HOW MUCH, and HOW FAST ---------------------------------------------------------------
         # An output is three questions, not one: is it ON (the conditions above), how much (duty), and
@@ -7269,6 +7273,7 @@ well_known_signals:
   pin_conflict_fault: pin_conflict_fault
   flood_clear: flood_clear
   uptime_s: uptime_s
+  key_on_s: key_on_s
   # Headroom, in the two senses that are not the same number (see EngineTask::frame_load_pct).
   cpu_load_pct: cpu_load_pct
   frame_load_pct: frame_load_pct
@@ -7575,8 +7580,8 @@ output_templates:
   params:
   - {name: prime_s, label: Prime Time, units: s, default: 3, min: 0, max: 30, digits: 1, help: 'How long the pump runs at key-on to bring the rail up before cranking.'}
   - {name: stop_ms, label: Stop After, units: ms, default: 1500, min: 200, max: 10000, digits: 0, help: 'How long after the last trigger tooth the pump is switched off. Long enough to ride out a slow crank, short enough to be off promptly when the engine stops.'}
-  on_when:  'uptime_s < {prime_s} or age(trigger_teeth) < {stop_ms}'
-  off_when: 'uptime_s >= {prime_s} and age(trigger_teeth) >= {stop_ms}'
+  on_when:  'key_on_s < {prime_s} or age(trigger_teeth) < {stop_ms}'
+  off_when: 'key_on_s >= {prime_s} and age(trigger_teeth) >= {stop_ms}'
 
 - id: thermo_fan
   name: Thermo Fan
@@ -7708,7 +7713,7 @@ output_templates:
   # One condition, no Turn Off: the lamp follows it (an empty off condition means "when this stops").
   # ON for any current code or level 3; levels 1 and 2 only FLASH, and only when neither holds — a level
   # can add a flash, never turn the lamp off.
-  on_when:  'uptime_s < {bulb_s} or dtc_active > 0 or prot_level == 3 or (prot_level == 2 and blink_fast) or (prot_level == 1 and blink_slow)'
+  on_when:  'key_on_s < {bulb_s} or dtc_active > 0 or prot_level == 3 or (prot_level == 2 and blink_fast) or (prot_level == 1 and blink_slow)'
   off_when: ''
 
 # THREE TACHOMETERS, one slot. A tacho reads a square wave whose FREQUENCY is engine speed; what differs

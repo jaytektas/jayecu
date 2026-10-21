@@ -151,6 +151,7 @@ private:
     // EMA / switch-debounce / stuck / derivative state now lives INSIDE the pipeline
     // (pipe::State per stage); this manager keeps only decimation + arbitration + DTC state.
     bool     key_on_   = false;   // hysteretic key state, decided mid-pass (see key_on())
+    uint32_t key_on_since_ = 0;   // tick the key last came on, 0 while it is off (key_on_s)
     // The 5 V references (see supply_lost()): read right after the key is decided, before any sensor that
     // they gate runs, so the pass in which one fails is also the pass in which the sensors go invalid.
     void     update_supplies(SignalBus& bus, uint32_t now);

@@ -9,6 +9,9 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- No more phantom trouble codes when the ignition is switched off with USB connected (Boost: MAP signal missing, Transient Throttle: load-source signal missing, and the like). The key is now read every millisecond; it used to be read 20 times a second, and for those few frames every sensor was dead with the key still on.
+- The fuel pump prime and the check engine light's bulb check are timed from key-on, not from when the ECU powered up. With USB connected the ECU is already awake, so the pump did not prime. Run the output wizard again on a Fuel Pump or Check Engine Light output to take the change. The new channel is Time Since Key On (`key_on_s`).
+- Every trouble code has a description. The codes a sensor gets from the manufacturer range (for example P1000, the battery's circuit-low code), its precondition and band codes, and the flex fuel temperature's codes showed with no text.
 - The flex fuel sensor's temperature can be calibrated: its page has a Fuel Temperature section with Measure (High Time, Low Time or Duty Cycle), the raw value live, and its own curve. The default is now Low Time, which is how a GM/Continental sensor sends it — reading the high time instead gave a temperature that was wrong and moved with the ethanol content (one car read 134 °C at 20 °C and raised P0183). A raw past either end of the curve raises P0182/P0183.
 
 ## 0.4.11

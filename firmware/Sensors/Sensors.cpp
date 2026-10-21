@@ -595,6 +595,11 @@ void Sensors::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
             // ON THE WIRE. Every channel below reads zero when the key is off and that is CORRECT —
             // but the studio cannot otherwise tell it from a broken sensor, so it has to be said.
             bus.set(SIG_KEY_ON, key_on_ ? 1.0f : 0.0f, true, now, 200u);
+            // …and for how long, which a key-on action times itself from (key_on_s in the schema).
+            if (!key_on_) key_on_since_ = 0;
+            else if (key_on_since_ == 0) key_on_since_ = now ? now : 1u;   // 0 = "off"
+            bus.set(SIG_KEY_ON_S, key_on_ ? static_cast<float>(now - key_on_since_) / 1000.0f : 0.0f,
+                    true, now, 200u);
             // ...and RETRACT the raw pins the key gates. HardwareInput published every one of them a
             // phase ago and cannot judge this itself — it runs before the key is known, so gating there
             // would cost a frame on the pass the key turns, and that pass publishing everything is a
@@ -709,7 +714,13 @@ void Sensors::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
         // same slot = same tick, however long either sensor has been running; different phases stagger
         // the work across the period. A skipped millisecond lands in the next slot and still runs,
         // where a "now % period == 0" test would have dropped the whole period.
-        if (period) {
+        // THE BOOTSTRAP SENSOR RUNS EVERY FRAME, whatever its type's rate. The key is decided from it, and
+        // at its type's 20 Hz the key stayed ON for up to 50 ms after the ignition went: the 5 V
+        // references drop the moment it does, so for those frames every pin-read sensor was invalid
+        // with the key still on, and the modules needing MAP or TPS logged them missing (P1710, P1720)
+        // on every other key-off. Measured on a car with USB holding the ECU up: supplies 0, battery
+        // still reading 12.68 V, key on, P1720 active — for one 40 ms telemetry frame.
+        if (period && !is_bootstrap) {
             const uint32_t slot = (now + phase_[i]) / period;
             if (ran_once_[i] && slot == last_slot_[i]) continue;   // already ran in this slot
             last_slot_[i] = slot;

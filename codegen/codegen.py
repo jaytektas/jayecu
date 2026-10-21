@@ -3318,14 +3318,38 @@ def _value_autotune_meta(schema: dict) -> list:
 
 def _dtc_descriptions(schema: dict) -> dict:
     """{ 'P0122': 'Throttle Position — circuit low …', … } for the studio dock hover.
-    Built from the sensor catalog `dtc:` assignments + the module_dtc list (one source)."""
+
+    FROM THE CODES THE FIRMWARE RAISES, not the ones the schema happens to name. A sensor's `dtc:` names
+    only the standard codes; every other check it can arm gets a manufacturer code from
+    sensor_diag_dtcs (P1000 is the battery's Raw Low), and so do its precondition and band codes. Built
+    from `dtc:` alone, those had no description at all — a code on the dock with nothing to say what it
+    is. The same allocation the catalog and the DTC reference use, so the three cannot disagree."""
     desc: dict = {}
-    for i, s in enumerate(schema.get("sensors", []) or []):
+    sensors = schema.get("sensors", []) or []
+    diag = sensor_diag_dtcs(schema, schema.get("sensor_types", []), sensors)
+    type_outputs = {t["id"]: (t.get("outputs") or []) for t in schema.get("sensor_types", [])}
+    for i, s in enumerate(sensors):
         name = s.get("name", s.get("id", "?"))
-        for chk, val in (s.get("dtc") or {}).items():
-            code = _dtc_to_u16(val)
-            if code and _DTC_FAULT_PHRASE.get(chk):
+        codes = diag.get(s["id"], {})
+        applicable = sensor_diagnostics(schema, s)
+        for chk in DIAG_SLOTS:
+            code = codes.get(chk)
+            if code and chk in applicable:
                 desc[f"P{code:04X}"] = f"{name} — {_DTC_FAULT_PHRASE[chk]}"
+        if codes.get("precond_invalid"):
+            desc[f"P{codes['precond_invalid']:04X}"] = f"{name} — precondition expression invalid"
+        if codes.get("no_band"):
+            desc[f"P{codes['no_band']:04X}"] = f"{name} — reading matches none of its calibrated bands"
+        # …and each secondary reading's own range codes (the flex sensor's fuel temperature).
+        chans = s.get("provides", [s["id"]])
+        for k, out in enumerate(type_outputs.get(s.get("type"), [])):
+            if 1 + k >= len(chans):
+                break
+            what = f"{name} — {out.get('label', out['role'].title())}"
+            for chk in ("operating_min", "operating_max"):
+                code = _dtc_to_u16((out.get("dtc") or {}).get(chk))
+                if code:
+                    desc[f"P{code:04X}"] = f"{what}: {_DTC_FAULT_PHRASE[chk]}"
         # Auto-allocated per-sensor config DTC (P18xx): enabled but no input pin assigned.
         desc[f"P{SENSOR_DTC_CONFIG_BASE + i:04X}"] = f"{name} — input not assigned (interface set, no pin)"
     for _name, code, label, _sev in _module_dtc_entries(schema):
