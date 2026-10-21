@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.12
 - With the key off the ECU is quiet on CAN: nothing is transmitted and anything still queued is dropped, so an ECU kept awake by USB does not talk into a sleeping car or keep its other modules awake. It still listens, and starts transmitting again at key-on.
 - CAN1/CAN2 "cannot complete a frame" (P1657/P1658) is no longer logged with the key off, or in the first two seconds after key-on. With the ignition off the rest of the car's bus is asleep, and at key-on it is still booting, so nobody answers; with USB connected the ECU logged it at key-off and again at power-up.
 - No more phantom trouble codes when the ignition is switched off with USB connected (Boost: MAP signal missing, Transient Throttle: load-source signal missing, and the like). The key is now read every millisecond; it used to be read 20 times a second, and for those few frames every sensor was dead with the key still on.
