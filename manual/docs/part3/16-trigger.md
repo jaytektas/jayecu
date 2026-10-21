@@ -642,8 +642,11 @@ that arrives late once in a while. Chapter 43 covers it in full.
     apart. Toyota's diagnosis expects 12 crank pulses (one revolution of the factory 12-tooth wheel)
     between G1 and G2. Pick the entry for the sensor you have wired. Its only difference is the cam's
     **WIDTH target angle**, 0° for the rear and 360° for the front. The wrong one puts the engine a
-    whole revolution out: it fires on the exhaust stroke and will not start.
-    <!-- src: definition/ecu.schema.yaml trigger_wheels "2JZ 36-2 + Front Cam" (and its comment: Toyota code 13, Haltech +360); tests/test_generic_trigger.cpp ("2JZ front and rear cam") -->
+    whole revolution out once it has phase. With **Min RPM for Full (PHASE) Sync** set for a VR cam
+    (about 1500), the engine cranks and idles on crank sync, in wasted spark, and runs normally. Then it
+    misfires or stalls the moment it takes phase and goes sequential, because every spark lands on
+    the exhaust stroke. With the band at 0 it takes phase while cranking and does not start at all.
+    <!-- src: definition/ecu.schema.yaml trigger_wheels "2JZ 36-2 + Front Cam" (and its comment: Toyota code 13, Haltech +360); definition/ecu.schema.yaml (min_full_sync_rpm_x10); firmware/Scheduler/EnginePositionHal.cpp (phase-sync rpm band: cam ignored for acquisition below it, phase retained as rpm falls); tests/test_generic_trigger.cpp ("2JZ front and rear cam") -->
 
     The crank-only version, **2JZ 36-2 (crank only)**, has no cam stream. It reaches Crank sync only,
     so it suits wasted spark and non-sequential injection.
