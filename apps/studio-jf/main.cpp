@@ -98,6 +98,9 @@ static std::function<void()> g_trackDockHomes, g_syncViewToggles;
 #include "model/TuneDiff.h"
 #include "ui/ListPickerDialog.h"
 #include "ui/EcuPickRows.h"
+#include "app/MetaLibrary.h"
+#include "app/AiCommands.h"
+#include "app/Headless.h"
 #include "ui/CanTemplateDialog.h"
 #include "ui/ChannelPickerDialog.h"
 #include "ui/ChannelPropsDialog.h"
@@ -987,13 +990,40 @@ static void openStudioLog() {
         if (e.path().extension() == ".log" && e.last_write_time(ec) < cutoff) fs::remove(e.path(), ec);
 }
 
+// `studio --help`: what a script or an agent can do with the studio, and where the rest is written.
+static const char* kUsage =
+    "jayecu studio %s\n"
+    "\n"
+    "  studio                                  the studio\n"
+    "  studio --headless --ecu <uid|car>       no window: open a library ECU's tune and serve the AI bus\n"
+    "         [--tune <name>]                  ...a named tune of it\n"
+    "  studio --headless --connect [--port P]  no window: connect to the ECU (with --ecu <uid> to pick one)\n"
+    "  studio --headless --meta <file>         no window: a definition's defaults\n"
+    "\n"
+    "  JF_AI_BUS=1 studio                      the studio with the AI bus on (headless always has it)\n"
+    "  jf-busctl call help                     the bus's commands: settings, tables, live channels...\n"
+    "\n"
+    "Window options for scripted screenshots: --open-meta <file> --node <page path> --set path=value\n"
+    "  --tool <name> --shot <file.ppm> --quit-after <ms> --connect --import <ini>\n"
+    "\n"
+    "The manual says it all: Help > User Manual, part 6, \"Driving the studio from a script or an AI\"\n"
+    "(manual/part6/50-automation.html beside the studio, and https://jaytektas.github.io/jayecu/).\n";
+
 int main(int argc, char** argv) {
     g_bootT0 = std::chrono::steady_clock::now();
     openStudioLog();
+    bool headlessMode = false;
+    headless::Args hargs;
     for (int i = 1; i < argc; ++i) {
         const std::string a = argv[i];
         auto next = [&]() -> std::string { return (i + 1 < argc) ? argv[++i] : std::string(); };
-        if      (a == "--import")     g_run.importIni = next();
+        if (a == "--help" || a == "-h") { headless::useParentConsole(); std::printf(kUsage, STUDIO_VERSION); return 0; }
+        if      (a == "--headless")   headlessMode = true;
+        else if (a == "--ecu")        hargs.ecu  = next();
+        else if (a == "--tune")       hargs.tune = next();
+        else if (a == "--port")       hargs.port = next();
+        else if (a == "--meta")       hargs.meta = next();
+        else if (a == "--import")     g_run.importIni = next();
         else if (a == "--node")       g_run.node      = next();
         else if (a == "--tool")       g_run.tool      = next();
         else if (a == "--open-meta")  g_run.openMeta  = next();
@@ -1008,6 +1038,13 @@ int main(int argc, char** argv) {
         else if (a == "--dirty")      g_run.dirty     = true;
         else if (a == "--mode-flips") g_run.modeFlips = std::atoi(next().c_str());
         else if (a == "--audit")      g_run.auditFile = next();
+    }
+    // NO WINDOW AT ALL: the model, the ECU link and the AI bus (Headless.h). Branches off before anything
+    // here asks for a display or a GPU, so it runs on a machine that has neither.
+    if (headlessMode) {
+        hargs.connect = g_run.connect;
+        if (hargs.meta.empty()) hargs.meta = g_run.openMeta;
+        return headless::run(hargs);
     }
     if (const char* st = std::getenv("STUDIO_SELFTEST"); st && *st == '1') return runOwnedStateSelfTest();
     bootMark("args parsed");
@@ -1959,36 +1996,8 @@ int main(int argc, char** argv) {
         const auto j = jf::JJson::tryParse(std::string(raw.begin(), raw.end()));
         return (j && j->isObject()) ? (*j)["layout_hash"].str() : std::string();
     };
-    auto metaForLayoutHash = [](const std::string& hash) -> std::string {
-        if (hash.empty()) return {};
-        namespace fs = std::filesystem;
-        const fs::path lib = StudioPaths::dataDir("meta");
-        std::error_code ec;
-        // THE NAME CARRIES THE HASH. A meta is saved as "<board> <layout_hash>.meta", so the library can
-        // be searched by looking at the directory. This used to PARSE every meta in it — 16 files, 23 MB
-        // of JSON — to read one string out of each, on every launch, and that was most of the wait
-        // between the studio's window appearing and its interface arriving with it.
-        //
-        // Parsing is still the answer for a file whose name does not name its hash: an older library, or
-        // one somebody has renamed. It just is not the FIRST answer any more.
-        std::vector<std::string> unnamed;
-        for (const auto& f : fs::directory_iterator(lib, ec)) {
-            if (f.path().extension() != ".meta") continue;
-            const std::string stem = f.path().stem().string();
-            if (stem.size() >= hash.size()
-                && stem.compare(stem.size() - hash.size(), hash.size(), hash) == 0
-                && (stem.size() == hash.size() || stem[stem.size() - hash.size() - 1] == ' '))
-                return f.path().string();
-            unnamed.push_back(f.path().string());
-        }
-        for (const std::string& path : unnamed) {
-            const auto j = jf::JJson::tryParseFile(path);
-            if (!j || !j->isObject()) continue;
-            const jf::JJson& doc = *j;                     // const: the mutating operator[] would rewrite it
-            if (doc["meta"]["layout_hash"].str() == hash) return path;
-        }
-        return {};
-    };
+    // The library, then the kits: one lookup for the window and for --headless (MetaLibrary.h).
+    auto metaForLayoutHash = [](const std::string& hash) -> std::string { return metalib::forLayoutHash(hash); };
 
     // OPEN A PROJECT: bring up the definition it was written against, then the project and its tune. Used
     // by Open ECU…, the Recent ECUs submenu and reopen-on-launch — each of which used to call openTune
@@ -6968,7 +6977,52 @@ int main(int argc, char** argv) {
     // and drive its setter, which fires the SAME change signal as a user edit (so bound models react, e.g.
     // the trigger designer's Cams count rebuilds its per-cam rows). Returns 1 handled / 0 not / -1 bad id.
     // Only ever invoked while the bus is enabled + ticking on the main thread, so the lookup is safe.
+    // The studio's own commands first (AiCommands.h): the tune and the live data by name, the same ones
+    // `studio --headless` answers. What only the window can do is handed in.
+    static aicmd::Host aiHost;
+    aiHost.status = [] {
+        jf::JJson o = jf::JJson::object();
+        o["mode"] = jf::JJson(std::string("window"));
+        o["studio"] = jf::JJson(std::string(STUDIO_VERSION));
+        o["connected"] = jf::JJson(link.isOpen() || tsLink.isOpen());
+        jf::JJson e = jf::JJson::object();
+        if (ecu) {
+            e["id"] = jf::JJson(ecu->uid());
+            e["board"] = jf::JJson(ecu->board());
+            const Ecu::Summary sm = Ecu::summary(ecu->uid());
+            if (!sm.vehicle.name.empty())  e["name"]  = jf::JJson(sm.vehicle.name);
+            if (!sm.vehicle.make.empty())  e["make"]  = jf::JJson(sm.vehicle.make);
+            if (!sm.vehicle.model.empty()) e["model"] = jf::JJson(sm.vehicle.model);
+        }
+        if (!s_ecuFwVersion.empty()) e["firmware"] = jf::JJson(s_ecuFwVersion);
+        if (!s_ecuFwBuild.empty())   e["build"]    = jf::JJson(s_ecuFwBuild);
+        o["ecu"] = e;
+        if (!activeTuneName.empty()) o["tune"] = jf::JJson(activeTuneName);
+        return o;
+    };
+    aiHost.burn = [](std::string& why) {
+        Cache::instance().flushWrites();     // the last edit first, exactly as the Burn button does
+        if (!(tuneburn::burn() && tuneburn::burn()())) { why = "not connected to an ECU"; return false; }
+        return true;
+    };
+    aiHost.save = [saveActiveTune](std::string& why) {
+        if (!ecu || activeTuneName.empty()) { why = "no ECU project is open"; return false; }
+        saveActiveTune();
+        return true;
+    };
+    aiHost.page = [](const std::string& path, std::string& why) {
+        if (path.empty() || !hyperlink::navigator()) { why = "page <navigation path>"; return false; }
+        hyperlink::navigator()(path);
+        return true;
+    };
     jf::JAiBus::instance().onAction = [&win](uint32_t id, const std::string& action) -> int {
+        {
+            std::string reply;
+            if (aicmd::handle(action, aiHost, reply)) {
+                jf::JAiBus::instance().reply(reply);
+                return reply.rfind("{\"ok\":true", 0) == 0 ? 1 : 2;   // 2: answered, and the answer is an error
+            }
+        }
         // "select_node:Configuration/Engine Configuration/Trigger System" — go to a page, by the path the
         // tree knows it by. A page is reached by clicking a row in a tree that scrolls, filters and hides
         // whatever its conditions hide, so driving to one through the pointer means knowing where that row

@@ -137,6 +137,7 @@ nav:
       - 47 Recovering an ECU: part6/47-recovery.md                      # bricked ECU, bootloader, bad tune
       - 48 Tunes, layouts and backups: part6/48-files-backups.md        # files, restore points, SD card
       - 49 Customising the studio: part6/49-customising-studio.md       # layouts, surfaces, widgets, editing mode
+      - 50 Scripts and AI: part6/50-automation.md                         # AI bus, jf-busctl, studio --headless
 
   - Part VII — Reference:
       - part7/index.md

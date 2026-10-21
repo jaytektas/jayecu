@@ -68,7 +68,7 @@ endif()
 # The studio, on JFramework. Consumes the framework as an
 # installed SDK — nothing from the studio leaks back into the framework.
 #   cmake -S . -B build -DCMAKE_PREFIX_PATH=$HOME/jframework-sdk
-find_package(JFramework 0.2 CONFIG REQUIRED)   # 0.2: the rebuilt file chooser — an older SDK is refused, not shipped
+find_package(JFramework 0.3 CONFIG REQUIRED)   # 0.3: the AI bus's reply channel (headless commands); 0.2: the file chooser
 
 # App source: the shell (main.cpp) + the ECU model/data backend (src/model/*).
 # The model is app code — it consumes the framework's
@@ -132,6 +132,21 @@ target_precompile_headers(studio_surface PRIVATE ${STUDIO_PCH})
 # into studio_model/studio_surface (which the test binaries link) and once more into the executable. Ninety
 # files, every time, for nothing — and editing one widget compiled it twice before the link.
 add_executable(studio main.cpp ${STUDIO_APP_SRC} ${STUDIO_UI_SRC})
+# THE BUS CLIENT SHIPS WITH THE STUDIO: built from the SDK's own copy of its source, so the jf-busctl beside
+# a studio always speaks that studio's bus ABI. An agent driving the studio needs nothing else installed.
+set(JF_BUSCTL_SRC "${JFramework_DIR}/../../../share/jframework/tools/jf-busctl.cpp")
+if(NOT EXISTS "${JF_BUSCTL_SRC}")
+    message(FATAL_ERROR "the JFramework SDK has no ${JF_BUSCTL_SRC} — rebuild it (make sdk / make sdk-win)")
+endif()
+add_executable(jf-busctl "${JF_BUSCTL_SRC}")
+target_include_directories(jf-busctl PRIVATE $<TARGET_PROPERTY:JFramework::platform,INTERFACE_INCLUDE_DIRECTORIES>)   # the ABI header only
+if(UNIX AND NOT APPLE)
+    target_link_libraries(jf-busctl PRIVATE rt)
+endif()
+if(WIN32)
+    target_link_options(jf-busctl PRIVATE -static -static-libgcc -static-libstdc++)   # standalone, as the studio is
+endif()
+add_dependencies(studio jf-busctl)
 target_link_libraries(studio PRIVATE studio_model studio_surface)
 target_include_directories(studio PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # A BETA BUILD's version: -DSTUDIO_VERSION_OVERRIDE=0.3.8-beta.1 (tools/beta_release.sh). The project()
@@ -1666,6 +1681,15 @@ target_link_libraries(tune_refs_test PRIVATE JFramework::platform)
 target_compile_definitions(tune_refs_test PRIVATE REAL_META="${CMAKE_CURRENT_SOURCE_DIR}/../../shared/tuneit-meta.json")
 add_test(NAME tune_refs COMMAND tune_refs_test)
 add_dependencies(studio_tests tune_refs_test)
+
+# The AI bus's studio commands — settings, tables and channels by name — against the real meta.
+#   cmake --build build --target ai_commands_test && ./build/ai_commands_test
+add_executable(ai_commands_test EXCLUDE_FROM_ALL tests/test_ai_commands.cpp src/app/AiCommands.cpp)
+target_link_libraries(ai_commands_test PRIVATE studio_model JFramework::platform)
+target_include_directories(ai_commands_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_compile_definitions(ai_commands_test PRIVATE REAL_META="${CMAKE_CURRENT_SOURCE_DIR}/../../shared/tuneit-meta.json")
+add_test(NAME ai_commands COMMAND ai_commands_test)
+add_dependencies(studio_tests ai_commands_test)
 
 
 

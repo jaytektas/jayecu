@@ -63,6 +63,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 ; Everything the studio needs beside its .exe — the same list CMakeLists.txt copies into the build.
 Source: "{#BuildDir}\studio.exe";         DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildDir}\jf-busctl.exe";      DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\studio.style";       DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\studio.common.style"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\jaytek-logo.png";    DestDir: "{app}"; Flags: ignoreversion

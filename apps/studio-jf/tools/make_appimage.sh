@@ -27,7 +27,7 @@ APPDIR="$BUILD/AppDir"
 rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr/bin"
 
-for f in studio studio.style studio.common.style jaytek-logo.png jaytek-landing.png UbuntuSans.ttf UbuntuSans-LICENCE.txt; do
+for f in studio jf-busctl studio.style studio.common.style jaytek-logo.png jaytek-landing.png UbuntuSans.ttf UbuntuSans-LICENCE.txt; do
     [ -e "$BUILD/$f" ] || { echo "make_appimage: $BUILD/$f is missing — build the studio first" >&2; exit 1; }
     cp "$BUILD/$f" "$APPDIR/usr/bin/"
 done
@@ -74,9 +74,15 @@ Categories=Utility;
 StartupWMClass=studio
 EOF
 
+# An AppImage has one way in, so the bus client is reached through it: "jayecu-studio.AppImage busctl call
+# status" runs jf-busctl, anything else runs the studio (--headless included).
 cat > "$APPDIR/AppRun" <<'EOF'
 #!/bin/sh
-exec "$(dirname "$(readlink -f "$0")")/usr/bin/studio" "$@"
+HERE="$(dirname "$(readlink -f "$0")")"
+case "$1" in
+    busctl|jf-busctl) shift; exec "$HERE/usr/bin/jf-busctl" "$@" ;;
+esac
+exec "$HERE/usr/bin/studio" "$@"
 EOF
 chmod +x "$APPDIR/AppRun"
 
