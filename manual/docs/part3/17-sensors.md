@@ -49,11 +49,11 @@ and air temperature, throttle position, and battery voltage.
 ### 1 · Sensor types and the pipeline
 
 Every sensor has a **type**, which sets its units, precision, value range and update rate:
-<!-- src: definition/ecu.schema.yaml (sensor_types); generated/sensors_catalog.h -->
+<!-- src: definition/ecu.schema.yaml (sensor_types); generated/sensors_catalog.h; firmware/Engine/Modules/FuelCalculator.cpp (temperatures claimed at the cycle rate) -->
 
 | Type | Units | Updates | Examples |
 |---|---|---|---|
-| temperature | °C | 5 Hz | coolant, air, oil |
+| temperature | °C | 50 Hz (faster when the fuel model needs it) | coolant, air, oil |
 | exhaust temperature | °C (to 1500) | 5 Hz | EGT |
 | pressure | kPa | 100 Hz | MAP, oil, fuel |
 | percent | % | 200 Hz | throttle, pedal |
