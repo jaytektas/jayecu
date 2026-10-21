@@ -10,6 +10,7 @@
 #include "Can/CanMessageTypes.h"
 #include "Signal/SignalBus.h"
 #include "ecu_config.h"      // g_config — the SHIPPED default for a field's channel
+#include "Diagnostics/DtcManager.h"
 
 #include <cstdio>
 #include <cstring>
@@ -36,6 +37,8 @@ struct MockChannel final : ICanChannel {
         return true;
     }
     bool is_up() const override { return true; }
+    CanErrorStatus err{};          // what the controller reports (a test sets "nobody answered")
+    CanErrorStatus error_status() const override { return err; }
 };
 
 // A tune builder: the config is a plain struct, so a test says exactly what a studio would write.
@@ -521,6 +524,32 @@ int main() {
         CHECK(br.generic().decoded() == 1);                // …but the frame WAS decoded, for the sensor
         const GenericCan::FieldValue* fv = br.generic().value(0);
         CHECK(fv != nullptr && fv->at_ms == 10);
+    }
+
+    // ---- NO ACKNOWLEDGEMENT IS A FAULT ONLY WITH THE KEY ON ----
+    // Found on a car with USB connected: the rest of the bus sleeps with the ignition, the ECU kept
+    // transmitting into it, and P1657 was logged at every key-off.
+    {
+        T t;
+        t.frame(0x5A0, true, 10).field(g_config.can.gc_field[0].sig, 7, 16, 1.0f, 0.0f);
+        MockChannel ch; CanBroker br; SignalBus bus; DtcManager dtc; dtc.init(1);
+        br.add_bus(0, &ch); br.set_signal_bus(&bus); br.set_dtc(&dtc);
+        br.reconfigure_generic(t.cfg, 0);
+        ch.accept = 0;                                     // every send refused: the mailboxes are full
+        ch.err.state = 2; ch.err.last_err = 3;             // error passive, ACK error: nobody there
+        const uint16_t NO_ACK = 0x1657;
+
+        br.set_key_on(false);
+        for (uint32_t ms = 0; ms <= 2100; ms += 10) br.update(ms);
+        CHECK(dtc.code_severity(NO_ACK) == 0);             // key off: silence is expected
+
+        br.set_key_on(true);
+        for (uint32_t ms = 2110; ms <= 4200; ms += 10) br.update(ms);
+        CHECK(dtc.code_severity(NO_ACK) != 0);             // key on: it is a fault
+
+        br.set_key_on(false);
+        for (uint32_t ms = 4210; ms <= 5300; ms += 10) br.update(ms);
+        CHECK(dtc.code_severity(NO_ACK) == 0);             // and goes the moment the key does
     }
 
     return test_summary();

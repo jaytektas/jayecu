@@ -124,10 +124,16 @@ void CanBroker::publish_stats(SignalBus& bus, uint32_t now_ms) {
         // outcome they share.
         //
         // Listen-only is exempt: it never transmits, so it can neither fail to complete nor be refused.
+        // So is the key being off. Every other module on a car's bus is powered by the ignition, so with
+        // it off there is nobody to acknowledge — and with USB holding the ECU up it transmits anyway,
+        // and logged P1657 at every key-off. The code is a CONFIG one (it is how a wrong bit rate shows
+        // on a bench), so the DTC table's own key-off gate does not cover it; this does.
         const bool offering = st.tx_fail > tx_fail_seen_[b] || st.tx_frames > 0;
         const bool mute     = (e.state >= 2) || (e.last_err == 1 || e.last_err == 2 || e.last_err == 3);
         if (dtc_ && !listen_only_[b]) {
-            if (offering && mute && st.tx_frames == 0)
+            if (!key_on_)
+                dtc_->heal(P_CAN_NO_ACK + b);
+            else if (offering && mute && st.tx_frames == 0)
                 dtc_->raise(P_CAN_NO_ACK + b, DtcSource::CONFIG, DTC_SEV_LEVEL1, now_ms, DTC_TTL_DEFAULT);
             else if (st.tx_frames > 0)
                 dtc_->heal(P_CAN_NO_ACK + b);          // something completed: somebody is there

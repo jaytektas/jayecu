@@ -107,6 +107,9 @@ public:
     // …and whether it is allowed to talk at all, so the no-acknowledgement check can exempt a bus
     // that is deliberately silent rather than reporting it as a fault every second.
     void set_bus_listen_only(uint8_t idx, bool on) { if (idx < MAX_BUSES) listen_only_[idx] = on; }
+    // …and whether the key is on, because with it off nobody is expected to answer: the rest of a car's
+    // bus sleeps with the ignition, and an ECU held up by USB still transmits into it.
+    void set_key_on(bool on) { key_on_ = on; }
 
     // Publish per-bus health to the signal bus. Called once per update(); the window is a second, so
     // this does real work about once in a thousand ticks.
@@ -140,6 +143,7 @@ private:
     BusStats stats_[MAX_BUSES];
     uint32_t bitrate_[MAX_BUSES]  = { 500000u, 500000u };
     bool     listen_only_[MAX_BUSES] = { false, false };   // a silent bus cannot ACK-fail
+    bool     key_on_ = true;                                // see set_key_on()
     uint32_t tx_fail_seen_[MAX_BUSES] = { 0, 0 };          // last window's refusal total
     uint32_t stats_window_ms_     = 0;
 

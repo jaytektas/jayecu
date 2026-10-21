@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- CAN1/CAN2 "cannot complete a frame" (P1657/P1658) is no longer logged with the key off. With the ignition off the rest of the car's bus is asleep, so nobody answers; with USB connected the ECU kept transmitting and logged it at every key-off.
 - No more phantom trouble codes when the ignition is switched off with USB connected (Boost: MAP signal missing, Transient Throttle: load-source signal missing, and the like). The key is now read every millisecond; it used to be read 20 times a second, and for those few frames every sensor was dead with the key still on.
 - The fuel pump prime and the check engine light's bulb check are timed from key-on, not from when the ECU powered up. With USB connected the ECU is already awake, so the pump did not prime. Run the output wizard again on a Fuel Pump or Check Engine Light output to take the change. The new channel is Time Since Key On (`key_on_s`).
 - Every trouble code has a description. The codes a sensor gets from the manufacturer range (for example P1000, the battery's circuit-low code), its precondition and band codes, and the flex fuel temperature's codes showed with no text.
