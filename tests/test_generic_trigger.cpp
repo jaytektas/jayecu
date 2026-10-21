@@ -389,6 +389,52 @@ int main() {
         CHECK(bad == 0);
     }
 
+    // THE 2JZ's TWO CAM SENSORS (the library's "2JZ 36-2 + Rear Cam" and "+ Front Cam"). G2 at the rear
+    // and G1 midway along the head each see one narrow pulse per cycle, one crank revolution apart. The
+    // two library wheels differ only in the cam's reference angle, 0 and 360.0 deg — and each must put
+    // the engine at the SAME angle from its own sensor, while either one fed the other's pulse is a
+    // whole revolution out (which is what the entries exist to prevent).
+    SECTION("2JZ front and rear cam: each wheel phases the engine the same from its own sensor");
+    {
+        auto run = [](AngleDeg10 pulseAt, AngleDeg10 target) {
+            GenericTrigger g;
+            uint8_t gi[1] = {0}, gr[1] = {3};
+            int cr  = g.add_gap(0, 2, 36, gi, gr, 1, 25);                          // 36-2
+            int cam = g.add_width(2, REPEATS_PHASE, 0, 7200, target, true);
+            struct E { uint32_t tick; int idx; bool rising; AngleDeg10 tru; bool crank; };
+            std::vector<E> ev;
+            for (int c = 0; c < 8; c++) {
+                for (int rev = 0; rev < 2; rev++) for (int slot = 0; slot < 36; slot++) {
+                    if (slot >= 34) continue;                                       // the two missing
+                    uint32_t a = c*7200 + rev*3600 + slot*100;
+                    ev.push_back({a*K, cr, true, (AngleDeg10)(a % 7200), true});
+                }
+                const uint32_t s = c*7200 + pulseAt;                                // a 10 deg VR pulse
+                ev.push_back({s*K, cam, true, 0, false});
+                ev.push_back({(s + 100)*K, cam, false, 0, false});
+            }
+            std::stable_sort(ev.begin(), ev.end(), [](const E& a, const E& b) { return a.tick < b.tick; });
+            int checked = 0, bad = 0;
+            for (auto& e : ev) {
+                g.on_edge((uint8_t)e.idx, e.tick, e.rising);
+                if (g.level() == SyncLvl::PHASE && e.crank && e.tick > 3*7200*K) {
+                    ++checked;
+                    if (adist(g.angle(), e.tru) > 200) ++bad;
+                }
+            }
+            return std::pair<int, int>{checked, bad};
+        };
+        const AngleDeg10 G2 = 1100, G1 = G2 + 3600;    // where each sensor's pulse falls in the cycle
+        const auto rear  = run(G2, 0);
+        const auto front = run(G1, 3600);
+        const auto swapped = run(G1, 0);
+        fprintf(stdout, "    rear %d/%d out, front %d/%d out, front pulse on the rear wheel %d/%d out\n",
+                rear.second, rear.first, front.second, front.first, swapped.second, swapped.first);
+        CHECK(rear.first > 0 && rear.second == 0);
+        CHECK(front.first > 0 && front.second == 0);
+        CHECK(swapped.first > 0 && swapped.second == swapped.first);   // every edge a revolution out
+    }
+
     // ---------------------------------------------------------------------------------------
     // THE TIME DIMENSION. A decoder that only ever reacts to edges cannot notice a tooth that came
     // too soon, or one that never came at all. These lock down the parts of that which live in the

@@ -637,6 +637,14 @@ that arrives late once in a while. Chapter 43 covers it in full.
 
     <!-- src: definition/ecu.schema.yaml trigger_wheels "2JZ 36-2 + Rear Cam"; definition/ecu.schema.yaml -->
 
+    **2JZ 36-2 + Front Cam** is the same wheel for the other cam sensor. The non-VVT-i head has two
+    single-tooth cam pickups: G2 toward the rear and G1 midway along the head, one crank revolution
+    apart. Toyota's diagnosis expects 12 crank pulses (one revolution of the factory 12-tooth wheel)
+    between G1 and G2. Pick the entry for the sensor you have wired. Its only difference is the cam's
+    **WIDTH target angle**, 0° for the rear and 360° for the front. The wrong one puts the engine a
+    whole revolution out: it fires on the exhaust stroke and will not start.
+    <!-- src: definition/ecu.schema.yaml trigger_wheels "2JZ 36-2 + Front Cam" (and its comment: Toyota code 13, Haltech +360); tests/test_generic_trigger.cpp ("2JZ front and rear cam") -->
+
     The crank-only version, **2JZ 36-2 (crank only)**, has no cam stream. It reaches Crank sync only,
     so it suits wasted spark and non-sequential injection.
 

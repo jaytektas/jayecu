@@ -8181,6 +8181,29 @@ trigger_wheels:
         width_min: 0
         width_max: 7200
         width_target: 0
+  # THE OTHER CAM SENSOR. The non-VVT-i head carries two single-tooth cam pickups: G2 toward the rear
+  # (the one above) and G1 midway along the head, ahead of it. Toyota's own check puts them one crank
+  # revolution apart — code 13 is set when the NE signal "does not pulse 12 times ... during the interval
+  # between G1 and G2 pulses", on the factory 12-tooth crank — and Haltech's 2JZ setup raises the TDC
+  # offset by exactly 360 for G1. So this is the rear-cam wheel with its cam reference a revolution on
+  # (width_target 360.0 deg); the crank wheel, the offset and the pickup are the same, and the cam edge
+  # is the same because the two pickups are the same part.
+  - name: "2JZ 36-2 + Front Cam"
+    sync: "PHASE"
+    cam_edge: 0
+    tdc_offset: 155.0
+    sensor_angle: 105.0
+    streams:
+      - rate: 0
+        kind: "gap"
+        slots: 36
+        ratio: 3
+        gaps: [0]
+      - rate: 1
+        kind: "width"
+        width_min: 0
+        width_max: 7200
+        width_target: 3600
   # ---- SYMMETRICAL crank wheels: the pattern recurs more than once per revolution ------------------
   # Measured off the rig with tools/stim_repeats.py, which finds the smallest rotation the sample
   # table is invariant under. These are the first wheels whose `repeats` is not the slot default, and

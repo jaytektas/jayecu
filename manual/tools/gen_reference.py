@@ -187,7 +187,7 @@ def stream_edges(s):
     gap:   `slots` positions; `gaps` lists the present teeth (by index) that are followed by a gap of
            `ratio` tooth periods — so 36-1 is slots 36, ratio 2, gaps [0]. Ratio 0 is evenly spaced.
     seq:   `cell` is the angle from each edge to the next, in tenths of a degree.
-    width: one pulse per cycle.
+    width: one pulse per cycle, its leading edge at `width_target` (tenths of a degree).
     `repeats` is how many times the pattern repeats per ENGINE CYCLE (720°), as the firmware reads it
     (GenericTriggerBuilder: repeats, else twice for a crank stream and once for a cam stream).
     The edges returned cover the whole 720° cycle; span is 720."""
@@ -214,7 +214,7 @@ def stream_edges(s):
             base.append(a * part / total)
             a += c
     elif kind == "width":
-        base = [0.0]
+        base = [s.get("width_target", 0) / 10.0]
     edges = [r * part + e for r in range(reps) for e in base]
     return edges, span
 
@@ -243,8 +243,11 @@ def wheel_svg(w):
         edges, span = stream_edges(s)
         cls = "cam" if cam else "tooth"
         if s.get("kind") == "width":
-            o.append(f'<rect x="{x(0):.1f}" y="{y0+10}" width="{plot*20/720:.1f}" height="30" class="{cls}"/>')
-            o.append(f'<text x="{x(30):.1f}" y="{y0+30}" class="muted">one pulse per cycle</text>')
+            # Where the pulse IS: a wheel for the 2JZ's front cam differs from the rear only by this.
+            at = (s.get("width_target", 0) / 10.0) % 720
+            o.append(f'<rect x="{x(at):.1f}" y="{y0+10}" width="{plot*20/720:.1f}" height="30" class="{cls}"/>')
+            tx = at + 30 if at < 540 else at - 200
+            o.append(f'<text x="{x(tx):.1f}" y="{y0+30}" class="muted">one pulse per cycle</text>')
             continue
         both = s.get("edge") == 2 and s.get("kind") == "seq"
         for p in range(1):
@@ -284,7 +287,8 @@ def describe(s):
         both = " (both edges)" if s.get("edge") == 2 else ""
         return f"{cam}: {len(s['cell'])} edges at set angles{both}{rep}"
     if k == "width":
-        return f"{cam}: one pulse per cycle"
+        at = s.get("width_target", 0) / 10.0
+        return f"{cam}: one pulse per cycle" + (f", at {at:g}°" if at else "")
     return f"{cam}: {k}"
 
 
