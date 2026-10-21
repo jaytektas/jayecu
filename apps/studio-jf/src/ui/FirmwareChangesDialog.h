@@ -297,6 +297,9 @@ private:
         s->setMode(Surface::Mode::Run);
         s->setActiveNode(node);
         s->setFitToView(true);
+        // The page line above already names the page. Drawn here too, the title sat over the page's own
+        // head band (its Enabled switch and note), which a page in a window never shows.
+        s->setPageTitleShown(false);
         std::shared_ptr<PanelLibrary> lib = c.side.pages;
         s->setPageAccess([lib](const std::string& p) -> PanelModel* { return lib ? &lib->forNode(p) : nullptr; },
                          [] {});
@@ -307,8 +310,12 @@ private:
     // captions are whatever its author typed next to the control, and a stale one — a box rebound to a
     // new setting but still captioned with the old — would have the report say a retired setting is
     // arriving. The tag is the firmware's word for what is highlighted, so the page's text cannot mislead.
+    //
+    // ONE TAG PER SETTING, and the count is of settings. A table is often shown twice on its page — the
+    // grid and its curve — and tagging each put the same name on the page twice and reported "3 of 2
+    // highlighted". Every control showing it is still outlined; only the first carries the name.
     void mark(jf::JPrimitiveBuffer& buf, CanvasWidget* w, const std::map<std::string, std::string>& want,
-              bool left, int& n) {
+              bool left, std::set<std::string>& lit) {
         if (!w) return;
         const std::string b = w->bindPath();
         const auto hit = b.empty() ? want.end() : want.find(b);
@@ -319,16 +326,17 @@ private:
                 const bool small = r.width * r.height < 40000.f;
                 buf.pushRectangle(r.x - 3.f, r.y - 3.f, r.width + 6.f, r.height + 6.f,
                                   small ? fill(left) : clear, 3.f, 2.f, edge(left));
-                const std::string tag = hit->second + (left ? "  \xC2\xB7  going" : "  \xC2\xB7  new");
-                const float tw = jf::JTextHelper::measureWidth(tag) + 12.f, th = jf::JTextHelper::lineHeight() + 4.f;
-                const float tx = r.x + r.width + 8.f, ty = r.y + (r.height - th) * 0.5f;
-                buf.pushRectangle(tx, ty, tw, th, edge(left), 3.f);
-                static const uint8_t ink[4] = { 20, 20, 20, 255 };
-                jf::JTextHelper::pushText(buf, tx + 6.f, ty + 2.f, tag, ink, tw);
-                ++n;
+                if (lit.insert(b).second) {
+                    const std::string tag = hit->second + (left ? "  \xC2\xB7  going" : "  \xC2\xB7  new");
+                    const float tw = jf::JTextHelper::measureWidth(tag) + 12.f, th = jf::JTextHelper::lineHeight() + 4.f;
+                    const float tx = r.x + r.width + 8.f, ty = r.y + (r.height - th) * 0.5f;
+                    buf.pushRectangle(tx, ty, tw, th, edge(left), 3.f);
+                    static const uint8_t ink[4] = { 20, 20, 20, 255 };
+                    jf::JTextHelper::pushText(buf, tx + 6.f, ty + 2.f, tag, ink, tw);
+                }
             }
         }
-        for (CanvasWidget* ch : w->childWidgets()) mark(buf, ch, want, left, n);
+        for (CanvasWidget* ch : w->childWidgets()) mark(buf, ch, want, left, lit);
     }
 
     void _column(jf::JPrimitiveBuffer& buf, Column& c, float x, float w, float bottom) {
@@ -365,11 +373,11 @@ private:
                 c.surf->populateRenderPrimitives(buf);
                 std::map<std::string, std::string> want;          // binding -> the meta's name for it
                 for (const tunediff::Item& it : items) want.emplace(it.path, it.label);
-                int lit = 0;
+                std::set<std::string> lit;
                 for (CanvasWidget* wd : c.surf->instances()) mark(buf, wd, want, left, lit);
                 buf.pushRectangle(x, y, w, h, clear, 4.f, 1.f, Colors::Border);
                 char note[160];
-                std::snprintf(note, sizeof note, "%d of %zu highlighted on this page", lit, items.size());
+                std::snprintf(note, sizeof note, "%zu of %zu highlighted on this page", lit.size(), want.size());
                 JTextHelper::pushText(buf, x + 4.f, bottom - 12.f - rowH(), note, Colors::TextSecondary, w - 8.f);
                 return;
             }

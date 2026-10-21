@@ -141,8 +141,19 @@ void CurveWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
         // Ticks at every GRID line, not just the ends — the grid says where the divisions are, and a division
         // with no number on it is decoration. Two numbers in the corners left you counting squares to read
         // a value off the plot.
-        for (int i = 0; i <= grows; ++i) yLabel(yhi - (yhi - ylo) * i / double(grows),
-                                                py + ph * i / float(grows) - lh * 0.5f + (i == 0 ? 4.f : 0.f));
+        //
+        // …AS MANY AS FIT. A short curve (a small one, or any page shown fitted into a preview) put all five
+        // in a few pixels, stacked into an unreadable smear. Every Nth line is labelled, N the fewest that
+        // leaves a line of text between labels; the top and bottom always are, and a plot too short for
+        // even those two keeps only the top.
+        const float rowPx = ph / float(grows);
+        const int every = rowPx >= lh ? 1 : int(std::ceil(lh / std::max(rowPx, 0.5f)));
+        for (int i = 0; i <= grows; ++i) {
+            const bool end = (i == 0 || i == grows);
+            if (!end && (i % every != 0 || ph - rowPx * i < lh)) continue;   // nor crowd the bottom label
+            if (i == grows && ph < lh * 1.5f) continue;
+            yLabel(yhi - (yhi - ylo) * i / double(grows), py + ph * i / float(grows) - lh * 0.5f + (i == 0 ? 4.f : 0.f));
+        }
         const int xd = (std::max(std::fabs(xlo), std::fabs(xhi)) >= 100.0) ? 0 : 1;
         const int xticks = gcols > 0 ? gcols : 1;
         float lastRight = -1e9f;
