@@ -55,8 +55,17 @@ void CanBroker::refresh_telemetry() {
     #include "../../generated/sensor_telem_pack.inc"   // one read per channel, scaled per type
 }
 
+void CanBroker::set_key_on(bool on, uint32_t now_ms) {
+    if (on && !key_on_) key_on_ms_ = now_ms;
+    if (!on && key_on_)
+        for (uint8_t b = 0; b < MAX_BUSES; b++) if (buses_[b]) buses_[b]->abort_pending();
+    key_on_ = on;
+}
+
 bool CanBroker::send_frame(uint8_t bus, const CanFrame& frame) {
     if (bus >= MAX_BUSES || !buses_[bus]) return false;
+    // Key off: quiet (see set_key_on). Not counted as a refusal — nothing is wrong with the bus.
+    if (!key_on_) return false;
     const bool ok = buses_[bus]->send(frame);
     // Count what actually went to the driver, and separately what it refused. A bus whose load reads
     // low while refusals climb is a jammed mailbox, not a quiet wire — and those look identical if you

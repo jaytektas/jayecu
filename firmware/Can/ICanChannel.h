@@ -41,4 +41,9 @@ public:
     // driver that cannot read them should say "no errors" rather than force every implementer to
     // invent an answer.
     virtual CanErrorStatus error_status() const { return {}; }
+
+    // Drop every frame still waiting to go out. A frame nobody acknowledges is retransmitted by the
+    // controller for ever, so going quiet means aborting what is queued, not only sending nothing new.
+    // Not pure, for the same reason as error_status: a bus with no mailboxes has nothing to drop.
+    virtual void abort_pending() {}
 };

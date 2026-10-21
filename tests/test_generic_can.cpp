@@ -37,6 +37,8 @@ struct MockChannel final : ICanChannel {
         return true;
     }
     bool is_up() const override { return true; }
+    int  aborts = 0;
+    void abort_pending() override { aborts++; }
     CanErrorStatus err{};          // what the controller reports (a test sets "nobody answered")
     CanErrorStatus error_status() const override { return err; }
 };
@@ -555,6 +557,24 @@ int main() {
 
         run(6010, 7100, false);
         CHECK(dtc.code_severity(NO_ACK) == 0);             // and goes the moment the key does
+    }
+
+    // ---- KEY OFF IS QUIET: nothing new is sent, and what was queued is aborted at the edge ----
+    {
+        T t;
+        t.frame(0x5A1, true, 10).field(g_config.can.gc_field[0].sig, 7, 16, 1.0f, 0.0f);
+        MockChannel ch; CanBroker br; SignalBus bus;
+        br.add_bus(0, &ch); br.set_signal_bus(&bus);
+        br.reconfigure_generic(t.cfg, 0);
+        for (uint32_t ms = 0; ms <= 200; ms += 10) { br.set_key_on(true, ms); br.update(ms); }
+        const int sent_on = count_id(ch.tx, 0x5A1);
+        CHECK(sent_on > 0);                                // key on: broadcasting
+        CHECK(ch.aborts == 0);
+        for (uint32_t ms = 210; ms <= 1200; ms += 10) { br.set_key_on(false, ms); br.update(ms); }
+        CHECK(count_id(ch.tx, 0x5A1) == sent_on);          // key off: not one more frame
+        CHECK(ch.aborts == 1);                             // the queue was dropped once, at the edge
+        for (uint32_t ms = 1210; ms <= 1400; ms += 10) { br.set_key_on(true, ms); br.update(ms); }
+        CHECK(count_id(ch.tx, 0x5A1) > sent_on);           // and talks again at key-on
     }
 
     return test_summary();

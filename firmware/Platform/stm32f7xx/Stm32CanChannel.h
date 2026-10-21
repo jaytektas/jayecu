@@ -31,6 +31,7 @@ public:
     // Re-init with a whole settings set (composition tier applies config through platform_can).
     bool apply(uint32_t bitrate_hz, bool listen_only);
     void shutdown();                       // take the bus down (a bus wired to nothing should not sit on the wire)
+    void abort_pending() override;         // drop the queued frames (AutoRetransmission retries for ever)
 
     bool send(const CanFrame& frame) override;
     bool receive(CanFrame& frame) override;

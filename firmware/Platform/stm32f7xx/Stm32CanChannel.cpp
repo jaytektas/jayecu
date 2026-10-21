@@ -146,6 +146,10 @@ bool Stm32CanChannel::apply(uint32_t bitrate_hz, bool listen_only) {
     return begin(bitrate_hz, loopback_, listen_only);
 }
 
+void Stm32CanChannel::abort_pending() {
+    if (up_) HAL_CAN_AbortTxRequest(&hcan_, CAN_TX_MAILBOX0 | CAN_TX_MAILBOX1 | CAN_TX_MAILBOX2);
+}
+
 void Stm32CanChannel::shutdown() {
     if (!up_) return;
     HAL_CAN_AbortTxRequest(&hcan_, CAN_TX_MAILBOX0 | CAN_TX_MAILBOX1 | CAN_TX_MAILBOX2);

@@ -107,13 +107,12 @@ public:
     // …and whether it is allowed to talk at all, so the no-acknowledgement check can exempt a bus
     // that is deliberately silent rather than reporting it as a fault every second.
     void set_bus_listen_only(uint8_t idx, bool on) { if (idx < MAX_BUSES) listen_only_[idx] = on; }
-    // …and whether the key is on, because with it off nobody is expected to answer: the rest of a car's
-    // bus sleeps with the ignition, and an ECU held up by USB still transmits into it. `now_ms` dates
-    // the key-on edge, so the bus is given KEY_ON_SETTLE_MS to come up before it is judged.
-    void set_key_on(bool on, uint32_t now_ms) {
-        if (on && !key_on_) key_on_ms_ = now_ms;
-        key_on_ = on;
-    }
+    // …and whether the key is on. With it off the ECU is QUIET: the rest of a car's bus sleeps with the
+    // ignition, and an ECU held up by USB transmitting into it is talking to nobody — and on some cars
+    // traffic keeps other modules awake. Every send is refused while it is off and what was queued is
+    // aborted at the edge; receiving carries on. `now_ms` dates the key-on edge, so the bus is given
+    // KEY_ON_SETTLE_MS to come up before it is judged.
+    void set_key_on(bool on, uint32_t now_ms);
     // Long enough for the rest of a car's bus to boot after the ignition, AND for one whole stats window
     // (a second) to lie after that: the window that straddles key-on is mostly key-off silence, and
     // judging it raised P1657 on every power-up.
