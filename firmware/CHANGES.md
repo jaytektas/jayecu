@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.11
 - The Trigger Library has 2JZ 36-2 + Front Cam, for a 2JZ whose cam signal comes from the front (G1) sensor instead of the rear (G2) one. It is the rear-cam wheel with the cam a crank revolution on, as Toyota places G1.
 
 ## 0.4.10
