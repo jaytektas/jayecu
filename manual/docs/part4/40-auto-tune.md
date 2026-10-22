@@ -129,21 +129,29 @@ Open **Tools ▸ Auto Tune** with the ECU connected.
    the same as what you are measuring.
 4. Press **Start Auto Tune** and drive, spending time in the areas you want tuned. Steady driving
    gives better readings than constant throttle changes.
-5. Watch the grid. **Show** switches it between **Change %** (the proposal), **Proposed VE**,
-   **Base VE** and **Records** (how much evidence each cell has). The line underneath counts the
-   readings (total / filtered / used), the cells altered, and the average and largest change.
+5. Watch the grid. **Show** switches it between **Session %** (how far each cell has moved since
+   Start or the last Reset, however many writes that took), **Change %** (what the next Apply would
+   do), **Proposed VE**, **Base VE** and **Records** (how much evidence each cell has). The line
+   underneath counts the readings (total / filtered / used), the cells altered, and the average and
+   largest change.
 6. Press **Stop**, look over the proposal, and press **Apply**. The VE Table is changed in one step
-   (Edit ▸ Undo takes it back) and the collected readings are cleared: they were measured against the
-   old table.
+   (Edit ▸ Undo takes it back). The readings are kept, re-measured against the new values: a cell
+   written the whole way proposes nothing more, and the grid still shows everywhere you have driven.
 7. Drive again to check, repeat, then **Burn**.
+
+**Stop** and **Start** carry on the same session. Only **Reset** starts over: it throws the readings
+away and takes the VE Table as it is now as the new 0 % for **Session %**.
 
 For **Predicted MAP**, choose it in **Tune** first, then press Start and hold a series of steady
 points: a throttle opening held at a steady speed for a second or two each, across the speeds and
 openings you drive at. There is no need to leave closed loop.
 
-**Apply continuously** applies the proposal every 2 seconds while recording, so the table converges
-as you drive. It changes the tune as you go: use it only once you trust the setup. **Reset** throws
-the readings away without changing anything.
+**Apply continuously** writes to the VE Table every 2 seconds while recording, so the table converges
+as you drive, and switches the grid to **Session %**. Each write moves a cell only a quarter of the
+way to its proposal; the rest stays in the readings and is taken on later writes if the engine still
+agrees, so one noisy stretch nudges the map instead of rewriting it. It changes the tune as you go:
+use it on steady driving, with **Minimum RPM** above idle and a tight **dTPS** filter, once you trust
+the setup. **Reset** throws the readings away without changing the table.
 <!-- src: apps/studio-jf/src/ui/AutotunePanel.cpp -->
 
 If the VE Table's axes are changed, or a flex-fuel engine moves to another ethanol plane, while a
