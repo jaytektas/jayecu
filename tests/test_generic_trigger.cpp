@@ -152,6 +152,15 @@ int main() {
         for (int c=16;c<24;c++) feed(c);
         CHECK(g.level() == SyncLvl::PHASE);
         CHECK(g.rev_known());
+
+        // ...and BACK INTO the band: the cam was ignored, not missing, so it is not overdue. The
+        // teeth counted while it was gated used to land on the first tooth back in band as one huge
+        // overdue — PHASE_LOST on every crossing of the band edge.
+        const uint32_t lost = g.phase_lost_total();
+        g.set_phase_stream_valid(true);
+        for (int c=24;c<28;c++) feed(c);
+        CHECK(g.phase_lost_total() == lost);
+        CHECK(g.level() == SyncLvl::PHASE);
     }
 
     SECTION("after drop_sync() the CRANK is still the fine-angle source (stall -> re-acquire)");

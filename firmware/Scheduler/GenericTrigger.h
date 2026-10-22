@@ -644,6 +644,20 @@ private:
             // not merely drifted, it has not come — and phase that is not still being proven is
             // phase the decoder is only remembering. Costs PHASE and nothing else: the crank is
             // proving itself tooth by tooth, so the engine keeps running wasted-spark / batch.
+            //
+            // NOT WHILE THE CAM IS GATED OUT. Below the phase-sync rpm band the cam is ignored and the
+            // phase is carried on crank counting — so its last sighting must be carried too, or the
+            // teeth counted while it was ignored land all at once on the first tooth back inside the
+            // band: hundreds of teeth "overdue", PHASE_LOST on a healthy cam, every time rpm crosses
+            // the band edge. (Kelly's Hilux: every phase drop on a drive sat at 1500-1535 rpm.)
+            // The window's own last sighting is carried the same way, a WHOLE cycle at a time, so it
+            // stays where the cam will next be due rather than going stale and rejecting it.
+            if (!phase_stream_valid_) {
+                phase_mark_ = crank_teeth_;
+                if (phase_expect_teeth_ && cam_sightings_ &&
+                    static_cast<uint16_t>(crank_teeth_ - cam_seen_teeth_) >= phase_expect_teeth_)
+                    cam_seen_teeth_ = static_cast<uint16_t>(cam_seen_teeth_ + phase_expect_teeth_);
+            }
             if (rev_known_ && phase_marked_ && phase_expect_teeth_ && phase_stream_valid_ &&
                 static_cast<uint16_t>(crank_teeth_ - phase_mark_) > phase_expect_teeth_ + 1) {
                 record_error(TriggerErrorKind::PHASE_LOST);
