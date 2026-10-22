@@ -119,9 +119,10 @@ The throttle stops driving the motor — and the spring closes the plate to its 
 
 <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
 
-A **latched** fault stays until a successful **Find limits**, or until the ECU restarts. Turning the
-key off and on does **not** clear it, and neither does clearing the codes. The motor stays off and the
-engine runs on the plate's rest position.
+A **latched** fault stays until a successful **Find limits**, a key-on check that passes (section 5),
+or until the ECU restarts. Clearing the codes does **not** clear it. While it is latched the motor stays
+off and the engine runs on the plate's rest position. When a passing key-on check clears it, the code
+stays in the stored list with its count, so an intermittent fault is still on record.
 <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
 
 ### 5 · The key-on check
