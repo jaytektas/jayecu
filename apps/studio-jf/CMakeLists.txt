@@ -1837,8 +1837,19 @@ add_dependencies(studio_tests help_pages_test)
 # checksums, the ECU's layout, a missing version (FirmwareFetch::fetchVersion).
 #   cmake --build build --target firmware_version_fetch_test && ./build/firmware_version_fetch_test
 add_executable(firmware_version_fetch_test EXCLUDE_FROM_ALL tests/test_firmware_version_fetch.cpp src/app/FirmwareFetch.cpp
+               src/app/RangedFetch.cpp
                ${CMAKE_CURRENT_BINARY_DIR}/generated/StudioVersion.cpp)
 target_link_libraries(firmware_version_fetch_test PRIVATE studio_model JFramework::platform ${STUDIO_TLS_LIBS})
 target_include_directories(firmware_version_fetch_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/generated)
 add_test(NAME firmware_version_fetch COMMAND firmware_version_fetch_test)
 add_dependencies(studio_tests firmware_version_fetch_test)
+
+# A release file downloaded in pieces (RangedFetch), against a fake server: a stalled or failed piece is
+# asked for again and only that piece, short or misplaced parts are never stitched in, and a piece that
+# keeps failing says why. The studio's 27 MB update failed whole on one 30 s CDN stall.
+#   cmake --build build --target ranged_fetch_test && ./build/ranged_fetch_test
+add_executable(ranged_fetch_test EXCLUDE_FROM_ALL tests/test_ranged_fetch.cpp src/app/RangedFetch.cpp)
+target_link_libraries(ranged_fetch_test PRIVATE JFramework::platform ${STUDIO_TLS_LIBS})
+target_include_directories(ranged_fetch_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_test(NAME ranged_fetch COMMAND ranged_fetch_test)
+add_dependencies(studio_tests ranged_fetch_test)

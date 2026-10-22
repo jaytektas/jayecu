@@ -1,4 +1,5 @@
 #include "FirmwareFetch.h"
+#include "RangedFetch.h"
 
 #include <j/update/JSha256.h>
 #include <j/update/JVersion.h>
@@ -115,7 +116,7 @@ Result run(const std::vector<std::string>& boards, const std::vector<fwkits::Kit
             if (!urls.count(fname)) { why = fname + " is not in the release"; return {}; }
             const std::string want = jf::JSha256::sumFor(sumsText(), fname);
             if (want.empty()) { why = "the release's checksums do not list " + fname; return {}; }
-            const auto r = jf::JHttpClient::getSync(urls[fname], 10 * 60 * 1000, kHeaders);
+            const auto r = rangedfetch::fetch(urls[fname], kHeaders);   // in pieces: a stall costs a piece
             if (!r.ok()) { why = fname + ": " + httpWhy(r); return {}; }
             if (jf::JSha256::hex(r.body) != want) { why = fname + " does not match its checksum"; return {}; }
             return r.body;
@@ -207,7 +208,7 @@ VersionFiles runVersion(const std::string& board, const std::string& version, co
         if (!urls.count(name)) { why = name + " is not in the release"; return {}; }
         const std::string want = jf::JSha256::sumFor(sums, name);
         if (want.empty()) { why = "the release's checksums do not list " + name; return {}; }
-        const auto r = jf::JHttpClient::getSync(urls[name], 10 * 60 * 1000, kHeaders);
+        const auto r = rangedfetch::fetch(urls[name], kHeaders);
         if (!r.ok()) { why = name + ": " + httpWhy(r); return {}; }
         if (jf::JSha256::hex(r.body) != want) { why = name + " does not match its checksum"; return {}; }
         return r.body;
