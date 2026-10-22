@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.15
 - Stored trouble codes are loaded from the SD card only if this firmware wrote them. A card that had been in an ECU running other firmware could bring back dozens of nonsense codes as stored history, and with them a protection level (one board came up in level 3 limp until the codes were cleared). Such a file is now discarded at power-up, the console says so, and the ECU starts with no stored codes. Codes saved by earlier versions of this firmware still load, and are saved in the checked form from then on.
 
 ## 0.4.14
