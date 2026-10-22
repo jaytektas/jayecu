@@ -307,6 +307,7 @@ const char* kHelp =
     "  burn                           persist the ECU's RAM tune to flash\n"
     "  save                           save the tune to the ECU's project folder\n"
     "  page <navigation path>         show a page (studio window only)\n"
+    "  key on|off|auto                force the ECU's key (off = no fuel, no spark) or hand it back\n"
     "Writes go to the ECU when it is connected (to RAM: burn to keep them).";
 
 }  // namespace
@@ -315,7 +316,7 @@ bool handle(const std::string& action, const Host& host, std::string& reply) {
     std::string verb, rest;
     splitFirst(action, verb, rest);
     static const char* kVerbs[] = { "help", "status", "settings", "get", "set", "tables", "table",
-                                    "table-set", "cell", "channels", "live", "burn", "save", "page" };
+                                    "table-set", "cell", "channels", "live", "burn", "save", "page", "key" };
     if (std::find_if(std::begin(kVerbs), std::end(kVerbs), [&](const char* v) { return verb == v; })
         == std::end(kVerbs))
         return false;
@@ -333,6 +334,18 @@ bool handle(const std::string& action, const Host& host, std::string& reply) {
         o["locked"] = JJson(c.readOnly());
         o["telemetry_frames"] = JJson(double(c.telemetryFrames()));
         if (c.telemetryFrames()) o["telemetry_age_ms"] = JJson(double(c.msSinceTelemetry()));
+        return done(o);
+    }
+    // THE KEY, AND ONLY THE KEY. The ECU's console has a 'key on|off|auto' bench command — off closes the
+    // firing gate (no fuel, no spark) exactly as turning the ignition off does, which is how an engine is
+    // stopped from a laptop. The console also reboots into the bootloader and drives outputs, so it is NOT
+    // passed through: this one command, with its three words, is.
+    if (verb == "key") {
+        if (rest != "on" && rest != "off" && rest != "auto") return done(fail("key on|off|auto"));
+        if (!c.telemetryFrames() || c.msSinceTelemetry() > 2000) return done(fail("no live ECU to send it to"));
+        c.sendCli("key " + rest);
+        JJson o = okObj();
+        o["key"] = JJson(rest);
         return done(o);
     }
     if (verb == "burn" || verb == "save" || verb == "page") {
