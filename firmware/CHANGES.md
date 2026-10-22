@@ -9,9 +9,9 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
-- Proteus F7: the Fuel Learn Block channel (above) is published on this board too.
 
 ## 0.4.14
+- Proteus F7: the Fuel Learn Block channel (above) is published on this board too.
 - Overboost (P0234) is recorded at level 1, not level 3. The overboost cut is its reaction; a level-3 limp on top meant every pull that touched the cut ended in a rev limit. Level 3 is left to faults a cut cannot fix: over-temperature, pre-ignition, EGT, a lost trigger.
 - A MAP reading that drops out is held at its last good value for MAP Failure Hold (default 500 ms) before it counts as failed. It used to be fuelled as atmosphere at once, so a dropout on a closed-throttle overrun was a full-load pulse (lambda 0.7 on a lift-off). After the hold, MAP Failure Source chooses atmosphere (as before, the default) or the Predicted MAP table. MAP Source now also reads Held and Failed (predicted). An update adds both settings at their defaults.
 - New channel Fuel Learn Block: whether the mixture the wideband is reading now can be learned from, with one bit per reason (MAP not measured, wideband, temperatures, fuel or ignition cut, transient, starting, crank-only sync, protection, rail pressure, and settling for one lambda delay after each). The long-term trim learns only when it is 0, and Auto Tune now rejects readings the ECU marks, naming the reason on its status line. It is in the default logs.
