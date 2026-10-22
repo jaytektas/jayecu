@@ -126,7 +126,7 @@ std::vector<CardLogs::Entry> CardLogs::logsOn(const std::string& dir) {
     return out;
 }
 
-bool CardLogs::import(const Entry& e, std::string* whyNot) {
+bool CardLogs::import(const Entry& e, std::string* whyNot, const std::function<void(uint64_t)>& progress) {
     auto fail = [whyNot](const std::string& m) { if (whyNot) *whyNot = m; return false; };
     std::error_code ec;
     if (e.imported) return true;               // nothing to do, and saying so is not an error
@@ -154,12 +154,14 @@ bool CardLogs::import(const Entry& e, std::string* whyNot) {
         head[11] = static_cast<char>( ep        & 0xFF);
     }
     if (got > 0) out.write(head, got);
+    uint64_t copied = got > 0 ? static_cast<uint64_t>(got) : 0;
 
-    std::vector<char> buf(64 * 1024);
+    std::vector<char> buf(256 * 1024);
     while (in) {
         in.read(buf.data(), static_cast<std::streamsize>(buf.size()));
         const std::streamsize n = in.gcount();
-        if (n > 0) out.write(buf.data(), n);
+        if (n > 0) { out.write(buf.data(), n); copied += static_cast<uint64_t>(n); }
+        if (progress) progress(copied);
     }
     out.flush();
     if (!out) { out.close(); fs::remove(dest, ec); return fail("write failed \xE2\x80\x94 is the disk full?"); }

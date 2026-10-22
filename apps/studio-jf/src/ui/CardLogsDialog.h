@@ -14,10 +14,16 @@
 // DELETE REFUSES A LOG THAT HAS NOT BEEN IMPORTED unless it is confirmed, because until it is
 // imported the card is the only copy of that drive.
 //
+// THE COPY RUNS OFF THE UI THREAD, with a bar. A drive's log is tens of megabytes off an SD card
+// behind the ECU's USB bridge — a minute or more — and copying it inside the button press froze
+// the whole studio for that long with nothing on screen to say it was working (and stalled the AI
+// bus, which is serviced on the same thread). The worker reports bytes; layout() reads them.
+//
 #include <j/app/JDialogWindow.h>
 #include <j/core/JStyle.h>
 #include <j/core/JButton.h>
 #include <j/core/JCheckBox.h>
+#include <j/core/JProgressBar.h>
 #include <j/core/JDialogButtonBox.h>
 #include <j/core/JTreeView.h>
 #include <j/core/JTextHelper.h>
@@ -27,11 +33,13 @@
 #include "../model/CardLogs.h"
 #include "WrapText.h"
 
+#include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <ctime>
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 class CardLogsDialog : public jf::JDialogWindow {
@@ -59,6 +67,8 @@ public:
         m_box->addButton("Close", jf::JDialogButtonBox::Role::Reject, 100.f);
         m_box->onReject.connect([this] { close(); });
 
+        m_bar = std::make_unique<jf::JProgressBar>(graph(), 200.f, 10.f);
+
         add(m_tree.get());
         add(m_importSel.get()); add(m_importNew.get()); add(m_erase.get()); add(m_locate.get());
         add(m_box.get());
@@ -68,18 +78,23 @@ public:
 protected:
     void layout(float w, float h) override {
         const float r = rowH();
-        _pollForCard();
+        _pollImport();
+        if (!m_job) _pollForCard();
 
         // WHAT NEEDS A CARD, needs a card. Find card… never does — it is the way OUT of having no
         // card on a machine that does not automount, and disabling it would close the only door.
-        const bool have = !m_card.empty();
+        // Nothing that changes the card or the list while a copy is running, though.
+        const bool have = !m_card.empty() && !m_job;
         m_importSel->setEnabled(have);
         m_importNew->setEnabled(have);
         m_erase->setEnabled(have);
+        m_locate->setEnabled(!m_job);
         // room for the card's own line, which WRAPS — as many lines as it takes
         const float treeY = contentTop() + r + 10.f + wraptext::extra(_line(), w - 2.f * kPad);
-        const float treeH = h - treeY - (2.f * r + 3.f * kPad);
+        const float barH  = m_job ? 10.f + 8.f : 0.f;
+        const float treeH = h - treeY - (2.f * r + 3.f * kPad) - barH;
         m_tree->setBounds({ kPad, treeY, w - 2.f * kPad, treeH });
+        if (m_job) m_bar->setBounds({ kPad, treeY + treeH + 8.f, w - 2.f * kPad, 10.f });
         float x = kPad;
         for (jf::JButton* b : { m_importNew.get(), m_importSel.get(),
                                 m_erase.get(), m_locate.get() }) {
@@ -98,6 +113,13 @@ protected:
 
     // The card's own line: what the last action did, else what is on the card.
     std::string _line() const {
+        if (m_job) {
+            const size_t i = m_job->index.load();
+            const size_t n = m_job->items.size();
+            return "Importing " + (i < n ? m_job->items[i].name : std::string("\xE2\x80\xA6")) +
+                   "  (" + std::to_string(i < n ? i + 1 : n) + " of " + std::to_string(n) + ")  \xE2\x80\x94  " +
+                   _size(m_job->doneBytes.load()) + " of " + _size(m_job->totalBytes);
+        }
         if (!m_note.empty())     return m_note;
         if (m_card.empty())      return "No card found \xE2\x80\x94 turn the key off and give it a moment, or Find card\xE2\x80\xA6";
         return m_card + "  \xE2\x80\x94  " + std::to_string(m_logs.size()) +
@@ -175,24 +197,64 @@ private:
         _rebuild();
     }
 
+    // One import run, shared with its worker. Shared rather than owned so that closing the dialog
+    // mid-copy leaves the worker something valid to finish writing into.
+    struct ImportJob {
+        std::vector<CardLogs::Entry> items;
+        uint64_t                     totalBytes = 0;
+        std::atomic<size_t>          index{0};          // which item is copying
+        std::atomic<uint64_t>        doneBytes{0};      // across all items
+        std::atomic<bool>            finished{false};
+        size_t                       done = 0, failed = 0;   // written by the worker before `finished`
+        std::string                  firstErr;
+    };
+
     void _import(bool allNew) {
-        size_t done = 0, failed = 0;
-        std::string firstErr;
+        if (m_job) return;
+        auto job = std::make_shared<ImportJob>();
         for (size_t i = 0; i < m_logs.size(); ++i) {
             const bool want = allNew ? !m_logs[i].imported : m_ticked[i];
             if (!want || m_logs[i].imported) continue;
-            std::string why;
-            if (CardLogs::import(m_logs[i], &why)) ++done;
-            else { ++failed; if (firstErr.empty()) firstErr = why; }
+            job->items.push_back(m_logs[i]);
+            job->totalBytes += m_logs[i].bytes;
         }
-        if (done == 0 && failed == 0) m_note = "Nothing to import.";
-        else if (failed)              m_note = "Imported " + std::to_string(done) +
-                                               ", failed " + std::to_string(failed) + ": " + firstErr;
-        else                          m_note = "Imported " + std::to_string(done) + " into " +
-                                               CardLogs::importDirectory();
-        const std::string keep = m_note;
+        if (job->items.empty()) { m_note = "Nothing to import."; return; }
+        m_note.clear();
+        m_job = job;
+        m_bar->setProgress(0.f);
+        add(m_bar.get());
+        std::thread([job] {
+            uint64_t before = 0;
+            for (size_t i = 0; i < job->items.size(); ++i) {
+                job->index = i;
+                std::string why;
+                const bool ok = CardLogs::import(job->items[i], &why,
+                    [&](uint64_t b) { job->doneBytes = before + b; });
+                if (ok) ++job->done;
+                else { ++job->failed; if (job->firstErr.empty()) job->firstErr = why; }
+                before += job->items[i].bytes;
+                job->doneBytes = before;
+            }
+            job->index = job->items.size();
+            job->finished = true;
+        }).detach();
+    }
+
+    // Every frame while a copy runs: move the bar, and once the worker is done, say how it went.
+    void _pollImport() {
+        if (!m_job) return;
+        const uint64_t total = m_job->totalBytes;
+        m_bar->setProgress(total ? float(double(m_job->doneBytes.load()) / double(total)) : 0.f);
+        if (!m_job->finished.load()) return;
+        std::string note;
+        if (m_job->failed) note = "Imported " + std::to_string(m_job->done) + ", failed " +
+                                  std::to_string(m_job->failed) + ": " + m_job->firstErr;
+        else               note = "Imported " + std::to_string(m_job->done) + " into " +
+                                  CardLogs::importDirectory();
+        m_job.reset();
+        remove(m_bar.get());
         _rescan();
-        m_note = keep;
+        m_note = note;
     }
 
     void _erase() {
@@ -242,6 +304,8 @@ private:
     }
 
     std::unique_ptr<jf::JTreeView>        m_tree;
+    std::unique_ptr<jf::JProgressBar>     m_bar;
+    std::shared_ptr<ImportJob>            m_job;
     std::unique_ptr<jf::JButton>          m_importSel, m_importNew, m_erase, m_locate;
     std::unique_ptr<jf::JDialogButtonBox> m_box;
 

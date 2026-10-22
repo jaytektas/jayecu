@@ -21,6 +21,7 @@
 // bytes as it copies. It is the one thing about the file the studio knows and the ECU did not.
 //
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -50,8 +51,10 @@ public:
     static std::vector<Entry> logsOn(const std::string& dir);
 
     // Copy one across, stamping the capture date into the MLG header on the way. False with a
-    // reason; an entry already imported succeeds without copying again.
-    static bool import(const Entry& e, std::string* whyNot = nullptr);
+    // reason; an entry already imported succeeds without copying again. `progress`, if given, is
+    // told the bytes copied so far after every chunk — from whichever thread is doing the copy.
+    static bool import(const Entry& e, std::string* whyNot = nullptr,
+                       const std::function<void(uint64_t)>& progress = {});
 
     // Delete one from the card. Refuses a log that has not been imported, unless `force` — the
     // whole point of a card is that it is the only copy until it is not.
