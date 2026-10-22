@@ -124,7 +124,10 @@ blip is left to fall freely before the loop takes over.
   stops, the trim is reset.
 
 **Idle Duty** is then limited to **Idle Min Output** (a table by speed) and **Max Duty** (default
-90 %). If the floor is set above the ceiling, the ceiling wins.
+90 %). If the floor is set above the ceiling, the ceiling wins. On drive-by-wire the throttle's own
+**Min TPS** is a floor too: below **Min TPS ÷ Idle Authority** (3 % ÷ 15 % = 20 % duty by default) no
+duty moves the plate, so the loop stops there instead of winding its trim down to a duty that does
+nothing. With two bodies, the lower of their floors counts.
 <!-- src: firmware/Engine/Modules/Idle.cpp -->
 
 Two overrides have the last word:
