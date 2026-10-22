@@ -375,7 +375,12 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     // on it, and this used to subtract the manifold from an absent sensor reading zero. What the
     // regulator REFERENCES is the whole difference between the three answers:
     //
-    //   Sensor       the rail is measured, so the differential is measured minus manifold.
+    //   Sensor       the rail is measured, so the differential is measured minus manifold. A rail sender
+    //                reads GAUGE — above atmosphere, like every pressure channel but MAP (a 3-bar
+    //                regulator reads 300 at rest) — so it is taken to absolute with baro before the
+    //                manifold, which is absolute, comes off it. Subtracting absolute MAP from a gauge
+    //                reading put the differential a whole atmosphere low: a 300 kPa rail read as ~200,
+    //                and every pulse came out about a quarter long.
     //   Fixed        the rail is held at a constant pressure, so the differential FALLS as the manifold
     //                rises. base is gauge at atmosphere — the number on the regulator — so the rail in
     //                absolute terms is base + baro.
@@ -423,8 +428,8 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
                 dp = base + (rail[st].ratio_x10 * 0.1f - 1.0f) * boost;
                 break;
             }
-            default: dp = bus.get(static_cast<SignalId>(rail[st].src),  // Sensor
-                                  base + baro_kpa) - map_kpa; break;
+            default: dp = bus.get(static_cast<SignalId>(rail[st].src),  // Sensor (gauge)
+                                  base) + baro_kpa - map_kpa; break;
         }
         bus.set(DP_SIG[st], dp, true, now, ttl());
     }

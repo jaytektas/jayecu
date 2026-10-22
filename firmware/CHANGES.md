@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Fuel pressure from a sensor is read as gauge pressure, as a rail sender reports it. The differential across the injectors subtracted the manifold's absolute pressure from a gauge reading, so a 300 kPa rail read as about 200 kPa and every injector pulse came out about a quarter long. A tune whose fuel pressure sensor was calibrated to read absolute needs its calibration taken back to gauge.
 
 ## 0.4.12
 - With the key off the ECU is quiet on CAN: nothing is transmitted and anything still queued is dropped, so an ECU kept awake by USB does not talk into a sleeping car or keep its other modules awake. It still listens, and starts transmitting again at key-on.

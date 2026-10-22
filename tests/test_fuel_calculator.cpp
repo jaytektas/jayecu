@@ -388,14 +388,14 @@ int main() {
         const float vv[5] = {8,10,12,14,16};   for (int i = 0; i < 5; i++) cfg.dead_time_volt_axis[i] = vv[i];
         cfg.dead_time_dp_axis_n = 4; cfg.dead_time_volt_axis_n = 5;
         cfg.stage1_dead_time_table_x_src = SIG_INJ_PRESS_DIFF; cfg.stage1_dead_time_table_y_src = SIG_BATTERY;
-        cfg.stage1_fuel_press_mode = 0;   // this section is about the SENSOR path: dp = measured rail − manifold
+        cfg.stage1_fuel_press_mode = 0;   // this section is about the SENSOR path: dp = gauge rail + baro − manifold
         FuelCalculator fc; fc.init(cfg);
         EngineFrame f{};
-        // inj_press_diff = fuel_press(400) − map(100) = 300 kPa (dp col 1)
-        { SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_FUEL_PRESSURE, 400.0f); b.set(SIG_BATTERY, 10.0f);
+        // inj_press_diff = fuel_press(300 gauge) + baro(101.3) − map(101.3) = 300 kPa (dp col 1)
+        { SignalBus b = make_bus(101.3f, 80.0f); b.set(SIG_FUEL_PRESSURE, 300.0f); b.set(SIG_BATTERY, 10.0f);
           fc.update(make_pos(3000.0f), b, f);
           CHECK_NEAR(b.get(SIG_PW_ADD_DEADTIME, 0.0f), 1130.0, 1.0); }   // 10 V, dp300
-        { SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_FUEL_PRESSURE, 400.0f); b.set(SIG_BATTERY, 14.0f);
+        { SignalBus b = make_bus(101.3f, 80.0f); b.set(SIG_FUEL_PRESSURE, 300.0f); b.set(SIG_BATTERY, 14.0f);
           fc.update(make_pos(3000.0f), b, f);
           CHECK_NEAR(b.get(SIG_PW_ADD_DEADTIME, 0.0f), 430.0, 1.0); }    // 14 V, dp300
     }
@@ -412,10 +412,10 @@ int main() {
         cfg.stage1_fuel_press_mode = 0;   // sensor path again — the point is dP moving, which needs a rail reading
         FuelCalculator fc; fc.init(cfg);
         EngineFrame lo{}, hi{};
-        // inj_press_diff = fuel_press − map(100): dp=150 (fp250) vs dp=600 (fp700)
-        { SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_IAT, 20.0f); b.set(SIG_FUEL_PRESSURE, 250.0f);
+        // inj_press_diff = fuel_press (gauge) at atmosphere: dp=150 (fp150) vs dp=600 (fp600)
+        { SignalBus b = make_bus(101.3f, 80.0f); b.set(SIG_IAT, 20.0f); b.set(SIG_FUEL_PRESSURE, 150.0f);
           fc.update(make_pos(3000.0f), b, lo); }
-        { SignalBus b = make_bus(100.0f, 80.0f); b.set(SIG_IAT, 20.0f); b.set(SIG_FUEL_PRESSURE, 700.0f);
+        { SignalBus b = make_bus(101.3f, 80.0f); b.set(SIG_IAT, 20.0f); b.set(SIG_FUEL_PRESSURE, 600.0f);
           fc.update(make_pos(3000.0f), b, hi); }
         fprintf(stdout, "    PW@dp150=%g  PW@dp600=%g\n", (double)lo.base_fuel_pw_us, (double)hi.base_fuel_pw_us);
         CHECK(hi.base_fuel_pw_us < lo.base_fuel_pw_us);   // more flow at higher dP -> shorter PW
@@ -439,8 +439,12 @@ int main() {
             c2.update(make_pos(3000.0f), b, ff);
             return b.get(SIG_INJ_PRESS_DIFF, 0.0f);
         };
-        // SENSOR: measured rail minus manifold, and nothing else comes into it.
-        CHECK_NEAR(dp_at(0, 100.0f, true), 350.0, 0.5);      // 450 − 100
+        // SENSOR: the measured rail, which reads GAUGE, taken to absolute and the manifold taken off it.
+        // At atmosphere the differential IS the gauge reading; a bar of boost takes a bar off it.
+        CHECK_NEAR(dp_at(0, 101.3f, true), 450.0, 0.5);      // 450 + 101.3 − 101.3
+        CHECK_NEAR(dp_at(0, 201.3f, true), 350.0, 0.5);      // 450 + 101.3 − 201.3
+        // …and a rail sender that is not reading falls back to the regulator's number, as Fixed does.
+        CHECK_NEAR(dp_at(0, 101.3f, false), 300.0, 0.5);
         // FIXED REGULATOR: the rail is held at base ABOVE ATMOSPHERE, so the differential falls as the
         // manifold rises — 300 at atmosphere, 100 less under a bar of boost.
         CHECK_NEAR(dp_at(1, 101.3f, false), 300.0, 0.5);
@@ -494,7 +498,7 @@ int main() {
         fc.update(make_pos(3000.0f), b, f);
         CHECK_NEAR(b.get(SIG_INJ_PRESS_DIFF,   0.0f), 200.0, 0.5);   // 300 + 101.3 − 201.3, boost eats 100
         CHECK_NEAR(b.get(SIG_INJ_PRESS_DIFF_2, 0.0f), 500.0, 0.5);   // 1:1 — boost changes nothing
-        CHECK_NEAR(b.get(SIG_INJ_PRESS_DIFF_3, 0.0f), 398.7, 0.5);   // 600 measured − 201.3 manifold
+        CHECK_NEAR(b.get(SIG_INJ_PRESS_DIFF_3, 0.0f), 500.0, 0.5);   // 600 gauge + 101.3 − 201.3 manifold
         CHECK_NEAR(b.get(SIG_INJ_PRESS_DIFF_4, 0.0f), 100.0, 0.5);   // 200 + 101.3 − 201.3
     }
 
