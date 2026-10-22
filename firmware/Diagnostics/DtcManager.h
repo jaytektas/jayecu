@@ -179,6 +179,7 @@ private:
     // The store's version if restore() would accept `buf` (DTC_STORE_VERSION, or the older one it still
     // reads), 0 if not. The one check, shared by restore() and image_boot_id().
     static uint16_t store_version(const uint8_t* buf, uint32_t len);
+    static uint32_t seal_store(uint8_t* buf, uint32_t n);
 
     DtcRecord table_[SLOTS] = {};
     // NOT PERSISTED, and it must not be: a ttl is a statement about who is judging in THIS run, and a

@@ -236,11 +236,15 @@ bool DtcManager::consume_dirty() {
 }
 
 uint32_t DtcManager::snapshot_if_dirty(uint8_t* buf, uint32_t buf_len) {
-    DtcGuard g;
-    if (!dirty_) return 0;
-    const uint32_t n = store_image(buf, buf_len);
-    if (n) dirty_ = false;
-    return n;
+    if (buf_len < store_max_bytes()) return 0;
+    uint32_t n;
+    {
+        DtcGuard g;
+        if (!dirty_) return 0;
+        n = serialize(buf, buf_len - 4u);
+        if (n) dirty_ = false;
+    }
+    return n ? seal_store(buf, n) : 0;
 }
 
 bool DtcManager::clear(uint16_t code) {
@@ -359,9 +363,16 @@ uint32_t DtcManager::serialize(uint8_t* buf, uint32_t buf_len, uint16_t first) c
 }
 
 uint32_t DtcManager::store_image(uint8_t* buf, uint32_t buf_len) const {
-    DtcGuard g;
     if (buf_len < store_max_bytes()) return 0;         // the store is never paged: all of it or nothing
-    const uint32_t n = serialize(buf, buf_len - 4u);
+    uint32_t n;
+    n = serialize(buf, buf_len - 4u);                  // takes the table lock itself
+    return n ? seal_store(buf, n) : 0;
+}
+
+// The wire image made a store: renumbered, and the CRC trailer added. Outside the table's lock — the
+// bytes are already a private copy, and a bitwise CRC over a full table is a few hundred microseconds
+// the scheduler need not spend suspended.
+uint32_t DtcManager::seal_store(uint8_t* buf, uint32_t n) {
     std::memcpy(buf + 4, &DTC_STORE_VERSION, 2);
     const uint32_t crc = crc32_buf(buf, n);
     std::memcpy(buf + n, &crc, 4);
