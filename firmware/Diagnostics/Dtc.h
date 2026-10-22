@@ -49,6 +49,9 @@ constexpr uint8_t DTC_STORED    = 0x02;  // recorded — persists to SD, survive
 constexpr uint8_t DTC_CONFIRMED = 0x04;  // confirmed: active in two key cycles, held DTC_CONFIRM_MS, or an event
 constexpr uint8_t DTC_CYCLE_ACT = 0x08;  // went active during the CURRENT key cycle (persisted: the next
                                          // key-on reads it to decide whether the last cycle was clean)
+// Every flag above. A stored record carrying any other bit was not written by this firmware (see
+// DtcManager::restore), so a new flag has to be added here or the stores that carry it stop loading.
+constexpr uint8_t DTC_STATUS_DEFINED = DTC_ACTIVE | DTC_STORED | DTC_CONFIRMED | DTC_CYCLE_ACT;
 
 // OBD-style aging, counted in KEY CYCLES (key-on edges), not boots — a bench power-up on USB is not a
 // drive. A key cycle in which a stored code never went active is a clean cycle (heal_cycles++).

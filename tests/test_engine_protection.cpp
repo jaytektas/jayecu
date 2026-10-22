@@ -245,6 +245,59 @@ int main() {
     }
 
     // -------------------------------------------------------------------
+    SECTION("a store from the card: ours keeps a STORED level, foreign bytes raise none");
+    {
+        // The STORED condition is evidence on the card, so it has to survive a boot — and so it must
+        // only ever be evidence this firmware wrote. A board reflashed from other firmware read its old
+        // dtc.bin (right magic, wrong everything else) as stored level-3 codes, and limped.
+        auto cfg = make_cfg();
+        cfg.protection_levels[2].enabled       = 1;
+        cfg.protection_levels[2].rev_limit_rpm = 2000;
+        cfg.protection_levels[2].dtc_condition = 1;      // watches STORED
+        uint8_t img[DtcManager::store_max_bytes()];
+        uint32_t n = 0;
+        {
+            DtcManager before; before.init(1);
+            before.raise(P_OVERTEMP_CLT, DtcSource::PROTECTION, DTC_SEV_LEVEL3, g_tick_ms);
+            before.heal(P_OVERTEMP_CLT);
+            n = before.store_image(img, sizeof(img));
+        }
+        {
+            EngineProtection ep; ep.init(cfg);
+            DtcManager dtc; ep.set_dtc(&dtc);
+            CHECK(dtc.restore(img, n) == DtcManager::StoreLoad::Loaded);
+            dtc.init(2);
+            SignalBus bus{}; EngineFrame frame{};
+            set_all_fresh(bus); ep.update(make_pos(), bus, frame);
+            CHECK(bus.valid(SIG_PROT_REV_LIMIT) && bus.get(SIG_PROT_REV_LIMIT) == 2000.0f);   // ours: holds
+        }
+        {
+            // The same bytes with one record byte changed: still "DTC1", still a level-3 STORED record —
+            // and not what this firmware wrote. Then a store whose every byte after the magic is noise.
+            img[10 + 6] ^= 0x01;                          // the record's count
+            uint8_t noise[DtcManager::store_max_bytes()];
+            for (uint32_t i = 0; i < sizeof(noise); ++i) noise[i] = static_cast<uint8_t>(i * 151u + 7u);
+            const uint32_t magic = 0x44544331u;
+            const uint16_t ver = 3, cnt = 29;
+            std::memcpy(noise, &magic, 4); std::memcpy(noise + 4, &ver, 2); std::memcpy(noise + 8, &cnt, 2);
+            const uint8_t* foreign[2] = {img, noise};
+            const uint32_t flen[2]    = {n, 10u + 36u * cnt + 4u};
+            for (int f = 0; f < 2; ++f) {
+                EngineProtection ep; ep.init(cfg);
+                DtcManager dtc; ep.set_dtc(&dtc);
+                CHECK(dtc.restore(foreign[f], flen[f]) == DtcManager::StoreLoad::Rejected);
+                dtc.init(2);
+                CHECK(dtc.stored_count() == 0 && dtc.worst_stored_severity() == 0);
+                SignalBus bus{}; EngineFrame frame{};
+                bus.invalidate(SIG_PROT_REV_LIMIT);
+                set_all_fresh(bus); ep.update(make_pos(), bus, frame);
+                CHECK(!bus.valid(SIG_PROT_REV_LIMIT));                                           // foreign: none
+                CHECK(bus.get_u32(SIG_PROT_STATUS) == 0u);
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------
     SECTION("CLT overtemp — P0217 raised (sev 3), Level 3 reaction");
     {
         auto cfg = make_cfg();

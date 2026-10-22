@@ -116,29 +116,46 @@ public:
     uint8_t list_active(uint16_t* out, uint8_t max) const;  // active codes → out[], returns n
     const DtcRecord& slot(uint8_t i) const { return table_[i]; }
 
-    // --- persistence (SD image; caller does the actual SD read/write) ---
+    // --- the table image: the 'G' reply, and the body of the SD store ---
     // Layout: [magic u32][version u16][boot_id u16][n u16][DtcRecord x n]. Returns bytes written,
     // or 0 if buf can't even hold the 10-byte header.
     //
     // PAGED: writes stored records starting at `first` (index into the STORED set, not the slot
     // array) and stops when buf_len runs out — `n` in the header is the count IN THIS IMAGE, not the
-    // table total. The SD path passes image_max_bytes() and first=0, so it still writes the whole
-    // table in one go, byte-identical to before. The comms path caps buf_len at the wire's max
-    // payload and pages, because a full table serialises to 10 + 36*64 = 2314 bytes -- more than
-    // twice what one frame can carry (OMNI_MAX_PAYLOAD 1030). Emitting that produced a header
-    // announcing a length the framing could not deliver, and every client waiting on it hung.
+    // table total. The comms path caps buf_len at the wire's max payload and pages, because a full
+    // table serialises to 10 + 36*64 = 2314 bytes -- more than twice what one frame can carry
+    // (OMNI_MAX_PAYLOAD 1030). Emitting that produced a header announcing a length the framing could
+    // not deliver, and every client waiting on it hung.
     uint32_t serialize(uint8_t* buf, uint32_t buf_len, uint16_t first = 0) const;
     // Records that fit in a buffer of `buf_len` bytes — lets a caller page without guessing.
     static constexpr uint32_t records_that_fit(uint32_t buf_len) {
         return buf_len < 10u ? 0u : (buf_len - 10u) / sizeof(DtcRecord);
     }
-    bool     restore(const uint8_t* buf, uint32_t len);  // false on bad magic/version/size
     static constexpr uint32_t image_max_bytes() { return 10 + sizeof(DtcRecord) * SLOTS; }
 
+    // --- persistence (the SD store; the caller does the actual SD read/write) ---
+    // The store is the whole-table image with its own version (3) and a CRC32 over every byte before
+    // it: [image, version 3][crc32 u32]. The 'G' image keeps version 2 and has no CRC — the studio and
+    // the dump tool read it as before.
+    //
+    // A STORE IS LOADED ONLY IF THIS FIRMWARE WROTE IT. The card outlives the firmware: a board that ran
+    // something else first can hold a dtc.bin whose bytes happen to start "DTC1", and the magic and the
+    // version were all that used to be checked — so whatever followed came back as stored codes, with
+    // severities that drove the protection levels watching STORED faults. Now the length must be exact,
+    // the CRC must match, and every record must be one the table could have held. See restore().
+    enum class StoreLoad : uint8_t {
+        Loaded,     // a version-3 store, CRC good
+        Upgraded,   // a version-2 store an older build wrote: loaded, rewritten as version 3 at the next save
+        Rejected,   // not a store this firmware wrote: nothing loaded, overwritten at the next save
+    };
+    uint32_t  store_image(uint8_t* buf, uint32_t buf_len) const;   // whole table; 0 if it does not fit
+    StoreLoad restore(const uint8_t* buf, uint32_t len);
+    static constexpr uint32_t store_max_bytes() { return image_max_bytes() + 4u; }
+
     // Persisted power-cycle counter; the boot loader peeks the last value out of
-    // the SD image, increments it, and feeds it back via init() for this session.
+    // the SD store, increments it, and feeds it back via init() for this session.
     uint16_t boot_id() const { return boot_id_; }
-    // Read just the stored boot_id out of a serialized image (0 if header invalid).
+    // Read just the stored boot_id out of a store (0 unless restore() would accept it).
     static uint16_t image_boot_id(const uint8_t* buf, uint32_t len);
 
     // Dirty flag for the SD writer: any table mutation sets it; the save task
@@ -147,8 +164,9 @@ public:
     bool consume_dirty();
     void mark_dirty() { dirty_ = true; }   // a save that failed: the change is still owed
 
-    // Serialise the whole table into `buf` only if it changed since the last call — the dirty check and
-    // the copy under ONE lock, so a change landing between them is never lost. Returns bytes, 0 if clean.
+    // The store image of the whole table (store_image) into `buf`, only if it changed since the last call —
+    // the dirty check and the copy under ONE lock, so a change landing between them is never lost. Returns
+    // bytes, 0 if clean.
     uint32_t snapshot_if_dirty(uint8_t* buf, uint32_t buf_len);
 
 private:
@@ -158,6 +176,9 @@ private:
     // A slot for a new code, or -1 when every slot holds an ACTIVE code of equal-or-higher severity.
     // Preference: empty > stored-but-healed (oldest) > lowest-severity ACTIVE code this one outranks.
     int  alloc(uint16_t code, uint8_t severity);
+    // The store's version if restore() would accept `buf` (DTC_STORE_VERSION, or the older one it still
+    // reads), 0 if not. The one check, shared by restore() and image_boot_id().
+    static uint16_t store_version(const uint8_t* buf, uint32_t len);
 
     DtcRecord table_[SLOTS] = {};
     // NOT PERSISTED, and it must not be: a ttl is a statement about who is judging in THIS run, and a

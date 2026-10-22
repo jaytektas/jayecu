@@ -1,10 +1,12 @@
 // Host test for the unified DTC table (DtcManager) — raise/dedupe/count, heal,
 // query, SD save/restore round-trip, clear, and full-table eviction.
 #include "Diagnostics/DtcManager.h"
+#include "Storage/Crc32.h"   // crc32_buf — to build a store whose CRC matches but whose records cannot
 #include "dtc_categories.h"   // dtc_indicator_bit(code) — P-code -> category bit
 #include <cassert>
 #include <cstdio>
 #include <cstdint>
+#include <cstring>
 
 static int _p = 0, _f = 0;
 static void check(bool c, const char* m) {
@@ -82,12 +84,12 @@ int main() {
     check(d.list_active_band(3, 3, band, 8) == 1 && band[0] == P0118, "band 3 lists the level 3 code (red cycle)");
     check(d.worst_code(3, 3) == P0118, "worst_code(3) still picks a level 3 code");
 
-    // ---- save → restore round-trip (the SD image) ----
-    uint8_t img[DtcManager::image_max_bytes()];
-    const uint32_t wrote = d.serialize(img, sizeof(img));
-    check(wrote > 0, "serialize produced an SD image");
+    // ---- save → restore round-trip (the SD store) ----
+    uint8_t img[DtcManager::store_max_bytes()];
+    const uint32_t wrote = d.store_image(img, sizeof(img));
+    check(wrote == 10u + 36u * 2u + 4u, "store_image: header + two records + crc");
     DtcManager d2; d2.init(8);
-    check(d2.restore(img, wrote), "restore accepts a valid image");
+    check(d2.restore(img, wrote) == DtcManager::StoreLoad::Loaded, "restore accepts a store this firmware wrote");
     check(d2.stored_count() == 2, "restore: both stored codes came back");
     check(d2.active_count() == 0, "restore: codes return STORED but NOT active (re-arm on condition)");
     check(d2.slot(0).count == 2, "restore: per-code count preserved");
@@ -102,7 +104,7 @@ int main() {
 
     // restore rejects garbage
     uint8_t bad[16] = { 0xDE, 0xAD };
-    check(!d2.restore(bad, sizeof(bad)), "restore rejects a bad/short image");
+    check(d2.restore(bad, sizeof(bad)) == DtcManager::StoreLoad::Rejected, "restore rejects a bad/short image");
 
     // ---- boot_id persistence: peek the stored id out of the image, bump it ----
     check(DtcManager::image_boot_id(img, wrote) == 7, "image_boot_id reads the stored boot_id (7)");
@@ -213,10 +215,10 @@ int main() {
         check(z.slot(0).ff[0] == 3500.0f && z.slot(0).ff[3] == 13.8f,
               "set_freeze_frame stores the snapshot on the record");
 
-        uint8_t fimg[DtcManager::image_max_bytes()];
-        const uint32_t fw = z.serialize(fimg, sizeof(fimg));
+        uint8_t fimg[DtcManager::store_max_bytes()];
+        const uint32_t fw = z.store_image(fimg, sizeof(fimg));
         DtcManager z2; z2.init(1);
-        check(z2.restore(fimg, fw), "restore image carrying freeze-frames");
+        check(z2.restore(fimg, fw) == DtcManager::StoreLoad::Loaded, "restore image carrying freeze-frames");
         check(z2.slot(0).ff[0] == 3500.0f && z2.slot(0).ff[2] == 105.0f,
               "freeze-frame survives serialize/restore (persisted in dtc.bin)");
 
@@ -309,9 +311,9 @@ int main() {
         check(!(status(m, C) & DTC_CONFIRMED) && (status(m, C) & DTC_STORED),
               "age: confirmed drops after the unconfirm cycles, history stays");
 
-        uint8_t img[DtcManager::image_max_bytes()];
-        const uint32_t n = m.serialize(img, sizeof(img));
-        DtcManager r; check(r.restore(img, n), "age: heal_cycles survive a save");
+        uint8_t img[DtcManager::store_max_bytes()];
+        const uint32_t n = m.store_image(img, sizeof(img));
+        DtcManager r; check(r.restore(img, n) == DtcManager::StoreLoad::Loaded, "age: heal_cycles survive a save");
         check(heal_n(r, C) == DTC_UNCONFIRM_CYCLES, "age: heal_cycles restored");
         r.set_active(false); r.set_active(false);                // USB/bench power-ups are not cycles
         check(heal_n(r, C) == DTC_UNCONFIRM_CYCLES, "age: bench (inactive) sessions do not count");
@@ -320,11 +322,101 @@ int main() {
 
         DtcManager s; s.init(1); s.set_active(true);
         s.raise(C, 5, DTC_SEV_LEVEL1, 1000, 500);
-        uint8_t im2[DtcManager::image_max_bytes()];
+        uint8_t im2[DtcManager::store_max_bytes()];
         check(s.snapshot_if_dirty(im2, sizeof(im2)) > 0, "save: a change is snapshotted");
         check(s.snapshot_if_dirty(im2, sizeof(im2)) == 0, "save: and only once");
         s.mark_dirty();
         check(s.snapshot_if_dirty(im2, sizeof(im2)) > 0, "save: a failed save stays owed");
+    }
+
+    // ---- the SD store is loaded only if this firmware wrote it ----
+    // A board that ran other firmware first kept that firmware's dtc.bin on its card. It began "DTC1",
+    // which was all that was checked, so ~50 nonsense codes came back as stored history and a level-3
+    // limp went with them. Every case below is a file that must load nothing.
+    {
+        DtcManager src; src.init(41);
+        src.raise(P0117, CLT_SRC, DTC_SEV_LEVEL2, 1000);
+        src.raise(P0118, CLT_SRC, DTC_SEV_LEVEL3, 2000);
+        src.heal(P0117);
+        uint8_t good[DtcManager::store_max_bytes() + 1];
+        const uint32_t gn = src.store_image(good, sizeof(good));
+        uint16_t ver; std::memcpy(&ver, good + 4, 2);
+        check(ver == 3, "store: version 3 in the header");
+        check(DtcManager::image_boot_id(good, gn) == 41, "store: boot_id read back from a good store");
+
+        auto rejected = [](const uint8_t* b, uint32_t len) {
+            DtcManager m; m.init(1);
+            const bool r = m.restore(b, len) == DtcManager::StoreLoad::Rejected;
+            // Nothing loaded, and owed a save: the first one replaces the file with a store of our own.
+            return r && m.stored_count() == 0 && m.worst_stored_severity() == 0 && m.consume_dirty() &&
+                   DtcManager::image_boot_id(b, len) == 0;
+        };
+        uint8_t t[sizeof(good)];
+
+        std::memcpy(t, good, gn); t[10 + 3] ^= 0x01;                     // a record's severity, 2 -> 3
+        check(rejected(t, gn), "store: a changed record byte fails the CRC");
+        std::memcpy(t, good, gn); t[gn - 1] ^= 0x80;                     // the CRC itself
+        check(rejected(t, gn), "store: a corrupted CRC is rejected");
+        std::memcpy(t, good, gn); t[gn] = 0;
+        check(rejected(t, gn + 1), "store: a byte past the CRC is rejected (exact length)");
+        check(rejected(good, gn - 1), "store: a truncated store is rejected");
+        std::memcpy(t, good, gn); t[4] = 4;
+        check(rejected(t, gn), "store: an unknown version is rejected");
+
+        // Foreign bytes behind a valid-looking header: right magic, right version, a count that fits.
+        uint8_t noise[DtcManager::store_max_bytes()];
+        for (uint32_t i = 0; i < sizeof(noise); ++i) noise[i] = static_cast<uint8_t>(i * 151u + 7u);
+        const uint32_t magic = 0x44544331u;
+        const uint16_t cnt = 29;
+        std::memcpy(noise, &magic, 4); std::memcpy(noise + 8, &cnt, 2);
+        const uint16_t v3 = 3, v2 = 2;
+        std::memcpy(noise + 4, &v3, 2);
+        check(rejected(noise, 10u + 36u * cnt + 4u), "store: foreign bytes with the magic (version 3) are rejected");
+        std::memcpy(noise + 4, &v2, 2);
+        check(rejected(noise, 10u + 36u * cnt), "store: foreign bytes with the magic (version 2) are rejected");
+
+        // A CRC that matches over records the table could not have held is still not ours.
+        uint8_t two[10 + 36 * 2 + 4];
+        std::memcpy(two, good, 10 + 36);                                  // header (n = 2) + the first record
+        std::memcpy(two + 10 + 36, good + 10, 36);                        // …and the first record again
+        const uint32_t crc = crc32_buf(two, 10 + 36 * 2);
+        std::memcpy(two + 10 + 36 * 2, &crc, 4);
+        check(rejected(two, sizeof(two)), "store: the same code twice is rejected");
+
+        DtcManager g; g.init(1);
+        check(g.restore(good, gn) == DtcManager::StoreLoad::Loaded && g.stored_count() == 2 &&
+              g.worst_stored_severity() == DTC_SEV_LEVEL3 && !g.consume_dirty(),
+              "store: a genuine store round-trips, in sync (not dirty)");
+
+        // ---- an older build's store: the version-2 image, no CRC ----
+        // What every earlier build wrote: serialize() of the whole table, verbatim. An update must not
+        // wipe the codes it holds, so it loads — under the record checks, since it has no CRC — and is
+        // owed a save, which rewrites it as version 3.
+        uint8_t old[DtcManager::image_max_bytes()];
+        const uint32_t on = src.serialize(old, sizeof(old));
+        std::memcpy(&ver, old + 4, 2);
+        check(ver == 2 && on == 10u + 36u * 2u, "wire image: still version 2, no CRC (the studio reads it as before)");
+        DtcManager u; u.init(1);
+        check(u.restore(old, on) == DtcManager::StoreLoad::Upgraded, "older store: loads (upgraded)");
+        check(u.stored_count() == 2 && u.active_count() == 0 && u.worst_stored_severity() == DTC_SEV_LEVEL3,
+              "older store: its codes come back STORED, not active");
+        check(DtcManager::image_boot_id(old, on) == 41, "older store: its boot_id still counts on");
+        uint8_t re[DtcManager::store_max_bytes()];
+        const uint32_t rn = u.snapshot_if_dirty(re, sizeof(re));
+        std::memcpy(&ver, re + 4, 2);
+        check(rn == gn && ver == 3, "older store: the next save rewrites it as version 3");
+        DtcManager u2; u2.init(1);
+        check(u2.restore(re, rn) == DtcManager::StoreLoad::Loaded && u2.stored_count() == 2,
+              "older store: …which then loads as a checked store");
+
+        std::memcpy(t, old, on); t[10 + 3] = 7;                          // severity past level 3
+        check(rejected(t, on), "older store: a severity above 3 is rejected");
+        std::memcpy(t, old, on); t[10 + 4] |= 0x40;                       // an undefined status flag
+        check(rejected(t, on), "older store: an undefined status bit is rejected");
+        std::memcpy(t, old, on); t[10 + 4] = DTC_CONFIRMED;               // not STORED
+        check(rejected(t, on), "older store: a record that is not STORED is rejected");
+        std::memcpy(t, old, on); t[10] = 0; t[11] = 0;                    // an empty slot in the list
+        check(rejected(t, on), "older store: a zero code is rejected");
     }
 
     printf("\n%d passed, %d failed\n", _p, _f);

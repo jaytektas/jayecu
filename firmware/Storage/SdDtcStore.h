@@ -7,10 +7,10 @@
 // ---------------------------------------------------------------------------
 // SdDtcStore — SD persistence for the unified DTC table.
 //
-// Writes the DtcManager's serialized image (a single flat blob, magic+version+
-// boot_id+records) to a fixed file, and restores it on boot. Unlike the
-// append-only fault log, this is a whole-image rewrite: the table is small
-// (<= image_max_bytes()) and we only persist the current set, not history.
+// Writes the DtcManager's store image (a single flat blob, magic+version+
+// boot_id+records+crc32, DtcManager::store_image) to a fixed file, and restores it on
+// boot. Unlike the append-only fault log, this is a whole-image rewrite: the table is
+// small (<= store_max_bytes()) and we only persist the current set, not history.
 //
 // boot_id (the power-cycle counter) lives in the image header. boot_restore()
 // reads the previous value, increments it for this session, and init()s the
@@ -26,7 +26,8 @@ public:
 
     // Boot path: read the image (if any), restore the table STORED-not-active,
     // and init the manager with (stored boot_id + 1). Always init()s the manager
-    // even with no card / no image (cold start → boot_id 1, empty table).
+    // even with no card / no image (cold start → boot_id 1, empty table). A file this
+    // firmware did not write is discarded the same way, with a line on the console.
     // Returns the boot_id assigned to this session.
     uint16_t boot_restore(DtcManager& dtc);
 
