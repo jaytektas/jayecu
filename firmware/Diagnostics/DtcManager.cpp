@@ -1,4 +1,5 @@
 #include "DtcManager.h"
+#include "../Storage/Crc32.h"
 #include <cstring>
 
 DtcManager::LockFn DtcManager::s_lock_   = nullptr;
@@ -14,6 +15,11 @@ struct DtcGuard {
 namespace {
 constexpr uint32_t DTC_MAGIC   = 0x44544331u;  // "DTC1"
 constexpr uint16_t DTC_VERSION = 2;            // 2: DtcRecord gained the freeze-frame (36B)
+// The SD store: the version-2 image, renumbered 3, with a CRC32 trailer. A version-2 store is what every
+// older build wrote (the image verbatim, no CRC); it still loads, under stricter checks, and the next
+// save rewrites it as version 3 — see restore().
+constexpr uint16_t DTC_STORE_VERSION = 3;
+constexpr uint32_t DTC_HDR = 10;               // magic + version + boot_id + n
 }
 
 void DtcManager::init(uint16_t boot_id) {
@@ -232,7 +238,7 @@ bool DtcManager::consume_dirty() {
 uint32_t DtcManager::snapshot_if_dirty(uint8_t* buf, uint32_t buf_len) {
     DtcGuard g;
     if (!dirty_) return 0;
-    const uint32_t n = serialize(buf, buf_len);
+    const uint32_t n = store_image(buf, buf_len);
     if (n) dirty_ = false;
     return n;
 }
@@ -352,40 +358,82 @@ uint32_t DtcManager::serialize(uint8_t* buf, uint32_t buf_len, uint16_t first) c
     return o;
 }
 
-bool DtcManager::restore(const uint8_t* buf, uint32_t len) {
-    if (len < 10) return false;
-    uint32_t magic; uint16_t ver, boot, n;
+uint32_t DtcManager::store_image(uint8_t* buf, uint32_t buf_len) const {
+    DtcGuard g;
+    if (buf_len < store_max_bytes()) return 0;         // the store is never paged: all of it or nothing
+    const uint32_t n = serialize(buf, buf_len - 4u);
+    std::memcpy(buf + 4, &DTC_STORE_VERSION, 2);
+    const uint32_t crc = crc32_buf(buf, n);
+    std::memcpy(buf + n, &crc, 4);
+    return n + 4u;
+}
+
+// WHAT A STORE THIS FIRMWARE WROTE LOOKS LIKE. The CRC is the check that matters: it is what tells our
+// bytes from anybody else's. The record checks on top are cheap and catch what a CRC cannot — the
+// version-2 store, which has none — and they are invariants of the table, not guesses: raise() always
+// sets STORED, severities are 0..3, the status flags are the four in Dtc.h, and a code is in the table
+// once. The length must be exact because both versions are written whole and never appended to.
+uint16_t DtcManager::store_version(const uint8_t* buf, uint32_t len) {
+    if (len < DTC_HDR) return 0;
+    uint32_t magic; uint16_t ver, n;
     std::memcpy(&magic, buf + 0, 4);
     std::memcpy(&ver,   buf + 4, 2);
-    std::memcpy(&boot,  buf + 6, 2);
     std::memcpy(&n,     buf + 8, 2);
-    if (magic != DTC_MAGIC || ver != DTC_VERSION || n > SLOTS) return false;
-    if (len < 10u + static_cast<uint32_t>(sizeof(DtcRecord)) * n) return false;
+    if (magic != DTC_MAGIC || n > SLOTS) return 0;
+    const uint32_t body = DTC_HDR + static_cast<uint32_t>(sizeof(DtcRecord)) * n;
+    if (ver == DTC_STORE_VERSION) {
+        if (len != body + 4u) return 0;
+        uint32_t crc;
+        std::memcpy(&crc, buf + body, 4);
+        if (crc != crc32_buf(buf, body)) return 0;
+    } else if (ver == DTC_VERSION) {
+        if (len != body) return 0;
+    } else {
+        return 0;
+    }
+    for (uint16_t k = 0; k < n; k++) {
+        DtcRecord r;
+        std::memcpy(&r, buf + DTC_HDR + sizeof(DtcRecord) * k, sizeof(DtcRecord));
+        if (r.code == 0 || r.severity > DTC_SEV_LEVEL3 ||
+            (r.status & ~DTC_STATUS_DEFINED) || !(r.status & DTC_STORED)) return 0;
+        for (uint16_t j = 0; j < k; j++) {
+            uint16_t other;
+            std::memcpy(&other, buf + DTC_HDR + sizeof(DtcRecord) * j, 2);
+            if (other == r.code) return 0;
+        }
+    }
+    return ver;
+}
+
+// ALL OR NOTHING. A store that fails any check loads no record at all — a record that passed on its
+// own is still out of a file this firmware did not write, and the protection levels act on what the
+// table holds. The table is left as it was (empty, at boot) and marked dirty, so the first save
+// replaces the file with this firmware's own and the next boot does not meet it again.
+DtcManager::StoreLoad DtcManager::restore(const uint8_t* buf, uint32_t len) {
+    const uint16_t ver = store_version(buf, len);
     DtcGuard g;
+    if (ver == 0) { dirty_ = true; return StoreLoad::Rejected; }
+    uint16_t n;
+    std::memcpy(&n, buf + 8, 2);
     clear_all();
-    uint32_t o = 10;
     for (uint16_t k = 0; k < n; k++) {
         DtcRecord r{};
-        std::memcpy(&r, buf + o, sizeof(DtcRecord));
-        o += sizeof(DtcRecord);
+        std::memcpy(&r, buf + DTC_HDR + sizeof(DtcRecord) * k, sizeof(DtcRecord));
         // Restored codes come back STORED but NOT active — they re-arm to active
         // only if their condition is still true after boot (the source raises them).
         r.status = static_cast<uint8_t>(r.status & ~DTC_ACTIVE);
-        if (r.code && k < SLOTS) {
-            table_[k] = r;
-            present_[(r.code >> 5) & 7u] |= (1u << (r.code & 31u));   // restored codes are present too
-        }
+        table_[k] = r;
+        present_[(r.code >> 5) & 7u] |= (1u << (r.code & 31u));   // restored codes are present too
     }
-    dirty_ = false;   // just loaded from SD — already in sync, don't rewrite it
-    return true;
+    // Loaded from SD and already in sync: don't rewrite it. Unless it is the older store, which is
+    // rewritten as version 3 so that from the next boot on it is checked by its CRC.
+    dirty_ = (ver != DTC_STORE_VERSION);
+    return ver == DTC_STORE_VERSION ? StoreLoad::Loaded : StoreLoad::Upgraded;
 }
 
 uint16_t DtcManager::image_boot_id(const uint8_t* buf, uint32_t len) {
-    if (len < 10) return 0;
-    uint32_t magic; uint16_t ver, boot;
-    std::memcpy(&magic, buf + 0, 4);
-    std::memcpy(&ver,   buf + 4, 2);
-    std::memcpy(&boot,  buf + 6, 2);
-    if (magic != DTC_MAGIC || ver != DTC_VERSION) return 0;
+    if (store_version(buf, len) == 0) return 0;
+    uint16_t boot;
+    std::memcpy(&boot, buf + 6, 2);
     return boot;
 }

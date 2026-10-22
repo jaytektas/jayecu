@@ -1,5 +1,6 @@
 #include "SdDtcStore.h"
 #include "../Platform/stm32f7xx/SdVolume.h"
+#include "../Diagnostics/TextLog.h"
 #include <cstring>
 
 SdDtcStore::SdDtcStore(SdArbitrator& arb, const char* path)
@@ -18,7 +19,6 @@ static void temp_path_of(const char* path, char* out, uint32_t cap) {
 
 uint16_t SdDtcStore::boot_restore(DtcManager& dtc) {
     uint16_t prev_boot = 0;
-    bool     restored  = false;
 
     if (sd_volume_ensure(arb_)) {
         // A cut between save()'s unlink and rename leaves only the complete .new: put it in place.
@@ -29,13 +29,23 @@ uint16_t SdDtcStore::boot_restore(DtcManager& dtc) {
 
         FIL fil;
         if (f_open(&fil, path_, FA_READ) == FR_OK) {
-            static uint8_t buf[DtcManager::image_max_bytes()];
+            // One byte more than the largest store: a longer file then reads as a length no store has,
+            // and restore()'s exact-length check refuses it rather than loading a store-sized prefix.
+            static uint8_t buf[DtcManager::store_max_bytes() + 1u];
+            const uint32_t size = static_cast<uint32_t>(f_size(&fil));
             UINT read = 0;
-            FRESULT fr = f_read(&fil, buf, sizeof(buf), &read);
+            const FRESULT fr = f_read(&fil, buf, sizeof(buf), &read);
             f_close(&fil);
-            if (fr == FR_OK && read >= 10) {
-                prev_boot = DtcManager::image_boot_id(buf, read);
-                restored  = dtc.restore(buf, read);   // STORED-not-active; false if bad image
+            if (fr == FR_OK) {
+                // STORED-not-active. A store this firmware did not write loads nothing and the first
+                // save overwrites it (restore()); the console says so, because the codes it seemed to
+                // hold are not coming back.
+                if (dtc.restore(buf, read) == DtcManager::StoreLoad::Rejected)
+                    g_text_log.printf("DTC store %s (%lu bytes) was not written by this firmware: "
+                                      "discarded, starting with no stored codes\n",
+                                      path_, static_cast<unsigned long>(size));
+                else
+                    prev_boot = DtcManager::image_boot_id(buf, read);
             }
         }
     }
@@ -44,7 +54,6 @@ uint16_t SdDtcStore::boot_restore(DtcManager& dtc) {
     uint16_t boot = static_cast<uint16_t>(prev_boot + 1);
     if (boot == 0) boot = 1;
     dtc.init(boot);   // boot_id only; restore() (above) already repopulated the table
-    (void)restored;
     return boot;
 }
 
@@ -54,7 +63,7 @@ uint16_t SdDtcStore::boot_restore(DtcManager& dtc) {
 // to a temp file, is synced, and is swapped in. The snapshot is taken under the table's lock
 // (snapshot_if_dirty), so it is never a record copied half-way through an update either.
 bool SdDtcStore::save_if_dirty(DtcManager& dtc) {
-    static uint8_t buf[DtcManager::image_max_bytes()];
+    static uint8_t buf[DtcManager::store_max_bytes()];
     if (!sd_volume_ensure(arb_)) return false;               // stays dirty: try again later
     const uint32_t n = dtc.snapshot_if_dirty(buf, sizeof(buf));
     if (n == 0) return true;                                 // nothing changed

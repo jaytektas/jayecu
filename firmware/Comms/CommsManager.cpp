@@ -431,7 +431,7 @@ void CommsManager::handle_packet(size_t stream_idx, uint8_t type_id, uint16_t se
         }
 
         // 'G' — read the full DTC table (active + stored). Reply is the DtcManager serialized image
-        // ([magic][ver][boot][n] + n DtcRecord), the same format SD persistence uses; the studio
+        // ([magic][ver 2][boot][n] + n DtcRecord), the body of the SD store (which is version 3 + a CRC); the studio
         // parses DtcRecord[] to list every code. Fits one 4 KB block (≤64 records). Wrapped-only.
         // DTC table read, PAGED. Body is optional: [first:u16] = index into the stored set to start at
         // (absent/short body = 0, so an existing host that sends no body still works).
