@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Proteus F7: the Fuel Learn Block channel (above) is published on this board too.
 
 ## 0.4.14
 - Overboost (P0234) is recorded at level 1, not level 3. The overboost cut is its reaction; a level-3 limp on top meant every pull that touched the cut ended in a rev limit. Level 3 is left to faults a cut cannot fix: over-temperature, pre-ignition, EGT, a lost trigger.
