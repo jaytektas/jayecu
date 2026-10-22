@@ -90,8 +90,11 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
     // a question with no answer on screen — the proposal is right there, under a dropdown nothing
     // identified. (Asked within a minute of the panel first being looked at.)
     row->add(std::make_unique<JLabel>(g, "  Show", 44.f, 22.f));
+    // SESSION % FIRST: how far each cell has moved since Start (or the last Reset), however many times
+    // it was revised on the way — the view a tuner driving with Apply continuously actually reads. The
+    // per-write proposal (Change %) is the second view, not the first.
     modeBox_ = row->add(std::make_unique<JComboBox>(
-        g, std::vector<std::string>{ "Change %", "Proposed", "Base", "Records" }, 120.f, 22.f));
+        g, std::vector<std::string>{ "Session %", "Change %", "Proposed", "Base", "Records" }, 120.f, 22.f));
     modeBox_->setCurrentIndex(0);
     row->add(std::make_unique<JLabel>(g, "Resistance", 68.f, 22.f));
     resistBox_ = row->add(std::make_unique<JComboBox>(
@@ -106,14 +109,21 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
 
     startBtn_->onClicked.connect([this] { if (recording_) stop(); else start(); });
     applyBtn_->onClicked.connect([this] { applyProposal(); });
-    resetBtn_->onClicked.connect([this] { eng_.clear(); refresh(); });
+    resetBtn_->onClicked.connect([this] { resetSession(); });
     // Open when the trims are on, restore when they are off — the button says which, and does that.
     openLoopBtn_->onClicked.connect([this] { if (onSetOpenLoop) onSetOpenLoop(trimActive_); });
-    liveBox_->onStateChanged.connect([this](bool on) { live_ = on; refresh(); });
+    liveBox_->onStateChanged.connect([this](bool on) {
+        live_ = on;
+        // Writing as it goes, the proposal is spent every couple of seconds — what there is to look
+        // at is where the map has been taken, so show that.
+        if (on && modeBox_) modeBox_->setCurrentIndex(0);
+        refresh();
+    });
     modeBox_->onIndexChanged.connect([this](int i) {
-        view_->setMode(i == 1 ? AutotuneView::Mode::Proposed
-                     : i == 2 ? AutotuneView::Mode::Base
-                     : i == 3 ? AutotuneView::Mode::Weight
+        view_->setMode(i == 0 ? AutotuneView::Mode::Session
+                     : i == 2 ? AutotuneView::Mode::Proposed
+                     : i == 3 ? AutotuneView::Mode::Base
+                     : i == 4 ? AutotuneView::Mode::Weight
                               : AutotuneView::Mode::Change);
     });
     resistBox_->onIndexChanged.connect([this](int) { applySettings(); refresh(); });
@@ -397,14 +407,35 @@ void AutotunePanel::readBase() {
 void AutotunePanel::start() {
     if (tablePath_.empty()) return;
     gridNote_.clear();
-    // THE BINS TOO, not just the cells: tiWriteBins announces nothing, so an axis edited through it
-    // reaches no signal and the tab would start a run against a grid that has already moved.
-    plane_ = livePlane();          // this run is about the plane the engine is on
-    seedGrid();
-    eng_.clear();
+    // STOP AND START AGAIN CARRIES ON. The session — its reference map, its records, its Session % —
+    // belongs to Reset, not to the Start button: pausing to pull over is not starting over. A new
+    // session begins only when there is none yet, or when the one there is no longer describes this
+    // map (THE BINS TOO, not just the cells: tiWriteBins announces nothing, so an axis edited through it
+    // reaches no signal) or this plane (the engine is now on another fuel).
+    if (!eng_.hasReference() || !gridMatchesTable() || livePlane() != plane_) {
+        plane_ = livePlane();      // this run is about the plane the engine is on
+        resetSession();
+    } else {
+        readBase();
+    }
     recording_ = true;
     lastApplyMs_ = nowMs();
     startBtn_->setLabel("Stop");
+    refresh();
+}
+
+// RESET IS THE ONE THING THAT STARTS OVER: the records go, and the map as it stands now becomes the
+// reference every Session % is measured from.
+void AutotunePanel::resetSession() {
+    seedGrid();                    // the live bins and cells; discards the records and old reference
+    std::vector<double> ref;
+    const int n = eng_.cols() * eng_.rows();
+    if (eng_.hasBase()) {
+        ref.reserve(static_cast<size_t>(n));
+        for (int r = 0; r < eng_.rows(); ++r)
+            for (int cc = 0; cc < eng_.cols(); ++cc) ref.push_back(eng_.base(cc, r));
+        eng_.setReference(std::move(ref));
+    }
     refresh();
 }
 
@@ -524,25 +555,37 @@ void AutotunePanel::applyProposal() {
     const int nx = std::min(c.tiLiveN(t, 0), eng_.cols());
     const int ny = std::min(c.tiLiveN(t, 1), eng_.rows());
 
+    // WRITING AS IT GOES, IT CREEPS. Each continuous write moves a cell only part of the way to its
+    // proposal; the rest stays in the evidence (rebase, below) and is taken on the next write if the
+    // engine still agrees. One noisy stretch of road therefore nudges the map instead of rewriting it,
+    // and a real error is still closed within a few writes. A manual Apply is a decision someone looked
+    // at, so it is applied whole.
+    const double step = (live_ && recording_) ? kLiveStep : 1.0;
+
     // ONE undo step. A proposal is a single decision even though it moves a hundred cells, and
     // undoing it a cell at a time would be unusable.
+    std::vector<std::pair<std::pair<int, int>, double>> written;
     c.beginEdit();
     for (int r = 0; r < ny; ++r)
         for (int cc = 0; cc < nx; ++cc) {
-            const double pct = eng_.changePct(cc, r);
+            const double pct = eng_.changePct(cc, r) * (isValue_ ? 1.0 : step);
             if (pct == 0.0) continue;                       // untouched cells are left exactly alone
             // A value target proposes the cell's new VALUE (a cell at zero has no percentage to scale).
             c.tiSetCell(t, cc, r, plane_, isValue_ ? eng_.proposed(cc, r)
                                                    : c.tiCell(t, cc, r, plane_) * (1.0 + pct / 100.0));
+            written.push_back({ { cc, r }, pct });
         }
     c.endEdit("Auto Tune");
 
-    // THE EVIDENCE WAS MEASURED AGAINST THE OLD CELLS. Keeping it would apply the same correction a
-    // second time on the next Apply, and a third on the one after — so it is spent, and the run
-    // continues from the map as it now stands.
+    // THE EVIDENCE WAS MEASURED AGAINST THE OLD CELLS, so it must not be applied a second time — but it
+    // is not thrown away either. Each written cell's records are re-measured against its new value
+    // (Engine::rebase): what was taken is gone from them, what was not is still there, and the records
+    // keep counting, so the grid shows the whole drive rather than the last two seconds. A value target
+    // records absolute readings, which a write does not re-measure, so those are still spent.
     lastApplyMs_ = nowMs();
     readBase();
-    eng_.clear();
+    if (isValue_) eng_.clear();
+    else for (const auto& wcell : written) eng_.rebase(wcell.first.first, wcell.first.second, wcell.second);
     refresh();
 }
 

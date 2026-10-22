@@ -32,7 +32,7 @@
 
 class AutotuneView : public jf::JWidget {
 public:
-    enum class Mode { Base, Proposed, Change, Weight };
+    enum class Mode { Base, Proposed, Change, Weight, Session };
 
     explicit AutotuneView(jf::JSceneGraph& g) : jf::JWidget(g, "AutotuneView") {}
 

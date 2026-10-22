@@ -68,10 +68,32 @@ void Engine::setGrid(std::vector<double> xb, std::vector<double> yb) {
     xb_ = std::move(xb);
     yb_ = std::move(yb);
     base_.clear();
+    ref_.clear();
     clear();
 }
 
 void Engine::setBase(std::vector<double> cells) { base_ = std::move(cells); }
+void Engine::setReference(std::vector<double> cells) { ref_ = std::move(cells); }
+
+double Engine::sessionPct(int col, int row) const {
+    if (!hasReference() || !hasBase() || col < 0 || row < 0 || col >= cols() || row >= rows()) return 0.0;
+    const size_t k = static_cast<size_t>(row) * xb_.size() + col;
+    if (ref_[k] == 0.0) return 0.0;
+    return (base_[k] / ref_[k] - 1.0) * 100.0;
+}
+
+void Engine::rebase(int col, int row, double appliedPct) {
+    if (valueMode_ || col < 0 || row < 0 || col >= cols() || row >= rows()) return;
+    const size_t k = static_cast<size_t>(row) * xb_.size() + col;
+    const double w = w_[k];
+    const double f = 1.0 + appliedPct / 100.0;
+    if (w <= 0.0 || f <= 0.0) return;
+    // The cell's evidence is a weighted mean of "wants this many percent more than the old value".
+    // Against old * f, the same fuel is (1 + mean) / f - 1 of the new value.
+    double mean = ((1.0 + sum_[k] / w / 100.0) / f - 1.0) * 100.0;
+    if (std::fabs(mean) < 1e-9) mean = 0.0;      // written the whole way: nothing left, not a rounding
+    sum_[k] = w * mean;
+}
 
 void Engine::setValueMode(double settleMs, std::vector<Steady> steady) {
     valueMode_ = true;

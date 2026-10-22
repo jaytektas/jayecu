@@ -356,6 +356,40 @@ int main(int argc, char** argv) {
         }
     }
 
+    std::printf("\n=== a write keeps its evidence, re-measured against the new value ===\n");
+    {
+        Engine e = makeEngine();
+        e.setSettings({ Resistance::Easy, 50.0, 50.0 });
+        for (int i = 0; i < 8; ++i) e.add(at(1000 + i * 30, 2000.0, 60.0, 1.08));
+        near(e.changePct(1, 1), 8.0, 0.01, "8 % lean proposes +8 %");
+        const double w = e.weight(1, 1);
+        // A QUARTER of it written (a continuous write): the cell is now x1.02, and the same fuel is
+        // 1.08 / 1.02 = +5.88 % of the new value — the rest of the error, no more and no less.
+        e.rebase(1, 1, 2.0);
+        near(e.changePct(1, 1), (1.08 / 1.02 - 1.0) * 100.0, 1e-6, "a quarter written leaves the rest");
+        near(e.weight(1, 1), w, 1e-12, "…and the records are still counted");
+        // The rest written: nothing more to ask for, exactly — not a rounding residue that keeps a
+        // proposal alive and an Apply button lit.
+        e.rebase(1, 1, (1.08 / 1.02 - 1.0) * 100.0);
+        check(e.changePct(1, 1) == 0.0, "written the whole way proposes nothing");
+        check(!e.hasProposal(), "…so there is no proposal left");
+        check(e.weight(1, 1) == w, "…and the cell still shows its records");
+    }
+
+    std::printf("\n=== Session %%: where the map has been taken, however many writes it took ===\n");
+    {
+        Engine e = makeEngine();
+        e.setReference({ 50.0, 55.0, 60.0,  65.0, 70.0, 75.0,  80.0, 85.0, 90.0 });
+        check(e.hasReference(), "a reference is held");
+        near(e.sessionPct(1, 1), 0.0, 1e-12, "an untouched cell reads 0");
+        // Three writes to the same cell: +2 %, +2 %, -1 % of whatever was there each time.
+        e.setBase({ 50.0, 55.0, 60.0,  65.0, 70.0 * 1.02 * 1.02 * 0.99, 75.0,  80.0, 85.0, 90.0 });
+        near(e.sessionPct(1, 1), (1.02 * 1.02 * 0.99 - 1.0) * 100.0, 1e-9,
+             "one number for the whole session, not the last write");
+        e.setGrid({ 1000.0, 2000.0, 3000.0 }, { 40.0, 60.0, 80.0 });
+        check(!e.hasReference(), "a new grid forgets the reference (it described the old one)");
+    }
+
     std::printf("\n%s\n", failures ? (std::to_string(failures) + " FAILED").c_str() : "ALL PASSED");
     return failures ? 1 : 0;
 }

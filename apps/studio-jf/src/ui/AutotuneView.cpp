@@ -78,6 +78,7 @@ void AutotuneView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
     const char* modeName = mode_ == Mode::Base     ? "Base"
                          : mode_ == Mode::Proposed ? "Proposed"
                          : mode_ == Mode::Weight   ? "Records per cell"
+                         : mode_ == Mode::Session  ? "Session %  (since Start / Reset)"
                                                    : "Change %";
     std::string title = modeName;
     if (!yLabel_.empty() || !xLabel_.empty()) title += "    " + yLabel_ + " x " + xLabel_;
@@ -109,6 +110,11 @@ void AutotuneView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
     // proposal is full colour and everything else is read against it, with a floor so that a map which
     // is nearly right does not get its rounding errors painted like a discovery.
     const double authority = std::max(2.0, eng_->stats().maxChange);
+    // The session has its own scale for the same reason: the biggest move so far is full colour.
+    double sessionMax = 2.0;
+    if (mode_ == Mode::Session)
+        for (int rr = 0; rr < rows; ++rr)
+            for (int cc = 0; cc < cols; ++cc) sessionMax = std::max(sessionMax, std::fabs(eng_->sessionPct(cc, rr)));
 
     const std::vector<double>& xb = eng_->xBins();
     const std::vector<double>& yb = eng_->yBins();
@@ -144,6 +150,14 @@ void AutotuneView::populateRenderPrimitives(JPrimitiveBuffer& buf) {
                     fill = changeColour(pct, authority);
                     if (pct != 0.0) std::snprintf(vb, sizeof vb, "%+.1f", pct);
                     break;
+                case Mode::Session: {
+                    // Every cell the session moved, and by how much in all — rounding noise below a
+                    // twentieth of a percent is left blank, as an untouched cell is.
+                    const double sp = eng_->sessionPct(cc, sr);
+                    fill = changeColour(std::fabs(sp) < 0.05 ? 0.0 : sp, sessionMax);
+                    if (std::fabs(sp) >= 0.05) std::snprintf(vb, sizeof vb, "%+.1f", sp);
+                    break;
+                }
             }
             buf.pushRectangle(x, y, cw - 1.f, ch - 1.f, fill.v);
 

@@ -77,6 +77,7 @@ public:
 
     void start();
     void stop();
+    void resetSession();     // Reset: records gone, and the map as it stands becomes the Session % reference
     [[nodiscard]] bool recording() const { return recording_; }
 
     // Write the proposal into the tune. One undo step, and the accumulated evidence is discarded
@@ -120,6 +121,8 @@ private:
     void readBase();         // pull the table's live cells into the engine (values only)
     void seedGrid();         // …and its BINS, which discards whatever was accumulated against the old ones
     void applySettings();    // combo/entry state -> engine settings
+    // How much of a cell's proposal one continuous write takes (the rest waits in the evidence).
+    static constexpr double kLiveStep = 0.25;
 
     autotune::Engine eng_;
     AutotuneView*    view_ = nullptr;

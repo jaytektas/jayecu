@@ -191,6 +191,34 @@ int main() {
         ck(!p.engine().hasProposal(), "…and the evidence is spent, so a second Apply cannot re-apply it");
     }
 
+    std::printf("\n=== Stop / Start carries on; Apply keeps the records; Reset starts over ===\n");
+    // The session belongs to Reset, not to the Start button. Pulling over to look at the grid must not
+    // throw away the drive, and an Apply must not empty the grid of everywhere it has been.
+    {
+        p.start();
+        drive(1.04, 20);
+        p.stop();
+        const int lc = p.engine().lastCol() < 0 ? 0 : p.engine().lastCol();
+        const int lr = p.engine().lastRow() < 0 ? 0 : p.engine().lastRow();
+        const double w1 = p.engine().weight(lc, lr);
+        p.start();                                   // carry on
+        ck(p.engine().weight(lc, lr) == w1, "Start after Stop keeps the records", std::to_string(w1));
+        drive(1.04, 10);
+        p.stop();
+        ck(p.engine().weight(lc, lr) > w1, "…and adds to them");
+        const double was = c.tiCell(t, lc, lr, 0);
+        p.applyProposal();
+        const double now = c.tiCell(t, lc, lr, 0);
+        ck(now > was, "Apply wrote the cell", std::to_string(was) + " -> " + std::to_string(now));
+        ck(p.engine().weight(lc, lr) > 0.0, "…and the cell still shows where the drive has been");
+        ck(!p.engine().hasProposal(), "…with nothing left to apply a second time");
+        ck(p.engine().sessionPct(lc, lr) > 0.0, "Session % shows the move",
+           std::to_string(p.engine().sessionPct(lc, lr)));
+        p.resetSession();
+        ck(p.engine().weight(lc, lr) == 0.0, "Reset clears the records");
+        ck(std::fabs(p.engine().sessionPct(lc, lr)) < 1e-9, "…and the map as it is now is the new 0 %");
+    }
+
     std::printf("\n=== a stacked map is tuned on the plane the engine is BURNING ===\n");
     // VE's third axis is ethanol. The autotuner read and wrote plane 0 whatever the engine was on, so
     // on a flex tune above E0 it measured one fuel and corrected another — silently, because plane 0

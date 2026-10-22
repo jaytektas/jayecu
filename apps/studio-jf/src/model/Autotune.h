@@ -156,6 +156,19 @@ public:
     void clear();                                  // forget every record; the grid and setup stay
     void add(const Sample& s);                     // offer one record
 
+    // THE SESSION. A run is judged against the map as it stood when it began, not against the last
+    // write: a cell revised a dozen times while driving still shows ONE number, how far it has moved
+    // since then. setReference() takes that map (row-major, like setBase); setGrid() forgets it.
+    void   setReference(std::vector<double> cells);
+    bool   hasReference() const { return ref_.size() == xb_.size() * yb_.size() && !ref_.empty(); }
+    double sessionPct(int col, int row) const;     // the cell now (base) against the reference, percent
+    // A WRITE KEEPS THE EVIDENCE, re-measured. Every record in a cell was a judgement of the value that
+    // was there; once the cell is multiplied by (1 + appliedPct/100) the same evidence says something
+    // smaller about the new value — exactly what remains of it. So it is carried over rather than
+    // thrown away: a cell written the whole way proposes nothing more, and one written part of the way
+    // still wants the rest. Ratio mode only (a value-mode record is an absolute reading, not a ratio).
+    void   rebase(int col, int row, double appliedPct);
+
     // What the proposal would do to a cell, as a percentage of its current value. Already clamped by
     // both authority limits and scaled by how much evidence the cell has. (Value mode: the change the
     // proposed VALUE makes, expressed the same way, so every view and stat reads either mode.)
@@ -180,7 +193,7 @@ private:
     void addValue(const Sample& s);                // Engine::add, value mode
     double valueDelta(int col, int row) const;     // value mode: the clamped move, in the cell's units
 
-    std::vector<double> xb_, yb_, base_;
+    std::vector<double> xb_, yb_, base_, ref_;
     std::vector<double> w_, sum_;                  // per cell: weight, and weight x percent
     std::deque<Sample>  ring_;                     // recent operating points, for the delay lookback
     std::vector<Filter> filters_;
