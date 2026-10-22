@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Starter Motor output template: new Release Above setting (default 700 rpm). The starter now lets go once the engine is running and above that speed, instead of at the moment it first counts as running (~450 rpm), so a warm restart is not left to stumble. Run the output wizard on a starter output to take it.
 - H-bridge carrier: the default is now 3 kHz (was 20 kHz) and it is capped at the bridge chip's 20 kHz rating. The IFX9201 switches slowly, so its switching loss rises with frequency; at 20 kHz, holding a throttle at idle on a hot day tripped its over-temperature shutdown and dropped the throttle to its spring. An existing tune keeps the carrier it already has (above 20 kHz it is held at 20 kHz) — set 3000 Hz on the H-Bridge page to take the new default.
 - Auto Tune ignores readings with the wideband pinned at its lean end (lambda above 1.3): misfire, overrun or free air, which it used to learn as "add fuel".
 - Electronic throttle: a key-on check that passes now clears a latched throttle fault. It drives the plate to both stops and checks them against the calibration, so a throttle that has just proved itself is no longer left dead at every key-on until a Find limits. A check that fails still latches, and the cleared code stays stored with its count.
