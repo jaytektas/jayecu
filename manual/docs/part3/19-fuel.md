@@ -155,7 +155,10 @@ Dead Time tables. **Stage 1 Fuel Pressure** has three modes:
 </figure>
 
 - **Sensor**: a rail pressure sensor (**Stage 1 Fuel Pressure Source**) is read, and manifold
-  pressure is subtracted.
+  pressure is subtracted. The sensor is read as **gauge** pressure, the number a gauge on the rail
+  shows (300 kPa for a 3-bar regulator with the engine off). Manifold pressure is absolute, so the
+  ECU adds barometric pressure to the rail reading first. Calibrate the sensor to read gauge, not
+  absolute. If the sensor stops reading, **Base Fuel Pressure** stands in for it.
 - **Fixed Regulator** (default): the rail is held at **Base Fuel Pressure** above atmosphere, so the
   difference falls as manifold pressure rises. Typical of a returnless system with the regulator in
   the tank.
