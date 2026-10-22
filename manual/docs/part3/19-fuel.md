@@ -309,7 +309,7 @@ at that point) instead:
 - After a movement, prediction holds for **Predicted MAP Time** (default 200 ms). A stronger movement
   during the hold restarts it.
 - **Manifold Pressure (est)** `map_est` is the value used, and **MAP Source** `map_source` says where
-  it came from: Measured, Predicted (transient), or Failed (baro).
+  it came from: Measured, Predicted (transient), Failed (baro), Held (last good) or Failed (predicted).
 - **Closed-loop lambda holds its trim** while prediction is active: the short-term trim is frozen, not
   reset, and **Closed-Loop Hold** `lambda_cl_hold` reads **Transient**. The same channel names every
   other reason the trim is held: fuel cut, after a cut, settling, cold, off range.
@@ -335,11 +335,23 @@ During a fuel cut the film only evaporates.
   pooling problem.
   <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
-**A failed MAP.** If the MAP sensor stops reading on a model that needs it, the ECU reads
-**atmospheric pressure** in its place, sets **P1700**, and **MAP Source** reads **Failed (baro)**. That
-is rich at idle, which is the safe side. It does **not** fall back to the Predicted MAP table: that
-table is for transients only, used only with prediction on.
-<!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
+**A failed MAP.** If the MAP sensor stops reading on a model that needs it, the ECU sets **P1700**
+and then:
+
+- For up to **MAP Failure Hold** `map_fail_hold_ms` (default 500 ms) it keeps using the **last good
+  reading**, and **MAP Source** reads **Held (last good)**. A momentary dropout, such as a connector
+  over a bump or a diagnostic limit brushed for a few milliseconds, then changes nothing. Fuelled as
+  atmosphere, the same dropout on a closed-throttle overrun is a full-load pulse.
+- After that the sensor has failed. **MAP Failure Source** `map_fail_predicted` decides what replaces
+  it:
+  - **Atmosphere** (default): the ECU reads the assumed baro, and **MAP Source** reads **Failed (baro)**.
+    That is rich everywhere below atmosphere: the safe side at idle, a flood on overrun.
+  - **Predicted MAP**: the ECU reads the Predicted MAP table (rpm × throttle), and **MAP Source** reads
+    **Failed (predicted)**. Choose this only once that table has been filled, by the Auto Tune
+    Predicted MAP target or from logs.
+- Set the MAP sensor's **Raw Low** limit below anything the engine can pull. Deep overrun vacuum is
+  the lowest real reading, and a limit at it reads every lift-off as a sensor fault.
+<!-- src: firmware/Engine/Modules/FuelCalculator.cpp; definition/ecu.schema.yaml (map_fail_hold_ms, map_fail_predicted) -->
 
 ### 7 · From fuel to injector pulses
 

@@ -59,7 +59,15 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     // vacuum: on Alpha-N — where MAP is optional by design — the injector differential came out a whole
     // bar high and the flow table was read in the wrong place entirely.
     const bool  map_ok    = (map_id != SIG_NONE) && bus.valid(map_id);
-    const float map_meas  = map_ok ? bus.get(map_id) : baro_kpa;
+    // …BUT NOT THE INSTANT IT GOES. A reading that has been good until a moment ago is a far better
+    // estimate than atmosphere: a connector letting go over a bump, or a diagnostic trip point brushed
+    // for a few milliseconds, fuelled as 101.3 kPa on a closed throttle was a full-load pulse on every
+    // overrun it happened on (Kelly's Hilux: eight of them in one drive, lambda 0.7 on a lift-off). The
+    // last good reading bridges MAP Failure Hold; past that the sensor has failed and is treated so.
+    if (map_ok) { map_last_good_ = bus.get(map_id); map_last_ok_ms_ = now; }
+    const bool  map_held  = !map_ok && map_id != SIG_NONE && map_last_ok_ms_ != 0 && cfg_->map_fail_hold_ms > 0
+                         && (now - map_last_ok_ms_) < static_cast<uint32_t>(cfg_->map_fail_hold_ms);
+    const float map_meas  = map_ok ? bus.get(map_id) : map_held ? map_last_good_ : baro_kpa;
     float       map_kpa   = map_meas;     // the ESTIMATE: measured, unless prediction is standing in
     const float clt_c   = bus.get(clt_id, 20.0f);
 
@@ -194,14 +202,17 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
             predict_wt_ = 0.0f;
         }
     }
-    // A FAILED MAP IS NOT PREDICTED. The predicted table is for TRANSIENTS — it stands in only while the
-    // throttle is moving and only when prediction is switched on — and it is only as good as someone has
-    // made it for that job. Used as a failover it drove the fuel model from a table that was
-    // switched off and never tuned: a disabled MAP sensor fuelled on an untuned 25 kPa, and every reading
-    // (fuel load, MAP est) looked plausible, which hid the fault. A missing MAP now reads as atmosphere
-    // (map_meas, above) — rich at idle, which is the safe side — and FUEL_MAP below says why.
-    if (cfg_->fuel_model != 1 && map_id != SIG_NONE && !bus.valid(map_id))
-        map_source = 2;                                          // failed: reading atmosphere, fault raised
+    // A FAILED MAP IS NOT PREDICTED UNLESS ASKED. The predicted table is for TRANSIENTS and only as good as
+    // someone has made it: used as an automatic failover it once fuelled a disabled MAP sensor on an untuned
+    // 25 kPa, and every reading looked plausible, which hid the fault. So by default a failed MAP reads as
+    // atmosphere (map_meas, above) — rich, the safe side at idle — and FUEL_MAP below says why. Atmosphere is
+    // a flood on overrun, though, so a tuner who HAS filled the table can choose it as the failure source.
+    // Either way only past MAP Failure Hold: inside it the last good reading stands in (Held).
+    if (cfg_->fuel_model != 1 && map_id != SIG_NONE && !map_ok) {
+        if (map_held)                     map_source = 3;      // bridging a dropout with the last good reading
+        else if (cfg_->map_fail_predicted) { map_kpa = predicted_map; map_source = 4; }
+        else                              map_source = 2;      // failed: reading atmosphere, fault raised
+    }
     bus.set(SIG_MAP_EST,    map_kpa, true, now, ttl());
     bus.set(SIG_MAP_SOURCE, static_cast<float>(map_source), true, now, ttl());
 

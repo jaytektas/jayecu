@@ -55,6 +55,8 @@ private:
     float    tps_rate_    = 0.0f;      // %/s, lightly filtered (a raw derivative of a noisy channel is noise)
     uint32_t tps_last_ms_ = 0;
     uint32_t predict_until_ms_ = 0;
+    float    map_last_good_   = 0.0f;   // the last valid MAP, bridging a dropout (MAP Failure Hold)
+    uint32_t map_last_ok_ms_  = 0;      // when it was read; 0 = never this power-up
     float    predict_wt_  = 0.0f;      // how much of the predicted value the trigger asked for (0..1)
     bool     predict_down_ = false;    // the movement was a lift (tip-out prediction, opt-in)
 

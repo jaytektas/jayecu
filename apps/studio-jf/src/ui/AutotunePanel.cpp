@@ -622,6 +622,28 @@ void AutotunePanel::setTrimState(bool anyTrimActive, bool canRestore) {
     refresh();
 }
 
+// THE ECU'S OWN REASON. When the filter stopping the run is the ECU's learn gate (fuel_learn_block), "Filtered:
+// ECU learn gate" says only that the ECU said no — the bits say why. Named as the schema documents them
+// (definition/ecu.schema.yaml, fuel_learn_block), read live: what is holding it off NOW.
+std::string AutotunePanel::learnGateReason(const std::string& filterName) const {
+    static const char* const kBits[16] = {
+        "MAP not measured", "wideband not readable", "temperature sensor", "fuel cut", "ignition cut",
+        "transient", "starting", "crank sync only", "protection", "rail pressure",
+        nullptr, nullptr, nullptr, nullptr, nullptr, "settling" };
+    const MetaModel* m = Cache::instance().meta();
+    if (!m) return {};
+    bool isGate = false;
+    for (const auto& f : m->autotune().filters)
+        if (f.name == filterName && f.channel == "fuel_learn_block") isGate = true;
+    const Cache& c = Cache::instance();
+    if (!isGate || !c.has("fuel_learn_block")) return {};
+    const unsigned bits = static_cast<unsigned>(c.value("fuel_learn_block") + 0.5);
+    std::string why;
+    for (int b = 0; b < 16; ++b)
+        if ((bits & (1u << b)) && kBits[b]) { if (!why.empty()) why += ", "; why += kBits[b]; }
+    return why.empty() ? std::string() : " (" + why + ")";
+}
+
 std::string AutotunePanel::statusText() const {
     if (!gridNote_.empty())   return gridNote_;
     if (!linkNotice_.empty()) return linkNotice_;
@@ -639,7 +661,7 @@ std::string AutotunePanel::statusText() const {
                                     : "Ready - tuning " + tablePath_;
     // WHY NOTHING IS HAPPENING, in the words of whatever is stopping it. "Active Filter" is the first
     // thing a tuner looks for when the counters are not moving.
-    if (!st.activeFilter.empty()) return "Filtered: " + st.activeFilter;
+    if (!st.activeFilter.empty()) return "Filtered: " + st.activeFilter + learnGateReason(st.activeFilter);
     if (isValue_) return "Learning " + valueTarget_.name + " (settled readings only)";
     if (trimActive_) return "Learning (ECU trims active - folded in)";
     return canRestore_ ? "Learning (open loop - trims held for Restore)" : "Learning";

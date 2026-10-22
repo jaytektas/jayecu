@@ -69,11 +69,28 @@ A reading is **rejected** when, at the moment its gas was made:
 | **Minimum TPS <** | 1 % | closed throttle — overrun, **and idle** |
 | **dTPS >** | 50 %/s | a tip-in, which belongs to transient fuel |
 | **VBatt <** | 12 V | injector dead time is off at low voltage |
+| **Lambda >** | 1.3 | the wideband is pinned lean: misfire, overrun or free air |
+| **ECU learn gate >** | 0.5 | the ECU says the reading cannot be learned from (below) |
+
+**The ECU learn gate** reads **Fuel Learn Block** `fuel_learn_block`, which the ECU works out itself.
+It is 0 when the gas reaching the wideband can be learned from. Otherwise each bit is a reason, and
+the status line names them, for example *Filtered: ECU learn gate (ignition cut, settling)*:
+
+- MAP not measured (held, failed or predicted), wideband not readable, coolant or air temperature
+  unreadable, rail pressure unreadable.
+- A fuel cut or an ignition cut (rev limit, overboost, flat shift), and just after one.
+- A transient (throttle rate, accel enrichment, fuel film), starting (cranking, post-start), crank
+  sync only, or protection acting on fuel.
+- **Settling**: everything is clean now, but the gas at the sensor was made before it was. The gate
+  stays shut for one lambda delay plus 150 ms after every other reason clears.
+
+The ECU's own long-term trim learns only when the gate is 0 too. The channel is in the default
+logs, so a log analysis can use the same answer.
 
 Every value can be changed on the panel and is remembered. The comparison is shown beside each box.
 With the defaults, **idle is not tuned**: the throttle is closed. Tune idle by hand (chapter 38), or
 lower **Minimum TPS** below your idle throttle reading if the idle is steady and fuel cut is off.
-<!-- src: definition/ecu.schema.yaml; apps/studio-jf/src/ui/AutotunePanel.cpp -->
+<!-- src: definition/ecu.schema.yaml; apps/studio-jf/src/ui/AutotunePanel.cpp (learnGateReason); firmware/Engine/Modules/Lambda.cpp (THE LEARN GATE) -->
 
 ### 4 · Weight, resistance and limits
 

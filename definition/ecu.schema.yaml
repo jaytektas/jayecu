@@ -155,6 +155,11 @@ enums:
   # the predicted table — that is for transients, and only when prediction is on. Short, because a value
   # label is read in a readout on the dense diagnostics card; which sensor, and why, is the DTC's job.
   - {id: failover, label: "Failed (baro)"}
+  # The sensor dropped out for less than MAP Failure Hold: the fuel model is on the last good reading.
+  # A momentary dropout on a lift-off fuelled as atmosphere was a full-load pulse on overrun.
+  - {id: held, label: "Held (last good)"}
+  # Past the hold, with MAP Failure Source set to Predicted: the fuel model is on the predicted table.
+  - {id: failover_predicted, label: "Failed (predicted)"}
   ign_base_kind:                     # which base table the advance came from this cycle (display only)
   - {id: map, label: "Advance Map"}
   - {id: cranking, label: "Cranking Table"}
@@ -441,6 +446,9 @@ autotune:
   # reads as "add fuel" in whatever cell the engine was passing — the biggest wrong corrections on a
   # first drive came from exactly these.
   - {name: "Lambda",      channel: lambda_1,  op: '>', value: 1.3}
+  # THE ECU'S OWN ANSWER (fuel_learn_block): any input it fuels from faulted, any cut, a transient, a start, and
+  # the transport delay after each — the things a filter on logged channels cannot see. 0 = learn.
+  - {name: "ECU learn gate", channel: fuel_learn_block, op: '>', value: 0.5}
   # Blend's low range is the Alpha-N VE table's charge, not this table's: learning it here would move the
   # MAP-indexed cells the upper range shares. Only records where the Alpha-N map carried none of it (a log
   # without the channel reads 0, which is right: it cannot be a Blend low-range record).
@@ -838,7 +846,7 @@ signals:
 - {id: switch_4, label: "Generic Switch 4", category: "Sensors - Other", bus_type: float}
 - {id: ac_temp, label: "Air Conditioner Temperature", category: "Sensors - Air Con", bus_type: float}
 - {id: advance, label: "Ignition Advance", units: 'deg', scale: 0.1, telem_type: int16, min: -30.0, max: 70.0, category: "Ignition", bus_type: float, datalog: true, gauge: {lo_warn: -10, hi_warn: 50, hi_bad: 60}, owner: firmware}
-- {id: air_mass, label: "Charge Air Mass", units: 'mg', scale: 0.01, telem_type: uint16, min: 0.0, max: 650.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
+- {id: air_mass, label: "Charge Air Mass", units: 'mg', scale: 0.1, telem_type: uint16, min: 0.0, max: 6500.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 - {id: alternator_duty, label: "Alternator Field Duty", units: '%', scale: 1.0, telem_type: uint8, min: 0.0, max: 100.0, category: "Alternator", bus_type: float, datalog: true, owner: firmware}
 - {id: wastegate_duty, label: "Wastegate Duty", units: '%', scale: 1.0, telem_type: uint8, min: 0.0, max: 100.0, category: "Boost", bus_type: float, datalog: true, owner: firmware}
 - {id: boost_target, label: "Boost Target", units: 'kPa', scale: 0.1, telem_type: uint16, min: 0.0, max: 600.0, category: "Boost", bus_type: float, datalog: true, owner: firmware}
@@ -1077,7 +1085,7 @@ signals:
 # calculation used, and a page that cannot show both cannot show prediction working.
 - {id: map_est, label: "Manifold Pressure (est)", units: 'kPa', scale: 0.1, telem_type: uint16, min: 0.0, max: 600.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 - {id: map_predicted, label: "Predicted MAP", units: 'kPa', scale: 0.1, telem_type: uint16, min: 0.0, max: 600.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
-- {id: map_source, label: "MAP Source", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 2.0, category: "FuelCalculator", bus_type: float, datalog: true, enum: map_source_kind, owner: firmware}
+- {id: map_source, label: "MAP Source", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 4.0, category: "FuelCalculator", bus_type: float, datalog: true, enum: map_source_kind, owner: firmware}
 - {id: tps_rate, label: "Throttle Rate", units: '%/s', scale: 0.1, telem_type: int16, min: -3000.0, max: 3000.0, category: "FuelCalculator", bus_type: float, datalog: true, owner: firmware}
 # The film model's own correction, in the same units as every other fuel correction: 1.000 = it is
 # asking for exactly the steady-state pulse, 1.100 = a tenth more to fill the film.
@@ -1378,6 +1386,15 @@ signals:
 - {id: lambda_cl_state, label: "Closed-Loop State", units: '', scale: 1.0, telem_type: uint8, min: 0, max: 3, category: "Lambda", bus_type: float, datalog: true, owner: firmware, options: ["Off", "Wideband", "Narrowband", "Open loop"]}
 # WHY CLOSED LOOP IS HELD (frozen, not reset) — a state that said only "open loop" could not say whether
 # that was a fuel cut, a cold engine or a throttle transient, which are three different things to fix.
+# WHETHER WHAT THE WIDEBAND IS READING NOW CAN BE LEARNED FROM — one answer for every learner (the LTFT, the
+# studio's Auto Tune, log analysis), from the one place that knows: the ECU. 0 = good. Otherwise the bits
+# say why: 1 MAP not measured (failed, held or predicted), 2 wideband not readable or off range, 4 coolant or
+# air temperature unreadable, 8 fuel cut (or just after one), 16 ignition cut (rev limit, flat shift…),
+# 32 transient (throttle rate, accel enrichment, fuel film), 64 starting (cranking, post-start, settling),
+# 128 crank sync only (semi-sequential), 256 protection acting on fuel, 512 rail pressure unreadable,
+# 32768 SETTLING — the conditions are clean now but the gas reaching the sensor was made before they were
+# (one lambda transport delay plus a margin). Zero is the safe default for a log or an ECU without it.
+- {id: fuel_learn_block, label: "Fuel Learn Block", units: '', scale: 1.0, telem_type: uint16, min: 0, max: 65535, category: "Lambda", bus_type: float, datalog: true, owner: firmware}
 - {id: lambda_cl_hold, label: "Closed-Loop Hold", units: '', scale: 1.0, telem_type: uint8, min: 0, max: 6, category: "Lambda", bus_type: float, datalog: true, owner: firmware, options: ["None", "Fuel Cut", "After Cut", "Settling", "Cold", "Off Range", "Transient"]}
 - {id: sync_level, label: "Sync Level", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 2.0, category: "Trigger", bus_type: float, enum: sync_level, owner: firmware}
 - {id: synchronized, label: "Crank Synchronized", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 1.0, category: "Trigger", bus_type: float, datalog: true, enum: bool_active, owner: firmware}
@@ -4355,6 +4372,8 @@ modules:
       - {name: map_predict_enabled, type: uint8, label: MAP Prediction Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'While the throttle is moving fast, take manifold pressure from the predicted table rather than the sensor, which is necessarily averaged over a cylinder period and therefore late. Meant to be used WITH the wall-film model and INSTEAD of transient throttle: this one fixes the measurement, the film model fixes the fuel.'}
       - {name: map_predict_hold_ms, type: uint16, label: Predicted MAP Time, units: ms, scale: 1.0, min: 0, max: 2000, default: 200, help: 'How long prediction stays in effect after the throttle movement that triggered it. Too short and it lets go before the real sensor has caught up, which is the lean hole it exists to fill; a long or shared MAP hose wants more. 200 ms suits a typical install.'}
       - {name: map_predict_tipout, type: uint8, label: Predict Tip-Out, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Also predict when the throttle CLOSES quickly: the estimate moves down towards Predicted MAP, taking the LOWER of the two, the same way a tip-in takes the higher. Off, a lift is left to the sensor. Opt in once the Predicted MAP table is tuned at part throttle — an untuned table predicting down makes a lean spike on every lift.'}
+      - {name: map_fail_hold_ms, type: uint16, label: MAP Failure Hold, units: ms, scale: 1.0, min: 0, max: 5000, default: 500, help: 'How long a MAP reading that has gone invalid is bridged with the LAST GOOD reading before the failure fallback takes over. A glitch, a connector that lets go over a bump or a diagnostic trip point brushed for a few milliseconds is not a failed sensor, and fuelling it as atmosphere on a closed throttle is a full-load pulse on overrun. 0 = no hold.'}
+      - {name: map_fail_predicted, type: enum, label: MAP Failure Source, units: '', scale: 1.0, min: 0, max: 1, default: 0, options: ["Atmosphere", "Predicted MAP"], help: 'What fuels the engine once MAP has been invalid for longer than MAP Failure Hold. Atmosphere (assumed baro) is rich everywhere below it, which is the safe side at idle and a flood on overrun. Predicted MAP uses the Predicted MAP table (rpm x throttle) — choose it only once that table has been filled, by the Auto Tune Predicted MAP target or from logs.'}
       - {name: wallfilm_enabled, type: uint8, label: Fuel Film Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Model the fuel film on the port walls explicitly, rather than correcting for it with transient tables. A fraction of every injection wets the wall and evaporates later, so the fuel delivered and the fuel that arrives are different during any change — this computes the difference from first principles and injects what is actually needed. At steady state it corrects nothing; on a tip-in it over-injects to fill the film, on a tip-out it under-injects because the film gives fuel back. It is only modelled while RUNNING: during cranking the port is dominated by priming rather than these dynamics.'}
       # Prime pulse: a ONE-SHOT simultaneous injector squirt fired once on the first crank/sync after power-up
       # (the STOPPED->CRANKING edge). prime_mode picks how the prime_fuel_table cell is read.
@@ -7437,7 +7456,7 @@ datalog_templates:
     run_time, baro_kpa,
     # the fuel calculation: what it read, what it decided
     ve, fuel_load, air_mass, charge_temp, map_source, map_est, imap, inj_pw, base_pw,
-    pw_add_deadtime, lambda_target, inj_press_diff, fuel_pressure, tps_rate,
+    pw_add_deadtime, lambda_target, inj_press_diff, fuel_pressure, tps_rate, fuel_learn_block,
     # …and WHY it was not the table value. A mixture error with no corrections in the file
     # is a question, not an answer.
     # THE WHOLE MULTIPLY CHAIN, not a selection of it: fuel_corr_overall says the mixture was moved

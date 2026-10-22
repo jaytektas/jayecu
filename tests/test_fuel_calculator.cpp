@@ -524,7 +524,7 @@ int main() {
         CHECK_NEAR(b.get(SIG_BARO_KPA, 0.0f), 101.3, 0.2);
     }
 
-    SECTION("speed-density with a FAILED MAP reads atmosphere — never the predicted table");
+    SECTION("speed-density with a MAP that has never read: atmosphere — not the predicted table unless chosen");
     {
         // The predicted table is for transients, and only when prediction is on. It was also used as a
         // failover, switched on or not: a disabled MAP sensor fuelled on an untuned 25 kPa and every
@@ -542,6 +542,43 @@ int main() {
                     (double)b.get(SIG_MAP_EST, -1.0f), (double)b.get(SIG_MAP_SOURCE, -1.0f));
             CHECK_NEAR(b.get(SIG_MAP_SOURCE, -1.0f), 2.0, 0.01);  // failed
             CHECK_NEAR(b.get(SIG_MAP_EST, 0.0f), 101.3, 0.2);     // atmosphere, not the table's 35
+        }
+    }
+
+    SECTION("a MAP that DROPS OUT is held at its last reading, then fails as configured");
+    {
+        // A lift-off at 4000 rpm, 30 kPa, and the MAP reading goes invalid (a connector over a bump, a
+        // diagnostic trip point brushed). Fuelled as 101.3 kPa that is a full-load pulse on overrun —
+        // lambda 0.7 on a real drive. Inside MAP Failure Hold the last good reading stands in; past it the
+        // sensor has failed: atmosphere by default, the predicted table when that is chosen.
+        for (int predicted = 0; predicted <= 1; ++predicted) {
+            auto cfg = make_cfg();
+            cfg.fuel_model = 0; cfg.map_fail_hold_ms = 500;
+            cfg.map_fail_predicted = static_cast<uint8_t>(predicted);
+            for (auto& v : cfg.predicted_map_table) v = 350;     // 35.0 kPa everywhere
+            FuelCalculator fc; fc.init(cfg);
+            EngineFrame f{};
+            g_test_ms = 100000;
+            SignalBus good = make_bus(30.0f);
+            fc.update(make_pos(4000.0f), good, f);
+            CHECK(good.get(SIG_MAP_SOURCE, -1.0f) == 0.0f);                 // measured
+
+            g_test_ms = 100200;                                             // 200 ms after the last good one
+            SignalBus gone;
+            gone.set(SIG_CLT, 80.0f); gone.set(SIG_IAT, 20.0f); gone.set(SIG_TPS, 2.0f); gone.set(SIG_BATTERY, 14.0f);
+            fc.update(make_pos(4000.0f), gone, f);
+            CHECK_NEAR(gone.get(SIG_MAP_SOURCE, -1.0f), 3.0, 0.01);        // held
+            CHECK_NEAR(gone.get(SIG_MAP_EST, 0.0f), 30.0, 0.2);            // …on the last good reading, not 101.3
+
+            g_test_ms = 100800;                                             // past the hold: failed
+            SignalBus dead;
+            dead.set(SIG_CLT, 80.0f); dead.set(SIG_IAT, 20.0f); dead.set(SIG_TPS, 2.0f); dead.set(SIG_BATTERY, 14.0f);
+            fc.update(make_pos(4000.0f), dead, f);
+            fprintf(stdout, "    failure source %s: map used = %.1f kPa, source = %.0f\n",
+                    predicted ? "predicted " : "atmosphere", (double)dead.get(SIG_MAP_EST, -1.0f),
+                    (double)dead.get(SIG_MAP_SOURCE, -1.0f));
+            CHECK_NEAR(dead.get(SIG_MAP_SOURCE, -1.0f), predicted ? 4.0 : 2.0, 0.01);
+            CHECK_NEAR(dead.get(SIG_MAP_EST, 0.0f), predicted ? 35.0 : 101.3, 0.2);
         }
     }
 

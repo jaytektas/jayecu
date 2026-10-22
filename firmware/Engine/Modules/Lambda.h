@@ -128,6 +128,12 @@ private:
     // --- LEARN GATE state ---------------------------------------------------------------------------
     uint32_t running_since_ms_ = 0;      // 0 = not running; else the tick the engine caught at
     uint32_t last_cut_ms_ = 0;          // last frame a fuel cut was active (closed-loop re-entry delay)
+    uint32_t last_ign_cut_ms_ = 0;     // last frame an ignition cut was asked for (the learn gate)
+    uint32_t last_block_ms_   = 0;     // last frame the learn gate was shut for a reason, not settling
+    uint16_t learn_block_     = 0;     // fuel_learn_block as published: 0 = learn
+    // After the conditions clear, the gate stays shut one transport delay plus this, so the gas the sensor
+    // reads was made entirely under them. The delay table is the tuner's; the margin covers its rounding.
+    static constexpr uint32_t kLearnSettleMarginMs = 150;
     float    tps_last_         = 0.0f;   // for the throttle RATE the transient limit tests
     bool     tps_seen_         = false;             // published: 0 off, 1 wideband, 2 narrowband closed, 3 open
 

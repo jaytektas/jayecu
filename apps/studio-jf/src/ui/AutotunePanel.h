@@ -111,6 +111,7 @@ public:
     // pixel. Same string, one source.
     [[nodiscard]] std::string statusText() const;
     [[nodiscard]] std::string statsText()  const;
+    [[nodiscard]] std::string learnGateReason(const std::string& filterName) const;   // the ECU gate's bits, in words
     [[nodiscard]] const std::string& tablePath() const { return tablePath_; }
 
     void refresh();          // repaint the stats/status lines from the engine

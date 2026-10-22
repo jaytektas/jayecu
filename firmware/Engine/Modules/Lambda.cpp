@@ -417,13 +417,56 @@ void Lambda::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& 
     bus.set(SIG_LAMBDA_CL_HOLD, static_cast<float>(in_cut ? 1 : after_cut ? 2 : unsettled ? 3 : cold ? 4
                                                    : off_range ? 5 : transient ? 6 : 0), true, now, ttl());
 
+    // --- THE LEARN GATE. Whether what the wideband is reading NOW can be learned from, answered once, here,
+    //     for every learner: this LTFT, the studio's Auto Tune, an analysis of the log. Only the ECU knows
+    //     the things that make a reading a lie — a sensor it fuels from has faulted, a cut is running, the
+    //     fuel model is on a fallback — and a learner filtering logged channels after the fact could not
+    //     see any of them: one drive taught the VE table from a MAP fault's 101.3 kPa fallback, a rev
+    //     limiter's misfires and an overboost cut's lean spikes, all of which read as honest mixture.
+    //     0 = learn. Each bit is one reason (schema: fuel_learn_block), so a learner that is not learning
+    //     can say why. And then the TRANSPORT DELAY: the gas reaching the sensor now was made one delay
+    //     ago, so the gate stays shut (SETTLING) until the conditions have been clean for that long —
+    //     which is what lets a learner read this at the measurement instead of looking it up backwards.
+    {
+        const FuelCalculatorConfig& fc = g_config.fuel_calculator;
+        auto off1 = [&](SignalId s, float tol) { return std::fabs(bus.get(s, 1.0f) - 1.0f) > tol; };
+        uint16_t block = 0;
+        const bool map_measured = fc.fuel_model == 1                                  // Alpha-N: no MAP to have
+            || (bus.valid(wk::map) && static_cast<int>(bus.get(SIG_MAP_SOURCE, 0.0f) + 0.5f) == 0);
+        if (!map_measured)                                                  block |= 1u << 0;
+        if (!(src_wide_ ? measured : nb_valid))                             block |= 1u << 1;
+        if (!bus.valid(wk::clt) || !bus.valid(static_cast<SignalId>(fc.iat_src))) block |= 1u << 2;
+        if (in_cut || after_cut)                                            block |= 1u << 3;
+        const bool ign_cut = bus.get_bool(wk::ign_cut);
+        if (ign_cut) last_ign_cut_ms_ = now;
+        if (ign_cut || (last_ign_cut_ms_ != 0
+                        && (now - last_ign_cut_ms_) < static_cast<uint32_t>(cfg_->cl_after_cut_ms)))
+                                                                            block |= 1u << 4;
+        const float rate_lim = static_cast<float>(cfg_->learn_tps_rate_limit) * 0.1f;
+        if (transient || off1(wk::fuel_corr_accel, 0.02f) || off1(SIG_FUEL_CORR_FILM, 0.02f)
+            || (rate_lim > 0.0f && std::fabs(bus.get(SIG_TPS_RATE, 0.0f)) > rate_lim))
+                                                                            block |= 1u << 5;
+        if (unsettled || off1(wk::fuel_corr_cranking, 0.005f) || bus.get(wk::fuel_corr_poststart, 1.0f) > 1.01f)
+                                                                            block |= 1u << 6;
+        if (bus.get(wk::sync_level, 0.0f) < 1.5f)                           block |= 1u << 7;
+        if (off1(wk::fuel_corr_protection, 0.005f))                         block |= 1u << 8;
+        if (fc.stage1_fuel_press_mode == 0 && fc.stage1_fuel_press_src >= 0
+            && !bus.valid(static_cast<SignalId>(fc.stage1_fuel_press_src))) block |= 1u << 9;
+        if (block) last_block_ms_ = now;
+        else if (last_block_ms_ != 0 && (now - last_block_ms_) < static_cast<uint32_t>(std::max(0.0f, delay_ms))
+                                                                  + kLearnSettleMarginMs)
+                                                                            block |= 1u << 15;
+        learn_block_ = block;
+        bus.set(SIG_FUEL_LEARN_BLOCK, static_cast<float>(block), true, now, ttl());
+    }
+
     const bool nb_on = cfg_->enabled != 0 && !src_fault_ && !measured && nb_valid && tgt_stoich && dt_s > 0.0f
                     && !cl_hold;
 
     const bool stft_on = cfg_->enabled != 0 && !src_fault_ && measured && dt_s > 0.0f && !cl_hold;
     const bool ltft_on = cfg_->ltft_enabled != 0;
     // Either loop can teach the surface; both need the same permit, and neither teaches while off.
-    const bool learn   = (stft_on || nb_on) && ltft_on && learn_permit && ltft_ != nullptr;
+    const bool learn   = (stft_on || nb_on) && ltft_on && learn_permit && learn_block_ == 0 && ltft_ != nullptr;
 
     // ONE CONTROL LAW, TWO ERROR DOMAINS. A wideband measures lambda and a narrowband measures volts,
     // and that is the whole of the difference: the error is (target - measured) in whichever unit the

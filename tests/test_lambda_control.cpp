@@ -10,6 +10,7 @@
 #include "../generated/sensors_catalog.h"
 #include <initializer_list>
 #include <cmath>
+#include <functional>
 #include <algorithm>
 
 static uint32_t g_ms = 0;
@@ -125,6 +126,10 @@ static SignalBus make_bus(std::initializer_list<Wb> wbs, float target = 1.0f,
     SignalBus b{};
     b.set(SIG_LAMBDA_TARGET, target); b.set(SIG_CLT, 80.0f);
     b.set(SIG_MAP, map); b.set(SIG_RPM, rpm);
+    // A HEALTHY ENGINE, as the learn gate needs to see one: full sync, and the air temperature the fuel
+    // model reads. Without them the gate rightly refuses to learn from an engine it cannot see.
+    b.set(SIG_SYNC_LEVEL, 2.0f);
+    b.set(static_cast<SignalId>(g_config.fuel_calculator.iat_src), 30.0f);
     for (const Wb& w : wbs) b.set(w.sig, w.lambda);
     return b;
 }
@@ -647,6 +652,65 @@ int main() {
         CHECK_NEAR(b2.get(SIG_LAMBDA_BANK_2, 0.0f), 0.940f, 0.0005f);
         // …and a job nobody holds stays UNPUBLISHED rather than reading a confident 1.00.
         CHECK(!b2.valid(SIG_LAMBDA_OVERALL));
+    }
+
+    SECTION("the ECU's learn gate: one answer, a bit per reason, and the transport delay after each");
+    {
+        // fuel_learn_block is what every learner reads (this LTFT, the studio's Auto Tune, a log): 0 = the
+        // gas reaching the sensor was made under conditions worth learning from. A drive taught the VE
+        // table from a MAP fault's fallback, a rev limiter and an overboost cut; each is one bit here.
+        // `poke` dirties one channel on the bus of a healthy engine and returns the gate's bits.
+        auto gate = [](std::function<void(SignalBus&)> poke, int frames = 40) {
+            reset_region(); clear_widebands(); clear_assignments(); set_engine(4, {1, 1, 2, 2});
+            enable_wb(SIG_LAMBDA_1); assign_wb(SIG_LAMBDA_1, WB_OVERALL);
+            const LambdaConfig cfg = make_cfg();   // init() keeps a POINTER: the config must outlive it
+            Lambda lc; lc.init(cfg); g_ms = 10000; lc.on_engine_start();
+            EngineFrame f{}; uint16_t bits = 0; float ltft = 0.0f;
+            for (int i = 0; i <= frames; i++) {
+                g_ms = 15000 + i * 30;
+                SignalBus b = make_bus({{SIG_LAMBDA_1, 1.10f}}, 1.0f, 1500.0f, 50.0f);
+                poke(b);
+                lc.update(pos(1500.0f), b, f);
+                bits = static_cast<uint16_t>(b.get(SIG_FUEL_LEARN_BLOCK, 0.0f));
+                ltft = b.get(SIG_LTFT_PCT, 0.0f);
+            }
+            return std::pair<uint16_t, float>{ bits, ltft };
+        };
+        const auto clean = gate([](SignalBus&) {});
+        CHECK(clean.first == 0);                     // a healthy engine at a steady point: learn
+        CHECK(clean.second > 0.0f);                  // …and the LTFT does
+
+        const auto map_held = gate([](SignalBus& b) { b.set(SIG_MAP_SOURCE, 3.0f); });   // fuelling on a fallback
+        CHECK(map_held.first & (1u << 0));
+        CHECK(map_held.second == 0.0f);              // the LTFT is gated on it too
+
+        CHECK(gate([](SignalBus& b) { b.set_bool(SIG_FUEL_CUT, true); }).first & (1u << 3));
+        CHECK(gate([](SignalBus& b) { b.set_bool(SIG_IGN_CUT, true); }).first & (1u << 4));   // limiter
+        CHECK(gate([](SignalBus& b) { b.set(SIG_FUEL_CORR_ACCEL, 1.2f); }).first & (1u << 5));
+        CHECK(gate([](SignalBus& b) { b.set(SIG_SYNC_LEVEL, 1.0f); }).first & (1u << 7));    // semi-sequential
+        CHECK(gate([](SignalBus& b) { b.set(SIG_FUEL_CORR_PROTECTION, 0.8f); }).first & (1u << 8));
+        CHECK(gate([](SignalBus& b) { b.set(SIG_LAMBDA_1, 3.0f); }).first & (1u << 1));      // off the sensor's range
+
+        // AFTER IT ENDS, ONE TRANSPORT DELAY MORE: the gas the sensor reads was made before it ended. A cut
+        // on the first frames only, then clean — the gate must not open the very next frame.
+        reset_region(); clear_widebands(); clear_assignments(); set_engine(4, {1, 1, 2, 2});
+        enable_wb(SIG_LAMBDA_1); assign_wb(SIG_LAMBDA_1, WB_OVERALL);
+        LambdaConfig cfg = make_cfg(); cfg.cl_after_cut_ms = 300;   // the cut's own hold: 300 ms
+        Lambda lc; lc.init(cfg); g_ms = 10000; lc.on_engine_start();
+        EngineFrame f{};
+        bool settling_seen = false, opened = false;
+        for (int i = 0; i <= 80; i++) {
+            g_ms = 15000 + i * 10;
+            SignalBus b = make_bus({{SIG_LAMBDA_1, 1.0f}});
+            if (i < 5) b.set_bool(SIG_IGN_CUT, true);
+            lc.update(pos(), b, f);
+            const uint16_t bits = static_cast<uint16_t>(b.get(SIG_FUEL_LEARN_BLOCK, 0.0f));
+            // cut until 40 ms, its hold until 340 ms, then SETTLING alone for delay (0) + 150 ms
+            if (i == 40 && bits == (1u << 15)) settling_seen = true;
+            if (bits == 0) opened = true;
+        }
+        CHECK(settling_seen);
+        CHECK(opened);                               // …and it does open again
     }
 
     return test_summary();
