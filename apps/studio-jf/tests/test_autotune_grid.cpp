@@ -219,6 +219,37 @@ int main() {
         ck(std::fabs(p.engine().sessionPct(lc, lr)) < 1e-9, "…and the map as it is now is the new 0 %");
     }
 
+    std::printf("\n=== Apply continuously: the map is written as it drives, and keeps converging ===\n");
+    // The path a tuner driving alone depends on, and the one a first drive showed writing nothing.
+    // Replayed on a fake clock: 33 ms frames (the live telemetry rate), 6 % lean, for twenty seconds.
+    {
+        uint32_t fake = 5000000;
+        p.setClock([&] { return fake; });
+        p.resetSession();
+        p.start();
+        p.setApplyContinuously(true);
+        const int lc0 = [&] { drive(1.06, 1); return p.engine().lastCol() < 0 ? 0 : p.engine().lastCol(); }();
+        const int lr0 = p.engine().lastRow() < 0 ? 0 : p.engine().lastRow();
+        const double was = c.tiCell(t, lc0, lr0, 0);
+        // THE ENGINE ANSWERS: more VE is more fuel, so the mixture richens as the cell rises. A constant
+        // lambda would be an engine that ignores its own fuel table, and any tuner chasing it diverges.
+        for (int i = 0; i < 600; ++i) {
+            fake += 33;
+            drive(1.06 * was / c.tiCell(t, lc0, lr0, 0), 1);
+        }
+        const double now = c.tiCell(t, lc0, lr0, 0);
+        const double moved = (now / was - 1.0) * 100.0;
+        ck(moved > 3.0, "continuous writes moved the cell towards +6 %",
+           std::to_string(was) + " -> " + std::to_string(now) + " (" + std::to_string(moved) + " %)");
+        ck(moved < 6.5, "…without overshooting it", std::to_string(moved));
+        ck(std::fabs(p.engine().sessionPct(lc0, lr0) - moved) < 0.05, "Session % shows the same move",
+           std::to_string(p.engine().sessionPct(lc0, lr0)));
+        ck(p.engine().weight(lc0, lr0) > 0.0, "…and the records are still there to see");
+        p.setApplyContinuously(false);
+        p.stop();
+        p.setClock(nullptr);
+    }
+
     std::printf("\n=== a stacked map is tuned on the plane the engine is BURNING ===\n");
     // VE's third axis is ethanol. The autotuner read and wrote plane 0 whatever the engine was on, so
     // on a flex tune above E0 it measured one fuel and corrected another — silently, because plane 0

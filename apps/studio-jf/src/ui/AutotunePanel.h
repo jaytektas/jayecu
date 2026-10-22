@@ -78,6 +78,11 @@ public:
     void start();
     void stop();
     void resetSession();     // Reset: records gone, and the map as it stands becomes the Session % reference
+    // The "Apply continuously" box, settable as the box itself sets it (tests, and the bus).
+    void setApplyContinuously(bool on);
+    // The clock records and continuous writes are paced by. Real time by default; a test replaces it so
+    // a drive of many seconds can be replayed in an instant.
+    void setClock(std::function<uint32_t()> clock) { clock_ = std::move(clock); }
     [[nodiscard]] bool recording() const { return recording_; }
 
     // Write the proposal into the tune. One undo step, and the accumulated evidence is discarded
@@ -169,4 +174,6 @@ private:
     bool canRestore_  = false;   // the app is holding the trim settings this panel switched off
     bool live_        = false;    // apply continuously while recording
     uint32_t lastApplyMs_ = 0;
+    std::function<uint32_t()> clock_;    // empty = real time (nowMs)
+    uint32_t now() const;
 };

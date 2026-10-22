@@ -419,7 +419,7 @@ void AutotunePanel::start() {
         readBase();
     }
     recording_ = true;
-    lastApplyMs_ = nowMs();
+    lastApplyMs_ = now();
     startBtn_->setLabel("Stop");
     refresh();
 }
@@ -478,7 +478,7 @@ void AutotunePanel::onFrame() {
     const Cache& c = Cache::instance();
 
     autotune::Sample s;
-    s.ms = nowMs();
+    s.ms = now();
     s.x  = chanOr(c, xChannel_, 0.0);
     s.y  = chanOr(c, yChannel_, 0.0);
 
@@ -535,6 +535,17 @@ void AutotunePanel::onFrame() {
     refresh();
 }
 
+uint32_t AutotunePanel::now() const { return clock_ ? clock_() : nowMs(); }
+
+void AutotunePanel::setApplyContinuously(bool on) {
+    if (liveBox_) liveBox_->setChecked(on);     // the box's own handler does the rest
+    if (live_ != on) {                          // …unless the box did not signal (same state, or none)
+        live_ = on;
+        if (on && modeBox_) modeBox_->setCurrentIndex(0);
+        refresh();
+    }
+}
+
 void AutotunePanel::applyProposal() {
     if (tablePath_.empty() || !eng_.hasProposal()) return;
     // LAST GATE BEFORE THE MAP IS WRITTEN. onTableEdited should have caught this already; an edit that
@@ -582,7 +593,7 @@ void AutotunePanel::applyProposal() {
     // (Engine::rebase): what was taken is gone from them, what was not is still there, and the records
     // keep counting, so the grid shows the whole drive rather than the last two seconds. A value target
     // records absolute readings, which a write does not re-measure, so those are still spent.
-    lastApplyMs_ = nowMs();
+    lastApplyMs_ = now();
     readBase();
     if (isValue_) eng_.clear();
     else for (const auto& wcell : written) eng_.rebase(wcell.first.first, wcell.first.second, wcell.second);
