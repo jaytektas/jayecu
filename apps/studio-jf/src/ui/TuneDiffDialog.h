@@ -61,6 +61,8 @@
 
 class TuneDiffDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     // SIZED TO TWO PAGES, SIDE BY SIDE. Pages are authored at 1280x700 and both are scaled to fit, so
     // the readable scale is set by the column width and nothing else: the wider this is, the larger the
     // numbers. 1820 gives each column ~890 px — about 0.7 scale — and still leaves a margin on a 1920
@@ -106,7 +108,9 @@ public:
         m_prev = m_box->addButton("<< Previous", jf::JDialogButtonBox::Role::Action, 110.f);
         m_next = m_box->addButton("Next >>",     jf::JDialogButtonBox::Role::Action, 96.f);
         jf::JButton* keep = m_box->addButton("Keep the ECU's tune", jf::JDialogButtonBox::Role::Accept, 190.f);
-        jf::JButton* push = m_box->addButton("Push " + m_left + " to the ECU",
+        // THE TUNE'S NAME IN QUOTES. A tune a recovery names "current" made this "Push current to the ECU",
+        // which reads as "push the one that is open now" — and was answered that way, about another tune.
+        jf::JButton* push = m_box->addButton("Push \u201C" + m_left + "\u201D to the ECU",
                                              jf::JDialogButtonBox::Role::Destructive, 210.f);
         // AND A WAY OUT THAT IS A BUTTON. Escape and the close box already mean "neither", but a
         // decision this size should not require knowing that: one of the other two overwrites a tune,

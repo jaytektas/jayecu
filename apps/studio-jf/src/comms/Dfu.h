@@ -47,6 +47,9 @@ struct Transport {
 std::unique_ptr<Transport> openDevice(std::string& error);
 // Is it on the bus at all? (Cheap; does not open it.) On Windows: whatever driver it has, or none.
 bool devicePresent();
+// The bootloader's USB serial number (ST derives it from the chip, so it is the same every time this
+// chip is in its bootloader). Empty when no bootloader is on the bus or it states none. Cheap; no open.
+std::string deviceSerial();
 
 #if defined(_WIN32)
 // WINDOWS NEEDS A DRIVER BOUND TO THE BOOTLOADER, once — the counterpart of the Linux udev rule.

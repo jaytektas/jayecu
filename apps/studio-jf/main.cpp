@@ -157,6 +157,7 @@ static std::function<void()> g_trackDockHomes, g_syncViewToggles;
 #include <j/core/JSpinBox.h>
 #include <j/core/JDoubleSpinBox.h>
 #include <j/core/JComboBox.h>
+#include <j/core/JListView.h>
 #include <j/core/JCheckBox.h>
 
 using namespace jf;
@@ -1549,17 +1550,38 @@ int main(int argc, char** argv) {
         }
         std::vector<std::string> rows;
         for (const fwkits::Kit& k : installable) rows.push_back(k.board + "  \xE2\x80\x94  firmware " + k.version);
+        // WHICH BOARD IS IT? The ROM bootloader cannot say — it knows the chip, not the PCB — so the list
+        // used to open with its FIRST row chosen, and Install put that board's firmware on whatever was
+        // there. A bench board running another project's build (rusEFI's Proteus image on a jaytek_v1)
+        // got Proteus firmware that way. Now: if this bootloader has been seen before — the studio records
+        // its USB serial whenever it sends an ECU into it — that board is offered, named. If not, NOTHING
+        // is chosen, and Install stays dead until someone picks the board that is actually on the bench.
+        const std::string serial = dfu::deviceSerial();
+        const Ecu::Summary known = Ecu::byDfuSerial(serial);
+        int initial = -1;
+        for (size_t i = 0; i < installable.size(); ++i)
+            if (!known.uid.empty() && installable[i].board == known.board) initial = int(i);
+        std::string message;
+        if (initial >= 0) {
+            const std::string name = !known.vehicle.name.empty() ? known.vehicle.name : known.uid;
+            message = "An ECU is waiting in its bootloader, and the studio has seen this one before: " + name +
+                      ", a " + known.board + " board. Install puts " + known.board + " firmware on it.\n\n"
+                      "If the board in front of you is not that one, choose its board instead: firmware for "
+                      "another board drives the wrong pins.";
+        } else {
+            message = "An ECU is waiting in its bootloader, and the studio has not seen this bootloader before, so "
+                      "it cannot tell which board this is. Choose the board printed on the ECU, not the firmware "
+                      "it was running: a board can run another board's firmware (a bench board running someone "
+                      "else's build).\n\nChoose carefully: firmware for another board drives the wrong pins.";
+        }
+        JLOGC("firmware", jf::JLogLevel::Info) << "bootloader serial " << (serial.empty() ? "(none)" : serial)
+            << (initial >= 0 ? " is known: " + known.uid + " (" + known.board + ")" : std::string(" is not a known ECU"));
         win.openModal<ListPickerDialog>(
-            std::string("ECU waiting in its bootloader"),
-            std::string("An ECU is waiting in its bootloader \xE2\x80\x94 put there with its BOOT button, or by a "
-                        "firmware update that did not finish. Choose the board it is, and Install puts that "
-                        "board's firmware on it.\n\nChoose carefully: firmware for another board drives the "
-                        "wrong pins."),
-            rows,
+            std::string("ECU waiting in its bootloader"), message, rows,
             std::function<void(int, std::string)>([installable](int i, std::string) {
                 if (i >= 0 && i < int(installable.size())) s_upgrade.recover(installable[size_t(i)]);
             }),
-            std::function<void()>{}, std::string("Install"));
+            std::function<void()>{}, std::string("Install"), ListPickerDialog::Initial{ initial });
     };
     link.configReadProgress.connect([](int done, int total) { s_upgrade.onConfigProgress(done, total); });
     // The port the last open() was given — recorded so the identity handler can file the ECU under
@@ -2070,7 +2092,15 @@ int main(int argc, char** argv) {
         if (!e) return;
         // The definition FIRST — a tune is a set of named values that means nothing without the layout it
         // was written for, and openTune needs it to decode the file at all.
-        const std::string hash = tuneLayoutHash(e->loadTune(name));
+        //
+        // …UNLESS AN ECU IS CONNECTED: then its FIRMWARE decides what the bytes mean, and the saved tune —
+        // a dictionary of named values — is migrated onto that layout by openTune like any other. Choosing
+        // the definition from the tune instead put a board recovered onto other firmware back on its OLD
+        // definition (a jaytek_v1 reflashed from a Proteus build read through the Proteus layout until the
+        // studio was restarted), because the adopt that opens the project can land after the connect has
+        // loaded the right one.
+        const bool live = link.isOpen() && !s_ecuLayout.empty();
+        const std::string hash = live ? s_ecuLayout : tuneLayoutHash(e->loadTune(name));
         const MetaModel* cur = Cache::instance().meta();
         if (!cur || !cur->isValid() || (!hash.empty() && cur->layoutHash() != hash)) {
             const std::string found = metaForLayoutHash(hash);
@@ -7285,14 +7315,28 @@ int main(int argc, char** argv) {
                 if (auto* d = dynamic_cast<jf::JDoubleSpinBox*>(w)) { d->setValue(std::stod(v)); return 1; }
                 if (auto* b = dynamic_cast<jf::JComboBox*>(w))      { b->setCurrentIndex(static_cast<int>(std::lround(std::stod(v)))); return 1; }
                 if (auto* k = dynamic_cast<jf::JCheckBox*>(w))      { k->setChecked(std::stod(v) != 0.0); return 1; }
+                if (auto* l = dynamic_cast<jf::JListView*>(w))      { l->setSelectedIndex(static_cast<int>(std::lround(std::stod(v)))); return 1; }
             } catch (...) { return -1; }   // non-numeric argument
             return 0;                      // a widget type with no numeric value
         }
-        if (const char* v = suffix("select:")) {   // combo box by option label
-            if (auto* b = dynamic_cast<jf::JComboBox*>(w)) {
-                const auto& items = b->items();
+        if (const char* v = suffix("select:")) {   // a combo box's option, or a list's row, by its label
+            // THE ROW WHOSE TEXT IS THIS, or failing that the ONE row that starts with it. Rows often carry
+            // more than their name ("proteus_f7  —  firmware 0.4.14"), and a script should not have to
+            // know the version to pick the board — but a prefix two rows share picks neither.
+            auto pick = [&](const std::vector<std::string>& items) -> int {
+                for (int i = 0; i < static_cast<int>(items.size()); ++i) if (items[i] == v) return i;
+                int found = -1;
                 for (int i = 0; i < static_cast<int>(items.size()); ++i)
-                    if (items[i] == v) { b->setCurrentIndex(i); return 1; }
+                    if (items[i].rfind(v, 0) == 0) { if (found >= 0) return -1; found = i; }
+                return found;
+            };
+            if (auto* b = dynamic_cast<jf::JComboBox*>(w)) {
+                const int i = pick(b->items());
+                if (i >= 0) { b->setCurrentIndex(i); return 1; }
+            }
+            if (auto* l = dynamic_cast<jf::JListView*>(w)) {
+                const int i = pick(l->items());
+                if (i >= 0) { l->setSelectedIndex(i); return 1; }
             }
             return 0;
         }

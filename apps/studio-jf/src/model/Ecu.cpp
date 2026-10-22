@@ -111,6 +111,21 @@ void Ecu::setLastPort(const std::string &port)
     save();
 }
 
+void Ecu::setDfuSerial(const std::string &serial)
+{
+    if (serial.empty() || j_["dfu_serial"].str() == serial) return;
+    j_["dfu_serial"] = jf::JJson(serial);
+    save();
+}
+
+Ecu::Summary Ecu::byDfuSerial(const std::string &serial)
+{
+    if (serial.empty()) return {};
+    for (const Summary &s : list())
+        if (s.dfuSerial == serial) return s;
+    return {};
+}
+
 
 void Ecu::save() const
 {
@@ -135,7 +150,17 @@ Ecu *Ecu::open(const std::string &uid)
 Ecu *Ecu::openOrCreate(const std::string &uid, const std::string &board)
 {
     if (uid.empty()) return nullptr;
-    if (Ecu *e = open(uid)) return e;
+    if (Ecu *e = open(uid)) {
+        // THE BOARD IS WHAT THE FIRMWARE SAYS IT IS, NOW. A chip keeps its uid across a reflash to another
+        // board's firmware (a bench board moved from one build to another; a recovery that picked the
+        // wrong board), and an entry that kept the board it was first filed under then named the wrong
+        // one in every list and in the studio's own status.
+        if (!board.empty() && e->j_["board"].str() != board) {
+            e->j_["board"] = jf::JJson(board);
+            e->save();
+        }
+        return e;
+    }
     const std::string dir = ecuRoot() + "/" + uid;
     std::error_code ec;
     fs::create_directories(dir, ec);
@@ -164,6 +189,7 @@ Ecu::Summary readSummary(const fs::path &dir)
     s.label    = o["label"].str().empty() ? s.board : o["label"].str();
     s.lastSeen = o["last_seen"].str();
     s.lastPort = o["last_port"].str();
+    s.dfuSerial = o["dfu_serial"].str();
     std::string tune = o["current_tune"].str();
     if (tune.empty() || !fs::exists(dir / "tunes" / (tune + ".tune"))) tune = o["last_active_tune"].str();
     if (tune.empty() || !fs::exists(dir / "tunes" / (tune + ".tune"))) {

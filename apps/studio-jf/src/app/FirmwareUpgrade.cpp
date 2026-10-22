@@ -111,7 +111,7 @@ void FirmwareUpgrade::recover(const fwkits::Kit& kit) {
     kit_ = kit; identity_.clear(); port_.clear(); board_ = kit.board;
     recovering_ = true;
     tuneDict_.clear(); noTune_ = false; pushed_.clear(); report_ = {}; backupPath_.clear(); sdNote_.clear();
-    fromVersion_ = "none"; fromHash_.clear(); uid_.clear();
+    fromVersion_ = "none"; fromHash_.clear(); uid_.clear(); dfuSerial_.clear();
     JLOGC("firmware", jf::JLogLevel::Info) << "recovery: flashing " << kit_.board << " " << kit_.version
                                            << " onto an ECU found waiting in its bootloader";
     // RECOVERY IS AN UPDATE whose first half cannot happen: the board is in its bootloader, so there is no
@@ -136,6 +136,7 @@ void FirmwareUpgrade::recover(const fwkits::Kit& kit) {
 }
 
 void FirmwareUpgrade::start(const fwkits::Kit& kit, const std::string& identity, const std::string& port) {
+    dfuSerial_.clear();
     kit_ = kit; identity_ = identity; port_ = port;
     recovering_ = false;
     tuneDict_.clear(); noTune_ = false; pushed_.clear(); report_ = {}; backupPath_.clear(); lastTelemetry_.clear(); waitingForKey_ = false;
@@ -398,6 +399,14 @@ void FirmwareUpgrade::backupThenFlash() {
     enterDfu();
 }
 
+void FirmwareUpgrade::recordDfuSerial() {
+    if (uid_.empty() || dfuSerial_.empty()) return;
+    std::unique_ptr<Ecu> e(Ecu::openOrCreate(uid_, board_));
+    if (!e) return;
+    e->setDfuSerial(dfuSerial_);
+    JLOGC("firmware", jf::JLogLevel::Info) << "ECU " << uid_ << " (" << board_ << ") answers as bootloader " << dfuSerial_;
+}
+
 // ---- 4. flash --------------------------------------------------------------------------------------
 
 void FirmwareUpgrade::enterDfu() {
@@ -443,6 +452,13 @@ void FirmwareUpgrade::runFlash() {
             }
         }
         if (!dev && error.empty()) error = "the ECU's bootloader did not appear";
+        // WHAT THIS ECU'S BOOTLOADER CALLS ITSELF, recorded against it (Ecu::dfuSerial), so a recovery
+        // that finds this board in its bootloader later knows which board it is. Read here, the one time
+        // the studio knows both sides: the ECU it sent, and the bootloader that came back.
+        if (dev) {
+            const std::string serial = dfu::deviceSerial();
+            if (!serial.empty()) post([this, serial] { dfuSerial_ = serial; recordDfuSerial(); });
+        }
         if (dev) {
             const std::string layout = dev->layoutString();
             const unsigned xfer = dev->transferSize();
@@ -572,6 +588,7 @@ bool FirmwareUpgrade::onIdentity(const std::string& sig) {
         // There was no old firmware to read the tune from, so read the one this firmware booted with.
         JLOGC("firmware", jf::JLogLevel::Info) << "recovery: firmware is running: " << sig;
         uid_ = w.size() > 5 ? w[5] : "";
+        recordDfuSerial();             // the board it was recovered as is now known by its uid too
         step_ = Step::Pulling;
         ui_.openProgress(title(), "Reading the tune the ECU started with");
         link_.setConfigSize(newMeta_.configSize());

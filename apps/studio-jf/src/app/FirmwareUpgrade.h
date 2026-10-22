@@ -145,6 +145,8 @@ private:
     bool recovering_ = false;
     fwkits::Kit kit_;
     std::string identity_, port_, board_, fromVersion_, fromHash_, uid_;
+    std::string dfuSerial_;            // the bootloader's USB serial, once seen (Ecu::dfuSerial)
+    void recordDfuSerial();
     MetaModel oldMeta_, newMeta_;
     std::vector<uint8_t> tuneDict_;       // the tune pulled off the ECU, by name (jayecu-tune/2)
     bool noTune_ = false;                 // the ECU had no tune: the new firmware's default tune goes on

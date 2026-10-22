@@ -195,6 +195,16 @@ bool driverInStore() {
 
 bool devicePresent() { return find().present; }
 
+std::string deviceSerial() {
+    // The instance id is USB\VID_0483&PID_DF11\<serial> — the serial is the last component.
+    const std::wstring id = find().instanceId;
+    const size_t slash = id.find_last_of(L'\\');
+    if (slash == std::wstring::npos || slash + 1 >= id.size()) return {};
+    std::string out;
+    for (wchar_t c : id.substr(slash + 1)) out.push_back(c < 0x80 ? char(c) : '?');
+    return out;
+}
+
 bool driverInstalled() {
     const Found f = find();
     if (f.present) return upper(f.service) == L"WINUSB";

@@ -87,13 +87,18 @@ std::string CardLogs::findCard() {
     const std::string remembered = rememberedPath();
     if (looksLikeCard(remembered)) return remembered;
 
+    // WHERE IT IS, NOT HOW FULL. Asking each drive for its free space read the card's whole allocation
+    // table through the ECU's USB bridge — over ten seconds on a freshly mounted card, for a number only
+    // a log line used. And said once per card, not on every poll: the dialog asks every 1.5 s.
+    static std::string s_lastFound;
     for (const jf::JVolumeInfo& v : jf::JVolumes::removableVolumes()) {
         if (!looksLikeCard(v.mountPoint)) continue;
-        JLOGC("model.cardlogs", jf::JLogLevel::Info)
-            << "card found at " << v.mountPoint << " (" << v.filesystem << ", "
-            << (v.freeBytes >> 20) << " MB free of " << (v.totalBytes >> 20) << " MB)";
+        if (v.mountPoint != s_lastFound)
+            JLOGC("model.cardlogs", jf::JLogLevel::Info) << "card found at " << v.mountPoint << " (" << v.filesystem << ")";
+        s_lastFound = v.mountPoint;
         return v.mountPoint;
     }
+    s_lastFound.clear();
     return {};
 }
 

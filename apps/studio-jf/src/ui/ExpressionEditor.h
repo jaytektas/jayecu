@@ -42,6 +42,8 @@
 
 class ExpressionEditor {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     static constexpr uint32_t kW = 540, kH = 460;
     static constexpr float kBtnW = 92.f;
     static float kBtnH() { return jf::JStyle::current().buttonHeight; }   // HEIGHT from JStyle (single source of truth)

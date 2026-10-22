@@ -66,6 +66,8 @@
 
 class OutputWizardDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     // TALL ENOUGH FOR THE ROWS IT NOW HAS. Two parameters, three options, four input rows and two
     // wrapped conditions do not fit 600 — the preview went under the button box.
     static constexpr uint32_t kW = 880, kH = 720;

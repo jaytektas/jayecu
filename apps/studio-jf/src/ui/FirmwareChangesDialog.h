@@ -54,6 +54,8 @@
 
 class FirmwareChangesDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     static constexpr uint32_t kW = 1820, kH = 760;
     static float kBtnH() { return jf::JStyle::current().buttonHeight; }
     static float hdrH()  { return jf::JStyle::current().titleBarHeight; }

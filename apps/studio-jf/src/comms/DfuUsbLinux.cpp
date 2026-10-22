@@ -76,6 +76,16 @@ private:
 
 bool devicePresent() { return !findSysfs().empty(); }
 
+std::string deviceSerial() {
+    const std::string sys = findSysfs();
+    if (sys.empty()) return {};
+    std::ifstream f(sys + "/serial");
+    std::string s;
+    std::getline(f, s);
+    while (!s.empty() && (s.back() == '\n' || s.back() == '\r' || s.back() == ' ')) s.pop_back();
+    return s;
+}
+
 static std::unique_ptr<Transport> openOnce(std::string& error, bool& hung);
 
 // A bootloader whose job was cut off mid-transfer (the studio closed during a flash) can stop answering

@@ -35,6 +35,8 @@
 
 class KeyBindingsDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     static constexpr uint32_t kW = 380, kH = 470;
     static constexpr float kBtnW = 96.f, kRestoreW = 130.f;
     static float kBtnH() { return jf::JStyle::current().buttonHeight; }   // HEIGHT from JStyle (single source of truth)

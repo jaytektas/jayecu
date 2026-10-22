@@ -396,6 +396,14 @@ target_compile_definitions(air_model_load_test PRIVATE
 add_test(NAME air_model_load COMMAND air_model_load_test)
 add_dependencies(studio_tests air_model_load_test)
 
+# The ECU library's memory of a board: the board its firmware names now, and its bootloader's serial.
+add_executable(ecu_library_test EXCLUDE_FROM_ALL tests/test_ecu_library.cpp)
+target_link_libraries(ecu_library_test PRIVATE studio_model JFramework::platform ${STUDIO_TLS_LIBS})
+target_include_directories(ecu_library_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../generated)
+add_test(NAME ecu_library COMMAND ecu_library_test)
+add_dependencies(studio_tests ecu_library_test)
+
 # Collecting the ECU's logs off the card — a real directory of real MLG bytes, because the card at
 # key-off is exactly that and nothing about this path is worth mocking.
 #   cmake --build build --target card_logs_test && ./build/card_logs_test

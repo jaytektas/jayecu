@@ -45,6 +45,8 @@
 
 class ChannelPropsDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     // One row's fixed facts: the channel and how to name it. Units offered come from the caller (the meta
     // knows which units a channel can be read in); an empty list leaves the row's unit as plain text.
     struct Row {

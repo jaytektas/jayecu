@@ -33,6 +33,8 @@
 
 class ListPickerDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     // A ROW THAT IS ON THE LIST BUT CANNOT BE CHOSEN. Filtering it out instead would answer a
     // different question: "we have no template for that controller", when the truth is "we have one
     // and this bus is not set up for it". The row stays, dimmed, with its reason in the text, so the
@@ -109,6 +111,22 @@ public:
         : ListPickerDialog(std::move(title), std::move(items), false, std::move(onAccept), std::move(onDismiss),
                            std::move(acceptLabel), hal, sx, sy, parent) {
         m_message = std::move(message);
+    }
+
+    // …AND STARTING ON A GIVEN ROW, or on none (-1). A question whose wrong answer is costly — which board
+    // is in the bootloader — must not come with an answer already ticked: with -1 the accept button stays
+    // dead until someone chooses. A row the caller KNOWS is right (the board seen in this bootloader
+    // before) is offered selected instead.
+    struct Initial { int index; };
+    ListPickerDialog(std::string title, std::string message, std::vector<std::string> items,
+                     std::function<void(int, std::string)> onAccept, std::function<void()> onDismiss,
+                     std::string acceptLabel, Initial initial,
+                     jf::JGpuHal& hal, int sx, int sy, NativeWinHandleType parent)
+        : ListPickerDialog(std::move(title), std::move(message), std::move(items), std::move(onAccept),
+                           std::move(onDismiss), std::move(acceptLabel), hal, sx, sy, parent) {
+        m_list->setSelectedIndex(initial.index);
+        m_list->onSelectionChanged.connect([this](int) { _syncAccept(); });
+        _syncAccept();
     }
 
     // ONE MORE WAY TO ANSWER, beside the list: a button that closes the picker and hands over to something

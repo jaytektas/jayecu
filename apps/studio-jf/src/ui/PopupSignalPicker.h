@@ -30,6 +30,8 @@
 
 class PopupSignalPicker {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     static constexpr uint32_t kW = 320, kH = 440;
     static constexpr float kPad = 10.f, kRowH = 22.f;
     // Title-bar height is the framework's ONE canonical value (JStyle::titleBarHeight) — never hardcoded.

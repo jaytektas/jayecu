@@ -39,6 +39,8 @@
 
 class ReseedDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     static constexpr uint32_t kW = 720, kH = 520;
     static constexpr float kBtnW = 120.f, kPad = 12.f, kGap = 10.f;
     static float kBtnH()  { return jf::JStyle::current().buttonHeight; }

@@ -49,6 +49,8 @@
 
 class AxisSetupDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     // Nested modals, wired in main.cpp (this dialog has no window to open one from — the same reason
     // Surface::onAxisSetup exists). The callback is invoked with the seed values and receives the
     // answer; both are no-ops if nothing wired them, so the dialog still works standalone.

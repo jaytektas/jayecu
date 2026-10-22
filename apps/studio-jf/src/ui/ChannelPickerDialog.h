@@ -41,6 +41,8 @@
 
 class ChannelPickerDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     // One offerable channel. `key` is what gets stored on the widget; the rest is what the columns show.
     struct Chan {
         std::string key;      // "rpm" — the binding, and the Short Name column

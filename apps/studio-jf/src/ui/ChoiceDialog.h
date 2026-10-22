@@ -51,6 +51,8 @@
 
 class ChoiceDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     // One answer: what the button says, and what kind of answer it is.
     struct Choice {
         std::string label;

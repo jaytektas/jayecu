@@ -35,6 +35,7 @@ public:
         std::string currentTune;   // the tune the vehicle details came from
         std::string lastSeen;
         std::string lastPort;
+        std::string dfuSerial;     // the USB serial its STM32 bootloader answers with ("3974356C3138")
         Vehicle     vehicle;
     };
 
@@ -80,6 +81,14 @@ public:
     void setCurrentTune(const std::string &name);
     void setLastPort(const std::string &port);
     void setLastActiveTune(const std::string &name);
+    // THE BOOTLOADER'S NAME FOR THIS ECU. A board in its ROM bootloader cannot say which board it is —
+    // ST's bootloader knows nothing about the PCB — but it does answer with a USB serial derived from the
+    // chip, and that does not change. Recorded whenever the studio itself sends this ECU into its
+    // bootloader, so a recovery later can recognise the board instead of asking someone to guess.
+    std::string dfuSerial() const { return j_["dfu_serial"].str(); }
+    void setDfuSerial(const std::string &serial);
+    // The library ECU whose bootloader answers with `serial`; empty uid when none has been seen.
+    static Summary byDfuSerial(const std::string &serial);
     void save() const;
 
 private:

@@ -40,6 +40,8 @@
 
 class SelectConnectionDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     static constexpr uint32_t kW = 760, kH = 560;
     static constexpr float kBtnW = 90.f, kPad = 12.f, kRowH = 30.f;
     static float kBtnH()   { return jf::JStyle::current().buttonHeight; }

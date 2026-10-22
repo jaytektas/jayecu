@@ -83,6 +83,8 @@ inline constexpr bool kTearOffMenusDefault =
 
 class PreferencesDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     // Bigger than it was (540x430): the widest page is a form of label + control at a fixed left
     // column, and at the old width a sentence of explanation had nowhere to go but off the edge.
     static constexpr uint32_t kW = 720, kH = 560;

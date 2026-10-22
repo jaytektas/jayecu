@@ -35,6 +35,8 @@
 
 class PanelContentsDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     static constexpr uint32_t kW = 620, kH = 420;
     static constexpr float kBtnW = 92.f, kBtnH = 22.f;
     static float hdrH() { return jf::JStyle::current().titleBarHeight; }

@@ -39,6 +39,8 @@
 
 class NewTuneDialog {
 public:
+    // The scene graph its widgets live in — how the window tells this modal's controls from the ones behind it.
+    jf::JSceneGraph& graph() { return m_graph; }
     static constexpr uint32_t kW = 500, kH = 480;
     static constexpr float kBtnW = 84.f, kPad = 12.f, kRowH = 22.f, kSecH = 18.f;
     static float kBtnH() { return jf::JStyle::current().buttonHeight; }   // HEIGHT from JStyle (single source of truth)
