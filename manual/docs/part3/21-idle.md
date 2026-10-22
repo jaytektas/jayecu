@@ -116,8 +116,12 @@ blip is left to fall freely before the loop takes over.
   all three at once (100 % = as the tables say).
 - The trim is limited to the room between **Idle Min Output** and **Max Duty**, and the integrator
   stops there too, so it cannot wind up.
-- When the loop is not engaged, the integrator is frozen, not reset, so it does not wind up off idle.
-  When the engine stops, it is reset.
+- When the loop is not engaged, air the loop **took away** stays as it was, so a blip does not dip
+  the idle when it comes back. Air it **added** does not outlive the loop: with the engine above
+  target, it is dropped at once off idle (pedal pressed, above **Idle Lockout RPM**) and bled away
+  within a second or two while **Waiting**. A start that stumbles winds the trim up; without this
+  the engine lit on that air, flared past the activation band and stayed there. When the engine
+  stops, the trim is reset.
 
 **Idle Duty** is then limited to **Idle Min Output** (a table by speed) and **Max Duty** (default
 90 %). If the floor is set above the ceiling, the ceiling wins.
