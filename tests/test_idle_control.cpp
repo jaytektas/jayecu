@@ -240,6 +240,38 @@ int main() {
         }
     }
 
+    // THE STALL. Hot and above target, the loop wound its trim down while the throttle's Min TPS held the
+    // plate up; lowering Min TPS then let the whole wound-down trim through and the plate fell to 1.4 %.
+    // The loop must treat the plate floor as its own: Min TPS 3 % at 15 % authority is 20 % duty.
+    SECTION("drive-by-wire: the trim never winds below the duty where the plate stops");
+    {
+        const ElectronicThrottleConfig saved = g_config.electronic_throttle;
+        g_config.electronic_throttle.idle_authority = 150;          // 15 %
+        g_config.electronic_throttle.etb[0].enabled = 1;
+        g_config.electronic_throttle.etb[0].min_tps_pct = 30;       // 3 % plate -> 20 % duty
+        g_config.electronic_throttle.etb[1].enabled = 0;
+        auto cfg = make_cfg(); cfg.mode = 1; Idle ic; ic.init(cfg); EngineFrame f{};
+        float duty = 0.0f;
+        for (int i = 0; i <= 200; i++) {                             // 6 s at 1080 vs 950: within the band
+            g_ms = 60000 + i * 30;
+            SignalBus b = make_bus(80.0f, 0.0f, EngineRunState::RUNNING, 1080.0f);
+            ic.update(make_pos(1080.0f), b, f);
+            duty = b.get(SIG_IDLE_DUTY, -1.0f);
+        }
+        CHECK(duty >= 20.0f - 1e-3f && duty < 20.5f);                // rests on the plate's floor, never below
+        // …and a second body with a LOWER floor still has air to give, so its floor is the one that counts.
+        g_config.electronic_throttle.etb[1].enabled = 1;
+        g_config.electronic_throttle.etb[1].min_tps_pct = 15;       // 1.5 % -> 10 % duty
+        for (int i = 0; i <= 200; i++) {
+            g_ms = 70000 + i * 30;
+            SignalBus b = make_bus(80.0f, 0.0f, EngineRunState::RUNNING, 1080.0f);
+            ic.update(make_pos(1080.0f), b, f);
+            duty = b.get(SIG_IDLE_DUTY, -1.0f);
+        }
+        CHECK(duty >= 10.0f - 1e-3f && duty < 10.5f);
+        g_config.electronic_throttle = saved;
+    }
+
     SECTION("idle_active: true only when RUNNING + throttle closed + below lockout RPM");
     {
         auto cfg = make_cfg(); Idle ic; ic.init(cfg); EngineFrame f{};

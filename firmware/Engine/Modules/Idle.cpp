@@ -9,6 +9,7 @@
 #include "../../Signal/SignalBus.h"
 #include "../EngineFrame.h"
 #include "../../../generated/learned_layout.h"  // LEARNED_IDLE_LTT_* (fixed offset + magic + dims)
+#include "../../../generated/ecu_config.h"      // g_config.electronic_throttle — the plate floor (throttle_floor_duty)
 #include <algorithm>
 #include <cmath>
 
@@ -22,6 +23,19 @@ static_assert(LEARNED_IDLE_LTT_CELLS == IDLE_LTT_CLT_AXIS_ALLOC, "learned_layout
 int Idle::ltt_cell_index(float clt) const {
     if (!cfg_) return 0;
     return tbl::nearest_bin(idle_ltt_desc(cfg_).x, clt);
+}
+
+float Idle::throttle_floor_duty() {
+    const ElectronicThrottleConfig& etb = g_config.electronic_throttle;
+    const float authority = static_cast<float>(etb.idle_authority) * 0.1f;     // % plate at 100% duty
+    if (authority <= 0.0f) return 0.0f;
+    float lowest = -1.0f;
+    for (unsigned i = 0; i < ELECTRONIC_THROTTLE_ETB_COUNT; i++) {
+        if (!etb.etb[i].enabled) continue;
+        const float floor_pct = static_cast<float>(etb.etb[i].min_tps_pct) * 0.1f;
+        if (lowest < 0.0f || floor_pct < lowest) lowest = floor_pct;
+    }
+    return lowest > 0.0f ? lowest / authority * 100.0f : 0.0f;
 }
 
 void Idle::reset_state() {
@@ -179,8 +193,17 @@ void Idle::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& /*fram
     // pair once, here, and the ceiling wins — it is the limit of the actuator, where the floor is a
     // preference about air. The PI's authority then falls out of an ordered pair instead of needing a
     // second guard of its own further down.
+    //
+    // THE THROTTLE'S OWN FLOOR IS A FLOOR HERE TOO. On drive-by-wire this duty becomes plate through Idle
+    // Authority, and every enabled body clamps its plate at its Min TPS — so below the duty that maps to
+    // the lowest of those floors, nothing the loop asks for moves any air. The loop did not know: hot and
+    // above target it wound its trim down to Min Output while the plate sat on the throttle's floor, and
+    // the moment that floor was lowered the whole wound-down trim reached the plate at once and stalled the
+    // engine. With it as part of min_out the trim stops where the plate stops (the anti-windup below is
+    // exactly this clamp). The LOWEST enabled floor, because a duty above it still moves that body's air.
     const float max_out  = static_cast<float>(cfg_->max_duty_pct) * 0.1f;
-    const float min_out  = std::min(tbl::table_eval(min_output_table_desc(cfg_), bus), max_out);  // % floor
+    const float min_out  = std::min(std::max(tbl::table_eval(min_output_table_desc(cfg_), bus),
+                                             throttle_floor_duty()), max_out);              // % floor
 
     // Publish the error BEFORE evaluating the gain tables — they read it back as their X axis channel.
     const float error = target - rpm;

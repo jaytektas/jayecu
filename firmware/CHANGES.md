@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Idle on drive-by-wire: the closed loop no longer winds its trim below the duty where the throttle's Min TPS stops the plate. It used to keep pulling the trim down while the plate sat on Min TPS, so lowering Min TPS let all of it through at once and could stall the engine.
 - Idle: air the closed loop added is let go once the engine is above its target with the loop off — at once off idle, within a second or two while still idling. It used to be held, so a start that stumbled wound the throttle open and the engine, once it lit, ran away on that air (one cold start reached 4700 rpm).
 
 ## 0.4.13

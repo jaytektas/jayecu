@@ -34,6 +34,9 @@ private:
     PiController pi_;                 // closed-loop trim; integ is the persistent state
     // How fast a positive trim is let go while idling above target with the loop off (see update()).
     static constexpr float kTrimBleedTauS = 0.5f;
+    // The idle duty below which no enabled throttle body's plate moves (its Min TPS / Idle Authority);
+    // 0 with no drive-by-wire body enabled or no idle authority.
+    static float throttle_floor_duty();
     uint32_t     last_ms_  = 0;       // for the PI/D dt
     float        last_err_ = 0.0f;    // for the derivative term
 
