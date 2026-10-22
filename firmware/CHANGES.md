@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Auto Tune ignores readings with the wideband pinned at its lean end (lambda above 1.3): misfire, overrun or free air, which it used to learn as "add fuel".
 - Electronic throttle: a key-on check that passes now clears a latched throttle fault. It drives the plate to both stops and checks them against the calibration, so a throttle that has just proved itself is no longer left dead at every key-on until a Find limits. A check that fails still latches, and the cleared code stays stored with its count.
 - Idle on drive-by-wire: the closed loop no longer winds its trim below the duty where the throttle's Min TPS stops the plate. It used to keep pulling the trim down while the plate sat on Min TPS, so lowering Min TPS let all of it through at once and could stall the engine.
 - Idle: air the closed loop added is let go once the engine is above its target with the loop off — at once off idle, within a second or two while still idling. It used to be held, so a start that stumbled wound the throttle open and the engine, once it lit, ran away on that air (one cold start reached 4700 rpm).
