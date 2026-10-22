@@ -283,7 +283,7 @@ int main() {
             dtc.age(g_tick_ms);                         // the table's own expiry sweep, as the firmware runs it
         }
         fprintf(stdout, "    P0234 severity after 10 s held: %u\n", (unsigned)dtc.code_severity(P_OVERBOOST));
-        CHECK(dtc.code_severity(P_OVERBOOST) == 3);     // still ACTIVE
+        CHECK(dtc.code_severity(P_OVERBOOST) == 1);     // still ACTIVE (recorded: the overboost cut is its reaction)
         // ...and it lets go once boost falls back under the limit.
         g_tick_ms += 10u;
         { SignalBus bus{}; set_all_fresh(bus, 80.0f, 150.0f);
@@ -449,7 +449,7 @@ int main() {
     }
 
     // -------------------------------------------------------------------
-    SECTION("overboost — P0234 (level 3), Level 3 reaction, no hard ign cut");
+    SECTION("overboost — P0234 RECORDED (level 1): the overboost cut is the reaction, not a limp");
     {
         auto cfg = make_cfg();
         EngineProtection ep; ep.init(cfg);
@@ -460,9 +460,12 @@ int main() {
         bus.invalidate(wk::fuel_cut); bus.invalidate(wk::ign_cut);
         ep.update(make_pos(), bus, frame);
 
-        CHECK(dtc.code_severity(P_OVERBOOST) == 3);
-        CHECK(bus.get(wk::prot_rev_limit) == 2000.0f);
-        CHECK(bus.get_bool(wk::prot_rev_cut_fuel));
+        // Tuning towards spring pressure, a level-3 limp on every pull that touched the cut punished an
+        // overshoot the cut had already stopped. It is a level-1 fault now: recorded, freeze frame and all,
+        // and whatever Level 1 is set to do — here its 6000 rpm limit, not Level 3's 2000.
+        CHECK(dtc.code_severity(P_OVERBOOST) == 1);
+        CHECK(bus.get(SIG_PROT_LEVEL) == 1.0f);
+        CHECK(bus.get(wk::prot_rev_limit) == 6000.0f);
         CHECK(!bus.valid(wk::ign_cut));                            // overboost ≠ sync loss: no hard ign cut
     }
 

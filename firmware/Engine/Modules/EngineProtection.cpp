@@ -26,7 +26,11 @@ constexpr uint16_t P_OVERTEMP_CLT    = 0x0217;  constexpr uint8_t S_OVERTEMP_CLT
 // manufacturer P1xxx space deliberately. Both are bucketed into coolant/iat categories.
 constexpr uint16_t P_CLT_WARNING     = 0x1217;  constexpr uint8_t S_CLT_WARNING     = 1;  // mfr: Coolant Temp Warning
 constexpr uint16_t P_OVERTEMP_IAT    = 0x1098;  constexpr uint8_t S_OVERTEMP_IAT    = 3;  // mfr: Intake Air Over-Temp
-constexpr uint16_t P_OVERBOOST       = 0x0234;  constexpr uint8_t S_OVERBOOST       = 3;
+// OVERBOOST IS RECORDED, NOT LIMPED. It has its own reaction — the overboost cut (boost.overboost_cut_method),
+// which stops the overshoot on the spot — and a level-3 limp on top punished an overshoot that had
+// already been dealt with: tuning towards spring pressure, every pull ended in a rev limit for no
+// remaining reason. Limp belongs to what a cut cannot fix (heat, pre-ignition, a lost trigger).
+constexpr uint16_t P_OVERBOOST       = 0x0234;  constexpr uint8_t S_OVERBOOST       = 1;
 // Battery low/high (P0562/P0563) is DETECTED by the battery sensor's operating-range check now —
 // EngineProtection only PROTECTS, so the old battery threshold checks were removed.
 constexpr uint16_t P_SYNC_LOSS       = 0x0335;  constexpr uint8_t S_SYNC_LOSS       = 3;
