@@ -2,11 +2,15 @@
 
 #include "Resources.h"
 #include "model/FirmwareKits.h"
+#include "model/MetaModel.h"
 #include "model/StudioPaths.h"
 
 #include <j/config/Json.h>
 
 #include <filesystem>
+#include <map>
+#include <memory>
+#include <mutex>
 #include <vector>
 
 namespace metalib {
@@ -47,6 +51,21 @@ std::string forLayoutHash(const std::string& hash) {
     for (const fwkits::Kit& k : kits)
         if (k.layoutHash == hash && fs::exists(k.meta, ec)) return k.meta;
     return {};
+}
+
+const MetaModel* loadedFor(const std::string& hash) {
+    static std::mutex mu;
+    static std::map<std::string, std::unique_ptr<MetaModel>> cache;   // a miss is cached too (null)
+    std::lock_guard<std::mutex> lock(mu);
+    auto it = cache.find(hash);
+    if (it != cache.end()) return it->second.get();
+    std::unique_ptr<MetaModel> m;
+    const std::string path = forLayoutHash(hash);
+    if (!path.empty()) {
+        m = std::make_unique<MetaModel>();
+        if (!m->loadFile(path) || m->layoutHash() != hash) m.reset();
+    }
+    return (cache[hash] = std::move(m)).get();
 }
 
 }  // namespace metalib

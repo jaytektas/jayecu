@@ -6,9 +6,16 @@
 
 #include <string>
 
+class MetaModel;
+
 namespace metalib {
 
 // The path of a meta describing `layoutHash`, or "" when nothing here does.
 std::string forLayoutHash(const std::string& layoutHash);
+
+// The meta for `layoutHash`, loaded once and kept for the life of the process; null when nothing
+// here describes it. What a tune load hands TuneFile::deserialise as the layout the tune was saved
+// on, so a value whose scale changed between firmwares is converted rather than copied.
+const MetaModel* loadedFor(const std::string& layoutHash);
 
 }  // namespace metalib

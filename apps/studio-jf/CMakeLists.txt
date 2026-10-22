@@ -1690,6 +1690,15 @@ target_compile_definitions(tune_refs_test PRIVATE REAL_META="${CMAKE_CURRENT_SOU
 add_test(NAME tune_refs COMMAND tune_refs_test)
 add_dependencies(studio_tests tune_refs_test)
 
+# A tune loaded across a firmware that changed a value's SCALE is converted, not copied raw.
+#   cmake --build build --target tune_rescale_test && ./build/tune_rescale_test
+add_executable(tune_rescale_test EXCLUDE_FROM_ALL tests/test_tune_rescale.cpp)
+target_link_libraries(tune_rescale_test PRIVATE studio_model JFramework::platform)
+target_include_directories(tune_rescale_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_compile_definitions(tune_rescale_test PRIVATE REAL_META="${CMAKE_CURRENT_SOURCE_DIR}/../../shared/tuneit-meta.json")
+add_test(NAME tune_rescale COMMAND tune_rescale_test)
+add_dependencies(studio_tests tune_rescale_test)
+
 # The AI bus's studio commands — settings, tables and channels by name — against the real meta.
 #   cmake --build build --target ai_commands_test && ./build/ai_commands_test
 add_executable(ai_commands_test EXCLUDE_FROM_ALL tests/test_ai_commands.cpp src/app/AiCommands.cpp)

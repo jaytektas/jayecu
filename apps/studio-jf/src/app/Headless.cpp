@@ -165,7 +165,7 @@ int run(const Args& args) {
             if (const std::string why = loadMeta(metaPath); !why.empty()) { sayError(why); return 2; }
             if (TuneFile::isDictFormat(raw)) {
                 MigrationReport rep;
-                c.setConfigImage(TuneFile::deserialise(raw, meta, rep, nullptr));
+                c.setConfigImage(TuneFile::deserialise(raw, meta, rep, nullptr, metalib::loadedFor));
             } else {
                 c.setConfigImage(raw);
             }

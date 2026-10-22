@@ -330,7 +330,7 @@ void FirmwareUpgrade::pulled(const std::vector<uint8_t>& image) {
     // THE DRY RUN, and from it THE OFFER: what this tune has set that the new firmware drops, and what
     // the new firmware brings, each on its own pages. That report IS the question — deciding to update
     // before seeing it would be deciding blind.
-    const std::vector<uint8_t> trial = TuneFile::deserialise(tuneDict_, newMeta_, report_);
+    const std::vector<uint8_t> trial = TuneFile::deserialise(tuneDict_, newMeta_, report_, nullptr, savedOnOld());
     if (trial.empty()) { abandon("The tune could not be read. Nothing was changed."); return; }
     Ui::Changes c;
     c.fromVersion = fromVersion_;
@@ -608,7 +608,7 @@ void FirmwareUpgrade::pushTune() {
                                       : "Putting your tune on the new firmware");
     ui_.progress(0, "");
     report_ = {};
-    pushed_ = TuneFile::deserialise(tuneDict_, newMeta_, report_);
+    pushed_ = TuneFile::deserialise(tuneDict_, newMeta_, report_, nullptr, savedOnOld());
     if (pushed_.empty()) { fail("The tune could not be converted for the new firmware.", true); return; }
     link_.setConfigSize(newMeta_.configSize());
     link_.setBlockSize(newMeta_.blockSize());
@@ -803,6 +803,7 @@ void FirmwareUpgrade::finish() {
       << "New settings (firmware defaults): " << report_.defaulted << "\n";
     if (!report_.unmapped.empty())   { r << "\nNo longer exist:\n";      for (auto& s : report_.unmapped)   r << "  " << s << "\n"; }
     if (!report_.unresolved.empty()) { r << "\nCould not be resolved:\n"; for (auto& s : report_.unresolved) r << "  " << s << "\n"; }
+    if (!report_.rescaled.empty())   { r << "\nConverted to a new scale:\n"; for (auto& s : report_.rescaled) r << "  " << s << "\n"; }
     const std::string reportPath = noTune_ ? std::string()
                                            : fs::path(backupPath_).replace_extension(".report.txt").string();
     if (!reportPath.empty()) { std::ofstream f(reportPath); f << r.str(); }
@@ -824,6 +825,7 @@ void FirmwareUpgrade::finish() {
         std::to_string(report_.defaulted) + " new settings start at their defaults.";
     if (!report_.unmapped.empty())   body += "\n" + std::to_string(report_.unmapped.size()) + " no longer exist.";
     if (!report_.unresolved.empty()) body += "\n" + std::to_string(report_.unresolved.size()) + " could not be resolved.";
+    if (!report_.rescaled.empty())   body += "\n" + std::to_string(report_.rescaled.size()) + " converted to a new scale.";
     if (!sdNote_.empty()) body += "\n\n" + sdNote_;
     body += "\n\nFull report: " + reportPath;
     step_ = Step::Idle;

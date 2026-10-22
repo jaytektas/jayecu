@@ -1721,7 +1721,7 @@ int main(int argc, char** argv) {
         const std::vector<uint8_t> raw = e->loadTune(name);
         if (raw.empty() || !TuneFile::isDictFormat(raw)) return raw;
         MigrationReport scratch;
-        return TuneFile::deserialise(raw, m, rep ? *rep : scratch);
+        return TuneFile::deserialise(raw, m, rep ? *rep : scratch, nullptr, metalib::loadedFor);
     };
 
     // IMAGE → THE STUDIO. Stamps which ECU the cache belongs to, so a cross-ECU compare cannot happen,
@@ -1801,7 +1801,9 @@ int main(int argc, char** argv) {
         if (rep.needed())
             status += "  (migrated: " + std::to_string(rep.migrated) + " kept, "
                     + std::to_string(rep.defaulted) + " defaulted, "
-                    + std::to_string(rep.unmapped.size()) + " dropped)";
+                    + std::to_string(rep.unmapped.size()) + " dropped"
+                    + (rep.rescaled.empty() ? std::string() : ", " + std::to_string(rep.rescaled.size()) + " rescaled")
+                    + ")";
         if (g_loadProjectDoc) g_loadProjectDoc();   // the project layout travels with the ECU folder
         win.showStatus(status, status.size() > 24 ? 5000 : 2500);   // longer dwell when a migration note is appended
     };
@@ -2068,7 +2070,7 @@ int main(int argc, char** argv) {
                         if (!TuneFile::isDictFormat(raw)) continue;
                         MigrationReport rep;
                         std::vector<uint8_t> host;
-                        const std::vector<uint8_t> img = TuneFile::deserialise(raw, nm, rep, &host);
+                        const std::vector<uint8_t> img = TuneFile::deserialise(raw, nm, rep, &host, metalib::loadedFor);
                         if (img.empty()) continue;
                         // Never over a tune the new project already has: that one is somebody's work too.
                         std::string out = t;

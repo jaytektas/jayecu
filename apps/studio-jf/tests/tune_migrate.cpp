@@ -18,6 +18,9 @@
 //   cmake --build build --target tune_migrate
 //   ./build/tune_migrate <meta> <tune> [path ...]
 //   ./build/tune_migrate <meta> <raw.tune> --from <old-meta> [--out <image>] [path ...]
+//
+// For a dictionary, --from names the meta it was SAVED on: a value whose scale changed between the
+// two is then converted, as the studio does when it has that definition to hand.
 #include "model/MetaModel.h"
 #include "model/TuneFile.h"
 
@@ -74,12 +77,15 @@ int main(int argc, char** argv) {
                     fromMeta.c_str(), old.layoutHash().c_str(), doc.size());
     }
 
+    MetaModel saved;
+    const bool haveSaved = !fromMeta.empty() && saved.loadFile(fromMeta);
     MigrationReport rep;
-    const std::vector<uint8_t> img = TuneFile::deserialise(doc, meta, rep);
+    const std::vector<uint8_t> img = TuneFile::deserialise(doc, meta, rep, nullptr,
+        [&](const std::string& h) -> const MetaModel* { return haveSaved && h == saved.layoutHash() ? &saved : nullptr; });
     if (img.empty()) { std::puts("\nDESERIALISE FAILED — no image produced"); return 1; }
 
-    std::printf("\nmigrated %d  defaulted %d  unmapped %zu  unresolved %zu\n",
-                rep.migrated, rep.defaulted, rep.unmapped.size(), rep.unresolved.size());
+    std::printf("\nmigrated %d  defaulted %d  unmapped %zu  unresolved %zu  rescaled %zu\n",
+                rep.migrated, rep.defaulted, rep.unmapped.size(), rep.unresolved.size(), rep.rescaled.size());
     // A NAME, not just a number: "412 unmapped" says a firmware update dropped something, and which
     // ones tells you whether it mattered.
     for (size_t i = 0; i < rep.unmapped.size() && i < 12; ++i)
@@ -87,6 +93,8 @@ int main(int argc, char** argv) {
     if (rep.unmapped.size() > 12) std::printf("   … and %zu more\n", rep.unmapped.size() - 12);
     for (size_t i = 0; i < rep.unresolved.size() && i < 12; ++i)
         std::printf("   unresolved: %s\n", rep.unresolved[i].c_str());
+    for (size_t i = 0; i < rep.rescaled.size() && i < 12; ++i)
+        std::printf("   rescaled:   %s\n", rep.rescaled[i].c_str());
 
     // The requested fields, read out of the produced image — the check that actually matters, because
     // a clean report and a defaulted image can look the same from the counts alone.

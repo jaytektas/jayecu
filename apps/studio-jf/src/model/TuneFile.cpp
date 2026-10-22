@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <cctype>
 #include <set>
 
@@ -388,7 +389,8 @@ std::vector<uint8_t> TuneFile::serialise(const std::vector<uint8_t> &image, cons
 }
 
 std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson, const MetaModel &meta,
-                                           MigrationReport &report, std::vector<uint8_t> *hostOut)
+                                           MigrationReport &report, std::vector<uint8_t> *hostOut,
+                                           const SavedMeta &savedOn)
 {
     report = {};
     // The host (PcVariable) block, sized from the meta's declaration. Rebuilt here from the document so a
@@ -412,6 +414,44 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
     unsigned char *img = image.data();
     const int      sz  = static_cast<int>(image.size());
 
+    // THE LAYOUT THE TUNE WAS SAVED ON, when it is not this one and its definition is to hand. Values
+    // are raw, so a field whose scale changed has to be converted or it arrives off by the ratio.
+    const MetaModel *from = nullptr;
+    {
+        const std::string saved = root["layout_hash"].str();
+        if (savedOn && !saved.empty() && saved != meta.layoutHash()) {
+            from = savedOn(saved);
+            if (from && from->layoutHash() != saved) from = nullptr;     // not the layout asked for
+        }
+    }
+    // raw at the OLD scale -> raw at THIS one. Each key is reported once however many cells it has.
+    std::set<std::string> rescaledKeys;
+    auto rescale = [&](const std::string &key, double raw, double sOld, double sNew) -> double {
+        if (!(sOld > 0.0) || !(sNew > 0.0) || std::fabs(sOld - sNew) <= 1e-9 * std::max(sOld, sNew)) return raw;
+        if (rescaledKeys.insert(key).second) {
+            char b[96];
+            std::snprintf(b, sizeof b, " %g -> %g", sOld, sNew);
+            report.rescaled.push_back(key + b);
+        }
+        return raw * sOld / sNew;
+    };
+    // A converted value can outgrow its type (a finer scale needs more counts), and encodeRaw WRAPS:
+    // 300 into a U08 is 44. Pinned to the type instead — the nearest value it can hold.
+    auto fit = [](const std::string &type, double raw) -> double {
+        if (type == "U08") return std::clamp(raw, 0.0, 255.0);
+        if (type == "S08") return std::clamp(raw, -128.0, 127.0);
+        if (type == "U16") return std::clamp(raw, 0.0, 65535.0);
+        if (type == "S16") return std::clamp(raw, -32768.0, 32767.0);
+        if (type == "U32") return std::clamp(raw, 0.0, 4294967295.0);
+        if (type == "S32") return std::clamp(raw, -2147483648.0, 2147483647.0);
+        return raw;
+    };
+    auto oldScalarScale = [&](const std::string &key, double sNew) -> double {
+        if (!from) return sNew;
+        auto o = from->config().find(key);
+        return o == from->config().end() ? sNew : o->second.scale;
+    };
+
     // --- Scalars ---
     for (const auto &[key, val] : root["scalars"].obj()) {
         auto it = meta.config().find(key);
@@ -422,7 +462,8 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
             if (f.offset >= int(MetaModel::kPcSegmentBase)) {      // host block, not the config image
                 const int off = f.offset - int(MetaModel::kPcSegmentBase);
                 if (hostOut && off >= 0 && off + f.size <= int(hostOut->size())) {
-                    MetaModel::encodeRaw(f.datatype, hostOut->data() + off, val.number());
+                    MetaModel::encodeRaw(f.datatype, hostOut->data() + off,
+                                         fit(f.datatype, rescale(key, val.number(), oldScalarScale(key, f.scale), f.scale)));
                     ++report.migrated;
                 }
             } else if (f.offset >= 0 && f.offset + f.size <= sz) {
@@ -442,7 +483,8 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
                     else
                         report.unresolved.push_back(key + " -> " + val.str());
                 } else {
-                    MetaModel::encodeRaw(f.datatype, img + f.offset, val.number());
+                    MetaModel::encodeRaw(f.datatype, img + f.offset,
+                                         fit(f.datatype, rescale(key, val.number(), oldScalarScale(key, f.scale), f.scale)));
                 }
                 ++report.migrated;
             }
@@ -471,6 +513,11 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
         // restored from their own keys. Restoring them here too would re-apply the count and (pre-fix tunes)
         // clobber a disabled axis' real _n down to 1. So module tables only restore cells below.
         const bool isElem = key.find('[') != std::string::npos;
+        // The same table as the saved layout described it. A type-scaled table's scale is the sensor
+        // type's in that slot — chosen by the tune, not the layout — so it is never converted here.
+        TableImage ot;
+        if (from) ot = from->resolveTable(key);
+        const bool convCells = ot.valid && !ot.cellTypeScaled && !t.cellTypeScaled;
         if (isElem) {
             for (int ax = 0; ax < static_cast<int>(t.axes.size()); ++ax) {   // 1) axis config: enable, src, count
                 const TableImage::Axis &a = t.axes[ax];
@@ -501,8 +548,10 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
                 const jf::JJson &bins = axesBins[ax];
                 for (int k = 0; k < static_cast<int>(bins.size()) && k < n[ax]; ++k) {
                     const int off = a.breaksBase + k * a.breakSize;
+                    const double sOld = ot.valid && ax < static_cast<int>(ot.axes.size()) ? ot.axes[ax].breakScale : a.breakScale;
                     if (off + a.breakSize <= sz)
-                        MetaModel::encodeRaw(a.breakType, img + off, bins[k].number());
+                        MetaModel::encodeRaw(a.breakType, img + off,
+                                             fit(a.breakType, rescale(key + ".axis" + std::to_string(ax), bins[k].number(), sOld, a.breakScale)));
                 }
             }
 
@@ -516,7 +565,8 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
                     if (k >= static_cast<int>(cells.size())) continue;
                     const int off = t.cellBase + (z * alloc[0] * alloc[1] + r * alloc[0] + c) * t.cellSize;
                     if (off + t.cellSize <= sz)
-                        MetaModel::encodeRaw(t.cellType, img + off, cells[k].number());
+                        MetaModel::encodeRaw(t.cellType, img + off,
+                                             fit(t.cellType, rescale(key, cells[k].number(), convCells ? ot.cellScale : t.cellScale, t.cellScale)));
                 }
         ++report.migrated;
     }
@@ -536,7 +586,9 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
         for (int i = 0; i < static_cast<int>(vals.size()) && i < count; ++i) {
             const int off = a.offset + i * elemSz;
             if (off + elemSz > sz) break;
-            MetaModel::encodeRaw(a.datatype, img + off, vals[i].number());
+            double sOld = a.scale;
+            if (from) { auto o = from->arrays1d().find(key); if (o != from->arrays1d().end()) sOld = o->second.scale; }
+            MetaModel::encodeRaw(a.datatype, img + off, fit(a.datatype, rescale(key, vals[i].number(), sOld, a.scale)));
         }
         ++report.migrated;
     }
@@ -569,7 +621,10 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
                         report.unresolved.push_back(key + " -> " + val.str());
                     }
                 } else {
-                    MetaModel::encodeRaw(L.datatype, img + L.offset, val.number());
+                    double sOld = L.scale;
+                    if (from) { const MetaModel::Location O = from->locate(key);
+                                if (O.kind == MetaModel::Location::Kind::Scalar) sOld = O.scale; }
+                    MetaModel::encodeRaw(L.datatype, img + L.offset, fit(L.datatype, rescale(key, val.number(), sOld, L.scale)));
                     ++report.migrated;
                 }
             }

@@ -148,6 +148,11 @@ private:
     std::string dfuSerial_;            // the bootloader's USB serial, once seen (Ecu::dfuSerial)
     void recordDfuSerial();
     MetaModel oldMeta_, newMeta_;
+    // The firmware being replaced IS the layout the tune was saved on: handed to the tune load so a
+    // value whose scale changed between the two firmwares is converted, not copied.
+    TuneFile::SavedMeta savedOnOld() const {
+        return [this](const std::string& h) -> const MetaModel* { return h == oldMeta_.layoutHash() ? &oldMeta_ : nullptr; };
+    }
     std::vector<uint8_t> tuneDict_;       // the tune pulled off the ECU, by name (jayecu-tune/2)
     bool noTune_ = false;                 // the ECU had no tune: the new firmware's default tune goes on
     std::vector<uint8_t> pushed_;         // the image written to the new firmware
