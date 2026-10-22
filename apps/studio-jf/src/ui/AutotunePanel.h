@@ -84,6 +84,7 @@ public:
     // a drive of many seconds can be replayed in an instant.
     void setClock(std::function<uint32_t()> clock) { clock_ = std::move(clock); }
     [[nodiscard]] bool recording() const { return recording_; }
+    [[nodiscard]] AutotuneView::Mode viewMode() const { return view_->mode(); }   // what the grid is drawing
 
     // Write the proposal into the tune. One undo step, and the accumulated evidence is discarded
     // afterwards: it was measured against the OLD cells, and keeping it would apply the same
@@ -114,6 +115,7 @@ public:
     void refresh();          // repaint the stats/status lines from the engine
 
 private:
+    void showMode(int menuIndex);   // the grid draws what the Show menu says
     void buildControls(jf::JSceneGraph& g);
     // The filter row is built from the DEFINITION, so it cannot exist until one is loaded — rebuilt on
     // every attach, one spin box per declared filter, in the order the definition lists them.

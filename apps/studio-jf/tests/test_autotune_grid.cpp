@@ -72,6 +72,10 @@ int main() {
     AutotunePanel p(g);
     p.attach();
 
+    // The Show menu opens on Session %, and the grid must be drawing Session % — it used to draw
+    // Change % under that label, which on a continuous-apply drive is a grid of zeros.
+    ck(p.viewMode() == AutotuneView::Mode::Session, "the grid opens drawing Session %, as the menu says");
+
     const std::string path = p.tablePath();
     ck(!path.empty(), "the panel resolved a table to tune", path);
     ck(p.gridMatchesTable(), "…and its grid is that table's grid");
@@ -228,6 +232,7 @@ int main() {
         p.resetSession();
         p.start();
         p.setApplyContinuously(true);
+        ck(p.viewMode() == AutotuneView::Mode::Session, "writing as it drives, the grid shows Session %");
         const int lc0 = [&] { drive(1.06, 1); return p.engine().lastCol() < 0 ? 0 : p.engine().lastCol(); }();
         const int lr0 = p.engine().lastRow() < 0 ? 0 : p.engine().lastRow();
         const double was = c.tiCell(t, lc0, lr0, 0);

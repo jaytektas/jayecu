@@ -54,6 +54,11 @@ AutotunePanel::AutotunePanel(JSceneGraph& g) : JContainer(g) {
     view_->setBounds({ 0.f, 0.f, 640.f, 380.f });
     view_->setVSizePolicy(JSizePolicyMode::Expanding, 1);
     view_->setEngine(&eng_);
+    // THE GRID SHOWS WHAT THE MENU SAYS FROM THE START. The menu is set to Session % before its handler
+    // exists, so the view kept its own default (Change %) under a menu reading "Session %" — and ticking
+    // Apply continuously re-selects index 0, which is no change, so nothing fired then either. Driving
+    // with continuous writes, the proposal is spent every two seconds: a grid of zeros labelled Session %.
+    showMode(modeBox_->currentIndex());
 
     // The accountability line, last so it sits under the grid it is accounting for.
     // WRAPPED, and as tall as its lines (populateRenderPrimitives fits it to the width it is given).
@@ -62,6 +67,14 @@ AutotunePanel::AutotunePanel(JSceneGraph& g) : JContainer(g) {
     stats_->setVSizePolicy(JSizePolicyMode::Fixed, 0);
 
     refresh();
+}
+
+void AutotunePanel::showMode(int i) {
+    view_->setMode(i == 0 ? AutotuneView::Mode::Session
+                 : i == 2 ? AutotuneView::Mode::Proposed
+                 : i == 3 ? AutotuneView::Mode::Base
+                 : i == 4 ? AutotuneView::Mode::Weight
+                          : AutotuneView::Mode::Change);
 }
 
 void AutotunePanel::buildControls(JSceneGraph& g) {
@@ -119,13 +132,7 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
         if (on && modeBox_) modeBox_->setCurrentIndex(0);
         refresh();
     });
-    modeBox_->onIndexChanged.connect([this](int i) {
-        view_->setMode(i == 0 ? AutotuneView::Mode::Session
-                     : i == 2 ? AutotuneView::Mode::Proposed
-                     : i == 3 ? AutotuneView::Mode::Base
-                     : i == 4 ? AutotuneView::Mode::Weight
-                              : AutotuneView::Mode::Change);
-    });
+    modeBox_->onIndexChanged.connect([this](int i) { showMode(i); });
     resistBox_->onIndexChanged.connect([this](int) { applySettings(); refresh(); });
     targetBox_->onIndexChanged.connect([this](int i) { if (!selecting_) selectTarget(i); });
 }
