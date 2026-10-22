@@ -79,6 +79,20 @@ int main() {
     ck(!call("table-set " + T + " [[1,2]]")["ok"].boolean(true), "a grid of the wrong shape is refused");
     ck(call("table " + T)["cells"][0][0].number() == 50.0, "…and writes nothing");
 
+    // The breakpoints: the part of a table its cells cannot reach.
+    std::string bins = "[";
+    for (int c2 = 0; c2 < cols; ++c2) bins += (c2 ? "," : "") + std::to_string(500 + 500 * c2);
+    bins += "]";
+    ck(call("axis-set " + T + " x " + bins)["ok"].boolean(), "axis-set writes an axis's breakpoints");
+    ck(call("table " + T)["x"]["bins"][1].number() == 1000.0, "…and they read back");
+    ck(!call("axis-set " + T + " x [1,2]")["ok"].boolean(true), "the wrong number of breakpoints is refused");
+    std::string down = "[";
+    for (int c2 = 0; c2 < cols; ++c2) down += (c2 ? "," : "") + std::to_string(9000 - 500 * c2);
+    down += "]";
+    ck(!call("axis-set " + T + " x " + down)["ok"].boolean(true), "…and so are breakpoints that do not ascend");
+    ck(call("table " + T)["x"]["bins"][1].number() == 1000.0, "…which write nothing");
+    ck(!call("axis-set " + T + " q " + bins)["ok"].boolean(true), "an axis that is not x, y or z is refused");
+
     std::puts("\n=== the tune is locked ===");
     c.setReadOnly(true);
     ck(!call("set engine.cylinder_count 4")["ok"].boolean(true), "a locked tune refuses a write");

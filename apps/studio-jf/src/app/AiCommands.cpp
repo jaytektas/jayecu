@@ -302,6 +302,7 @@ const char* kHelp =
     "  table <path>                   axes (bins, channel) and cells, rows of columns\n"
     "  table-set <path> <json>        write cells: [[row0...],[row1...]] (3-D: planes of those)\n"
     "  cell <path> <col> <row> <v>    write one cell (0-based)\n"
+    "  axis-set <path> x|y|z <json>   write an axis's live breakpoints: [b0, b1, ...] ascending\n"
     "  channels [filter]              the live channels (name, label, units, module, rate)\n"
     "  live [name ...]                their values now; no names = every channel\n"
     "  burn                           persist the ECU's RAM tune to flash\n"
@@ -316,7 +317,7 @@ bool handle(const std::string& action, const Host& host, std::string& reply) {
     std::string verb, rest;
     splitFirst(action, verb, rest);
     static const char* kVerbs[] = { "help", "status", "settings", "get", "set", "tables", "table",
-                                    "table-set", "cell", "channels", "live", "burn", "save", "page", "key" };
+                                    "table-set", "cell", "axis-set", "channels", "live", "burn", "save", "page", "key" };
     if (std::find_if(std::begin(kVerbs), std::end(kVerbs), [&](const char* v) { return verb == v; })
         == std::end(kVerbs))
         return false;
@@ -450,6 +451,36 @@ bool handle(const std::string& action, const Host& host, std::string& reply) {
                     c.setTableCell(path, col, r, g.arr()[size_t(r)].arr()[size_t(col)].number(), z);
         }
         c.endEdit("AI: " + path);
+        JJson o = tableJson(c, *m, path, true);
+        o["ok"] = JJson(true);
+        return done(o);
+    }
+    // THE BREAKPOINTS, the one part of a table cells cannot reach — re-pointing an axis at another channel
+    // (its source is an ordinary setting) is half a change until its bins describe the new quantity.
+    // Same path as typing them into the table's axis strip: snapped to the axis's precision, one edit.
+    if (verb == "axis-set") {
+        std::string path, args, which, json;
+        splitFirst(rest, path, args);
+        splitFirst(args, which, json);
+        if (path.empty() || !c.isTable(path)) return done(fail("no table '" + path + "'"));
+        if (c.readOnly()) return done(fail("the tune is locked (the studio's Locked switch)"));
+        if (c.lockedWhileRunning(path)) return done(fail("'" + path + "' cannot be changed while the engine is turning"));
+        const int axis = which == "x" ? 0 : which == "y" ? 1 : which == "z" ? 2 : -1;
+        const TableImage t = c.resolveTable(path);
+        if (!t.valid || axis < 0 || axis >= int(t.axes.size()))
+            return done(fail("axis-set <path> x|y|z <json>: no such axis on '" + path + "'"));
+        const auto doc = JJson::tryParse(json);
+        if (!doc || !doc->isArray()) return done(fail("axis-set: the breakpoints are not a JSON array"));
+        const int n = c.tiLiveN(t, axis);
+        if (int(doc->arr().size()) != n)
+            return done(fail("the axis has " + std::to_string(n) + " live breakpoints (set its bin count first)"));
+        std::vector<double> vals;
+        for (const JJson& v : doc->arr()) vals.push_back(c.snapBin(t, axis, v.number()));
+        for (size_t k = 1; k < vals.size(); ++k)
+            if (vals[k] <= vals[k - 1]) return done(fail("axis-set: breakpoints must ascend"));
+        c.beginEdit();
+        c.tiWriteBins(t, axis, vals);
+        c.endEdit("AI: " + path + " axis " + which);
         JJson o = tableJson(c, *m, path, true);
         o["ok"] = JJson(true);
         return done(o);
