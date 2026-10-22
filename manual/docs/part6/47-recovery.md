@@ -55,6 +55,12 @@ The ECU also ends up waiting in its bootloader on its own if a firmware update i
    in its bootloader**, which lists every board type it has firmware for, each with the firmware
    version it would install (`jaytek_v1 — firmware 0.4.0`, `proteus_f7 — firmware 0.4.0`). These
    are hardware types, not the ECUs it has connected to before.
+   - **An ECU it has seen before.** Each bootloader has a serial number of its own, and the studio
+     notes it whenever it installs firmware. If it knows this one, it names the ECU and its board,
+     and that board is already chosen.
+   - **An ECU it has not seen before.** Nothing is chosen. The board's firmware is no guide: a board
+     can run another board's firmware (a bench board running a build made for another board).
+     Choose by the board itself.
 4. Choose the board this ECU is and press **Install**. Choose carefully: firmware for another board
    drives the wrong pins. If the studio does not yet have USB access to the bootloader — the
    permission rule on Linux, the USB driver on Windows — it asks for it first (chapter 3). Then the
@@ -145,6 +151,8 @@ meta: the studio fetches it from the card (chapter 48).
 | "The studio has no firmware for …" | No kit for that board | Check now for updates |
 | Firmware installed, engine side still off, **NO TUNE ON THE ECU** | No tune for this firmware | Section 2 |
 | The wrong board was chosen | Firmware for another board | Recover again, choosing the right one |
+| The bootloader list chose a board you did not expect | It recognised this bootloader from an earlier install, and the board record is from that time | Choose the board printed on the ECU; the studio records the new choice |
+| After recovery, **ACTIVE** codes or a protection level you did not expect | Stored codes left on the SD card by other firmware (firmware 0.4.14 and older loaded them) | Clear them in the DTC dock. Newer firmware discards a store it did not write at power-up (chapter 44) |
 
 ## Related
 

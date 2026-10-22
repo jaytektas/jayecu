@@ -167,10 +167,16 @@ large for a command line.
 
 The window also publishes every visible control. `jf-busctl dump` lists them (id, kind, caption,
 value; its first line says how many, and `dropped=` how many did not fit, normally 0), and `jf-busctl act <id or caption> click` presses one, `type:12.5` types into it, `key:Return`
-presses a key, and `dialog:ok` answers the dialog in front. This drives the studio the way a person
-does, which is what testing a page needs. For reading and writing the tune, the commands above are
+presses a key, and `dialog:ok` answers the dialog in front. `select:<text>` picks an option in a
+drop-down, or a row in a list: the row whose text is exactly that, otherwise the one row that starts
+with it. This drives the studio the way a person does, which is what testing a page needs.
+
+While a dialog is open, only that dialog's controls can be pressed, as for a person: an action
+aimed at the window behind it is refused, and the reply says a dialog is open.
+
+For reading and writing the tune, the commands above are
 quicker and do not depend on the layout.
-<!-- src: JFramework include/j/core/JAiBus.h (click, type:, key:, dialog:ok); JFramework docs/architecture/02_AI_CONTROL_BUS.md -->
+<!-- src: JFramework include/j/core/JAiBus.h (click, type:, key:, dialog:ok, blockedBy); JFramework include/j/app/JAppWindow.h (modal gate); apps/studio-jf/main.cpp (select: on JListView); JFramework docs/architecture/02_AI_CONTROL_BUS.md -->
 
 ## Examples
 

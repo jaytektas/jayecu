@@ -27,6 +27,8 @@
 - **Downloaded**: with **Check for firmware updates at startup** on (Edit ▸ Preferences ▸ Updates), or
   when you press **Check now**, the studio looks for newer firmware for every board it has met or has
   a kit for, and downloads it. Every file is checked against the release's published checksums before it is kept.
+  If the connection stops part-way, the download carries on from where it stopped rather than
+  starting again; the studio's own update does the same.
   Nothing is put on an ECU by this: it only makes the kit available.
 - **Beta**: with **Include beta firmware** on (Preferences ▸ Updates), the check also looks at beta
   releases published between full ones, and downloads whichever is newest. A beta's version reads
@@ -57,6 +59,14 @@ Under them, **What else changed** says in words what each newer version changes 
 behaves, a fix, a page that reads better — which the two halves cannot show because no setting moved.
 If your ECU is several versions behind, every one of them is listed, newest first. When no setting
 changes at all, this is most of the report, headed **What changed**.
+
+A tune stores each value as the number the ECU holds, not the number you see. If a new firmware stores
+a setting with a different resolution (dwell in 0.01 ms steps instead of 0.1 ms, say), the studio
+converts the stored number so the value you set is unchanged. A value too large for the new storage is
+held at the largest it can take. The finished update says how many were converted, and its full report
+(beside the backup) lists them under **Converted to a new scale**. The same applies when you open an
+offline tune saved on older firmware, as long as the studio still has that firmware's definition. If it
+does not, values are carried over unchanged.
 
 That report is the question: **Update firmware** or **Not now**. Not now changes nothing; the next
 connect asks again, and so does **Tools ▸ Check for ECU Firmware Update…** at any time while connected.

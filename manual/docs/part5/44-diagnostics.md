@@ -49,7 +49,12 @@ The complete list of codes is in the reference section: [Trouble codes](../refer
 - **Freeze frame**: engine speed, MAP, coolant and battery voltage the last time it went active.
 - **Ageing**: a key cycle in which a stored code never went active is a clean cycle. After 3 clean
   cycles a code is no longer "confirmed"; after 40 it is removed.
-  <!-- src: firmware/Diagnostics/Dtc.h; firmware/Diagnostics/DtcManager.cpp -->
+- **Kept on the SD card**: stored codes are saved to the card and come back at power-up, not active.
+  The firmware loads the file only if it wrote it (it carries a checksum, and every code in it must be
+  one the firmware could have stored). A file left by other firmware is discarded at power-up, the
+  console says so, and the ECU starts with no stored codes. Older firmware loaded such a file as
+  stored history, which could raise a protection level on its own.
+  <!-- src: firmware/Diagnostics/Dtc.h; firmware/Diagnostics/DtcManager.cpp (store_version, restore); firmware/Storage/SdDtcStore.cpp -->
 
 ### 2 · Severity and protection
 
