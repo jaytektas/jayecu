@@ -28,6 +28,7 @@
 // Documented for users in the manual (part 6, "Driving the studio from a script or an AI").
 
 #include <functional>
+#include <map>
 #include <string>
 
 #include <j/config/Json.h>
@@ -40,6 +41,16 @@ struct Host {
     std::function<bool(std::string& why)>                    burn;     // false + why when it cannot
     std::function<bool(std::string& why)>                    save;
     std::function<bool(const std::string& path, std::string& why)> page;   // show a page (window only)
+
+    // EVERYTHING ELSE THE APP CAN DO, by name. What a tuner reaches through a button — connect, Auto
+    // Tune, the card's logs, the trouble codes — a script has to reach too, or it is left asking the
+    // person at the wheel to click for it. The app registers each with its own usage line, so `help`
+    // lists exactly what this build answers. `run` fills `out` (merged into the reply) or says why not.
+    struct Verb {
+        std::string usage, help;
+        std::function<bool(const std::string& args, jf::JJson& out, std::string& why)> run;
+    };
+    std::map<std::string, Verb> verbs;
 };
 
 // Handle `action` if it is one of these commands: fills `reply` (JSON) and returns true. False means

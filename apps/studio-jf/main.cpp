@@ -7015,6 +7015,198 @@ int main(int argc, char** argv) {
         hyperlink::navigator()(path);
         return true;
     };
+
+    // ---- what a button does, by name (AiCommands.h: Host::verbs) ----
+    using JJ = jf::JJson;
+    aiHost.verbs["connect"] = { "connect", "open the link to the ECU, as the toolbar button does",
+        [&connectFn](const std::string&, JJ& out, std::string& why) {
+            if (link.isOpen() || tsLink.isOpen()) { out["connected"] = JJ(true); return true; }
+            if (!connectFn) { why = "no connect path in this build"; return false; }
+            connectFn();
+            out["connecting"] = JJ(true);       // the identity and tune follow asynchronously: watch status
+            return true;
+        } };
+    aiHost.verbs["disconnect"] = { "disconnect", "close the link (the tune is saved first, as the button does)",
+        [&connectFn](const std::string&, JJ& out, std::string& why) {
+            if (!(link.isOpen() || tsLink.isOpen())) { out["connected"] = JJ(false); return true; }
+            if (!connectFn) { why = "no connect path in this build"; return false; }
+            connectFn();
+            out["connected"] = JJ(false);
+            return true;
+        } };
+
+    // AUTO TUNE, without its tab having to be open or anyone at the keyboard.
+    aiHost.verbs["autotune"] = {
+        "autotune status|start|stop|reset|apply|continuous on|off|grid [session|change|proposed|base|weight]",
+        "",
+        [](const std::string& args, JJ& out, std::string& why) {
+            std::istringstream in(args);
+            std::string sub, opt;
+            in >> sub >> opt;
+            AutotunePanel& p = autotunePanel;
+            if (p.tablePath().empty()) p.attach();
+            if (p.tablePath().empty()) { why = "no table to tune: is a tune loaded?"; return false; }
+            if (sub == "start")       p.start();
+            else if (sub == "stop")   p.stop();
+            else if (sub == "reset")  p.resetSession();
+            else if (sub == "apply")  p.applyProposal();
+            else if (sub == "continuous") {
+                if (opt != "on" && opt != "off") { why = "autotune continuous on|off"; return false; }
+                p.setApplyContinuously(opt == "on");
+            } else if (sub == "grid") {
+                const autotune::Engine& e = p.engine();
+                const std::string mode = opt.empty() ? "session" : opt;
+                JJ rows = JJ::array();
+                for (int r = 0; r < e.rows(); ++r) {
+                    JJ row = JJ::array();
+                    for (int col = 0; col < e.cols(); ++col) {
+                        double v = 0.0;
+                        if      (mode == "session")  v = e.sessionPct(col, r);
+                        else if (mode == "change")   v = e.changePct(col, r);
+                        else if (mode == "proposed") v = e.proposed(col, r);
+                        else if (mode == "base")     v = e.base(col, r);
+                        else if (mode == "weight")   v = e.weight(col, r);
+                        else { why = "autotune grid session|change|proposed|base|weight"; return false; }
+                        row.push(JJ(std::round(v * 100.0) / 100.0));
+                    }
+                    rows.push(row);
+                }
+                JJ xb = JJ::array(), yb = JJ::array();
+                for (double v : e.xBins()) xb.push(JJ(v));
+                for (double v : e.yBins()) yb.push(JJ(v));
+                out["mode"] = JJ(mode);
+                out["x"] = xb; out["y"] = yb;
+                out["cells"] = rows;            // rows of columns, row 0 = the first (lowest) y bin
+            } else if (!sub.empty() && sub != "status") {
+                why = "autotune status|start|stop|reset|apply|continuous on|off|grid [mode]";
+                return false;
+            }
+            const autotune::Stats st = p.engine().stats();
+            out["table"]      = JJ(p.tablePath());
+            out["recording"]  = JJ(p.recording());
+            out["continuous"] = JJ(p.applyContinuously());
+            out["session"]    = JJ(p.engine().hasReference());
+            JJ s = JJ::object();
+            s["records"] = JJ(double(st.total)); s["filtered"] = JJ(double(st.filtered));
+            s["used"] = JJ(double(st.used));     s["altered_cells"] = JJ(st.altered);
+            s["avg_change_pct"] = JJ(st.avgChange); s["max_change_pct"] = JJ(st.maxChange);
+            if (!st.activeFilter.empty()) s["last_rejected_by"] = JJ(st.activeFilter);
+            out["stats"] = s;
+            return true;
+        } };
+
+    // THE CARD'S LOGS: listed, and brought across on a worker — a drive's log is tens of megabytes.
+    struct CardJob { std::vector<CardLogs::Entry> items; uint64_t total = 0;
+                     std::atomic<size_t> index{0}; std::atomic<uint64_t> done{0}; std::atomic<bool> finished{false};
+                     size_t ok = 0, failed = 0; std::string firstErr; };
+    static std::shared_ptr<CardJob> s_cardJob;
+    aiHost.verbs["cardlogs"] = { "cardlogs list|import new|import <LOGnnnn.MLG> ...|status",
+        "the ECU's SD logs, once the card is mounted (key off)",
+        [](const std::string& args, JJ& out, std::string& why) {
+            std::istringstream in(args);
+            std::string sub; in >> sub;
+            auto progress = [&] {
+                if (!s_cardJob) return;
+                JJ j = JJ::object();
+                const size_t i = s_cardJob->index.load(), n = s_cardJob->items.size();
+                j["file"] = JJ(i < n ? s_cardJob->items[i].name : std::string());
+                j["files_done"] = JJ(double(std::min(i, n))); j["files"] = JJ(double(n));
+                j["bytes_done"] = JJ(double(s_cardJob->done.load())); j["bytes"] = JJ(double(s_cardJob->total));
+                j["finished"] = JJ(s_cardJob->finished.load());
+                if (s_cardJob->finished.load()) {
+                    j["imported"] = JJ(double(s_cardJob->ok)); j["failed"] = JJ(double(s_cardJob->failed));
+                    if (!s_cardJob->firstErr.empty()) j["error"] = JJ(s_cardJob->firstErr);
+                }
+                out["import"] = j;
+            };
+            if (sub == "status") { progress(); if (!s_cardJob) out["import"] = JJ(std::string("none")); return true; }
+            const std::string card = CardLogs::findCard();
+            out["card"] = JJ(card);
+            out["into"] = JJ(CardLogs::importDirectory());
+            if (card.empty()) { why = "no card mounted: key off and give it a moment"; return false; }
+            const std::vector<CardLogs::Entry> logs = CardLogs::logsOn(card);
+            if (sub.empty() || sub == "list") {
+                JJ list = JJ::array();
+                for (const auto& e : logs) {
+                    JJ x = JJ::object();
+                    x["name"] = JJ(e.name); x["bytes"] = JJ(double(e.bytes)); x["epoch"] = JJ(double(e.epoch));
+                    x["imported"] = JJ(e.imported); x["target"] = JJ(e.target);
+                    list.push(x);
+                }
+                out["logs"] = list;
+                progress();
+                return true;
+            }
+            if (sub != "import") { why = "cardlogs list|import new|import <name> ...|status"; return false; }
+            if (s_cardJob && !s_cardJob->finished.load()) { why = "an import is already running (cardlogs status)"; return false; }
+            std::vector<std::string> names; for (std::string w; in >> w;) names.push_back(w);
+            auto job = std::make_shared<CardJob>();
+            for (const auto& e : logs) {
+                const bool want = (names.empty() || (names.size() == 1 && names[0] == "new")) ? !e.imported
+                                : std::find(names.begin(), names.end(), e.name) != names.end();
+                if (want && !e.imported) { job->items.push_back(e); job->total += e.bytes; }
+            }
+            if (job->items.empty()) { out["import"] = JJ(std::string("nothing to import")); return true; }
+            s_cardJob = job;
+            std::thread([job] {
+                uint64_t before = 0;
+                for (size_t i = 0; i < job->items.size(); ++i) {
+                    job->index = i;
+                    std::string w;
+                    if (CardLogs::import(job->items[i], &w, [&](uint64_t b) { job->done = before + b; })) ++job->ok;
+                    else { ++job->failed; if (job->firstErr.empty()) job->firstErr = w; }
+                    before += job->items[i].bytes;
+                    job->done = before;
+                }
+                job->index = job->items.size();
+                job->finished = true;
+            }).detach();
+            progress();
+            return true;
+        } };
+
+    // THE TROUBLE CODES, as the DTC dock shows them.
+    aiHost.verbs["dtc"] = { "dtc list|refresh|clear", "trouble codes: active and stored, with counts and freeze frames",
+        [](const std::string& args, JJ& out, std::string& why) {
+            const std::string sub = args.empty() ? std::string("list") : args;
+            if (sub == "refresh" || sub == "clear") {
+                if (!link.isOpen()) { why = "not connected to an ECU"; return false; }
+                if (sub == "clear") link.clearDtcs();
+                link.readDtcImage();
+                out["requested"] = JJ(sub);
+                return true;
+            }
+            if (sub != "list") { why = "dtc list|refresh|clear"; return false; }
+            JJ list = JJ::array();
+            for (const DtcTable::Row& r : dtcView.rows()) {
+                JJ x = JJ::object();
+                x["code"] = JJ(r.code); x["status"] = JJ(r.status); x["severity"] = JJ(r.severity);
+                x["source"] = JJ(r.source); x["count"] = JJ(r.count); x["first"] = JJ(r.first);
+                x["last"] = JJ(r.last);
+                if (!r.desc.empty())   x["description"] = JJ(r.desc);
+                if (!r.freeze.empty()) x["freeze"] = JJ(r.freeze);
+                list.push(x);
+            }
+            out["summary"] = JJ(dtcView.summary());
+            out["codes"] = list;
+            return true;
+        } };
+
+    // THE STUDIO'S OWN RECORDING (the PC-side log, separate from the ECU's card).
+    aiHost.verbs["record"] = { "record start|stop|status", "the studio's PC-side datalog",
+        [](const std::string& args, JJ& out, std::string& why) {
+            DatalogRecorder& r = DatalogRecorder::instance();
+            if (args == "start") {
+                if (!r.recording() && !r.start(&why)) return false;
+                refreshRecBtn();
+            } else if (args == "stop") {
+                if (r.recording()) out["saved"] = JJ(r.stop());
+                refreshRecBtn();
+            } else if (!args.empty() && args != "status") { why = "record start|stop|status"; return false; }
+            out["recording"] = JJ(r.recording());
+            if (r.recording()) { out["path"] = JJ(r.path()); out["rows"] = JJ(double(r.rows())); }
+            return true;
+        } };
     jf::JAiBus::instance().onAction = [&win](uint32_t id, const std::string& action) -> int {
         {
             std::string reply;

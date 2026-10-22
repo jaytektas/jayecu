@@ -31,6 +31,23 @@ int main() {
     std::string r;
     ck(!aicmd::handle("click", aicmd::Host{}, r), "a widget action is not ours (the bus's own dispatch has it)");
 
+    // What a button does, by name: the app registers a verb, and the bus answers it and lists it.
+    {
+        aicmd::Host h;
+        h.verbs["echo"] = { "echo <words>", "say it back",
+            [](const std::string& args, jf::JJson& out, std::string& why) {
+                if (args.empty()) { why = "echo needs words"; return false; }
+                out["said"] = jf::JJson(args);
+                return true;
+            } };
+        std::string rr;
+        ck(aicmd::handle("echo hello there", h, rr) && jf::JJson::tryParse(rr)->operator[]("said").str() == "hello there",
+           "an app verb is answered with what it put in the reply", rr);
+        ck(aicmd::handle("echo", h, rr) && !(*jf::JJson::tryParse(rr))["ok"].boolean(true)
+           && (*jf::JJson::tryParse(rr))["error"].str() == "echo needs words", "…and its refusal says why", rr);
+        ck(aicmd::handle("help", h, rr) && rr.find("echo <words>") != std::string::npos, "help lists it");
+    }
+
     MetaModel m;
     if (!m.loadFile(REAL_META)) { std::fprintf(stderr, "cannot load %s\n", REAL_META); return 1; }
     Cache& c = Cache::instance();
@@ -52,6 +69,11 @@ int main() {
        && call("get sensors.sensor[clt].interface")["id"].str() == "analog_voltage", "…or by its label");
     ck(call("set vehicle.Name Bench Car")["ok"].boolean()
        && call("get vehicle.Name")["value"].str() == "Bench Car", "text is written whole, spaces and all");
+
+    jf::JJson cals = call("tables lambda");
+    bool named = false;
+    for (const jf::JJson& e : cals["tables"].arr()) if (e["path"].str() == "sensors.sensor[lambda_1].cal") named = true;
+    ck(named, "a sensor's calibration curve is listed by the sensor's id, so 'tables lambda' finds it");
 
     jf::JJson list = call("settings cylinder_count");
     ck(list["ok"].boolean() && list["count"].number() >= 1, "settings finds by filter", list.dump().substr(0, 120));

@@ -49,6 +49,8 @@ public:
     // clipped every header to two or three letters ("Co", "Sta", "Se") and every cell with it. The
     // grid scrolls horizontally, so overflow is a scrollbar rather than a guess at what "Fir" meant.
 
+    [[nodiscard]] const std::vector<Row>& rowData() const { return m_meta; }
+
     void setRows(std::vector<Row> r) {
         m_meta = std::move(r);
         std::vector<std::vector<std::string>> cells;
@@ -134,6 +136,9 @@ public:
         table_->setVSizePolicy(jf::JSizePolicyMode::Expanding, 1);
         add(row_.get()); add(summary_.get()); add(table_.get());
     }
+
+    [[nodiscard]] const std::vector<DtcTable::Row>& rows() const { return table_->rowData(); }
+    [[nodiscard]] const std::string& summary() const { return summary_->text(); }
 
     void setImage(const std::vector<uint8_t>& img) {
         // The 1 Hz background poll re-reads this image continuously and it is almost always identical.

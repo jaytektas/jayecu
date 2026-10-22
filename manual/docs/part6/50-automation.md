@@ -134,15 +134,24 @@ telemetry arrived.
 | `settings [filter]` | every setting: path, label, kind, units, value, range |
 | `get <path>` | one setting in full: value, units, range, its options, its help text |
 | `set <path> <value>` | write it, in the units shown; a choice by label or id |
-| `tables [filter]` | every table, with its size |
+| `tables [filter]` | every table, with its size — a sensor's calibration curve too, by the sensor's id (`sensors.sensor[map].cal`) |
 | `table <path>` | the table: each axis's bins and channel, and the cells |
 | `table-set <path> <json>` | write every cell: `[[row 0…],[row 1…]]` (a 3-D table: a list of those) |
 | `cell <path> <col> <row> <value>` | write one cell (counting from 0) |
+| `axis-set <path> x\|y\|z <json>` | write an axis's breakpoints, `[b0, b1, …]`, ascending, as many as it has live |
 | `channels [filter]` | the live channels: name, label, units, rate |
 | `live [name …]` | their values now; with no names, every channel |
 | `burn` | make the ECU keep what it has (flash) |
 | `save` | save the tune into the ECU's folder in the studio's library |
 | `page <navigation path>` | show a page (window only), e.g. `Configuration/Engine Configuration` |
+| `key on\|off\|auto` | force the ECU's key: `off` stops the engine (no fuel, no spark); `auto` hands it back |
+| `connect` / `disconnect` | open or close the link, as the toolbar button does (the tune is saved first) |
+| `autotune status\|start\|stop\|reset\|apply` | Auto Tune without its tab open: run it, pause it, start a new session, apply the proposal |
+| `autotune continuous on\|off` | write to the map as it drives |
+| `autotune grid [session\|change\|proposed\|base\|weight]` | the grid as the panel shows it: Session % by default, rows of columns |
+| `cardlogs list\|import new\|import <name>…\|status` | the ECU's SD logs once the card is mounted; an import runs in the background, and `status` reports its progress |
+| `dtc list\|refresh\|clear` | the trouble codes, as the DTC dock shows them, with freeze frames |
+| `record start\|stop\|status` | the studio's own PC-side datalog |
 | `quit` | stop (headless only) |
 
 A table's cells are **rows of columns**: `cells[2][5]` is row 2, column 5. Row 0 is the first Y bin, and
@@ -151,12 +160,13 @@ column 0 is the first X bin, as the axes list them.
 `jf-busctl` exits 0 when a command succeeded and 4 when it was refused (the reply says why), so a
 script can test it the ordinary way. An action of `-` is read from standard input, for a table too
 large for a command line.
-<!-- src: apps/studio-jf/src/app/AiCommands.cpp (kHelp, handle); JFramework tools/jf-busctl.cpp (exit codes, '-' from stdin) -->
+`help` lists every command this studio answers, including the ones the window adds.
+<!-- src: apps/studio-jf/src/app/AiCommands.cpp (kHelp, handle, Host::verbs); apps/studio-jf/main.cpp (aiHost.verbs); JFramework tools/jf-busctl.cpp (exit codes, '-' from stdin) -->
 
 ### 5 · With the window: the pages themselves
 
 The window also publishes every visible control. `jf-busctl dump` lists them (id, kind, caption,
-value), and `jf-busctl act <id or caption> click` presses one, `type:12.5` types into it, `key:Return`
+value; its first line says how many, and `dropped=` how many did not fit, normally 0), and `jf-busctl act <id or caption> click` presses one, `type:12.5` types into it, `key:Return`
 presses a key, and `dialog:ok` answers the dialog in front. This drives the studio the way a person
 does, which is what testing a page needs. For reading and writing the tune, the commands above are
 quicker and do not depend on the layout.

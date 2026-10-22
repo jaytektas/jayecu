@@ -316,6 +316,13 @@ const char* kHelp =
 bool handle(const std::string& action, const Host& host, std::string& reply) {
     std::string verb, rest;
     splitFirst(action, verb, rest);
+    if (const auto hv = host.verbs.find(verb); hv != host.verbs.end() && hv->second.run) {
+        JJson out = okObj();
+        std::string why;
+        if (!hv->second.run(rest, out, why)) { reply = fail(why.empty() ? hv->second.usage : why).dump(); return true; }
+        reply = out.dump();
+        return true;
+    }
     static const char* kVerbs[] = { "help", "status", "settings", "get", "set", "tables", "table",
                                     "table-set", "cell", "axis-set", "channels", "live", "burn", "save", "page", "key" };
     if (std::find_if(std::begin(kVerbs), std::end(kVerbs), [&](const char* v) { return verb == v; })
@@ -326,7 +333,15 @@ bool handle(const std::string& action, const Host& host, std::string& reply) {
     Cache& c = Cache::instance();
     const MetaModel* m = c.meta();
 
-    if (verb == "help") { JJson o = okObj(); o["help"] = JJson(std::string(kHelp)); return done(o); }
+    if (verb == "help") {
+        std::string h = kHelp;
+        for (const auto& [name, v] : host.verbs) {
+            std::string u = v.usage;
+            if (u.size() < 31) u.append(31 - u.size(), ' ');
+            h += "\n  " + u + v.help;
+        }
+        JJson o = okObj(); o["help"] = JJson(h); return done(o);
+    }
     if (verb == "status") {
         JJson o = host.status ? host.status() : JJson::object();
         o["ok"] = JJson(true);
@@ -391,11 +406,37 @@ bool handle(const std::string& action, const Host& host, std::string& reply) {
     }
     if (verb == "tables") {
         JJson list = JJson::array();
-        std::vector<std::string> paths = m->tableInstancePaths();
-        std::sort(paths.begin(), paths.end());
-        for (const std::string& p : paths) {
-            const TableImage t = c.resolveTable(p);
-            if (t.valid && matches(rest, p, t.label)) list.push(tableJson(c, *m, p, false));
+        // A table that belongs to an array ELEMENT (each sensor's calibration curve) is named the way its
+        // settings are: by the element's id and label — sensors.sensor[map].cal, "MAP · Calibration" — so
+        // "tables map" finds it. By index and bare label, sixteen curves all read "Calibration".
+        struct Named { std::string path, label; };
+        std::vector<Named> named;
+        for (const std::string& p : m->tableInstancePaths()) {
+            Named n{ p, {} };
+            const size_t lb = p.find('['), rb = p.find(']');
+            if (lb != std::string::npos && rb != std::string::npos && rb > lb) {
+                const std::string arr = p.substr(0, lb);
+                const auto it = m->configArrays().find(arr);
+                const int i = std::atoi(p.substr(lb + 1, rb - lb - 1).c_str());
+                if (it != m->configArrays().end() && i >= 0 && i < it->second.count) {
+                    const auto& ca = it->second;
+                    if (i < int(ca.elementIds.size()) && !ca.elementIds[size_t(i)].empty())
+                        n.path = arr + "[" + ca.elementIds[size_t(i)] + "]" + p.substr(rb + 1);
+                    n.label = (i < int(ca.elementLabels.size()) && !ca.elementLabels[size_t(i)].empty())
+                            ? ca.elementLabels[size_t(i)] : ca.label + " " + std::to_string(i + 1);
+                }
+            }
+            named.push_back(std::move(n));
+        }
+        std::sort(named.begin(), named.end(), [](const Named& a, const Named& b) { return a.path < b.path; });
+        for (const Named& n : named) {
+            const TableImage t = c.resolveTable(n.path);
+            if (!t.valid) continue;
+            const std::string label = n.label.empty() ? t.label : n.label + " \xC2\xB7 " + t.label;
+            if (!matches(rest, n.path, label)) continue;
+            JJson e = tableJson(c, *m, n.path, false);
+            e["label"] = JJson(label);
+            list.push(e);
         }
         JJson o = okObj();
         o["count"] = JJson(double(list.size()));

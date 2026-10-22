@@ -84,6 +84,7 @@ public:
     // a drive of many seconds can be replayed in an instant.
     void setClock(std::function<uint32_t()> clock) { clock_ = std::move(clock); }
     [[nodiscard]] bool recording() const { return recording_; }
+    [[nodiscard]] bool applyContinuously() const { return live_; }
     [[nodiscard]] AutotuneView::Mode viewMode() const { return view_->mode(); }   // what the grid is drawing
 
     // Write the proposal into the tune. One undo step, and the accumulated evidence is discarded
