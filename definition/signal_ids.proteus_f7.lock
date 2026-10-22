@@ -496,6 +496,7 @@
     "blink_slow": 492,
     "blink_fast": 493,
     "fuel_temp_flex_raw": 494,
-    "key_on_s": 495
+    "key_on_s": 495,
+    "fuel_learn_block": 496
   }
 }
