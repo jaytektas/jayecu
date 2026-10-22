@@ -98,6 +98,7 @@ public:
         }
         level_ = SyncLvl::NONE; angle_ = 0; velocity_ = 0;
         phase_marked_ = false; phase_expect_teeth_ = 0;
+        cam_sightings_ = 0; stray_seen_ = false;
         anchored_ = false; pending_anchor_ = false;
         // has_crank_ IS NOT DECODE STATE AND IS NOT CLEARED HERE. It says whether the TUNE gave this
         // wheel a crank-rate stream, and only add_gap/add_seq/add_width ever set it — a sync loss
@@ -476,6 +477,52 @@ private:
                 if (s.at_origin()) check_phase_position(s, idx, /*demote*/false, tick);
                 return;
             }
+            // THE WINDOW, AND TWO SIGHTINGS. A cam edge used to be believed wherever it landed: the first
+            // one decided which revolution the engine was in, and the position check that could have
+            // said "that is not where the cam is" ran only after it had been used — and not at all with
+            // no nominal stated. On a VR cam a single noise edge was therefore a coin toss for a lock
+            // 360 deg out: sequential spark on the overlap TDC, no power, fuel lighting in the exhaust.
+            // (Kelly's Hilux, a warm restart: full sync, a stumble, a backfire, a stall.)
+            //
+            // Where the crank can state its own position it can also say where a cam edge FELL, so:
+            //   * RIGHT PLACE — the reference edge must sit at the cam's angle within the revolution,
+            //     give or take its band: the stated nominal, or (none stated) where the last accepted
+            //     sighting sat. Within the revolution, so a true cam passes before the revolution is known.
+            //   * RIGHT TIME — consecutive sightings exactly one engine cycle of crank teeth apart. That
+            //     is what rejects a decoy in the right place but the other revolution.
+            //   * TWICE — phase is granted on the second sighting, never the first.
+            // An edge that fails is IGNORED, not treated as a fault: it moves nothing, and it does not
+            // take a good phase away either (a cam that stops arriving still fails the overdue check
+            // below). It is counted as a noise edge so it can be seen, but not into the crank's error %.
+            // Wheels that cannot place themselves (an even crank anchored BY the cam, distributor mode,
+            // cam-only) have nothing to window against and keep the old behaviour.
+            const bool windowed = has_crank_ && !sync_always_ && any_crank_absolute();
+            if (windowed) {
+                if (!s.at_origin()) return;                  // only the reference edge may speak
+                if (!anchored_ || !any_crank_locked() || phase_expect_teeth_ == 0) return;   // no crank to judge by yet
+                const AngleDeg10 fine = cam_fine_angle(s, tick);
+                const int32_t    band = phase_band(s);
+                const bool       confirmed = cam_sightings_ >= 2 && rev_known_;
+                // Where it should be: the stated nominal; with none, where it was last seen — but a
+                // first sighting is not yet a place, so before confirmation it only moves the guess.
+                const bool have_place = s.nominal_ != 0 || confirmed;
+                if (have_place) {
+                    const AngleDeg10 want = s.nominal_ != 0
+                        ? static_cast<AngleDeg10>(s.nominal_ % ANGLE_360) : cam_seen_fine_;
+                    const int32_t d = wrap_rev(static_cast<int32_t>(fine) - want);
+                    if (s.nominal_ != 0) note_residual(idx, d);
+                    if (d > band || d < -band) { stray_cam_edge(s, idx, fine, band); return; }
+                }
+                const uint16_t since = static_cast<uint16_t>(crank_teeth_ - cam_seen_teeth_);
+                const bool one_cycle = cam_sightings_ > 0 &&
+                                       since + 1u >= phase_expect_teeth_ && since <= phase_expect_teeth_ + 1u;
+                if (!one_cycle) {
+                    if (confirmed) { reject_cam_edge(idx); return; }    // right place, wrong revolution
+                    cam_sightings_ = 1; cam_seen_teeth_ = crank_teeth_; cam_seen_fine_ = fine;
+                    return;                                              // a first sighting: trust nothing
+                }
+                cam_sightings_ = 2; cam_seen_teeth_ = crank_teeth_; cam_seen_fine_ = fine;
+            }
             // WHICH revolution of the cycle we are in. Two for a four-stroke, ONE for a two-stroke,
             // THREE for a rotary — so this is a counter, not the bit it used to be: a rotary's three
             // e-shaft revolutions cannot be told apart by a single flag, and without that its three
@@ -528,7 +575,10 @@ private:
             // a sync that arrives PUNCTUALLY BUT IN THE WRONG PLACE. Half a cycle out is a slipped
             // chain or an inverted cam; "roughly on time" says nothing about it.
             if (s.at_origin()) {
-                check_phase_position(s, idx, /*demote*/true, tick);
+                // Already judged by the window, within the revolution and before it moved anything.
+                // Judged again here it is measured against angle_ BEFORE it is recomputed below, so
+                // the acquiring edge reads a revolution out and faults the very lock it just made.
+                if (!windowed) check_phase_position(s, idx, /*demote*/true, tick);
                 phase_mark_   = crank_teeth_;    // liveness is measured on the cycle's spokesman
                 phase_marked_ = true;
             }
@@ -699,6 +749,7 @@ private:
             // Whatever was believed about position is discarded rather than repaired: an anomaly
             // says the belief was wrong, and there is nothing in it worth carrying forward.
             level_ = SyncLvl::NONE; rev_known_ = false; primed_fine_ = false; phase_marked_ = false;
+            cam_sightings_ = 0; stray_seen_ = false;
             anchored_ = false; pending_anchor_ = false;
             angle_ = 0; velocity_ = 0; fine_pitch_ = 0;
         }
@@ -779,14 +830,9 @@ private:
     // stop injecting sequentially on a position that is still correct. Whether THAT should cut the
     // engine is a protection policy, decided from the fault, not something the decoder rules on by
     // throwing away knowledge it still has.
-    void check_phase_position(const Stream& s, uint8_t idx, bool demote, uint32_t tick) noexcept {
-        if (!has_crank_ || !anchored_ || !phase_stream_valid_ || s.nominal_ == 0) return;
-        // THE CRANK ANGLE AT THE CAM EDGE, not at the last tooth before it. angle_ only advances on
-        // a crank tooth, so comparing the cam against it quantised this measurement to a whole crank
-        // pitch — and it rounded in the FAULT'S FAVOUR. On a 36-1 that meant 2, 5 and 9 degrees of
-        // chain stretch all measured 0.0 and were invisible, while 45 degrees measured 40.0 and
-        // passed a 40 degree band. Interpolating with the same elapsed-time arithmetic the anchor
-        // uses makes the residual mean what it says, which is the whole point of recording it.
+    // THE CRANK ANGLE AT A CAM EDGE, not at the last tooth before it: the open pitch interpolated with
+    // the same elapsed-time arithmetic the anchor uses (see check_phase_position for why it matters).
+    AngleDeg10 crank_angle_at(uint32_t tick) const noexcept {
         AngleDeg10 crank_now = angle_;
         if (fine_idx_ < MAX_STREAMS && velocity_ > 0 && fine_pitch_ > 0) {
             const uint32_t d_raw = tick - st_[fine_idx_].last;
@@ -796,6 +842,74 @@ private:
                           + static_cast<int32_t>((d * static_cast<uint32_t>(fine_pitch_)) / velocity_));
             }
         }
+        return crank_now;
+    }
+
+    // Where within the revolution this cam's REFERENCE edge fell, by the crank. A WIDTH stream is fed at
+    // its trailing edge, so the pulse is taken back off — the same like-for-like as check_phase_position.
+    AngleDeg10 cam_fine_angle(const Stream& s, uint32_t tick) const noexcept {
+        int32_t a = static_cast<int32_t>(crank_angle_at(tick))
+                  - (static_cast<int32_t>(s.event_angle()) - static_cast<int32_t>(s.angle()));
+        a %= ANGLE_360;
+        if (a < 0) a += ANGLE_360;
+        return static_cast<AngleDeg10>(a);
+    }
+
+    // How far a cam may sit from where it should: a phaser's authority, or a fixed cam's mechanical
+    // allowance, never tighter than the decoder's own measurement floor (one crank pitch).
+    int32_t phase_band(const Stream& s) const noexcept {
+        const int32_t floor = fine_pitch_ ? fine_pitch_ : ANGLE_360 / 36;
+        return s.phased_ ? s.authority_ : (floor > s.allowance_ ? floor : s.allowance_);
+    }
+
+    static int32_t wrap_rev(int32_t d) noexcept {
+        d %= ANGLE_360;
+        if (d >  ANGLE_360 / 2) d -= ANGLE_360;
+        if (d < -ANGLE_360 / 2) d += ANGLE_360;
+        return d;
+    }
+
+    void note_residual(uint8_t idx, int32_t d) noexcept {
+        if (idx < MAX_STREAMS) { phase_resid_[idx] = static_cast<AngleDeg10>(d); phase_resid_ok_[idx] = true; }
+    }
+
+    // A cam edge OUTSIDE its window. Once, it is noise. But a cam that lands in the same wrong place
+    // a cycle later is not noise, it is the cam — a chain that has jumped, a phaser that has stuck
+    // out — and that is a fault to report, not an edge to hide: PHASE_LOST, as it always was. With
+    // no nominal to judge it by, the cam has simply moved, and it is learned again from there.
+    void stray_cam_edge(const Stream& s, uint8_t idx, AngleDeg10 fine, int32_t band) noexcept {
+        const uint16_t since = static_cast<uint16_t>(crank_teeth_ - stray_teeth_);
+        const int32_t  moved = wrap_rev(static_cast<int32_t>(fine) - stray_fine_);
+        const bool again = stray_seen_ && since + 1u >= phase_expect_teeth_ &&
+                           since <= phase_expect_teeth_ + 1u && moved <= band && moved >= -band;
+        stray_seen_ = true; stray_teeth_ = crank_teeth_; stray_fine_ = fine;
+        if (!again) { reject_cam_edge(idx); return; }
+        record_error(TriggerErrorKind::PHASE_LOST, idx);
+        rev_known_ = false;
+        if (level_ == SyncLvl::PHASE)
+            level_ = any_crank_locked() ? SyncLvl::CRANK : SyncLvl::NONE;
+        if (s.nominal_ == 0) { cam_sightings_ = 1; cam_seen_teeth_ = crank_teeth_; cam_seen_fine_ = fine; }
+        else cam_sightings_ = 0;
+    }
+
+    // A cam edge outside its window: seen, counted, used for nothing. A noise edge — but not a crank
+    // error, so it stays out of errors_cycle_ (the crank's error %, which protections act on).
+    void reject_cam_edge(uint8_t idx) noexcept {
+        ++noise_total_;
+        last_err_stream_ = idx;
+        last_err_tooth_  = tooth_counter_;
+        last_err_kind_   = static_cast<uint8_t>(TriggerErrorKind::NOISE_EDGE);
+    }
+
+    void check_phase_position(const Stream& s, uint8_t idx, bool demote, uint32_t tick) noexcept {
+        if (!has_crank_ || !anchored_ || !phase_stream_valid_ || s.nominal_ == 0) return;
+        // THE CRANK ANGLE AT THE CAM EDGE, not at the last tooth before it. angle_ only advances on
+        // a crank tooth, so comparing the cam against it quantised this measurement to a whole crank
+        // pitch — and it rounded in the FAULT'S FAVOUR. On a 36-1 that meant 2, 5 and 9 degrees of
+        // chain stretch all measured 0.0 and were invisible, while 45 degrees measured 40.0 and
+        // passed a 40 degree band. Interpolating with the same elapsed-time arithmetic the anchor
+        // uses makes the residual mean what it says, which is the whole point of recording it.
+        const AngleDeg10 crank_now = crank_angle_at(tick);
         // nominal_ names where the REFERENCE edge sits, the same edge the matcher's angle() reports.
         // A WIDTH stream is fed at the trailing edge, a whole pulse later, so compare like with like
         // or every width cam reads a pulse-width out.
@@ -829,9 +943,7 @@ private:
         // already records the displacement on every cam edge; the number should be chosen from that
         // distribution across real engines and real thermal and load conditions, not guessed here.
         // Until then allowance defaults to 0 and this evaluates exactly as it always did.
-        const int32_t floor = fine_pitch_ ? fine_pitch_ : ANGLE_360 / 36;
-        const int32_t band  = s.phased_ ? s.authority_
-                                        : (floor > s.allowance_ ? floor : s.allowance_);
+        const int32_t band = phase_band(s);
         if (resid <= band && resid >= -band) return;
         record_error(TriggerErrorKind::PHASE_LOST, idx);
         if (!demote) return;
@@ -897,6 +1009,14 @@ private:
     uint16_t   phase_mark_ = 0;          // the count at which the cam's sync last landed
     uint16_t   phase_expect_teeth_ = 0;  // how many crank teeth a whole engine cycle holds
     bool       phase_marked_ = false;
+    // THE CAM'S OWN SIGHTINGS, for the window and the two-sighting rule (see fuse). Where its last
+    // accepted reference edge sat within the revolution, and on which crank tooth; 0..2 sightings.
+    AngleDeg10 cam_seen_fine_  = 0;
+    uint16_t   cam_seen_teeth_ = 0;
+    uint8_t    cam_sightings_  = 0;
+    AngleDeg10 stray_fine_     = 0;      // ...and the last edge OUTSIDE it, to tell noise from a moved cam
+    uint16_t   stray_teeth_    = 0;
+    bool       stray_seen_     = false;
     bool       fine_advanced_ = false;
     // Sync-health counters (lean integers, ISR-written; the task reads + derives error %).
     uint16_t   tooth_counter_ = 0, teeth_cycle_ = 0, errors_cycle_ = 0;

@@ -225,9 +225,27 @@ crank actually is with where the cam should be (**Nominal Angle**). A cam outsid
 **phase lost** fault. On a fixed cam the band is the larger of one crank tooth pitch and **Cam
 Mechanical Allowance**. On a phased cam it is **± Phaser Authority**. If the failing cam is the one
 that gives the engine its phase, phase drops back to Crank. If it is another bank's cam, the fault is
-recorded but phase is kept, because the position is still right. A Nominal Angle of 0 turns this
-check off.
+recorded but phase is kept, because the position is still right.
 <!-- src: firmware/Scheduler/GenericTrigger.h -->
+
+**The cam window, and two sightings.** On a crank wheel that knows its own position (one with a gap
+or other mark), a cam edge is believed only if it lands in the right place **and** at the right time:
+
+- **Right place.** Its position within the revolution must be within the band above of Nominal
+  Angle. With a Nominal Angle of 0, it is judged against where the cam was last seen instead.
+- **Right time.** It must come exactly one engine cycle of crank teeth after the last cam edge that
+  was believed (give or take one tooth). An edge in the right place but in the other revolution
+  fails this.
+- **Twice.** Phase is granted on the second good sighting, never the first, so it takes one more
+  engine cycle to reach Phase.
+
+An edge that fails is ignored. It changes nothing, and it does not take away a good phase. It is
+counted in **Trigger Noise Edges**. A single noise spike on the cam wire can therefore no longer
+place the engine 360° out, which would put sequential spark on the overlap TDC. A cam that is in the
+same wrong place on two cycles running is the cam itself (a jumped chain, a stuck phaser), not noise.
+That raises **phase lost** and drops to Crank, as before. For this to work as intended, set Nominal
+Angle to where the cam really is; read **VVT Cam Advance** to find it.
+<!-- src: firmware/Scheduler/GenericTrigger.h (fuse: windowed phase stream; stray_cam_edge) -->
 
 Phase is also dropped if the cam's reference does not arrive within one full cycle's worth of crank
 teeth (plus one).
@@ -436,7 +454,8 @@ Click **Cam Intake B1** (or open it from the Trigger System page).
     - **Nominal Angle** `nominal_angle`: where this cam's reference sits with the phaser parked on
       its stop (fully retarded for a typical intake, fully advanced for a typical exhaust). Cam
       control (chapter 25) measures cam advance from it, and the cam-to-crank
-      check uses it. **0 turns the check off.**
+      check and the cam window use it. With 0 the cam is judged against where it was last seen
+      and there is no position fault.
     - **Cam Is Phased (VVT)** `phased`: tick it if a phaser moves this cam.
     - **Phaser Authority** `phase_authority` (phased cams only, default 60°): how far, in crank
       degrees, the phaser can move the cam from Nominal Angle. Set it to the phaser's real travel.

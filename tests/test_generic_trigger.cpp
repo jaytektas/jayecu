@@ -1138,5 +1138,125 @@ int main() {
         }
     }
 
+    // ---------------------------------------------------------------------------------------
+    // THE CAM WINDOW AND TWO SIGHTINGS. A single noise edge on a VR cam used to be believed: the
+    // first cam pulse decided the revolution wherever it landed, so one spike in the other half of
+    // the cycle put sequential spark on the overlap TDC — no power, fuel lighting in the exhaust
+    // (Kelly's Hilux, a warm restart). Where the crank can place itself, a cam edge now has to be
+    // in the right place within the revolution AND one engine cycle after the last one.
+    // ---------------------------------------------------------------------------------------
+    struct CamRun { bool ever_wrong; int first_phase_cycle; SyncLvl end; uint32_t noise, lost; };
+    // 36-1 crank, WIDTH cam whose reference sits at 200.0 deg. `extra` adds 80 deg pulses (which match
+    // the width test exactly like the real one) at {cycle, cycle angle}; `drop` silences the real cam
+    // on that cycle. ever_wrong: PHASE claimed with the engine angle anywhere but the truth.
+    struct Pulse { int cycle; int at; };
+    auto cam_run = [](bool nominal, std::vector<Pulse> extra, int drop, int cycles) {
+        GenericTrigger g;
+        uint8_t gi[1] = {0}, gr[1] = {2};
+        const int cr  = g.add_gap(0, 2, 36, gi, gr, 1, 25);
+        const int cam = g.add_width(2, REPEATS_PHASE, 600, 1100, 2000, true);
+        if (nominal) g.set_phase_meta(2, 2000, false, 0, 0);
+        struct E { uint32_t tick; int idx; bool rising; int tru; int cycle; };
+        std::vector<E> ev;
+        for (int c = 0; c < cycles; c++) {
+            for (int rev = 0; rev < 2; rev++) for (int slot = 0; slot < 36; slot++) {
+                if (slot == 35) continue;
+                const int a = rev*3600 + slot*100;
+                ev.push_back({(uint32_t)(c*7200 + a) * K, cr, true, a, c});
+            }
+            if (c != drop) {
+                ev.push_back({(uint32_t)(c*7200 + 2000) * K, cam, true,  -1, c});
+                ev.push_back({(uint32_t)(c*7200 + 2800) * K, cam, false, -1, c});
+            }
+        }
+        for (auto& x : extra) {
+            ev.push_back({(uint32_t)(x.cycle*7200 + x.at) * K,       cam, true,  -1, x.cycle});
+            ev.push_back({(uint32_t)(x.cycle*7200 + x.at + 800) * K, cam, false, -1, x.cycle});
+        }
+        std::stable_sort(ev.begin(), ev.end(), [](const E&a,const E&b){return a.tick<b.tick;});
+        CamRun r{false, -1, SyncLvl::NONE, 0, 0};
+        for (auto& e : ev) {
+            g.set_rpm(2000);
+            g.on_edge((uint8_t)e.idx, e.tick, e.rising);
+            if (e.idx == cr && g.level() == SyncLvl::PHASE) {
+                if (r.first_phase_cycle < 0) r.first_phase_cycle = e.cycle;
+                if (g.angle() != e.tru) r.ever_wrong = true;
+            }
+        }
+        r.end = g.level(); r.noise = g.noise_total(); r.lost = g.phase_lost_total();
+        return r;
+    };
+
+    SECTION("a clean cam: PHASE on the SECOND sighting, never the first, and always right");
+    for (bool nom : {false, true}) {
+        const CamRun r = cam_run(nom, {}, -1, 6);
+        CHECK(!r.ever_wrong);
+        CHECK(r.end == SyncLvl::PHASE);
+        CHECK(r.first_phase_cycle >= 1);       // the crank anchors in cycle 0; one sighting is not enough
+        CHECK(r.first_phase_cycle <= 2);
+        CHECK(r.lost == 0);
+    }
+
+    SECTION("a noise pulse in the OTHER revolution while acquiring cannot place the engine 360 out");
+    for (bool nom : {false, true}) {
+        // Same place within the revolution as the real cam, so only the timing rule can reject it.
+        const CamRun r = cam_run(nom, {{1, 5600}}, -1, 8);
+        CHECK(!r.ever_wrong);
+        CHECK(r.end == SyncLvl::PHASE);
+    }
+
+    SECTION("...nor once locked: ignored, counted as noise, PHASE kept");
+    for (bool nom : {false, true}) {
+        const CamRun r = cam_run(nom, {{4, 5600}, {6, 5650}}, -1, 9);
+        CHECK(!r.ever_wrong);
+        CHECK(r.end == SyncLvl::PHASE);
+        CHECK(r.noise >= 2);
+        CHECK(r.lost == 0);                    // noise is not a phase fault
+    }
+
+    SECTION("a noise pulse at the WRONG ANGLE is ignored, with a nominal to judge it by");
+    {
+        const CamRun r = cam_run(true, {{0, 4100}, {1, 900}, {4, 6300}}, -1, 8);
+        CHECK(!r.ever_wrong);
+        CHECK(r.end == SyncLvl::PHASE);
+        CHECK(r.noise >= 3);
+        CHECK(r.lost == 0);
+    }
+
+    SECTION("a MISSING cam pulse still costs PHASE (overdue), and it comes back after two sightings");
+    {
+        const CamRun r = cam_run(true, {}, 4, 9);
+        CHECK(!r.ever_wrong);
+        CHECK(r.lost > 0);
+        CHECK(r.end == SyncLvl::PHASE);
+    }
+
+    SECTION("a cam that is CONSISTENTLY out of its window is a fault, not noise");
+    {
+        // The cam really is 90 deg out (a jumped chain), every cycle: PHASE_LOST, and never PHASE.
+        GenericTrigger g;
+        uint8_t gi[1] = {0}, gr[1] = {2};
+        const int cr  = g.add_gap(0, 2, 36, gi, gr, 1, 25);
+        const int cam = g.add_width(2, REPEATS_PHASE, 600, 1100, 2000, true);
+        g.set_phase_meta(2, 2900, false, 0, 0);
+        struct E { uint32_t tick; int idx; bool rising; };
+        std::vector<E> ev;
+        for (int c = 0; c < 6; c++) {
+            for (int rev = 0; rev < 2; rev++) for (int slot = 0; slot < 36; slot++)
+                if (slot != 35) ev.push_back({(uint32_t)(c*7200 + rev*3600 + slot*100) * K, cr, true});
+            ev.push_back({(uint32_t)(c*7200 + 2000) * K, cam, true});
+            ev.push_back({(uint32_t)(c*7200 + 2800) * K, cam, false});
+        }
+        std::stable_sort(ev.begin(), ev.end(), [](const E&a,const E&b){return a.tick<b.tick;});
+        bool phased = false;
+        for (auto& e : ev) { g.set_rpm(2000); g.on_edge((uint8_t)e.idx, e.tick, e.rising);
+                             if (g.level() == SyncLvl::PHASE) phased = true; }
+        CHECK(!phased);
+        CHECK(g.phase_lost_total() > 0);
+        CHECK((int)(int16_t)g.phase_residual(2) == -900);   // and it says by how much
+        (void)cr; (void)cam;
+    }
+
+
     return test_summary();
 }
