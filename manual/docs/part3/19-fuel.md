@@ -235,7 +235,8 @@ actually stops.
 Enabled**, the fuel stops while the engine is cranking and the throttle is at or above **Flood Clear
 Above TPS** (default 90 %). It needs a valid throttle reading, so a failed throttle sensor can never
 stop an engine starting. The prime pulse is held back too, and fires on a later crank with the
-throttle closed. **Flood Clear Active** `flood_clear` shows it.
+throttle closed. **Flood Clear Active** `flood_clear` shows it. Launch control does not arm while
+cranking, so holding the throttle open here never puts the launch maps in charge (chapter 26).
 <!-- src: firmware/Engine/Modules/FuelCalculator.cpp -->
 
 ### 6 · Throttle movement: transient fuel

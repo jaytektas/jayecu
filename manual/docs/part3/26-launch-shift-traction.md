@@ -40,6 +40,11 @@ Launch is **armed** while its **Arm When** condition is true. Left empty, the bu
 
 With no road speed or no throttle reading, launch does not arm. So idling at the lights runs the
 normal maps, and flooring the throttle on the line arms the launch.
+
+Whatever the rule, launch arms only once the engine is **running**. Cranking with the throttle open is
+how flood clear is asked for (chapter 19), and launch keeps out of it: its fuel map is not applied to the
+cranking fuel, and its timeout starts when the engine has caught. A launch that bogs is never treated
+as cranking either, so flood clear cannot cut the fuel under it.
 <!-- src: firmware/Engine/Modules/Launch.cpp -->
 
 **Arm When** is an expression (chapter 34) for any other rule, for example:

@@ -130,6 +130,13 @@ void Launch::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& fram
         ex.curve_user = &bus; ex.curve_count = EXPR_TABLE_COUNT;
         armed = expr::exec(cfg_->arm_expr, sizeof cfg_->arm_expr, ex).truthy();
     }
+    // …AND THE ENGINE RUNNING, whatever Arm When says. Cranking with the pedal down and the car still is
+    // FLOOD CLEAR's condition too, and it looks exactly like a launch to the rule above: launch armed
+    // under it, put its fuel map onto the cranking fuel (below the flood-clear throttle, where fuel still
+    // flows), and started its timeout before the engine had caught. A launch is something a running engine
+    // does. RUNNING never falls back to CRANKING, so a launch that bogs is not handed to flood clear either.
+    if (static_cast<EngineRunState>(static_cast<int>(bus.get(wk::engine_state, 0.0f))) != EngineRunState::RUNNING)
+        armed = false;
 
     // --- The timeout. Measured from the moment the condition went true, and once it has expired the
     //     launch stays dead until the condition goes false and true again: something has to end a

@@ -57,6 +57,7 @@ static SignalBus make_bus(bool arm, float rpm, float load = 100.0f) {
     b.set_bool(SIG_LAUNCH_SW, arm, g_ms, 0);
     b.set(wk::rpm, rpm, true, g_ms, 0);
     b.set(wk::fuel_load, load, true, g_ms, 0);
+    b.set(wk::engine_state, static_cast<float>(EngineRunState::RUNNING), true, g_ms, 0);   // launch is a running engine's
     return b;
 }
 
@@ -355,6 +356,32 @@ int main() {
         CHECK(!bus.valid(wk::fuel_cut));
         CHECK(!bus.get_bool(wk::launch_active));
         CHECK_NEAR(bus.get(wk::fuel_corr_launch), 1.0f, 0.001f);
+    }
+
+    SECTION("cranking is flood clear's, never launch's — built-in rule or Arm When");
+    {
+        // Pedal down, car still, engine turning on the starter: flood clear's condition, and the built-in
+        // launch rule's too. Launch must stay out of it — its fuel map would multiply the cranking fuel —
+        // and its timeout must not have started by the time the engine catches.
+        for (int withExpr = 0; withExpr < 2; ++withExpr) {
+            auto cfg = make_cfg();
+            if (!withExpr) memset(cfg.arm_expr, 0, sizeof cfg.arm_expr);
+            cfg.timeout_s = 1;
+            Launch lc; lc.init(cfg); lc.set_dtc(&dtc);
+            EngineFrame f{};
+            SignalBus bus = make_bus(/*arm*/true, 250.0f);
+            bus.set(wk::vehicle_spd, 0.0f, true, g_ms, 0);
+            bus.set(wk::tps, 60.0f, true, g_ms, 0);
+            bus.set(wk::engine_state, static_cast<float>(EngineRunState::CRANKING), true, g_ms, 0);
+            for (int i = 0; i < 400; ++i) run(lc, bus, 250.0f, f);          // two seconds of cranking
+            CHECK(!bus.get_bool(wk::launch_active));
+            CHECK_NEAR(bus.get(wk::fuel_corr_launch), 1.0f, 0.001f);
+            bus.set(wk::engine_state, static_cast<float>(EngineRunState::RUNNING), true, g_ms, 0);
+            run(lc, bus, 1200.0f, f);
+            CHECK(bus.get_bool(wk::launch_active));                         // caught: now it is a launch,
+            for (int i = 0; i < 100; ++i) run(lc, bus, 1200.0f, f);
+            CHECK(bus.get_bool(wk::launch_active));                         // timed from here, not the crank
+        }
     }
 
     SECTION("on_engine_stop clears the latch");
