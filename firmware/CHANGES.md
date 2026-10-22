@@ -9,6 +9,7 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Idle: air the closed loop added is let go once the engine is above its target with the loop off — at once off idle, within a second or two while still idling. It used to be held, so a start that stumbled wound the throttle open and the engine, once it lit, ran away on that air (one cold start reached 4700 rpm).
 
 ## 0.4.13
 - Fuel pressure from a sensor is read as gauge pressure, as a rail sender reports it. The differential across the injectors subtracted the manifold's absolute pressure from a gauge reading, so a 300 kPa rail read as about 200 kPa and every injector pulse came out about a quarter long. A tune whose fuel pressure sensor was calibrated to read absolute needs its calibration taken back to gauge.

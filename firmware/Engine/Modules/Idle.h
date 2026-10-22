@@ -32,6 +32,8 @@ public:
 private:
     const IdleConfig* cfg_ = nullptr;
     PiController pi_;                 // closed-loop trim; integ is the persistent state
+    // How fast a positive trim is let go while idling above target with the loop off (see update()).
+    static constexpr float kTrimBleedTauS = 0.5f;
     uint32_t     last_ms_  = 0;       // for the PI/D dt
     float        last_err_ = 0.0f;    // for the derivative term
 

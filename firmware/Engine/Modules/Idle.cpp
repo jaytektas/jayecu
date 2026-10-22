@@ -199,7 +199,20 @@ void Idle::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& /*fram
     pi_.out_min = min_out - base_eff;
     pi_.out_max = max_out - base_eff;
 
-    float trim = pi_.integ;                       // frozen when not engaged (no windup off-idle)
+    // EXTRA AIR THE LOOP ADDED DOES NOT OUTLIVE THE LOOP. A disengaged integrator used to be frozen, which
+    // is right for the air it TOOK AWAY and wrong for the air it ADDED: a start that stumbles below target
+    // winds the trim up to the ceiling, the engine then lights on all that air and flares past target +
+    // activation offset (or the lockout), and the frozen trim holds the plate open so the RPM never comes
+    // back down for the loop to re-engage — a cold start ran away to 4700 RPM that way. So a POSITIVE trim
+    // is let go once the engine is above target with the loop off: at once when it is off idle altogether
+    // (pedal pressed, above the lockout — the throttle follower is the dashpot, not this), and with a short
+    // time constant while it is idling but still falling towards the activation band. A negative trim stays
+    // frozen, as before: less air than base is the safe side of a blip.
+    if (!closed && pi_.integ > 0.0f && rpm > target) {
+        pi_.integ = !idle_active ? 0.0f
+                  : (dt_s > 0.0f ? pi_.integ * std::exp(-dt_s / kTrimBleedTauS) : pi_.integ);
+    }
+    float trim = pi_.integ;                       // otherwise frozen when not engaged
     float d_term = 0.0f;
     if (closed) {
         // THE GAINS ARE READ WHERE THEY ARE USED. P and I were evaluated every frame and handed to a

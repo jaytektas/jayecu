@@ -200,6 +200,46 @@ int main() {
         CHECK_NEAR(duty, 28.0, 1e-3);   // base only, integrator never stepped
     }
 
+    // THE RUNAWAY. A start that stumbles below target winds the trim up; when the engine lights it flares
+    // past the activation band, and a frozen trim then held the plate open with nothing to bring the RPM
+    // back — a cold start ran to 4700 RPM. The added air must not outlive the loop that added it.
+    SECTION("wound-up trim is let go when the engine flares above target");
+    {
+        auto wind_up = [&](Idle& ic, EngineFrame& f) {
+            float duty = 0.0f;
+            for (int i = 0; i <= 100; i++) {          // 3 s at 500 RPM against a 950 target
+                g_ms += 30;
+                SignalBus b = make_bus(80.0f, 0.0f, EngineRunState::RUNNING, 500.0f);
+                ic.update(make_pos(500.0f), b, f);
+                duty = b.get(SIG_IDLE_DUTY, -1.0f);
+            }
+            return duty;
+        };
+        auto cfg = make_cfg(); cfg.mode = 1;
+        // Off idle altogether (above the 2000 lockout): the added air goes at once, back to base.
+        {
+            Idle ic; ic.init(cfg); EngineFrame f{}; g_ms = 20000;
+            CHECK(wind_up(ic, f) > 60.0f);            // wound well above base 28
+            g_ms += 30;
+            SignalBus b = make_bus(80.0f, 0.0f, EngineRunState::RUNNING, 3000.0f);
+            ic.update(make_pos(3000.0f), b, f);
+            CHECK_NEAR(b.get(SIG_IDLE_DUTY, -1.0f), 28.0, 1e-3);
+        }
+        // Still idling but above the activation band (1300 vs 950 + 150): it bleeds back to base.
+        {
+            Idle ic; ic.init(cfg); EngineFrame f{}; g_ms = 40000;
+            const float wound = wind_up(ic, f);
+            float duty = wound;
+            for (int i = 0; i <= 100; i++) {          // 3 s, six time constants
+                g_ms += 30;
+                SignalBus b = make_bus(80.0f, 0.0f, EngineRunState::RUNNING, 1300.0f);
+                ic.update(make_pos(1300.0f), b, f);
+                duty = b.get(SIG_IDLE_DUTY, -1.0f);
+            }
+            CHECK(duty < 28.0f + 0.05f * (wound - 28.0f));   // under 5 % of the added air left
+        }
+    }
+
     SECTION("idle_active: true only when RUNNING + throttle closed + below lockout RPM");
     {
         auto cfg = make_cfg(); Idle ic; ic.init(cfg); EngineFrame f{};
