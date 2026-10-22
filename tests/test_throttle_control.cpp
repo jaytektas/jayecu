@@ -458,12 +458,12 @@ int main() {
         CHECK(bus.get_bool(SIG_ETB_EN_1) == false);         // pedal demand ignored: nothing is driven
     }
 
-    SECTION("a key-on verify must never forgive a latched fault");
+    SECTION("a key-on sweep that PASSES clears a latched fault; one that fails keeps it");
     {
-        // findlimits doubles as the authorized fail-safe CLEAR -- it drops the latch so a deliberate
-        // recal recovers a faulted ETB. The key-on check reuses that same routine, so it MUST NOT
-        // inherit that: if it did, every key cycle would quietly clear a fault that is supposed to
-        // require intervention, and the latch would mean nothing at all.
+        // The key-on sweep drives the plate to both stops and checks them against the stored cal on
+        // agreeing feedback. When that passes, the throttle has just proved it works, so the latch from
+        // an earlier transient is cleared rather than leaving the throttle dead at every key-on until a
+        // findlimits. (The code stays stored with its count.) A sweep that fails still latches.
         ElectronicThrottleConfig cfg = make_cfg();
         ElectronicThrottle tc; SignalBus bus;
         DtcManager dtc; tc.set_dtc(&dtc);
@@ -485,8 +485,24 @@ int main() {
             run(tc, bus, 10);
             plant_step(bus.get(SIG_ETB_DUTY_1));
         }
-        CHECK(static_cast<int>(bus.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_FAULT);   // still latched
-        CHECK(bus.get_bool(SIG_ETB_EN_1) == false);                                          // still dead
+        CHECK(static_cast<int>(bus.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_READY);   // proven: cleared
+        CHECK(dtc.code_severity(0x2135) == 0);                                               // …and healed
+
+        // A sweep that CANNOT move the plate (bridge dead) latches again and stays latched.
+        for (int i = 0; i < 60; i++) {
+            bus.set(SIG_TPS, 20.0f, true, g_ms); bus.set(SIG_AUX_1, 80.0f, true, g_ms);
+            bus.set(SIG_ENGINE_STATE, 0.0f, true, g_ms);
+            run(tc, bus, 10);
+        }
+        CHECK(static_cast<int>(bus.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_FAULT);
+        tc.start_autocal(0, /*verify=*/true);
+        for (int i = 0; i < 1200; i++) {               // plate held still: no plant_step, the motor does nothing
+            bus.set(SIG_TPS, 20.0f, true, g_ms); bus.set(SIG_AUX_1, 20.0f, true, g_ms);
+            bus.set(SIG_ENGINE_STATE, 0.0f, true, g_ms);
+            run(tc, bus, 10);
+        }
+        CHECK(static_cast<int>(bus.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_FAULT);   // failed sweep: latched
+        CHECK(bus.get_bool(SIG_ETB_EN_1) == false);
 
         // A DELIBERATE findlimits still clears it -- that is the authorized path.
         tc.start_autocal(0, /*verify=*/false);

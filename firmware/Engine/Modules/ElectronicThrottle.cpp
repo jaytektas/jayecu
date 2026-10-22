@@ -391,6 +391,15 @@ void ElectronicThrottle::run_autocal(unsigned i, const EtbConfig& e, SignalBus& 
                 const float open_err   = std::fabs(pos - 100.0f);
                 if (closed_err <= SWEEP_STOP_TOL_PCT && open_err <= SWEEP_STOP_TOL_PCT) {
                     calibrated_[i] = true;                       // mechanically proven -> loop may close
+                    // A PASSED SWEEP CLEARS THE LATCH. The plate has just been driven to both stops and
+                    // landed where the cal says, on feedback that agreed the whole way — the strongest
+                    // evidence there is that the throttle works, and stronger than the latch it overrides.
+                    // Keeping the latch through a pass left a throttle dead at every key-on after a
+                    // transient (a bridge that stopped driving and recovered once the key cycled), with
+                    // nothing short of a findlimits to bring it back. The code stays STORED with its
+                    // count, so an intermittent fault is still on record; it just no longer disables a
+                    // throttle that has proved itself. A sweep that FAILS latches below, as before.
+                    clear_fault(i);
                     g_text_log.printf("ETB%u key-on sweep OK: closed %d.%d%% open %d.%d%% - cal verified\n", i,
                                       static_cast<int>(ac_closed_pct_[i]),
                                       iabs(static_cast<int>(ac_closed_pct_[i] * 10)) % 10,
