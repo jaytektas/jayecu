@@ -340,7 +340,7 @@ run. With this firmware they are:
 | **Thermo Fan** | Digital | Fixed 100 % | On | **Switch On Above** (95 °C), **Switch Off Below** (90 °C); 5 s minimum on and off |
 | **Thermo Fan with A/C** | Digital | Fixed 100 % | On | the same, plus the A/C request as a reason to run |
 | **Variable-Speed Fan** | PWM 200 Hz | Generic Table 1 | On | switch-on and switch-off temperatures (92 / 86 °C); duty from the table |
-| **Starter Motor** | Digital | Fixed 100 % | Off | **Maximum Crank** (10 s), **Rest Before Retry** (3 s); interlocks to tick: in neutral, clutch down, brake pressed |
+| **Starter Motor** | Digital | Fixed 100 % | Off | **Maximum Crank** (10 s), **Rest Before Retry** (3 s), **Release Above** (700 rpm: the starter lets go once the engine is running *and* above this); interlocks to tick: in neutral, clutch down, brake pressed |
 | **Main Relay** | Digital | Fixed 100 % | On | nothing: on whenever the ECU is awake |
 | **Shift Light** | Digital | Fixed 100 % | Off | **Light On Above** (6500 rpm), **Light Off Below** (6300 rpm) |
 | **Check Engine Light** | Digital | Fixed 100 % | On | **Bulb Check** (3 s): lit at key-on; then on for any current code or level 3, fast flash for level 2 and slow flash for level 1 once their codes have cleared |

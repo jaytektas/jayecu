@@ -95,8 +95,10 @@ At key-off the ECU hands the card to USB and it appears as a drive (chapter 36).
 Card…** lists the `.MLG` files and marks the ones already in the studio's log folder. **Import all
 new** or **Import ticked** copies them across; **Delete ticked** removes them from the card, and asks
 first if a log has not been imported (the card is then its only copy). **Find card…** points it at the
-card if the computer did not mount it where the studio expected.
-<!-- src: apps/studio-jf/src/ui/CardLogsDialog.h -->
+card if the computer did not mount it where the studio expected. A drive's log is tens of megabytes
+through the ECU's USB link, so the copy runs in the background with a progress bar (file *n* of *m*, and
+how much of it), and the studio stays usable while it does.
+<!-- src: apps/studio-jf/src/ui/CardLogsDialog.h; apps/studio-jf/src/model/CardLogs.cpp -->
 
 ### 5 · Reading a log
 

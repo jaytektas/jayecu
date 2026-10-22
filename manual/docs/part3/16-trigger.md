@@ -358,7 +358,8 @@ The page, in the order it appears:
   trusted to establish phase. Outside the band the cam is ignored for gaining phase, but phase the
   ECU already has is kept. With both at 0 (the default), the band is off and the cam is always
   trusted. For a **VR** cam sensor, a Min of about **1500 rpm** stops a glitch at cranking speed from
-  giving a false phase.
+  giving a false phase. Below the band the cam is not expected either, so crossing back into the band
+  never counts the cam as overdue.
   <!-- src: definition/ecu.schema.yaml; firmware/Scheduler/EnginePositionHal.cpp -->
 - **Streams**: a switch for each of the six roles, each linking to its own page.
 - **Engine-Sync Sampling ▸ Averaging Window**: how many crank degrees the engine-synchronous

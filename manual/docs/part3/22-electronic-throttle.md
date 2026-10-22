@@ -111,8 +111,8 @@ The throttle stops driving the motor — and the spring closes the plate to its 
 | Check | What trips it | Code | Clears |
 |---|---|---|---|
 | **Plate sensors disagree** | Sensors A and B differ by more than **TPS Match Error Limit** (default 10 %) for longer than **TPS Match Debounce** (default 200 ms), or a sensor stops reading | **P2135** | latched |
-| **Plate stuck closed** | The loop is pushing the plate open (error over 8 %, duty over 25 %) and it moves less than 1.5 % in 600 ms | **P2112** | latched |
-| **Plate stuck open** | The same, while pushing the plate closed | **P2111** | latched |
+| **Plate stuck closed** | The loop is pushing the plate open (error over 8 %, duty over 25 %) and it moves less than 1.5 % in 600 ms | **P2112** | latched; a key-on check that passes clears it |
+| **Plate stuck open** | The same, while pushing the plate closed | **P2111** | latched; a key-on check that passes clears it |
 | **Pedal not trusted** | Pedal fault (section 1) | P2138 / P1780 | at key-off |
 | **Key off** | Ignition switched off | — | at key-on |
 | **Not calibrated** | The body has never been through Find limits | — | after Find limits |

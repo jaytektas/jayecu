@@ -43,7 +43,14 @@ Protection is built from a few parts:
 | Coolant warning | P1217 | 1 | **CLT Warning Threshold** 95 °C |
 | Coolant over-temperature | P0217 | 3 | **CLT Cut Threshold** 105 °C |
 | Intake air over-temperature | P1098 | 3 | **IAT Cut Threshold** 65 °C |
-| Overboost | P0234 | 3 | **Overboost Cut** 250 kPa (absolute) |
+| Overboost | P0234 | 1 | **Overboost Cut** 250 kPa (absolute) |
+
+**Overboost is level 1 on purpose.** It has its own reaction, the overboost cut (**Overboost Cut** on
+the Boost page), which stops the overshoot on the spot. A level-3 limp on top would end every pull that
+touches the cut in a rev limit for no remaining reason, which is the usual state of affairs while boost
+is being raised towards spring pressure. The code is still recorded, with its freeze frame. Level 3 is
+left to what a cut cannot fix: overheating, pre-ignition, EGT and a lost trigger.
+<!-- src: firmware/Engine/Modules/EngineProtection.cpp (S_OVERBOOST) -->
 
 A sensor that is not enabled cannot time out. A value check only runs while that sensor is up to date.
 The trigger checks (P0335–P0339, P0341) are in chapter 16; a loss of sync **while running** always

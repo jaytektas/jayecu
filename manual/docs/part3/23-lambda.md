@@ -125,6 +125,9 @@ This lets it learn during a hard acceleration, not only at steady speeds.
 - the throttle moving slower than **Transient Throttle Rate Limit** (200 %/s);
 - throttle below **Max TPS** and manifold pressure below **Max MAP** (default 100 kPa absolute, about
   atmospheric), if you enable those limits;
+- the ECU's own learn gate, **Fuel Learn Block** `fuel_learn_block`, is 0: no input it fuels from is
+  faulted or on a fallback, no fuel or ignition cut, no transient, start or protection enrichment, full
+  sync, and none of those in the last lambda delay plus 150 ms (chapter 40 lists the bits);
 - and the **Learn While** expression is true, if you write one.
 
 **Learn While** adds a condition of your own, for example `rpm > 1200` to keep learning out of idle.
