@@ -36,9 +36,13 @@ void HBridge::on_config_change(const HBridgeConfig& cfg) noexcept {
 
 void HBridge::apply_carrier() noexcept {
     applied_freq_hz_ = cfg_->pwm_freq_hz;
+    // NEVER ABOVE THE BRIDGE'S RATING, whatever a tune says: a tune written before the 20 kHz cap (or by a
+    // tool that ignores the schema's max) could still ask for more, and above its rating the IFX9201 spends
+    // most of each period switching. Clamped here, at the one place the carrier reaches the hardware.
+    const uint32_t hz = std::min<uint32_t>(cfg_->pwm_freq_hz, kMaxCarrierHz);
     for (int i = 0; i < 2; ++i) {
         if (bridges_[i]) {
-            bridges_[i]->set_freq(cfg_->pwm_freq_hz);
+            bridges_[i]->set_freq(hz);
             bridges_[i]->enable(false);
         }
         was_enabled_[i] = false;

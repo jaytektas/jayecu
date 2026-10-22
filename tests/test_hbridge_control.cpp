@@ -222,6 +222,19 @@ int main() {
         CHECK(a.freq == 5000 && b.freq == 5000);
     }
 
+    SECTION("the carrier never exceeds the bridge's 20 kHz rating, whatever the tune asks");
+    {
+        // A tune saved before the cap (the schema allowed 50 kHz) still reaches the hardware at the ceiling.
+        FakeBridge a, b;
+        HBridgeConfig cfg = base_cfg();
+        cfg.pwm_freq_hz = 50000;
+        HBridge ctl; ctl.init(cfg, &a, &b);
+        CHECK(a.freq == HBridge::kMaxCarrierHz && b.freq == HBridge::kMaxCarrierHz);
+        cfg.pwm_freq_hz = 3000;                      // and below it, exactly what was asked
+        ctl.on_config_change(cfg);
+        CHECK(a.freq == 3000 && b.freq == 3000);
+    }
+
     // ---- bench nudge ("prove it moves") -----------------------------------------------------------
     // The whole point of it is that it needs NEITHER a demand signal nor an asserted enable: it answers
     // "does this actuator move at all" before any producer is trustworthy. What it must still respect is

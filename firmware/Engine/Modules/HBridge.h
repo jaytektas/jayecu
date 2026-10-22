@@ -17,6 +17,9 @@ namespace Comms { class CommsManager; }
 
 class HBridge : public EngineModule {
 public:
+    // The bridge's datasheet ceiling (IFX9201SG: "up to 20 kHz"). The carrier is clamped to it in firmware
+    // as well as by the schema's max, so no tune can drive the part past its rating.
+    static constexpr uint32_t kMaxCarrierHz = 20000;
     void init(const HBridgeConfig& cfg, IHBridge* a, IHBridge* b,
               Comms::CommsManager* comms = nullptr) noexcept;
     void on_config_change(const HBridgeConfig& cfg) noexcept;

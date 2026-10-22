@@ -4109,7 +4109,12 @@ modules:
     provides: []
     config:
       scalars:
-      - {name: pwm_freq_hz, type: uint32, label: PWM Carrier, units: Hz, scale: 1.0, min: 1, max: 50000, default: 20000, help: Shared DMA-PWM carrier for both bridges. Set high (20 kHz) to suppress audible whine.}
+      # 20 kHz IS THE BRIDGE'S CEILING, NOT A WORKING POINT. The IFX9201SG is rated "up to 20 kHz", but its high-side
+      # output slews at only 0.2-1.6 V/us, so an edge across 14 V takes 9-70 us against a 50 us period: at 20 kHz the
+      # switches spend much of every cycle in transition. Switching loss rises with frequency, and holding a throttle
+      # at idle on a hot day at 20 kHz drove the bridge into its latching over-temperature shutdown (Kelly's Hilux).
+      # The same chip and motor ran 9 months at 3 kHz under rusEFI. Default 3 kHz; capped at the datasheet's 20 kHz.
+      - {name: pwm_freq_hz, type: uint32, label: PWM Carrier, units: Hz, scale: 1.0, min: 1, max: 20000, default: 3000, help: 'Shared PWM carrier for both bridges. 3 kHz (the default) is the working point for the IFX9201 bridge on this board: switching loss rises in step with frequency and its outputs switch slowly, so a high carrier turns into heat. Higher values reduce the audible whine of an electronic throttle, at the cost of that heat; 20 kHz is the bridge''s absolute limit, and holding a throttle there on a hot day has tripped its over-temperature shutdown, which drops the throttle to its spring until the key is cycled.'}
       arrays:
       - name: half
         count: 2
