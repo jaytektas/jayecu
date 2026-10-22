@@ -7649,7 +7649,7 @@ output_templates:
 - id: starter
   name: Starter Motor
   blurb: 'Cranks while the button is held, and never for too long. Interlocks to taste.'
-  detail: 'A press LATCHES the crank: the starter runs until the engine catches, or until Maximum Crank runs out, whichever comes first — you do not have to hold the button, and letting go does not stop it. Hold it and you get another crank after the Rest, and another, until you let go. The maximum on time is what makes that safe. The interlocks are the part that varies between cars, so they are ticked rather than assumed — on a manual leave at least one on, because that is what stops the car being started in gear. An interlock you tick and do not wire reads as false, which is a starter that never cranks; the wizard says which of them are wired.'
+  detail: 'A press LATCHES the crank: the starter runs until the engine is running and above Release Above, or until Maximum Crank runs out, whichever comes first — you do not have to hold the button, and letting go does not stop it. Hold it and you get another crank after the Rest, and another, until you let go. The maximum on time is what makes that safe. The interlocks are the part that varies between cars, so they are ticked rather than assumed — on a manual leave at least one on, because that is what stops the car being started in gear. An interlock you tick and do not wire reads as false, which is a starter that never cranks; the wizard says which of them are wired.'
   kind: 1
   value_source: 2
   fixed_pct: 100
@@ -7665,6 +7665,7 @@ output_templates:
   params:
   - {name: crank_s, label: Maximum Crank, units: s, default: 10, min: 1, max: 30, digits: 0, help: 'How long one attempt may last before the output releases, whatever the button says.'}
   - {name: rest_s,  label: Rest Before Retry, units: s, default: 3, min: 0, max: 60, digits: 0, help: 'How long the slot is locked out afterwards — the motor cooling down.'}
+  - {name: release_rpm, label: Release Above, units: RPM, default: 700, min: 0, max: 2000, digits: 0, help: 'The starter lets go once the engine is running AND turning faster than this. A warm engine fires at not much over cranking speed, and a starter that drops out the moment the ECU calls it running (the cranking threshold, ~450 rpm) can leave it to stumble and die before it has caught. Set it at or below the cranking threshold for the old behaviour: release as soon as it is running. Maximum Crank still ends a crank that never gets here.'}
   # THE CRANK IS LATCHED, and both of these say so.
   #
   # `off_when` no longer names the button. That is what turns a momentary press into a crank: the gate
@@ -7679,8 +7680,14 @@ output_templates:
   # and that is a starter engaging on a spinning engine. Both conditions read the state for that reason
   # — the on side must go false the instant the off side goes true, or the dip re-opens the same hole.
   # (The compiler has no names for enum values yet, hence the 2.)
+  #
+  # THE RELEASE WAITS FOR SPEED TOO, and only the release does. Between "running" and Release Above
+  # neither condition is true, so the gate holds: a starter that is cranking stays in until the engine
+  # is turning properly, and a running engine that dips under it cannot re-engage it, because the on
+  # side still needs engine_state < 2. A warm restart released at the 450 rpm "running" edge stumbled,
+  # ran rich and backfired; held to 700 it catches.
   on_when:  'start_sw > 0.5 and engine_state < 2{@options}'
-  off_when: 'engine_state >= 2'
+  off_when: 'engine_state >= 2 and rpm > {release_rpm}'
   max_on_from: crank_s
   rearm_from: rest_s
 
