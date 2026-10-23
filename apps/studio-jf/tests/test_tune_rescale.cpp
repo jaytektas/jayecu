@@ -133,6 +133,25 @@ int main() {
            std::to_string(rep.unmapped.size()) + " unmapped, " + std::to_string(rep.defaulted) + " defaulted");
     }
 
+    std::puts("=== is this file the tune the ECU has? ===");
+    {
+        const std::vector<uint8_t> ecu = TuneFile::serialise(now.defaultImage(), now);
+        ck(TuneFile::sameValues(ecu, ecu), "a tune is the same as itself");
+        // The same values with an old studio's padding and another layout hash in the header: the same tune.
+        jf::JJson d = jf::JJson::parse(std::string(ecu.begin(), ecu.end()));
+        d["arrays"]["outputs.output[0]._align_pad_99"] = jf::JJson(0.0);
+        d["layout_hash"] = jf::JJson(std::string("0ldf1rm0"));
+        const std::string padded = d.dump();
+        ck(TuneFile::sameValues(ecu, std::vector<uint8_t>(padded.begin(), padded.end())),
+           "padding and the header are not values");
+        // One setting different: a tune opened to be sent, not the one on the ECU.
+        std::vector<uint8_t> img = now.defaultImage();
+        MetaModel::encodeRaw("U16", img.data() + now.config().at(SC).offset, 77);
+        const std::vector<uint8_t> edited = TuneFile::serialise(img, now);
+        ck(!TuneFile::sameValues(ecu, edited), "one changed setting makes it a different tune");
+        ck(!TuneFile::sameValues(ecu, {}), "an empty file is not the ECU's tune");
+    }
+
     std::printf("\n%s (%d failure%s)\n", fails ? "FAILED" : "ALL PASS", fails, fails == 1 ? "" : "s");
     return fails ? 1 : 0;
 }

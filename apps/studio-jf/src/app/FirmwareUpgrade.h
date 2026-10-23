@@ -153,6 +153,7 @@ private:
     TuneFile::SavedMeta savedOnOld() const {
         return [this](const std::string& h) -> const MetaModel* { return h == oldMeta_.layoutHash() ? &oldMeta_ : nullptr; };
     }
+    std::string savedTune_, keptTune_;    // where finish() put the ECU's tune; an open tune it did NOT overwrite
     std::vector<uint8_t> tuneDict_;       // the tune pulled off the ECU, by name (jayecu-tune/2)
     bool noTune_ = false;                 // the ECU had no tune: the new firmware's default tune goes on
     std::vector<uint8_t> pushed_;         // the image written to the new firmware

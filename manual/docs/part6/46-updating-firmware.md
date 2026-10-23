@@ -101,7 +101,12 @@ this ECU. Burn any unburned changes before using it.
    ECU had **no tune** before the update (a new board, or a tune it had refused), there is nothing to
    convert or back up: the new firmware's default tune goes on instead, and the studio says so when it
    finishes.
-   <!-- src: apps/studio-jf/src/app/FirmwareUpgrade.cpp (noTune_: defaults, no backup); FirmwareUpgrade.cpp (the finishing message) -->
+
+   The converted tune is saved in the ECU's project, under the name of the tune file that holds what
+   was on the ECU. If the tune you have open is a different one (say one you opened to send after the
+   update), it is **not** overwritten: the ECU's tune is saved as `ecu-tune-fw<version>`, and the
+   finishing message names both. Open yours and send it when you are ready.
+   <!-- src: apps/studio-jf/src/app/FirmwareUpgrade.cpp (noTune_: defaults, no backup; finish: savedTune_, keptTune_); apps/studio-jf/src/model/TuneFile.cpp (sameValues) -->
 9. **SD card**: the studio asks whether to copy the new meta and pages onto the ECU's card, so
    another studio that has never seen this firmware can fetch them from the ECU (chapter 48). It
    takes about a minute. Tick **Remember my choice** and it stops asking; **Copy the meta and

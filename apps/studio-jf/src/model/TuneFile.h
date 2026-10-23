@@ -57,6 +57,12 @@ std::vector<uint8_t> deserialise(const std::vector<uint8_t> &tuneJson, const Met
                                  MigrationReport &report, std::vector<uint8_t> *hostOut = nullptr,
                                  const SavedMeta &savedOn = {});
 
+// True when two jayecu-tune documents hold the same values: every scalar, table, axis, array field and
+// expression, compared by name. Padding and the header (format, layout_hash) are not values. Used to
+// ask "is this file the tune the ECU has?" — a document written by another studio version may differ in
+// form and answer false, which is the safe answer for every caller.
+bool sameValues(const std::vector<uint8_t> &a, const std::vector<uint8_t> &b);
+
 // True if the bytes look like a dict tune (JSON: first non-whitespace byte is '{'); false for a raw image.
 // Legacy projects may still hold raw-byte tunes — callers fall back to using the bytes as-is.
 bool isDictFormat(const std::vector<uint8_t> &data);

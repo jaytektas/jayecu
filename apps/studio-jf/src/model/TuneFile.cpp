@@ -13,6 +13,15 @@
 #include "MetaModel.h"
 #include "TableImage.h"
 
+// ALIGNMENT PADDING IS NOT A SETTING. The compiler's filler bytes are in the meta so offsets add up, and
+// a tune that stored them by name carried ~1,200 of them (10 % of the document). Worse, they are
+// renumbered whenever a layout shifts, so every firmware update reported hundreds of settings dropped
+// and as many added — on a tune that had lost nothing. Never written; ignored when an older tune has them.
+static bool isPadding(const std::string &key) {
+    const size_t dot = key.rfind('.');
+    return key.compare(dot == std::string::npos ? 0 : dot + 1, 10, "_align_pad") == 0;
+}
+
 // ---------------------------------------------------------------------------
 // Format: JSON object with four keyed sections.
 //
@@ -194,6 +203,25 @@ bool nameToRef(const MetaModel &meta, const std::string &kind,
 
 } // namespace
 
+bool TuneFile::sameValues(const std::vector<uint8_t> &a, const std::vector<uint8_t> &b)
+{
+    const auto pa = jf::JJson::tryParse(std::string(a.begin(), a.end()));
+    const auto pb = jf::JJson::tryParse(std::string(b.begin(), b.end()));
+    if (!pa || !pb || !pa->isObject() || !pb->isObject()) return false;
+    const jf::JJson &A = *pa, &B = *pb;
+    for (const char *sec : { "scalars", "tables", "axes", "arrays", "expressions" }) {
+        size_t na = 0, nb = 0;
+        for (const auto &[key, val] : A[sec].obj()) {
+            if (isPadding(key)) continue;
+            ++na;
+            if (B[sec][key].dump(-1) != val.dump(-1)) return false;
+        }
+        for (const auto &[key, val] : B[sec].obj()) { (void)val; if (!isPadding(key)) ++nb; }
+        if (na != nb) return false;
+    }
+    return true;
+}
+
 bool TuneFile::isDictFormat(const std::vector<uint8_t> &data)
 {
     // A dict tune is JSON: first non-whitespace byte is '{'.
@@ -203,14 +231,6 @@ bool TuneFile::isDictFormat(const std::vector<uint8_t> &data)
     return false;
 }
 
-// ALIGNMENT PADDING IS NOT A SETTING. The compiler's filler bytes are in the meta so offsets add up, and
-// a tune that stored them by name carried ~1,200 of them (10 % of the document). Worse, they are
-// renumbered whenever a layout shifts, so every firmware update reported hundreds of settings dropped
-// and as many added — on a tune that had lost nothing. Never written; ignored when an older tune has them.
-static bool isPadding(const std::string &key) {
-    const size_t dot = key.rfind('.');
-    return key.compare(dot == std::string::npos ? 0 : dot + 1, 10, "_align_pad") == 0;
-}
 
 std::vector<uint8_t> TuneFile::serialise(const std::vector<uint8_t> &image, const MetaModel &meta,
                                         const std::vector<uint8_t> *host)

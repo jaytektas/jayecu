@@ -779,9 +779,33 @@ bool FirmwareUpgrade::onFileError(const std::string& name, const std::string& me
 void FirmwareUpgrade::finish() {
     ui_.closeProgress();
     // The migrated tune becomes the ECU's active tune, so the normal connect finds studio and ECU in sync.
+    //
+    // UNDER THE NAME OF THE TUNE THE ECU HAD — never over one it did not. This saved under whatever tune
+    // was OPEN, which is not the same thing: a tune opened offline to be sent after the update was
+    // overwritten by the ECU's old tune, and the work in it was gone before it reached the car. A file is
+    // the ECU's only when it holds the values that were read off the ECU (tuneDict_); otherwise the
+    // migrated tune gets a name of its own and every existing file is left as it was.
+    keptTune_.clear();
     if (Ecu* e = Ecu::openOrCreate(uid_, board_)) {
-        const std::string name = e->lastActiveTune().empty() ? "current" : e->lastActiveTune();
+        std::string name;
+        for (const std::string &c : { e->lastActiveTune(), e->currentTune(), std::string("current") }) {
+            if (c.empty()) continue;
+            const std::vector<uint8_t> raw = e->loadTune(c);
+            if (raw.empty() && c == "current") { name = c; break; }          // nothing there to lose
+            if (!raw.empty() && !noTune_ && TuneFile::sameValues(raw, tuneDict_)) { name = c; break; }
+        }
+        if (name.empty()) {
+            const std::vector<std::string> have = e->tuneNames();
+            const std::string base = "ecu-tune-fw" + kit_.version;
+            name = base;
+            for (int n = 2; std::find(have.begin(), have.end(), name) != have.end(); ++n)
+                name = base + " (" + std::to_string(n) + ")";
+            if (!e->lastActiveTune().empty()) keptTune_ = e->lastActiveTune();
+        }
         e->saveTune(name, TuneFile::serialise(pushed_, newMeta_));
+        e->setLastActiveTune(name);
+        e->setCurrentTune(name);
+        savedTune_ = name;
     }
     // A RECOVERY THAT KEPT THE ECU'S OWN TUNE has nothing to report: no tune carried over, no backup, nothing
     // for the person to act on — so no dialog, which would only be a click in front of the connect. The
@@ -826,6 +850,10 @@ void FirmwareUpgrade::finish() {
     if (!report_.unmapped.empty())   body += "\n" + std::to_string(report_.unmapped.size()) + " no longer exist.";
     if (!report_.unresolved.empty()) body += "\n" + std::to_string(report_.unresolved.size()) + " could not be resolved.";
     if (!report_.rescaled.empty())   body += "\n" + std::to_string(report_.rescaled.size()) + " converted to a new scale.";
+    body += "\n\nThe ECU's tune is saved as \u201C" + savedTune_ + "\u201D.";
+    if (!keptTune_.empty())
+        body += " \u201C" + keptTune_ + "\u201D was not the tune on the ECU, so it was left as it was: open it and "
+                "send it when you are ready.";
     if (!sdNote_.empty()) body += "\n\n" + sdNote_;
     body += "\n\nFull report: " + reportPath;
     step_ = Step::Idle;
