@@ -17,7 +17,10 @@
 //
 //   cmake --build build --target tune_migrate
 //   ./build/tune_migrate <meta> <tune> [path ...]
-//   ./build/tune_migrate <meta> <raw.tune> --from <old-meta> [--out <image>] [path ...]
+//   ./build/tune_migrate <meta> <raw.tune> --from <old-meta> [--out <image>] [--dict-out <tune>] [path ...]
+//
+// --dict-out writes the dictionary the raw image was read into: with the meta's own default image as the
+// raw input and the same meta as --from, that is the DEFAULT TUNE as a .tune, comparable path by path.
 //
 // For a dictionary, --from names the meta it was SAVED on: a value whose scale changed between the
 // two is then converted, as the studio does when it has that definition to hand.
@@ -35,12 +38,13 @@ int main(int argc, char** argv) {
         std::fputs("usage: tune_migrate <meta> <tune> [config.path ...]\n", stderr);
         return 2;
     }
-    std::string fromMeta, outPath;
+    std::string fromMeta, outPath, dictOut;
     std::vector<std::string> want;
     for (int i = 3; i < argc; ++i) {
         const std::string a = argv[i];
         if (a == "--from" && i + 1 < argc)      fromMeta = argv[++i];
         else if (a == "--out" && i + 1 < argc)  outPath  = argv[++i];
+        else if (a == "--dict-out" && i + 1 < argc) dictOut = argv[++i];
         else                                    want.push_back(a);
     }
     MetaModel meta;
@@ -75,6 +79,11 @@ int main(int argc, char** argv) {
         doc = TuneFile::serialise(raw, old);
         std::printf("       read against %s (layout %s) -> %zu B of dictionary\n",
                     fromMeta.c_str(), old.layoutHash().c_str(), doc.size());
+        if (!dictOut.empty()) {
+            std::ofstream o(dictOut, std::ios::binary);
+            o.write((const char*)doc.data(), std::streamsize(doc.size()));
+            std::printf("       wrote the dictionary -> %s\n", dictOut.c_str());
+        }
     }
 
     MetaModel saved;

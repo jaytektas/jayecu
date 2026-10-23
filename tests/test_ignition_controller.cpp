@@ -334,7 +334,8 @@ int main() {
 
     SECTION("disabled, cranking fires on the map exactly as before");
     {
-        auto cfg = make_cfg(25);          // cranking_ign_enable stays 0 — the shipped default
+        auto cfg = make_cfg(25);
+        cfg.cranking_ign_enable = 0;      // disabled HERE (the shipped tune is a car's, and enables it)
         Ignition ic;
         ic.init(cfg);
         EngineFrame f{};

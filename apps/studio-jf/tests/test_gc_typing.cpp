@@ -25,6 +25,21 @@ static void ck(bool ok, const std::string& what, const std::string& note = {}) {
     if (!ok) ++fails;
 }
 
+// THE CAN TABLE THIS TEST BUILDS STARTS EMPTY. The shipped default tune is a car's and fills the first frames
+// and fields with its dash and gearbox; the frames below are this test's own, laid over slots it assumes free.
+static void clearCan(Cache& C, const MetaModel& meta) {
+    for (int i = 0; meta.locate("can.gc_frame[" + std::to_string(i) + "].flags").valid(); ++i) {
+        const std::string f = "can.gc_frame[" + std::to_string(i) + "].";
+        C.setConfigValue(f + "flags", 0);
+        C.setConfigValue(f + "first_field", 0);
+        C.setConfigValue(f + "field_count", 0);
+        C.setConfigValue(f + "id", 0);
+        C.setConfigString(f + "name", "");
+    }
+    for (int i = 0; meta.locate("can.gc_field[" + std::to_string(i) + "].sig").valid(); ++i)
+        C.setConfigValue("can.gc_field[" + std::to_string(i) + "].sig", 0xFFFF);
+}
+
 int main(int argc, char** argv) {
     MetaModel meta;
     const char* cands[] = { argc > 1 ? argv[1] : nullptr,
@@ -41,6 +56,7 @@ int main(int argc, char** argv) {
     std::vector<uint8_t> image = meta.defaultImage();
     if (image.empty()) image.assign((size_t)meta.configSize(), 0);
     C.setConfigImage(image);
+    clearCan(C, meta);
 
     // One receive frame on CAN1 with two fields, the shape the page holds after "Add" and a field or two.
     C.setConfigValue("can.gc_frame[0].flags", 1);

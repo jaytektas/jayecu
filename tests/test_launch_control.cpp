@@ -42,6 +42,11 @@ static LaunchConfig make_cfg(uint8_t cut_type = Launch::HardCut,
     c.cut_type    = cut_type;
     c.cut_method  = cut_method;
     c.timeout_s   = 0;                    // the timeout has its own section; off everywhere else
+    // THE LIMIT THESE CASES ARE WRITTEN AROUND, pinned here rather than read from the shipped tune: the
+    // shipped End RPM is a car's (it moved 5000 -> 3800 when the default tune became one), and every
+    // threshold below is a distance from 5000. Both axes off, so the limit is cell 0.
+    c.end_rpm_table_x_en = 0; c.end_rpm_table_y_en = 0;
+    c.end_rpm_table[0]   = 5000;
     switch_prog(c.arm_expr, sizeof c.arm_expr, SIG_LAUNCH_SW);
     return c;
 }
@@ -265,9 +270,17 @@ int main() {
     SECTION("the ignition map is published as an ABSOLUTE advance, read at rpm x load");
     {
         auto cfg = make_cfg();
+        // THE TEST'S OWN MAP, not the shipped one (that is a car's calibration — a flat -15 deg on the default
+        // tune). Rows = load 0,50,75,100,150,200,250,300 kPa; columns = the launch RPM axis; deg x10.
+        static const int16_t kMap[8][8] = {
+            {150, 200, 240, 280, 300, 300, 300, 300}, {150, 200, 240, 280, 300, 300, 300, 300},
+            {140, 180, 220, 250, 270, 280, 280, 280}, {120, 150, 180, 200, 220, 220, 220, 220},
+            {100, 120, 130, 120, 100,  80,  60,  50}, { 80,  90,  90,  60,  20, -50, -80,-100},
+            { 60,  70,  60,  20, -50,-120,-150,-150}, { 40,  50,  40,   0,-100,-150,-150,-150}};
+        for (int r = 0; r < 8; ++r) for (int c = 0; c < 8; ++c) cfg.ign_advance_table[r * 8 + c] = kMap[r][c];
         Launch lc; lc.init(cfg); lc.set_dtc(&dtc);
         EngineFrame f{};
-        // 5000 rpm x 100 kPa is a shipped cell: 22.0 deg. Off boost at the same RPM it is 30.0 —
+        // 5000 rpm x 100 kPa is a cell of that map: 22.0 deg. Off boost at the same RPM it is 30.0 —
         // a NORMAL advance, which is the whole point of the table being absolute.
         SignalBus bus = make_bus(true, 5000.0f, /*load*/100.0f);
         run(lc, bus, 5000.0f, f);
@@ -291,8 +304,9 @@ int main() {
         SignalBus bus = make_bus(true, 3000.0f, /*load*/0.0f);
         run(lc, bus, 3000.0f, f);
         CHECK_NEAR(bus.get(wk::fuel_corr_launch), 1.10f, 0.001f);
-        // The shipped table is zero everywhere, which has to read as 1.0x and not as 0.
+        // A table of zeros has to read as 1.0x and not as 0 (set here: the shipped table is a car's).
         auto plain = make_cfg();
+        for (auto& c : plain.fuel_corr_table) c = 0;
         Launch lc2; lc2.init(plain); lc2.set_dtc(&dtc);
         EngineFrame f2{}; SignalBus b2 = make_bus(true, 3000.0f, 100.0f);
         run(lc2, b2, 3000.0f, f2);

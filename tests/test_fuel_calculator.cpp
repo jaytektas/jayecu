@@ -93,8 +93,9 @@ static FuelCalculatorConfig make_cfg() {
     return c;
 }
 
-// Displacement + cylinder count are live tune fields now (g_config.engine.*); default_config seeds them
-// to the schema defaults (2000 cc / 4 cyl), which is what these expectations are calibrated for.
+// Displacement + cylinder count are live tune fields (g_config.engine.*). These expectations are
+// calibrated for 2000 cc / 4 cyl, so main() pins that engine rather than taking the shipped default
+// (which is a car's: a 2.5 L six since the default tune became one).
 
 static EnginePosition make_pos(float rpm = 3000.0f, bool synced = true) {
     EnginePosition p{};
@@ -129,6 +130,8 @@ static void film(FuelCalculatorConfig& c, uint16_t pool_x10, uint16_t tau_ms) {
 
 int main() {
     fprintf(stdout, "=== FuelCalculator ===\n");
+    g_config.engine.displacement   = 2000;   // the engine every expectation below is worked out for
+    g_config.engine.cylinder_count = 4;
 
     SECTION("basic PW — positive, non-zero at 100kPa 80%VE");
     {

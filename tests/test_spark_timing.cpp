@@ -374,9 +374,11 @@ int main() {
         // silently clamped to TDC and the whole rotary timing model would quietly stop working.
         CHECK(g_config.ignition.min_adv_deg <= -50);      // room for at least -5.0 deg
         CHECK(g_config.ignition.max_adv_deg >   0);
-        // The TRAIL is computed after that clamp, deliberately: a 15 deg split must be free to take
-        // it to -20 without being clipped, or the split silently is not the split you asked for.
-        const AngleDeg10 lead  = -50, split = 150;
+        // The TRAIL is computed after that clamp, deliberately: a split must be free to take it PAST the
+        // floor without being clipped, or the split silently is not the split you asked for. Sized off the
+        // floor actually shipped (10 deg beyond it), so it proves this whatever that floor is set to.
+        const AngleDeg10 lead  = -50;
+        const AngleDeg10 split = static_cast<AngleDeg10>(lead - g_config.ignition.min_adv_deg + 100);
         CHECK(static_cast<AngleDeg10>(lead - split) < g_config.ignition.min_adv_deg);
     }
 

@@ -103,6 +103,12 @@ static LambdaConfig make_cfg() {
     // everything — the real defaults come from the schema, so a unit test has to state them. Each is
     // at its neutral value except the ones a test is actually about; the gate itself is covered by
     // its own section rather than by accident here.
+    // The settle delay after start, at the 3 s these cases were written around (a car's shipped value is
+    // 20 s — long enough for a hot wideband — and every case here starts probing within seconds).
+    c.cl_start_delay_s = 3;
+    // A fixed regulator, as these cases assume: with the shipped "Sensor" mode the learn gate (rightly)
+    // blocks every cell until a fuel-pressure reading exists, and no case here publishes one.
+    g_config.fuel_calculator.stage1_fuel_press_mode = 1;
     c.learn_min_clt = -40; c.learn_min_rpm = 0; c.learn_max_rpm = 12000;
     c.learn_run_time_s = 0; c.learn_tps_rate_limit = 0;
     c.learn_max_tps_en = 0; c.learn_max_map_en = 0;

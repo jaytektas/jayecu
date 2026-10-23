@@ -47,6 +47,21 @@ static void field(Cache& C, int i, double sig, int bit, int width) {
     C.setConfigValue(p + "scale", 1.0);
 }
 
+// THE CAN TABLE THIS TEST BUILDS STARTS EMPTY. The shipped default tune is a car's and fills the first frames
+// and fields with its dash and gearbox; the frames below are this test's own, laid over slots it assumes free.
+static void clearCan(Cache& C, const MetaModel& meta) {
+    for (int i = 0; meta.locate("can.gc_frame[" + std::to_string(i) + "].flags").valid(); ++i) {
+        const std::string f = "can.gc_frame[" + std::to_string(i) + "].";
+        C.setConfigValue(f + "flags", 0);
+        C.setConfigValue(f + "first_field", 0);
+        C.setConfigValue(f + "field_count", 0);
+        C.setConfigValue(f + "id", 0);
+        C.setConfigString(f + "name", "");
+    }
+    for (int i = 0; meta.locate("can.gc_field[" + std::to_string(i) + "].sig").valid(); ++i)
+        C.setConfigValue("can.gc_field[" + std::to_string(i) + "].sig", 0xFFFF);
+}
+
 int main(int argc, char** argv) {
     MetaModel meta;
     const char* cands[] = { argc > 1 ? argv[1] : nullptr,
@@ -63,6 +78,10 @@ int main(int argc, char** argv) {
     std::vector<uint8_t> image = meta.defaultImage();
     if (image.empty()) image.assign((size_t)meta.configSize(), 0);
     C.setConfigImage(image);
+    int lastField = 0;
+    while (meta.locate("can.gc_field[" + std::to_string(lastField + 1) + "].sig").valid()) ++lastField;
+    const double lastSig = C.configValue("can.gc_field[" + std::to_string(lastField) + "].sig");
+    clearCan(C, meta);
 
     const std::string slot = "sensors.sensor[lambda_1]";
     if (!meta.locate(slot + ".can_frame").valid() || !meta.locate(slot + ".can_bit").valid()) {
@@ -74,9 +93,8 @@ int main(int argc, char** argv) {
 
     // THE SHIPPED DEFAULT IS UNSET, and unset cannot be 0 — 0 is a real channel (abs_mode), so a
     // field left alone would publish onto it and two of them would be two producers of one channel.
-    ck(C.configValue("can.gc_field[0].sig") == kSigNone,
-       "a field's channel defaults to UNSET, not to channel 0",
-       std::to_string(C.configValue("can.gc_field[0].sig")));
+    // (Checked on the shipped image, before clearCan: the LAST slot, which no default frame reaches.)
+    ck(lastSig == kSigNone, "a field's channel defaults to UNSET, not to channel 0", std::to_string(lastSig));
 
     // One receive frame carrying two fields: one for a sensor to read, one the frame publishes itself.
     frame(C, 0, M_USED, /*bus=*/0, /*id=*/0x360, /*first=*/0, /*n=*/2, "Wideband");

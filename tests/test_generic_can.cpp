@@ -507,10 +507,13 @@ int main() {
     // value onto abs_mode at PRIO_CAN, and two of them counted as two producers of one channel.
     SECTION("a field with no channel publishes nothing");
     {
-        CHECK(g_config.can.gc_field[0].sig == SIG_NONE);   // the shipped default means UNSET
+        // An UNUSED slot's shipped channel means UNSET. The last slot: the default tune is a car's and fills
+        // the first ones with its dash and gearbox frames, but nothing reaches the end of the pool.
+        constexpr size_t kLast = sizeof(g_config.can.gc_field) / sizeof(g_config.can.gc_field[0]) - 1;
+        CHECK(g_config.can.gc_field[kLast].sig == SIG_NONE);
 
         T t;
-        t.frame(0x4B0, false, 0).field(g_config.can.gc_field[0].sig, 7, 16, 1.0f, 0.0f);
+        t.frame(0x4B0, false, 0).field(g_config.can.gc_field[kLast].sig, 7, 16, 1.0f, 0.0f);
 
         MockChannel ch; CanBroker br; SignalBus bus;
         br.add_bus(0, &ch); br.set_signal_bus(&bus);

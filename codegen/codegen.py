@@ -5528,7 +5528,9 @@ def _pack_field(buf, off, prim_types, f, idx=None):
         # "no expression" (always armed). The buffer is already zeroed.
         return
     if t == "string":
-        s = f.get("default", "")
+        # Per element, as _elem_init_value does for the C++ initializer: a list default names each element
+        # (a CAN frame's name), and reading `default` whole packed nothing for every one of them.
+        s = _elem_default(f, idx) if idx is not None else f.get("default", "")
         s = s if isinstance(s, str) else ""
         b = s.encode("ascii", "ignore")[: int(f["length"])]
         buf[off:off + len(b)] = b                       # remainder stays 0

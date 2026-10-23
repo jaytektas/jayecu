@@ -5,6 +5,9 @@
 #include "../firmware/Can/CanBroker.h"
 #include "../firmware/Can/ICanChannel.h"
 #include "../generated/signal_ids.h"
+#include "../generated/ecu_config.h"          // g_config: what getCalibration/evalTable must agree with
+#include "../generated/table_descs.h"
+#include "../firmware/Engine/TableEval.h"
 #include <vector>
 
 volatile uint32_t g_config_generation = 0;
@@ -483,8 +486,12 @@ int main() {
         ScriptEngine eng; eng.init(cfg);
         SignalBus bus = make_bus(101.3f, 20.0f, 0.0f);   // clt = 0
         run_tick(eng, bus);
-        CHECK_NEAR(bus.get(SIG_LUA_GAUGE_1), 90.0f, 0.01f);   // idle max-duty default scalar
-        CHECK_NEAR(bus.get(SIG_LUA_GAUGE_2), 64.85f, 0.1f);   // base-duty (default 8-pt table) interp @ clt 0: 72.0@-10, 57.7@+10 -> midpoint 64.85
+        // By name, the SAME numbers the module reads: the stored scalar at its scale (Max Duty is % x10), and
+        // the table evaluated at this bus. Against the live config rather than literals — the shipped values
+        // are a car's tune and move with it; what is under test is the lookup.
+        CHECK_NEAR(bus.get(SIG_LUA_GAUGE_1), g_config.idle.max_duty_pct * 0.1f, 0.01f);
+        CHECK_NEAR(bus.get(SIG_LUA_GAUGE_2), tbl::table_eval(base_duty_table_desc(&g_config.idle), bus), 0.1f);
+        CHECK(bus.get(SIG_LUA_GAUGE_2) > 0.0f);                 // a real duty, not an empty table
         CHECK_NEAR(bus.get(SIG_LUA_GAUGE_3), 1.0f, 0.01f);    // unknown name -> nil
     }
 
