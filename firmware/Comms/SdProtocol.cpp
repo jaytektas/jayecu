@@ -15,6 +15,12 @@ extern EcuConfig g_config;      // the log FORMAT — MLG v2, which MegaLogViewe
 #include <cstring>
 #include <cstdio>
 
+// The tune's channel picker must reach every channel the log can carry. Sized by hand once, it fell
+// behind the catalog and the newest 63 channels became unselectable without a word; now the build stops.
+static_assert(DATALOG_MASK_COUNT * 8u >= MLG_FIELD_COUNT,
+              "Datalog mask (definition/ecu.schema.yaml, Datalog.mask count) has fewer bits than there are "
+              "log channels: raise its count");
+
 // ECU/USB ownership shim (defined in SdArbitratorShim.cpp).
 extern "C" bool SdArbitrator_EcuHasCard(void);
 // SD card arbitrator (defined in main.cpp) — used to bracket comms card access.

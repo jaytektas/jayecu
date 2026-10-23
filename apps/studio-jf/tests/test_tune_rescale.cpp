@@ -117,6 +117,22 @@ int main() {
         ck(!asked && rep.rescaled.empty(), "a tune on its own layout does not consult another");
     }
 
+    std::puts("=== alignment padding is not a setting ===");
+    {
+        const std::vector<uint8_t> doc = TuneFile::serialise(now.defaultImage(), now);
+        const std::string text(doc.begin(), doc.end());
+        ck(text.find("_align_pad") == std::string::npos, "a saved tune carries no padding fields");
+        // An older tune that did store them: they load as nothing, neither dropped nor applied.
+        jf::JJson d = jf::JJson::parse(text);
+        d["arrays"]["outputs.output[0]._align_pad_99"] = jf::JJson(0.0);
+        d["scalars"]["lambda._align_pad_3"] = jf::JJson(0.0);
+        const std::string t2 = d.dump();
+        MigrationReport rep;
+        TuneFile::deserialise(std::vector<uint8_t>(t2.begin(), t2.end()), now, rep);
+        ck(rep.unmapped.empty() && rep.defaulted == 0, "an old tune's padding is not reported as dropped or new",
+           std::to_string(rep.unmapped.size()) + " unmapped, " + std::to_string(rep.defaulted) + " defaulted");
+    }
+
     std::printf("\n%s (%d failure%s)\n", fails ? "FAILED" : "ALL PASS", fails, fails == 1 ? "" : "s");
     return fails ? 1 : 0;
 }

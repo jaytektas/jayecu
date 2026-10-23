@@ -203,6 +203,15 @@ bool TuneFile::isDictFormat(const std::vector<uint8_t> &data)
     return false;
 }
 
+// ALIGNMENT PADDING IS NOT A SETTING. The compiler's filler bytes are in the meta so offsets add up, and
+// a tune that stored them by name carried ~1,200 of them (10 % of the document). Worse, they are
+// renumbered whenever a layout shifts, so every firmware update reported hundreds of settings dropped
+// and as many added — on a tune that had lost nothing. Never written; ignored when an older tune has them.
+static bool isPadding(const std::string &key) {
+    const size_t dot = key.rfind('.');
+    return key.compare(dot == std::string::npos ? 0 : dot + 1, 10, "_align_pad") == 0;
+}
+
 std::vector<uint8_t> TuneFile::serialise(const std::vector<uint8_t> &image, const MetaModel &meta,
                                         const std::vector<uint8_t> *host)
 {
@@ -228,6 +237,7 @@ std::vector<uint8_t> TuneFile::serialise(const std::vector<uint8_t> &image, cons
     // an absolute base far above it. Without this the host fields fall outside the image and vanish from
     // the document — the values would exist in the session and never survive a save.
     for (const auto &[key, f] : meta.config()) {
+        if (isPadding(key)) continue;
         const bool isHost = f.offset >= int(MetaModel::kPcSegmentBase);
         if (isHost) {
             if (!host) continue;
@@ -330,6 +340,7 @@ std::vector<uint8_t> TuneFile::serialise(const std::vector<uint8_t> &image, cons
         for (int i = 0; i < arr.count; ++i) {
             const int base = arr.baseOffset + i * arr.stride;
             for (const MetaModel::ArrayField &f : arr.fields) {
+                if (isPadding(f.name)) continue;
                 // Keyed by the element's STABLE ID ("clt"), not its position. An index is a position:
                 // remove one sensor from the catalog — as the knock row was — and every element after it
                 // shifts, so a stored value lands on its neighbour and a sensor inherits another's pin,
@@ -454,6 +465,7 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
 
     // --- Scalars ---
     for (const auto &[key, val] : root["scalars"].obj()) {
+        if (isPadding(key)) continue;
         auto it = meta.config().find(key);
         if (it == meta.config().end()) {
             report.unmapped.push_back(key);
@@ -595,6 +607,7 @@ std::vector<uint8_t> TuneFile::deserialise(const std::vector<uint8_t> &tuneJson,
 
     // --- Struct-array fields ---
     for (const auto &[key, val] : root["arrays"].obj()) {
+        if (isPadding(key)) continue;
         const MetaModel::Location L = meta.locate(key);
         if (L.kind != MetaModel::Location::Kind::Scalar) {
             report.unmapped.push_back(key);

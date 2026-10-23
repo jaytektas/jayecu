@@ -1444,7 +1444,7 @@ signals:
 - {id: turbo_speed_1, label: "Turbo Speed 1", category: "Sensors - Boost/Turbo", bus_type: float}
 - {id: turbo_speed_2, label: "Turbo Speed 2", category: "Sensors - Boost/Turbo", bus_type: float}
 - {id: vehicle_dynamics, label: "Vehicle Dynamics", category: "Sensors - Chassis", bus_type: float}
-- {id: vehicle_spd, label: "Vehicle Speed", units: 'km/h', scale: 0.1, telem_type: uint16, min: 0.0, max: 400.0, category: "Sensors - Vehicle Speed", bus_type: float, owner: firmware}
+- {id: vehicle_spd, label: "Vehicle Speed", units: 'km/h', scale: 0.1, telem_type: uint16, min: 0.0, max: 400.0, category: "Sensors - Vehicle Speed", bus_type: float, datalog: true, owner: firmware}
 # The RAW pickups. A speed sensor is a frequency sensor and nothing more — it counts teeth — so what it
 # publishes is Hz, and turning that into a road speed needs a number it cannot know: how many pulses the
 # car makes per kilometre. That number lives on the VehicleSpeed module with the rest of the calibration,
@@ -1778,7 +1778,7 @@ modules:
   # ECU owns the SD card. Enable + bench-validate before relying on it.
   Datalog:
     config:
-      # WHICH CHANNELS the card records, one bit per telemetry channel (452 today -> 57 bytes). It is a
+      # WHICH CHANNELS the card records, one bit per telemetry channel. It is a
       # TUNE field and not a build-time list because what a car logs is a tuning decision: a fuel
       # session and a misfire hunt want different columns, and neither is worth a reflash.
       #
@@ -1786,8 +1786,12 @@ modules:
       # default correct without encoding 57 bytes of defaults here, and it means a tune that predates
       # the feature logs the sensible thing rather than nothing at all.
       arrays:
+      # ROOM FOR EVERY CHANNEL, AND THEN SOME. It was sized to the channel count of its day (57 bytes,
+      # 456 channels) and the catalog grew past it: at 519 channels the last 63 could not be picked in a
+      # custom set — injector duty, lambda overall, the CAN health counters — with nothing to say so.
+      # 80 bytes is 640 channels, and SdProtocol.cpp refuses to BUILD once the catalog outgrows it.
       - name: mask
-        count: 57
+        count: 80
         label: Channel
         element:
         - {name: bits, type: uint8, label: Channel Bits, default: 0, help: 'Eight channels per byte, in telemetry-descriptor order, LSB first. Edited through the studio''s channel picker rather than by hand — the bit order is the meta''s field order, which is not something to count on paper.'}

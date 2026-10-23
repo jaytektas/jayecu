@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Vehicle Speed is in the default datalog. It never was, so no log recorded road speed even on a car that has one.
+- A custom datalog channel set can now include every channel. The list had room for 456 and there are 519, so the newest 63 (injector duty, lambda overall and per bank, the wastegate and CAN health channels among them) could not be chosen, without any warning. An update keeps the channels you had picked.
 - Launch control arms only once the engine is running. Cranking with the pedal down and the car still (how flood clear is asked for) also met launch's built-in rule, so the launch fuel map was applied to the cranking fuel and the launch timeout started before the engine caught.
 
 ## 0.4.15
