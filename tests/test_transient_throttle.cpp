@@ -1,4 +1,6 @@
 #include "test_helpers.h"
+#include <algorithm>
+#include <utility>
 #include "../firmware/Engine/Modules/TransientThrottle.h"
 #include "../firmware/Signal/EnginePosition.h"
 #include "../firmware/Signal/SignalBus.h"
@@ -70,6 +72,36 @@ int main() {
         { SignalBus b{}; b.set(SIG_TPS, 20.0f); b.set(SIG_RPM, 3000.0f); tt.update(pos(1), b, f);
           v = b.get(SIG_FUEL_CORR_ACCEL, 1.0f); }
         CHECK_NEAR(v, 1.0, 0.001);                     // disenrich disabled -> neutral
+    }
+
+    SECTION("a lift ends a tip-in (disenrich off), and the throttle's rebound at the bottom does not re-enrich");
+    {
+        // Drive 7: stab to 36 %, lift to 1.8 %, the ETB rebounds to 2.7 %. The rate swings -528 -> +32 %/s,
+        // a huge positive accel, and the old code re-took the table peak: fuel_corr_accel 1.95 on a lift.
+        cfg.enabled = 1; cfg.load_source = 0; cfg.enable_disenrich = 0; cfg.enable_decay = 1; cfg.enable_async = 0;
+        TransientThrottle tt; tt.init(cfg);
+        EngineFrame f{};
+        uint32_t cyc = 0;
+        auto step = [&](float tps) {
+            g_ms += 10; SignalBus b{}; b.set(SIG_TPS, tps); b.set(SIG_CLT, 80.0f); b.set(SIG_RPM, 1800.0f);
+            tt.update(pos(cyc++ / 6), b, f);                       // ~1900 rpm: one engine cycle per 6 frames
+            return std::make_pair(b.get(SIG_FUEL_CORR_ACCEL, 1.0f), b.get(SIG_TRANSIENT_ACTIVE, 0.0f));
+        };
+        g_ms = 6000;
+        for (int i = 0; i < 5; ++i) step(4.0f);
+        float tip = 1.0f;
+        for (float t : {12.0f, 24.0f, 36.0f}) tip = std::max(tip, step(t).first);
+        step(36.0f);                                               // lift straight after, as on the road
+        CHECK(tip > 1.05f);                                        // the stab enriched
+        step(25.0f);                                               // first lift frame: the rate filter's lag
+        float worst = 0.0f; float state_after = -1.0f;
+        for (float t : {12.0f, 1.8f, 2.4f, 2.7f, 2.7f, 2.9f, 3.0f, 3.3f, 3.5f, 3.6f, 3.6f}) {
+            auto r = step(t); worst = std::max(worst, r.first); state_after = r.second;
+        }
+        fprintf(stdout, "    tip-in peak %.3f, worst during/after lift %.3f, state %.0f\n",
+                (double)tip, (double)worst, (double)state_after);
+        CHECK(worst <= 1.0f + 1e-3f);                              // nothing added once the lift is seen
+        CHECK(state_after == 0.0f);                                // the event ended
     }
 
     SECTION("async enabled -> tip-in arms an async injection burst (pulses + per-pulse pw)");

@@ -10,6 +10,13 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 
 ## Unreleased
 
+- Lifting off the throttle no longer adds fuel. With disenrichment off, the tip-in's enrichment carried on
+  through a lift and, when the throttle settled closed, came back at full strength: a rich stumble after every
+  lift. A lift now ends the tip-in.
+- The closed-loop fuel trim now holds still during throttle transients and wall-film corrections, instead of
+  chasing the brief rich or lean reading they cause and leaving the mixture off afterwards.
+- The closed-loop fuel trim starts from zero after the engine stops, so a restart doesn't begin on the last
+  run's correction.
 - Log files on the SD card now carry the ECU clock's date and time (the clock Studio sets on connect)
   instead of all reading 1 January 2026.
 

@@ -309,6 +309,50 @@ int main() {
         CHECK_NEAR(reason, 0.0, 0.01);
     }
 
+    SECTION("transient FUELLING holds the trim too: accel enrichment, wall film, or an event in progress");
+    {
+        // Drive 7: a lift's +95 % accel spike read 0.70 for a second; the trim wound to -15 % chasing it
+        // (MAP source was measured, so the old hold never fired) and the next second ran 30 % lean.
+        reset_region(); clear_widebands(); clear_assignments(); enable_wb(SIG_LAMBDA_1);
+        assign_wb(SIG_LAMBDA_1, WB_OVERALL);
+        LambdaConfig cfg = make_cfg(); cfg.ltft_enabled = 0;
+        for (int which = 0; which < 3; ++which) {
+            Lambda lc; lc.init(cfg); lc.on_engine_start(); EngineFrame f{};
+            for (int i = 0; i <= 30; i++) { g_ms = 80000 + which * 10000 + i * 30;
+                SignalBus b = make_bus({{SIG_LAMBDA_1, 1.05f}}); lc.update(pos(), b, f); }
+            float first = -1.0f, held = 0.0f, reason = -1.0f;
+            for (int i = 1; i <= 10; i++) { g_ms = 81000 + which * 10000 + i * 30;
+                SignalBus b = make_bus({{SIG_LAMBDA_1, 0.70f}});
+                if (which == 0) b.set(SIG_FUEL_CORR_ACCEL, 1.95f);
+                if (which == 1) b.set(SIG_FUEL_CORR_FILM, 0.72f);
+                if (which == 2) b.set(SIG_TRANSIENT_ACTIVE, 1.0f);
+                lc.update(pos(), b, f); held = b.get(SIG_FUEL_CORR_STFT, 1.0f); reason = b.get(SIG_LAMBDA_CL_HOLD, -1.0f);
+                if (first < 0.0f) first = held; }
+            fprintf(stdout, "    %s: held %.4f -> %.4f, reason %.0f\n",
+                    which == 0 ? "accel 1.95" : which == 1 ? "film 0.72" : "event active", (double)first, (double)held, (double)reason);
+            CHECK_NEAR(held, first, 0.0001);
+            CHECK_NEAR(reason, 6.0, 0.01);
+        }
+    }
+
+    SECTION("an engine stop drops the fast trim: a restart does not begin on the last run's correction");
+    {
+        reset_region(); clear_widebands(); clear_assignments(); enable_wb(SIG_LAMBDA_1);
+        assign_wb(SIG_LAMBDA_1, WB_OVERALL);
+        LambdaConfig cfg = make_cfg(); cfg.ltft_enabled = 0;
+        Lambda lc; lc.init(cfg); lc.on_engine_start(); EngineFrame f{}; float wound = 1.0f;
+        for (int i = 0; i <= 60; i++) { g_ms = 120000 + i * 30;
+            SignalBus b = make_bus({{SIG_LAMBDA_1, 1.10f}}); lc.update(pos(), b, f); wound = b.get(SIG_FUEL_CORR_STFT, 1.0f); }
+        lc.on_engine_stop();
+        lc.on_engine_start();
+        g_ms += 30;
+        SignalBus b = make_bus({{SIG_LAMBDA_1, 1.10f}}); lc.update(pos(), b, f);
+        const float restart = b.get(SIG_FUEL_CORR_STFT, 1.0f);
+        fprintf(stdout, "    trim before the stop %.4f; first frame after restart %.4f\n", (double)wound, (double)restart);
+        CHECK(wound > 1.02f);
+        CHECK_NEAR(restart, 1.0, 0.0001);
+    }
+
     SECTION("disabling a trim zeroes it rather than freezing it");
     {
         reset_region(); clear_widebands(); clear_assignments(); enable_wb(SIG_LAMBDA_1);

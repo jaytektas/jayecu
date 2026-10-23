@@ -132,6 +132,16 @@ void TransientThrottle::update(const EnginePosition& pos, SignalBus& bus, Engine
     } else {
         detect_ms_ = 0.0f;
     }
+    // A LIFT ENDS A TIP-IN, whether or not disenrichment is in use. With disenrich off nothing above can
+    // flip the event, so the tip-in's enrichment used to ride on through the whole lift — and re-peaked
+    // at its end (see `maintaining` below). The closing rate is judged against the disenrich threshold
+    // when one is set, else the enrich threshold mirrored. The wall-film model owns the lift's fuel.
+    {
+        const float lift_db = (dis_db < 0.0f) ? dis_db : -rate_db;
+        if (state_ == ENRICH && !cfg_->enable_disenrich && rate_ < lift_db) {
+            state_ = IDLE; enrich_pct_ = 0.0f; detect_ms_ = 0.0f; start_load_ = load;
+        }
+    }
 
     // --- Magnitude (target %) for the active event -------------------------------------------
     float target = 0.0f;
@@ -176,8 +186,13 @@ void TransientThrottle::update(const EnginePosition& pos, SignalBus& bus, Engine
     if (state_ == ENRICH || state_ == DISENRICH) {
         const float accel_db = (state_ == ENRICH) ? cfg_->enr_load_accel_db * 0.1f
                                                   : cfg_->dis_load_decel_db * 0.1f;
-        const bool maintaining = (state_ == ENRICH) ? (accel >  accel_db)
-                                                    : (accel <  accel_db);
+        // MAINTAINING MEANS STILL MOVING THE EVENT'S WAY. Accel alone was not enough: the end of a lift is
+        // a rate swinging from very negative back to zero, a huge POSITIVE accel — and on a drive-by-wire
+        // throttle that overshoots closed and rebounds, the rate even pokes a few %/s positive. Read as
+        // "the tip-in is still accelerating", that re-took the peak from the rate table: +95 % fuel on a
+        // closing throttle, lambda 0.70 for a second after every lift (Kelly, drive 7).
+        const bool maintaining = (state_ == ENRICH) ? (accel >  accel_db && rate_ > rate_db)
+                                                    : (accel <  accel_db && rate_ < dis_db);
         if (!cfg_->enable_decay) {
             enrich_pct_ = target;                                  // no decay system → follow the rate table directly
         } else if (maintaining) {

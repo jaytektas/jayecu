@@ -236,7 +236,11 @@ uint16_t Lambda::cell_at(uint32_t when_ms) const {
 // key-on and not from the first frame — it is the settling a freshly running engine needs before what
 // it is doing means anything (a sensor coming to temperature, a fuel system finding its pressure).
 void Lambda::on_engine_start() { running_since_ms_ = platform_get_tick_ms(); if (!running_since_ms_) running_since_ms_ = 1; }
-void Lambda::on_engine_stop()  { running_since_ms_ = 0; tps_seen_ = false; }
+// A STOP DROPS THE FAST TRIM. Held through settling, a trim from the run before carried into the next start:
+// a hot restart's sensor read a flat 1.02 while still warming, the loop added 13 %, the engine stalled, and
+// the restart began 14 % rich before the sensor had said anything (Kelly, drive 7). The learned surface
+// (LTFT) is what is meant to survive a stop; the fast trim is about this run only.
+void Lambda::on_engine_stop()  { running_since_ms_ = 0; tps_seen_ = false; stft_.reset(); stft2_.reset(); }
 
 void Lambda::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& /*frame*/) {
     if (!cfg_) return;
@@ -409,7 +413,13 @@ void Lambda::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& 
     // A THROTTLE TRANSIENT, while MAP prediction is standing in for the sensor (Map Source 1). The mixture
     // the wideband sees then is the transient's — the air estimate and the fuel film are catching up — not
     // the operating point's, so correcting it would chase an error the VE table does not have.
-    const bool transient  = bus.valid(SIG_MAP_SOURCE) && static_cast<int>(bus.get(SIG_MAP_SOURCE, 0.0f)) == 1;
+    // …OR ANY TRANSIENT FUELLING AT ALL: an accel enrichment or a wall-film correction in play, or the
+    // transient module mid-event. The wideband then reads the transient's mixture, and a trim integrating
+    // it wound to -15 % through a lift's rich spike, then made the next second 30 % lean (drive 7).
+    const bool transient  = (bus.valid(SIG_MAP_SOURCE) && static_cast<int>(bus.get(SIG_MAP_SOURCE, 0.0f)) == 1)
+                         || bus.get(wk::transient_active, 0.0f) > 0.5f
+                         || std::fabs(bus.get(wk::fuel_corr_accel, 1.0f) - 1.0f) > 0.02f
+                         || std::fabs(bus.get(SIG_FUEL_CORR_FILM, 1.0f) - 1.0f) > 0.02f;
     const bool cl_hold    = in_cut || after_cut || unsettled || cold || off_range || transient;
     // WHY it is held, first reason wins — a state that said only "open loop" could not tell a fuel cut
     // from a cold engine from a transient. 0 None, 1 Fuel Cut, 2 After Cut, 3 Settling, 4 Cold,
