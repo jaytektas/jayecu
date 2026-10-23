@@ -10,6 +10,7 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 
 ## Unreleased
 
+## 0.4.17
 - The engine can no longer start on an electronic throttle that hasn't passed its key-on check. Fuel and spark
   stay off while it cranks, whatever is turning it; a check cut short by cranking runs again as soon as the
   engine stops, and every key-off starts the check from scratch. Before, cranking during the check left the
