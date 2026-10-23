@@ -69,6 +69,10 @@ AutotunePanel::AutotunePanel(JSceneGraph& g) : JContainer(g) {
     refresh();
 }
 
+void AutotunePanel::setShow(int i) {
+    if (modeBox_ && i >= 0 && i <= 4) modeBox_->setCurrentIndex(i);
+}
+
 void AutotunePanel::showMode(int i) {
     view_->setMode(i == 0 ? AutotuneView::Mode::Session
                  : i == 2 ? AutotuneView::Mode::Proposed

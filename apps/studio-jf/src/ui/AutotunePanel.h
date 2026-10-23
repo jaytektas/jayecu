@@ -86,6 +86,8 @@ public:
     [[nodiscard]] bool recording() const { return recording_; }
     [[nodiscard]] bool applyContinuously() const { return live_; }
     [[nodiscard]] AutotuneView::Mode viewMode() const { return view_->mode(); }   // what the grid is drawing
+    void setShow(int menuIndex);                               // the Show menu, by its index
+    void setViewLayout(AutotuneView::Layout l) { view_->setLayout(l); }   // the right-click View
 
     // Write the proposal into the tune. One undo step, and the accumulated evidence is discarded
     // afterwards: it was measured against the OLD cells, and keeping it would apply the same

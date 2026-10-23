@@ -4170,6 +4170,17 @@ int main(int argc, char** argv) {
     // belongs to Main — i.e. nothing, since Main is no longer in front.
     static const Surface* g_pageTab = nullptr;
 
+    // A PAGE THAT GOES IS HIDDEN, not just unpainted. A right-click asks every widget flagged visible
+    // whether the point is on it, and a closed page's surface kept its flag and its last bounds: on a
+    // tool tab (Auto Tune) the right-click over the grid was answered by the page window that had been
+    // up on the tab before — its table menu, acting on a table no longer on screen.
+    auto parkPage = [&] {
+        if (pageChild) {
+            if (pageChild->content()) mdi.removeChild(pageChild->content());
+            mdi.close(pageChild); pageChild = nullptr;
+        }
+        if (pageSurface) { pageSurface->setVisible(false); pageClosed = std::move(pageSurface); }
+    };
     mdi.onChildClosed = [&](jf::JMdiChild* c) {
         if (c != pageChild) return;                    // a tool window closing says nothing about the page
         // The owner goes with the window. Leaving a stale one behind makes the next tab change compare
@@ -4179,7 +4190,8 @@ int main(int argc, char** argv) {
         // it shows nothing — rather than reopening the window you just closed, which would make the ✕
         // look broken. Opening any page on it starts it remembering again.
         if (g_pageTab) g_tabPage.erase(g_pageTab);
-        pageChild = nullptr; pageClosed = std::move(pageSurface); pageOpen.clear(); g_pageTab = nullptr;
+        pageChild = nullptr; pageOpen.clear(); g_pageTab = nullptr;
+        if (pageSurface) { pageSurface->setVisible(false); pageClosed = std::move(pageSurface); }
     };
     g_invalidatePageSurface = [&surfaceTabs]{
         surfaceTabs.invalidate();                      // the tab surfaces…
@@ -4205,11 +4217,7 @@ int main(int argc, char** argv) {
         // cannot be on the stack. mdi.close() does not fire onChildClosed, so it does not touch this — nor
         // does it cut the content's parent edge (a dying widget used to cut its own), so that goes here,
         // as the ✕ reaper does, or the parked page would stay in the tree under the MDI.
-        pageClosed = std::move(pageSurface);
-        if (pageChild) {                       // …the previous page, and only it
-            if (pageChild->content()) mdi.removeChild(pageChild->content());
-            mdi.close(pageChild); pageChild = nullptr;
-        }
+        parkPage();                            // …the previous page, and only it
         win.setCentralWidget(&mdi);            // a tool may have taken the centre; the page needs it back
         pageSurface = std::make_unique<Surface>(g, Cache::instance(), pm);
         // KEEP CLEAR OF THE LIVE BAND. The surface behind the windows carries its readouts along the top
@@ -4245,7 +4253,7 @@ int main(int argc, char** argv) {
         std::string want = (it != g_tabPage.end()) ? it->second : std::string();
         if (want.empty() && tab) want = surfaceTabs.defaultPageOf(tab);
         if (want == pageOpen && tab == g_pageTab) return;   // this tab's own window is already up
-        if (pageChild) { mdi.close(pageChild); pageChild = nullptr; }
+        parkPage();
         pageOpen.clear();
         if (want.empty()) return;
         openPage(want);
@@ -7078,9 +7086,19 @@ int main(int argc, char** argv) {
             return true;
         } };
 
+    aiHost.verbs["tool"] = { "tool <name>", "open a Tools tab: Trigger Designer, Engine Cycle, Trigger Log, Knock Scope, Auto Tune",
+        [](const std::string& name, JJ& out, std::string& why) {
+            if (!g_openTool) { why = "no tools in this build"; return false; }
+            if (name.empty()) { why = "tool <name>"; return false; }
+            g_openTool(name);
+            out["tool"] = JJ(name);
+            return true;
+        } };
+
     // AUTO TUNE, without its tab having to be open or anyone at the keyboard.
     aiHost.verbs["autotune"] = {
-        "autotune status|start|stop|reset|apply|continuous on|off|grid [session|change|proposed|base|weight]",
+        "autotune status|start|stop|reset|apply|continuous on|off|grid [session|change|proposed|base|weight]"
+        "|show session|change|proposed|base|records|view grid|3d|slice",
         "",
         [](const std::string& args, JJ& out, std::string& why) {
             std::istringstream in(args);
@@ -7096,6 +7114,16 @@ int main(int argc, char** argv) {
             else if (sub == "continuous") {
                 if (opt != "on" && opt != "off") { why = "autotune continuous on|off"; return false; }
                 p.setApplyContinuously(opt == "on");
+            } else if (sub == "show") {       // what the grid shows, as the Show menu picks it
+                static const char* const kShow[] = { "session", "change", "proposed", "base", "records" };
+                const auto it = std::find(std::begin(kShow), std::end(kShow), opt);
+                if (it == std::end(kShow)) { why = "autotune show session|change|proposed|base|records"; return false; }
+                p.setShow(static_cast<int>(it - std::begin(kShow)));
+            } else if (sub == "view") {       // how it is drawn, as the grid's right-click View picks it
+                if      (opt == "grid")  p.setViewLayout(AutotuneView::Layout::Grid);
+                else if (opt == "3d")    p.setViewLayout(AutotuneView::Layout::Surface);
+                else if (opt == "slice") p.setViewLayout(AutotuneView::Layout::Slice);
+                else { why = "autotune view grid|3d|slice"; return false; }
             } else if (sub == "grid") {
                 const autotune::Engine& e = p.engine();
                 const std::string mode = opt.empty() ? "session" : opt;
@@ -7121,7 +7149,7 @@ int main(int argc, char** argv) {
                 out["x"] = xb; out["y"] = yb;
                 out["cells"] = rows;            // rows of columns, row 0 = the first (lowest) y bin
             } else if (!sub.empty() && sub != "status") {
-                why = "autotune status|start|stop|reset|apply|continuous on|off|grid [mode]";
+                why = "autotune status|start|stop|reset|apply|continuous on|off|grid [mode]|show <what>|view grid|3d|slice";
                 return false;
             }
             const autotune::Stats st = p.engine().stats();
