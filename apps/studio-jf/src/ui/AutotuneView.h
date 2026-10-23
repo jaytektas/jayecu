@@ -90,6 +90,7 @@ private:
     const autotune::Engine* eng_ = nullptr;
     Mode         mode_ = Mode::Change;
     int          plane_ = 0;
+    bool         pressed_ = false;      // a button is down: moves are a drag
     std::string  notice_, tablePath_;
     Scales       scales_;
     Source       source_{ *this };

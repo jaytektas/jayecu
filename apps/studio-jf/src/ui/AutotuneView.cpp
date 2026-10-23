@@ -244,13 +244,18 @@ ControlInput at(ControlInput::Kind k, float mx, float my) {
 }
 }  // namespace
 
+// Moves go to the table only while a button is held, as a surface sends them (Surface::handleMouseMove,
+// runDrag_): the table treats any Move as part of a drag, so a bare hover would orbit the 3D view.
 void AutotuneView::handleMousePress(float mx, float my) {
+    pressed_ = true;
     if (ready() && table_->onControlInput(tableRect(), at(ControlInput::Kind::Press, mx, my))) invalidate();
 }
 void AutotuneView::handleMouseMove(float mx, float my) {
-    if (ready() && table_->onControlInput(tableRect(), at(ControlInput::Kind::Move, mx, my))) invalidate();
+    if (pressed_ && ready() && table_->onControlInput(tableRect(), at(ControlInput::Kind::Move, mx, my))) invalidate();
 }
 void AutotuneView::handleMouseRelease(float mx, float my) {
+    if (!pressed_) return;
+    pressed_ = false;
     if (ready() && table_->onControlInput(tableRect(), at(ControlInput::Kind::Release, mx, my))) invalidate();
 }
 bool AutotuneView::handleScroll(float mx, float my, float wheel) {
