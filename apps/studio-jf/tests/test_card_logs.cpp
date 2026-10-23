@@ -28,14 +28,14 @@ static void ck(bool ok, const std::string& what, const std::string& note = {}) {
 
 // An MLG v2 file as the ECU writes one: the magic, version 2, and a ZERO epoch — which is the whole
 // reason the importer has anything to do.
-static void writeFakeLog(const fs::path& p, size_t payload) {
+static void writeFakeLog(const fs::path& p, size_t payload, char fill = '\x5A') {
     std::ofstream f(p.string(), std::ios::binary);
     char head[24] = {};
     head[0]='M'; head[1]='L'; head[2]='V'; head[3]='L'; head[4]='G'; head[5]=0;
     head[6]=0; head[7]=2;                       // format version 2, big-endian
     // bytes 8..11 (epoch) deliberately left zero
     f.write(head, sizeof head);
-    std::vector<char> body(payload, '\x5A');
+    std::vector<char> body(payload, fill);
     f.write(body.data(), (std::streamsize)body.size());
 }
 
@@ -120,6 +120,38 @@ int main() {
         ck(CardLogs::erase(*imported, false, &why), "…and now it deletes", why);
         ck(!fs::exists(imported->path, ec), "…gone from the card");
     }
+
+    // --- a DIFFERENT log wanting the same name is never written over ----------------------------
+    // What nearly lost a drive: the card's dates were all one value, the LOG numbers started again
+    // after the card was cleared, and the second LOG0000 truncated the first one's import.
+    const fs::path clash = card / "LOG0009.MLG";
+    writeFakeLog(clash, 4096, 'A');
+    const auto stamp = fs::last_write_time(clash, ec);
+    auto pick = [&](const std::string& name) {
+        for (const auto& e : CardLogs::logsOn(card.string())) if (e.name == name) return e;
+        return CardLogs::Entry{};
+    };
+    ck(CardLogs::import(pick("LOG0009.MLG"), &why), "the first LOG0009 imports", why);
+    const fs::path first = logs / fs::path(pick("LOG0009.MLG").target);
+    const uint64_t firstSize = fs::file_size(first, ec);
+
+    writeFakeLog(clash, 6000, 'B');             // a new drive: same name, same date, other size
+    fs::last_write_time(clash, stamp, ec);
+    CardLogs::Entry second = pick("LOG0009.MLG");
+    ck(!second.imported, "a different log under the same name is not 'imported'");
+    ck(CardLogs::import(second, &why), "…it imports", why);
+    ck(fs::file_size(first, ec) == firstSize, "…and the first log is untouched",
+       std::to_string(fs::file_size(first, ec)) + " vs " + std::to_string(firstSize));
+    const fs::path two = logs / (fs::path(second.target).stem().string() + "-2.mlg");
+    ck(fs::exists(two, ec) && fs::file_size(two, ec) == second.bytes, "…beside it as -2", two.string());
+    ck(pick("LOG0009.MLG").imported, "…and is then seen as imported");
+
+    writeFakeLog(clash, 6000, 'C');             // a third: the SAME size as the second, other data
+    fs::last_write_time(clash, stamp, ec);
+    ck(!pick("LOG0009.MLG").imported, "same name and size but other data is not 'imported'");
+    ck(CardLogs::import(pick("LOG0009.MLG"), &why), "…it imports as well", why);
+    ck(fs::exists(logs / (fs::path(second.target).stem().string() + "-3.mlg"), ec), "…as -3");
+    ck(fs::file_size(two, ec) == second.bytes, "…leaving -2 alone");
 
     CardLogs::rememberPath("");
     fs::remove_all(card, ec); fs::remove_all(logs, ec);

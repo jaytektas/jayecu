@@ -59,6 +59,47 @@ std::string targetName(const std::string& cardName, int64_t epoch) {
     if (dot != std::string::npos) base = base.substr(0, dot);
     return std::string("jayecu_") + stamp + "_" + base + ".mlg";
 }
+
+// The name with "-N" before the extension: what the Nth log to want the same name is called.
+fs::path numbered(const fs::path& dir, const std::string& target, int n) {
+    if (n <= 1) return dir / target;
+    const size_t dot = target.rfind('.');
+    const std::string stem = dot == std::string::npos ? target : target.substr(0, dot);
+    const std::string ext  = dot == std::string::npos ? std::string() : target.substr(dot);
+    return dir / (stem + "-" + std::to_string(n) + ext);
+}
+
+// The last few KB of a file. Past the 24-byte header the import copies every byte untouched, so a
+// copy's tail is the card file's tail — and two different logs that happen to share a size do not
+// share it (the tail is data records, timestamps and all).
+constexpr size_t kTail = 4096;
+bool tailOf(const fs::path& p, uint64_t size, std::vector<char>& out) {
+    std::ifstream f(p, std::ios::binary);
+    if (!f) return false;
+    const uint64_t n = std::min<uint64_t>(kTail, size > 24 ? size - 24 : 0);
+    f.seekg(static_cast<std::streamoff>(size - n));
+    out.resize(static_cast<size_t>(n));
+    f.read(out.data(), static_cast<std::streamsize>(n));
+    return f.gcount() == static_cast<std::streamsize>(n);
+}
+
+// Is this card log already in the folder? Its own name first, then the numbered names a clash would
+// have pushed it to. SAME NAME AND SIZE WAS NOT ENOUGH: with the card's dates stuck at one value, and
+// LOG numbers starting again after a card is cleared, two different logs got the same name — and the
+// second import, seeing a different size, truncated the first one to write over it.
+bool alreadyLanded(const fs::path& dir, const std::string& target, const fs::path& card, uint64_t bytes) {
+    std::vector<char> want;
+    bool haveWant = false;
+    for (int n = 1;; ++n) {
+        std::error_code se;
+        const fs::path p = numbered(dir, target, n);
+        if (!fs::exists(p, se)) return false;          // the names are taken in order; a gap ends them
+        if (fs::file_size(p, se) != bytes || se) continue;
+        if (!haveWant) { if (!tailOf(card, bytes, want)) return false; haveWant = true; }
+        std::vector<char> have;
+        if (tailOf(p, bytes, have) && have == want) return true;
+    }
+}
 }  // namespace
 
 std::string CardLogs::importDirectory() { return DatalogRecorder::resolvedDirectory(); }
@@ -116,12 +157,10 @@ std::vector<CardLogs::Entry> CardLogs::logsOn(const std::string& dir) {
         x.bytes  = static_cast<uint64_t>(e.file_size(ec));
         x.epoch  = epochOf(e.path());
         x.target = targetName(x.name, x.epoch);
-        // ALREADY IMPORTED = the file is sitting in the log folder at the same size. No manifest,
-        // so nothing can go stale or disagree with the disk, and deleting an import honestly makes
-        // the card's copy new again.
-        std::error_code se;
-        const fs::path landed = importDir / fs::path(x.target);
-        x.imported = fs::exists(landed, se) && fs::file_size(landed, se) == x.bytes;
+        // ALREADY IMPORTED = the file is sitting in the log folder, same size, same data. No
+        // manifest, so nothing can go stale or disagree with the disk, and deleting an import
+        // honestly makes the card's copy new again.
+        x.imported = alreadyLanded(importDir, x.target, e.path(), x.bytes);
         out.push_back(std::move(x));
     }
     std::sort(out.begin(), out.end(), [](const Entry& a, const Entry& b) {
@@ -135,11 +174,18 @@ bool CardLogs::import(const Entry& e, std::string* whyNot, const std::function<v
     auto fail = [whyNot](const std::string& m) { if (whyNot) *whyNot = m; return false; };
     std::error_code ec;
     if (e.imported) return true;               // nothing to do, and saying so is not an error
-    const fs::path dest = fs::path(importDirectory()) / fs::path(e.target);
+    // NEVER OVER ANOTHER LOG. A name already taken is a different log (logsOn would have called this
+    // one imported otherwise), so this one takes the next free numbered name instead.
+    const fs::path dir = importDirectory();
+    fs::path dest;
+    for (int n = 1;; ++n) {
+        dest = numbered(dir, e.target, n);
+        if (!fs::exists(dest, ec)) break;
+    }
 
     std::ifstream in(e.path, std::ios::binary);
     if (!in) return fail("cannot read " + e.name + " from the card");
-    std::ofstream out(dest.string(), std::ios::binary | std::ios::trunc);
+    std::ofstream out(dest.string(), std::ios::binary);
     if (!out) return fail("cannot write into " + importDirectory());
 
     // THE HEADER, PATCHED AS IT PASSES. MLG v2 puts a unix epoch at bytes 8..11, big-endian, and the

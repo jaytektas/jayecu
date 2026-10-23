@@ -45,12 +45,13 @@ public:
     // Does this folder look like the card? One directory listing; true when it holds any .MLG.
     static bool looksLikeCard(const std::string& dir);
 
-    // The logs on it, newest first. `imported` is true when a file of the same target name and size
-    // is already in the studio's log directory — no manifest to go stale, and moving a log out of
+    // The logs on it, newest first. `imported` is true when a file of the same target name (or a
+    // numbered "-2", "-3"… of it), size and data is already in the studio's log directory — no manifest to go stale, and moving a log out of
     // that folder honestly makes it un-imported again.
     static std::vector<Entry> logsOn(const std::string& dir);
 
-    // Copy one across, stamping the capture date into the MLG header on the way. False with a
+    // Copy one across, stamping the capture date into the MLG header on the way. Never replaces a
+    // file: a name already taken gets the next "-N" (the log there is a different one). False with a
     // reason; an entry already imported succeeds without copying again. `progress`, if given, is
     // told the bytes copied so far after every chunk — from whichever thread is doing the copy.
     static bool import(const Entry& e, std::string* whyNot = nullptr,
