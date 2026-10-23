@@ -72,9 +72,11 @@ int main() {
     AutotunePanel p(g);
     p.attach();
 
-    // The Show menu opens on Session %, and the grid must be drawing Session % — it used to draw
-    // Change % under that label, which on a continuous-apply drive is a grid of zeros.
-    ck(p.viewMode() == AutotuneView::Mode::Session, "the grid opens drawing Session %, as the menu says");
+    // The grid draws what the Show menu says (it once drew Change % under a Session % label). With Apply
+    // continuously off — how the panel opens — it opens on Change %: Session % only shows cells the run
+    // has MOVED, and nothing moves until Apply, so a drive full of proposals opened on a blank grid.
+    ck(!p.applyContinuously() && p.viewMode() == AutotuneView::Mode::Change,
+       "applying by hand, the grid opens on the proposals (Change %), as the menu says");
 
     const std::string path = p.tablePath();
     ck(!path.empty(), "the panel resolved a table to tune", path);

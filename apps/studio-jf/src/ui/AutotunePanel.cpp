@@ -108,7 +108,15 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
     // per-write proposal (Change %) is the second view, not the first.
     modeBox_ = row->add(std::make_unique<JComboBox>(
         g, std::vector<std::string>{ "Session %", "Change %", "Proposed", "Base", "Records" }, 120.f, 22.f));
-    modeBox_->setCurrentIndex(0);
+    // THE VIEW FOLLOWS HOW IT IS BEING USED. Session % only shows cells the session has MOVED, and with
+    // Apply continuously off nothing moves until Apply is pressed — so a run with 87 proposals opened on
+    // a blank grid, and read as "Auto Tune is not working". Off, the proposal (Change %) is what there is
+    // to read; on, it is spent every couple of seconds and Session % is. The last choice is remembered,
+    // except that a remembered Session % never opens a blank grid.
+    {
+        const int saved = JSettings::instance().get<int>("autotune.show", 1);
+        modeBox_->setCurrentIndex(saved >= 0 && saved <= 4 && saved != 0 ? saved : 1);
+    }
     row->add(std::make_unique<JLabel>(g, "Resistance", 68.f, 22.f));
     resistBox_ = row->add(std::make_unique<JComboBox>(
         g, std::vector<std::string>{ "Easy", "Normal", "Hard" }, 90.f, 22.f));
@@ -128,11 +136,17 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
     liveBox_->onStateChanged.connect([this](bool on) {
         live_ = on;
         // Writing as it goes, the proposal is spent every couple of seconds — what there is to look
-        // at is where the map has been taken, so show that.
-        if (on && modeBox_) modeBox_->setCurrentIndex(0);
+        // at is where the map has been taken, so show that. Back off, the proposal is.
+        if (modeBox_) {
+            if (on) modeBox_->setCurrentIndex(0);
+            else if (modeBox_->currentIndex() == 0) modeBox_->setCurrentIndex(1);
+        }
         refresh();
     });
-    modeBox_->onIndexChanged.connect([this](int i) { showMode(i); });
+    modeBox_->onIndexChanged.connect([this](int i) {
+        showMode(i);
+        JSettings::instance().set("autotune.show", JVariant(i));
+    });
     resistBox_->onIndexChanged.connect([this](int) { applySettings(); refresh(); });
     targetBox_->onIndexChanged.connect([this](int i) { if (!selecting_) selectTarget(i); });
 }
@@ -160,6 +174,12 @@ void AutotunePanel::buildFilters(JSceneGraph& g, const std::vector<autotune::Fil
     if (fs.empty()) return;
 
     auto& st = JSettings::instance();
+    // RESISTANCE IS REMEMBERED with the target's other settings. It was the one control on the panel
+    // that went back to Normal every time the studio started.
+    if (resistBox_) {
+        const int r = st.get<int>(settingPrefix() + "resistance", 1);
+        resistBox_->setCurrentIndex(r >= 0 && r <= 2 ? r : 1);
+    }
     constexpr size_t kPerRow = 4;
     const auto newRow = [&] {
         auto* r = filterRow_->add(std::make_unique<JContainer>(g));
@@ -219,6 +239,7 @@ void AutotunePanel::applySettings() {
         st.set(settingKey(fs[k].channel), JVariant(fs[k].value));
     }
     eng_.setFilters(std::move(fs));
+    if (resistBox_) st.set(settingPrefix() + "resistance", JVariant(i));
     if (maxPct_) st.set(settingPrefix() + "maxCellPct", JVariant(s.maxCellPct));
     if (maxAbs_) st.set(settingPrefix() + "maxCellAbs", JVariant(s.maxCellAbs));
 }
