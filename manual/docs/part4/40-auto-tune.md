@@ -151,6 +151,14 @@ Open **Tools ▸ Auto Tune** with the ECU connected.
    do), **Proposed VE**, **Base VE** and **Records** (how much evidence each cell has). The line
    underneath counts the readings (total / filtered / used), the cells altered, and the average and
    largest change.
+
+   The grid is drawn like the VE Table itself, on the table's own axes. Right-click it to choose
+   **2D Grid**, **3D Surface** (drag to turn it, the mouse wheel to change the height) or **Slice**
+   (one row as a graph: click a cell in the grid first to choose the row). The thin bar along the
+   bottom of each cell is how much evidence it has, and the outlined cell is where the last reading
+   landed. The grid shows the tuner's numbers, so it cannot be typed into: edit the VE Table itself
+   for that. Hover over any control on the tab, or the words beside it, for what it does.
+   <!-- src: apps/studio-jf/src/ui/AutotuneView.cpp; apps/studio-jf/src/surface/widgets/TableWidget.cpp; apps/studio-jf/src/ui/AutotunePanel.cpp -->
 6. Press **Stop**, look over the proposal, and press **Apply**. The VE Table is changed in one step
    (Edit ▸ Undo takes it back). The readings are kept, re-measured against the new values: a cell
    written the whole way proposes nothing more, and the grid still shows everywhere you have driven.

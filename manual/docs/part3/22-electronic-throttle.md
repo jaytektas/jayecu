@@ -145,8 +145,21 @@ A calibration saved in the tune is not trusted blindly. Each time the key is tur
     to three seconds. Turn the key, wait until the throttle has gone quiet, then start.
     <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
 
-If the key is turned on with the engine already turning, the sweep is skipped and the sensor check
-alone is used.
+**The engine will not start until the check has passed.** While a throttle that is switched on has
+not passed its check since the key went on, fuel and spark stay off whenever the engine is turning
+but not running, whatever is turning it: the ECU's starter output, a hard-wired starter, or a push
+start. If you crank during the check, the check stops (the plate is never swept while the engine
+turns) and runs again as soon as the engine stops: let go of the key, wait for the throttle to go
+quiet, then start. Every key-off forgets the last pass, so each key-on checks again.
+
+If the ECU's starter output cranks the engine, make it wait for the throttle as well: add
+`and etb_state_1 == 2` (**ETB State** RUNNING) to the starter output's **Turn On When** (chapter 18), so
+it does not crank against the check. The Starter Motor template does not add this for you.
+
+An engine that is already **running** when the check starts (the ECU restarted on the move, after a
+supply dip) is never cut by this. The sweep is skipped and the sensor check alone is used, because a
+running engine is worse off with a dead throttle than with an unswept one.
+<!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
 
 ### 6 · The half bridges
 
@@ -392,7 +405,7 @@ Live channels: `pedal_demand`, `app_state`, `throttle_demand`, `etb_position_1`,
 | Pedal does nothing, lamp **UNCAL** | Find limits never run (Relax Position is 0), or the key-on check has not finished | Run Find limits; wait after key-on |
 | Pedal does nothing, lamp **RUNNING** | Pedal module off or faulted; Pedal to Throttle all zero | Accelerator Pedal page: Enabled, OK lamp; the map |
 | Lamp **FAULT** after every key-on | Key-on check failing: a sensor or a stop has changed | ECU Console message; run Find limits |
-| Engine will not fire straight after key-on | The key-on sweep cuts fuel and spark | Wait two to three seconds before cranking |
+| Engine will not fire straight after key-on | The key-on sweep cuts fuel and spark; cranking during it holds them off until the check has passed | Let go of the key, wait two to three seconds for the check, then crank |
 | Drive forward closes the plate | Motor wired the other way | Direction Invert |
 | Plate moves only one way | DC Map set to Bipolar | DC Map Unipolar |
 | Find limits: "no closed stop" / "no open stop" | Plate cannot reach a stop in time; Duty Cap below the spring's breakaway | Motor wiring; raise Duty Cap a little; Step Timeout |

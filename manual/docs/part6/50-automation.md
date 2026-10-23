@@ -146,11 +146,14 @@ telemetry arrived.
 | `burn` | make the ECU keep what it has (flash) |
 | `save` | save the tune into the ECU's folder in the studio's library |
 | `page <navigation path>` | show a page (window only), e.g. `Configuration/Engine Configuration` |
+| `tool <name>` | open a Tools tab (window only): `Trigger Designer`, `Engine Cycle`, `Trigger Log`, `Knock Scope`, `Auto Tune` |
 | `key on\|off\|auto` | force the ECU's key: `off` stops the engine (no fuel, no spark); `auto` hands it back |
 | `connect` / `disconnect` | open or close the link, as the toolbar button does (the tune is saved first) |
 | `autotune status\|start\|stop\|reset\|apply` | Auto Tune without its tab open: run it, pause it, start a new session, apply the proposal |
 | `autotune continuous on\|off` | write to the map as it drives |
 | `autotune grid [session\|change\|proposed\|base\|weight]` | the grid as the panel shows it: Session % by default, rows of columns |
+| `autotune show session\|change\|proposed\|base\|records` | what the Auto Tune tab's grid shows, as **Show** picks it (window only) |
+| `autotune view grid\|3d\|slice` | how the grid is drawn, as its right-click menu picks it (window only) |
 | `cardlogs list\|import new\|import <name>…\|status` | the ECU's SD logs once the card is mounted; an import runs in the background, and `status` reports its progress |
 | `dtc list\|refresh\|clear` | the trouble codes, as the DTC dock shows them, with freeze frames |
 | `record start\|stop\|status` | the studio's own PC-side datalog |
