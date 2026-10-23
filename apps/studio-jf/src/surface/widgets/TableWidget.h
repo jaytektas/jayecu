@@ -44,6 +44,44 @@ public:
     }
     int  view() const { return m_view; }
 
+    // ------------------------------------------------------------------
+    // A TABLE SHOWING SOMETHING ELSE ABOUT ITS OWN CELLS. The autotuner's grid is this table — same
+    // bins, same axes, same orientation — but each cell shows what the tuner thinks of it (its proposed
+    // value, how far it would move, how much evidence it has) rather than what it holds. Bound to the
+    // real table, the widget keeps everything it knows about the shape — breakpoints, units, transpose,
+    // the three views — and asks the source only for what goes IN each cell.
+    //
+    // A sourced table is READ-ONLY: what it shows is not the tune, so typing into it, dragging a slice
+    // bar or editing a breakpoint would write the tune from a picture of something else. Selection,
+    // navigation and the views still work.
+    //
+    // Indices are STORAGE (i0 = axis 0, i1 = axis 1) on the plane the source names, so the source never
+    // needs to know how the table is oriented on screen.
+    // ------------------------------------------------------------------
+    class CellSource {
+    public:
+        virtual ~CellSource() = default;
+        virtual double value(int i0, int i1) const = 0;
+        // The cell's own fill. false = the table's heat colour for the value.
+        virtual bool   fill(int i0, int i1, uint8_t out[4]) const { (void)i0; (void)i1; (void)out; return false; }
+        // The cell's text. true = this text ("" leaves the cell blank); false = the value at the table's decimals.
+        virtual bool   label(int i0, int i1, std::string& out) const { (void)i0; (void)i1; (void)out; return false; }
+        // A sliver along the foot of the cell, 0..1 of its width; < 0 draws none.
+        virtual float  coverage(int i0, int i1) const { (void)i0; (void)i1; return -1.f; }
+        // Outlined in every view — for the autotuner, the cell its last record landed in.
+        virtual bool   marked(int i0, int i1) const { (void)i0; (void)i1; return false; }
+        // The scale heights and bars are read against, when the values' own min..max is the wrong one
+        // (a signed change wants zero in the middle). false = min..max.
+        virtual bool   range(double& lo, double& hi) const { (void)lo; (void)hi; return false; }
+        // What the numbers are, for the name bar. "" = the table's cell units.
+        virtual std::string units() const { return {}; }
+        // The Z plane shown, for a stacked table. The source decides it; the depth control is hidden.
+        virtual int    plane() const { return 0; }
+    };
+    // Borrowed; nullptr = the tune's own cells (the ordinary table).
+    void setCellSource(const CellSource* s) { m_source = s; }
+    [[nodiscard]] const CellSource* cellSource() const { return m_source; }
+
     void loadContent(const PanelElement& el) override {
         const std::string s = el.prop("view");           // derive the owned member from the element each re-source
         m_view = s.empty() ? 0 : std::clamp(std::atoi(s.c_str()), 0, 2);
@@ -291,6 +329,28 @@ public:
     }
 
 private:
+    // Screen cell -> storage indices, the same mapping TableGeom::cellOffset uses.
+    static void storageOf(const TableGeom& g, int screenRow, int col, int& i0, int& i1) {
+        const int vIdx = g.rows - 1 - screenRow, hIdx = col;
+        i0 = g.transpose ? hIdx : vIdx; i1 = g.transpose ? vIdx : hIdx;
+    }
+    // What a cell SHOWS: the source's value when there is one, else the tune's.
+    double shownValue(const PanelElement& el, const TableGeom& g, int screenRow, int col) const {
+        if (!m_source) return cellValue(el, g.t, g.cellOffset(screenRow, col));
+        int i0, i1; storageOf(g, screenRow, col, i0, i1);
+        return m_source->value(i0, i1);
+    }
+    // The range heights and bars are scaled to — the values' own, unless the source names one.
+    void shownRange(const PanelElement& el, const TableGeom& g, double& mn, double& mx) const {
+        mn = 1e300; mx = -1e300;
+        for (int rr = 0; rr < g.rows; ++rr)
+            for (int cc = 0; cc < g.cols; ++cc) { const double v = shownValue(el, g, rr, cc); mn = std::min(mn, v); mx = std::max(mx, v); }
+        double lo, hi;
+        if (m_source && m_source->range(lo, hi) && hi > lo) { mn = lo; mx = hi; }
+        if (!(mx > mn)) mx = mn + 1.0;
+    }
+
+    const CellSource* m_source = nullptr;   // borrowed; see setCellSource
     int         m_view = 0;              // OWNED runtime state: 0 grid / 1 3D / 2 slice (loadContent/saveContent)
     Table3DState m_view3d;              // OWNED 3D orbit/height/drag state (per instance; not serialized — runtime only)
     std::string m_axisColor, m_gridColor;   // local colour overrides ("" = JStyle palette default)

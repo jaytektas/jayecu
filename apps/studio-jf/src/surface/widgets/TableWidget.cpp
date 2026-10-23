@@ -98,17 +98,29 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
     double mn = 1e300, mx = -1e300;
     for (int rr = 0; rr < g.rows; ++rr)
         for (int cc = 0; cc < g.cols; ++cc) {
-            const double v = cellValue(el, g.t, g.cellOffset(rr, cc));
+            const double v = shownValue(el, g, rr, cc);
             cell[rr * g.cols + cc] = v; mn = std::min(mn, v); mx = std::max(mx, v);
         }
+    { double lo, hi; if (m_source && m_source->range(lo, hi) && hi > lo) { mn = lo; mx = hi; } }
     if (!(mx > mn)) mx = mn + 1.0;
+    // A cell's fill: the source's own when it has one, else the heat colour for its place in the range.
+    auto fillOf = [&](int rr, int cc, uint8_t o[4]) {
+        if (m_source) { int i0, i1; storageOf(g, rr, cc, i0, i1); if (m_source->fill(i0, i1, o)) return; }
+        heatColor((cell[rr * g.cols + cc] - mn) / (mx - mn), o);
+    };
+    auto markedAt = [&](int rr, int cc) {
+        if (!m_source) return false;
+        int i0, i1; storageOf(g, rr, cc, i0, i1);
+        return m_source->marked(i0, i1);
+    };
     const int view = m_view;   // the widget owns its view mode
     if (view == 2) {   // Slice
         uint8_t sbg[4] = {30, 30, 34, 255}; buf.pushRectangle(r.x, r.y, r.width, r.height, sbg, 0.f);
         const TableCursor* scur = nullptr;
         { const auto it = tableCursors().find(el.uid); if (it != tableCursors().end()) scur = &it->second; }
         const int sr = scur ? std::clamp(scur->row, 0, g.rows - 1) : 0, scc = scur ? std::clamp(scur->col, 0, g.cols - 1) : 0;
-        const float plotX = r.x + 46.f, plotY = r.y + lh + 4.f, plotW = r.width - 54.f, plotH = r.height - lh * 2.f - 10.f;
+        // Clear of the caption by half a line: the top gridline's value is drawn centred on the line.
+        const float plotX = r.x + 46.f, plotY = r.y + lh * 2.f + 4.f, plotW = r.width - 54.f, plotH = r.height - lh * 3.f - 10.f;
         if (plotW < 4.f || plotH < 4.f) return;
         const float bcw = plotW / g.cols;
         auto yOf = [&](double v) { return plotY + plotH - static_cast<float>((v - mn) / (mx - mn)) * plotH; };
@@ -126,9 +138,13 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
         for (int cc = 0; cc < g.cols; ++cc) {
             const float y = yOf(cell[sr * g.cols + cc]);
             if (cc >= ssc0 && cc <= ssc1) buf.pushRectangle(plotX + cc * bcw, plotY, bcw, plotH, span, 0.f);
-            uint8_t hc[4]; heatColor(static_cast<float>((cell[sr * g.cols + cc] - mn) / (mx - mn)), hc); hc[3] = 150;
+            uint8_t hc[4]; fillOf(sr, cc, hc); hc[3] = 150;
             buf.pushRectangle(plotX + cc * bcw + 1.f, y, bcw - 2.f, plotY + plotH - y, hc, 1.f);
             if (cc == scc) buf.pushRectangle(plotX + cc * bcw, plotY, bcw, plotH, jf::Colors::Transparent, 0.f, 1.5f, hl);
+            if (markedAt(sr, cc)) {
+                static const uint8_t kMark[4] = { 255, 255, 255, 255 };
+                buf.pushRectangle(plotX + cc * bcw, plotY, bcw, plotH, jf::Colors::Transparent, 0.f, 2.f, kMark);
+            }
         }
         std::vector<jf::JVectorCanvas::JVec2> line; line.reserve(g.cols);
         for (int cc = 0; cc < g.cols; ++cc) line.push_back({ plotX + cc * bcw + bcw * 0.5f, yOf(cell[sr * g.cols + cc]) });
@@ -191,13 +207,20 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
                 const float nl = std::sqrt(uz * uz + vz * vz + 1.f) + 1e-6f;
                 const float diff = std::clamp((-uz * lx - vz * ly + lz) / nl, 0.f, 1.f), bright = 0.55f + 0.45f * diff;
                 const float hn = (z00 + z10 + z11 + z01) * 0.25f;
-                hsv2rgb(240.f * (1.f - hn), 0.70f, std::clamp(0.9f * bright, 0.16f, 1.f), q.col);
-                q.outline = 0;
+                if (m_source) {   // the source's colours, averaged over the quad's corners and shaded
+                    uint8_t c4[4][4];
+                    fillOf(rr, cc, c4[0]); fillOf(rr, cc + 1, c4[1]); fillOf(rr + 1, cc + 1, c4[2]); fillOf(rr + 1, cc, c4[3]);
+                    for (int k = 0; k < 3; ++k)
+                        q.col[k] = static_cast<uint8_t>(std::clamp((c4[0][k] + c4[1][k] + c4[2][k] + c4[3][k]) * 0.25f * bright * 1.15f, 0.f, 255.f));
+                    q.col[3] = 255;
+                } else
+                    hsv2rgb(240.f * (1.f - hn), 0.70f, std::clamp(0.9f * bright, 0.16f, 1.f), q.col);
+                q.outline = markedAt(rr, cc) ? 4 : 0;
                 if (c3) {
                     const int adr = std::clamp(c3->aRow, 0, g.rows - 1);
                     const int r0 = std::min(cdr, adr), r1 = std::max(cdr, adr), k0 = std::min(c3->col, c3->aCol), k1 = std::max(c3->col, c3->aCol);
-                    if (rr <= r1 && rr + 1 >= r0 && cc <= k1 && cc + 1 >= k0) q.outline = 2;
-                    if ((rr == cdr || rr + 1 == cdr) && (cc == c3->col || cc + 1 == c3->col)) q.outline = 3;
+                    if (q.outline != 4 && rr <= r1 && rr + 1 >= r0 && cc <= k1 && cc + 1 >= k0) q.outline = 2;
+                    if (q.outline != 4 && (rr == cdr || rr + 1 == cdr) && (cc == c3->col || cc + 1 == c3->col)) q.outline = 3;
                 }
                 quads.push_back(q);
             }
@@ -205,7 +228,8 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
         for (const Q& q : quads) {
             vg.fillConvex({ q.p[0], q.p[1], q.p[2], q.p[3] }, jf::JPaint::solid(jf::rgba(q.col[0], q.col[1], q.col[2], 255)));
             const std::vector<jf::JVectorCanvas::JVec2> ol{ q.p[0], q.p[1], q.p[2], q.p[3] };
-            if (q.outline == 3)      vg.strokePolyline(ol, 2.2f, jf::JPaint::solid(jf::rgba(255, 235, 60, 255)), true);
+            if (q.outline == 4)      vg.strokePolyline(ol, 2.2f, jf::JPaint::solid(jf::rgba(255, 255, 255, 255)), true);
+            else if (q.outline == 3) vg.strokePolyline(ol, 2.2f, jf::JPaint::solid(jf::rgba(255, 235, 60, 255)), true);
             else if (q.outline == 2) vg.strokePolyline(ol, 1.3f, jf::JPaint::solid(jf::rgba(255, 224, 64, 255)), true);
             else                     vg.strokePolyline(ol, 0.5f, jf::JPaint::solid(jf::rgba(0, 0, 0, 60)), true);
         }
@@ -217,7 +241,9 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
                 std::snprintf(lb, sizeof(lb), "%s", g.viewV.text(g.breakpointY(rr)).c_str()); text(buf, pp.x - 28.f, pp.y - lh * 0.5f, lb, jf::Colors::TextSecondary, 40.f); }
             for (int cc = 0; cc < g.cols; cc += cstep) { proj((float)cc, (float)g.rows + 0.2f, 0.f, pp, dd);
                 std::snprintf(lb, sizeof(lb), "%s", g.viewH.text(g.breakpointX(cc)).c_str()); text(buf, pp.x - 10.f, pp.y, lb, jf::Colors::TextSecondary, 40.f); }
-            text(buf, r.x + 8.f, r.y + 6.f, "3D - drag rotate / wheel height / click+type to edit", jf::Colors::TextSecondary, r.width - 12.f);
+            text(buf, r.x + 8.f, r.y + 6.f, m_source ? "3D - drag rotate / wheel height"
+                                                     : "3D - drag rotate / wheel height / click+type to edit",
+                 jf::Colors::TextSecondary, r.width - 12.f);
         }
         return;
     }
@@ -255,7 +281,8 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
         std::vector<std::string> parts;
         if (!g.yb.empty()) parts.push_back("\xE2\x86\x95 " + _named(g.vName, g.viewV));
         if (!g.xb.empty()) parts.push_back("\xE2\x86\x94 " + _named(g.hName, g.viewH));
-        if (const std::string cu = _cellUnits(el, g); !cu.empty()) parts.push_back(cu);
+        if (const std::string cu = (m_source && !m_source->units().empty()) ? m_source->units() : _cellUnits(el, g);
+            !cu.empty()) parts.push_back(cu);
         std::string nb;
         for (std::size_t pi = 0; pi < parts.size(); ++pi)
             nb += (pi ? "     \xC2\xB7     " : "") + parts[pi];   // a separator only ever BETWEEN parts
@@ -308,8 +335,19 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
             const float x = g.gx + cc * g.cw;
             const double v = cell[rr * g.cols + cc];
             uint8_t hc[4];
-            if (g.heat) { heatColor((v - mn) / (mx - mn), hc); buf.pushRectangle(x, y, g.cw - 1.f, g.ch - 1.f, hc, 0.f, 1.f, kGrid); }
+            const bool filled = g.heat || m_source;   // a source's colours ARE what it shows: never off
+            if (filled) { fillOf(rr, cc, hc); buf.pushRectangle(x, y, g.cw - 1.f, g.ch - 1.f, hc, 0.f, 1.f, kGrid); }
             else         buf.pushRectangle(x, y, g.cw - 1.f, g.ch - 1.f, jf::Colors::Transparent, 0.f, 1.f, kGrid);
+            int si0 = 0, si1 = 0;
+            if (m_source) storageOf(g, rr, cc, si0, si1);
+            if (m_source) {
+                const float cov = m_source->coverage(si0, si1);
+                if (cov > 0.f) {
+                    static const uint8_t kCover[4] = { 235, 235, 240, 200 };
+                    const float ch3 = std::min(3.f, g.ch * 0.15f);
+                    buf.pushRectangle(x, y + g.ch - 1.f - ch3, (g.cw - 2.f) * std::min(1.f, cov), ch3, kCover);
+                }
+            }
             const bool active = cur && cur->row == rr && cur->col == cc;
             bool selected = false;
             if (cur) {
@@ -322,12 +360,18 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
                 }
             }
             if (active) buf.pushRectangle(x, y, g.cw - 1.f, g.ch - 1.f, jf::Colors::Transparent, 0.f, 2.f, jf::Colors::Accent);
+            if (markedAt(rr, cc)) {
+                static const uint8_t kMark[4] = { 255, 255, 255, 255 };
+                buf.pushRectangle(x, y, g.cw - 1.f, g.ch - 1.f, jf::Colors::Transparent, 0.f, 2.f, kMark);
+            }
             if (cells) {
+                std::string own;
                 if (active && cur->editing) std::snprintf(vb, sizeof(vb), "%s", cur->buf.c_str());
+                else if (m_source && m_source->label(si0, si1, own)) std::snprintf(vb, sizeof(vb), "%s", own.c_str());
                 else                     std::snprintf(vb, sizeof(vb), "%.*f", g.dec, v);
                 static const uint8_t kBlack[4] = {0,0,0,255}, kWhite[4] = {255,255,255,255};
                 const uint8_t* tc = fg;
-                if (g.heat) { const int L = (std::max(hc[0], std::max(hc[1], hc[2])) + std::min(hc[0], std::min(hc[1], hc[2]))) / 2; tc = L > 127 ? kBlack : kWhite; }
+                if (filled) { const int L = (std::max(hc[0], std::max(hc[1], hc[2])) + std::min(hc[0], std::min(hc[1], hc[2]))) / 2; tc = L > 127 ? kBlack : kWhite; }
                 if (selected) tc = kWhite;
                 // CENTRED, BUT NEVER STARTING OUTSIDE ITS OWN CELL. maxW clips the RUN, not the
                 // origin, so a string wider than the cell got a NEGATIVE centring offset and began
@@ -395,7 +439,7 @@ void TableWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
             bar(true, g.vx, r.y + r.height - kTSB, g.vw, kTSB, g.vw, len, ovf > 0.f ? std::clamp(-g.sx, 0.f, ovf) / ovf : 0.f, false);
         }
     }
-    if (g.zn > 1 && jf::JTextHelper::hasAtlas()) {
+    if (g.zn > 1 && !m_source && jf::JTextHelper::hasAtlas()) {   // a source picks its own plane
         const int depthCtl = choiceOf(el, "depthControl");   // global defaults to "Stepper" (the old else-branch), as before
         if (depthCtl == 2) {
             const float tw = 24.f, th = lh + 6.f, tabsW = g.zn * tw, tx0 = r.x + r.width - tabsW - 4.f, ty = r.y + 4.f;
@@ -439,7 +483,7 @@ bool TableWidget::handleControlInput(const jf::JRect& r, const ControlInput& in)
     const PanelElement& el = *m_el;
             const TableGeom g = tableGeom(el, r, Cache::instance(), elementContext(), renderZoom());
             // Z-plane depth control (top-right) — tested before cell selection so a click navigates.
-            if (g.zn > 1 && in.kind == ControlInput::Kind::Press && jf::JTextHelper::hasAtlas()) {
+            if (g.zn > 1 && !m_source && in.kind == ControlInput::Kind::Press && jf::JTextHelper::hasAtlas()) {
                 const float lh = g.lh > 0.f ? g.lh : jf::JTextHelper::lineHeight();   // the geom font, so the hit-test matches what was drawn
                 const int depthCtl = choiceOf(el, "depthControl");   // global defaults to "Stepper" (the old else-branch), as before
                 if (depthCtl == 2) {   // tabs
@@ -485,12 +529,10 @@ bool TableWidget::handleControlInput(const jf::JRect& r, const ControlInput& in)
                 if (in.kind == ControlInput::Kind::Scroll) { st.hScale = std::clamp(st.hScale * (in.wheel > 0 ? 1.12f : 1.f / 1.12f), 0.2f, 4.f); return true; }
                 if (in.kind == ControlInput::Kind::Release) {
                     if (!st.dragged) {   // pick the cell whose TOP (projected at its height, like the render) is nearest the cursor
-                        double mn = 1e300, mx = -1e300; std::vector<double> cv(static_cast<size_t>(g.rows) * g.cols);
-                        for (int rr = 0; rr < g.rows; ++rr) for (int cc = 0; cc < g.cols; ++cc) {
-                            const double v = cellValue(el, g.t, g.cellOffset(rr, cc));
-                            cv[rr * g.cols + cc] = v; mn = std::min(mn, v); mx = std::max(mx, v);
-                        }
-                        if (!(mx > mn)) mx = mn + 1.0;
+                        double mn, mx; shownRange(el, g, mn, mx);   // the heights the render drew
+                        std::vector<double> cv(static_cast<size_t>(g.rows) * g.cols);
+                        for (int rr = 0; rr < g.rows; ++rr) for (int cc = 0; cc < g.cols; ++cc)
+                            cv[rr * g.cols + cc] = shownValue(el, g, rr, cc);
                         const float cx = r.x + r.width * 0.5f, cy = r.y + r.height * 0.5f + r.height * 0.16f;
                         const float sxy = std::min(r.width, r.height) * 0.82f / std::max(std::max(g.cols, g.rows), 2), hPix = r.height * 0.38f * st.hScale;
                         const float yaw = st.yaw * 3.14159265f / 180.f, pitch = st.pitch * 3.14159265f / 180.f;
@@ -577,25 +619,20 @@ bool TableWidget::handleControlInput(const jf::JRect& r, const ControlInput& in)
             };
             if (view == 2) {   // Slice: click a column selects it; drag near the bar top edits the value; drag the body extends
                 const float lh = g.lh > 0.f ? g.lh : jf::JTextHelper::lineHeight();   // geom font (matches the slice render)
-                const float plotX = r.x + 46.f, plotY = r.y + lh + 4.f, plotW = r.width - 54.f, plotH = r.height - lh * 2.f - 10.f;
+                const float plotX = r.x + 46.f, plotY = r.y + lh * 2.f + 4.f, plotW = r.width - 54.f, plotH = r.height - lh * 3.f - 10.f;
                 const float bcw = (g.cols > 0) ? plotW / g.cols : plotW;
                 auto colAt = [&](float mx) { return std::clamp(static_cast<int>((mx - plotX) / bcw), 0, g.cols - 1); };
                 // Value axis = the WHOLE table's min/max — the SAME range the slice render scales its bars to
                 // (not the current row). Using the row range here put the bar-top hit-test at the wrong Y, so a
                 // click on the visible bar top missed the 12px window and fell through to select instead of edit.
-                auto plotMinMax = [&](double& mn, double& mx) {
-                    mn = 1e300; mx = -1e300;
-                    for (int rr = 0; rr < g.rows; ++rr) for (int cc = 0; cc < g.cols; ++cc) {
-                        const double v = cellValue(el, g.t, g.cellOffset(rr, cc));
-                        mn = std::min(mn, v); mx = std::max(mx, v);
-                    }
-                    if (!(mx > mn)) mx = mn + 1.0;
-                };
+                auto plotMinMax = [&](double& mn, double& mx) { shownRange(el, g, mn, mx); };
                 if (in.kind == ControlInput::Kind::Press && plotW >= 4.f && plotH >= 4.f) {
                     const int c = colAt(in.mx); cur.col = c; cur.aRow = cur.row; cur.aCol = c;
                     double mn, mx; plotMinMax(mn, mx);
-                    const float barTopY = plotY + plotH - static_cast<float>((cellValue(el, g.t, g.cellOffset(cur.row, c)) - mn) / (mx - mn)) * plotH;
-                    cur.sliceDrag = (std::abs(in.my - barTopY) < 12.f) ? c : -1;   // near the top = drag the value; else column-range select
+                    const float barTopY = plotY + plotH - static_cast<float>((shownValue(el, g, cur.row, c) - mn) / (mx - mn)) * plotH;
+                    // near the top = drag the value; else column-range select. Never on a sourced table:
+                    // its bars are not the tune.
+                    cur.sliceDrag = (!m_source && std::abs(in.my - barTopY) < 12.f) ? c : -1;
                     return true;
                 }
                 if (in.kind == ControlInput::Kind::Move && plotH >= 4.f) {
@@ -659,11 +696,11 @@ bool TableWidget::handleControlInput(const jf::JRect& r, const ControlInput& in)
                 const float lh = lh0;
                 const float xHdrY = xHdrY0;
                 const float yHdrX = yHdrX0;
-                if (g.hdrH > 0.f && in.my >= xHdrY - 2.f && in.my <= xHdrY + lh + 2.f && in.mx >= g.gx && in.mx < g.gx + g.cols * g.cw) {
+                if (!m_source && g.hdrH > 0.f && in.my >= xHdrY - 2.f && in.my <= xHdrY + lh + 2.f && in.mx >= g.gx && in.mx < g.gx + g.cols * g.cw) {
                     commit(); cur.axisEdit = 1; cur.axisIdx = std::clamp(static_cast<int>((in.mx - g.gx) / g.cw), 0, g.cols - 1);
                     cur.editing = true; cur.buf.clear(); return true;
                 }
-                if (g.hdrW > 0.f && in.mx >= yHdrX - 2.f && in.mx <= yHdrX + g.hdrW + 2.f && in.my >= g.gy && in.my < g.gy + g.rows * g.ch) {
+                if (!m_source && g.hdrW > 0.f && in.mx >= yHdrX - 2.f && in.mx <= yHdrX + g.hdrW + 2.f && in.my >= g.gy && in.my < g.gy + g.rows * g.ch) {
                     const int rr = std::clamp(static_cast<int>((in.my - g.gy) / g.ch), 0, g.rows - 1);
                     commit(); cur.axisEdit = 2; cur.axisIdx = g.rows - 1 - rr;   // screen row -> storage bin (Y increases upward)
                     cur.editing = true; cur.buf.clear(); return true;
@@ -682,6 +719,21 @@ bool TableWidget::handleControlInput(const jf::JRect& r, const ControlInput& in)
             if (in.kind == ControlInput::Kind::Release) { cur.selecting = false; return true; }
             if (in.kind == ControlInput::Kind::Key && in.key) {
                 using K = jf::JKeyEvent::JKey;
+                // A SOURCED TABLE MOVES, IT DOES NOT EDIT: the arrows slide the cursor and nothing else is
+                // taken — every other key here writes the tune, from a picture of something that is not it.
+                if (m_source) {
+                    int dR = 0, dC = 0;
+                    switch (in.key->key) {
+                        case K::Up:    dR = -1; break;
+                        case K::Down:  dR = +1; break;
+                        case K::Left:  dC = -1; break;
+                        case K::Right: dC = +1; break;
+                        default: return false;
+                    }
+                    cur.row = std::clamp(cur.row + dR, 0, g.rows - 1); cur.col = std::clamp(cur.col + dC, 0, g.cols - 1);
+                    cur.aRow = cur.row; cur.aCol = cur.col;
+                    return true;
+                }
                 // PageUp/PageDown step the Z plane on a 3D table.
                 if (g.zn > 1 && (in.key->key == K::PageUp || in.key->key == K::PageDown)) {
                     cur.z = std::clamp(cur.z + (in.key->key == K::PageUp ? 1 : -1), 0, g.zn - 1);

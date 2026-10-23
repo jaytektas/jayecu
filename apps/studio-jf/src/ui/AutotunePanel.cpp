@@ -342,8 +342,7 @@ void AutotunePanel::selectTarget(int i) {
     xChannel_ = c.axisChannel(t, 0);
     yChannel_ = c.axisChannel(t, 1);
     view_->setNotice({});
-    view_->setAxisLabels(xChannel_.empty() ? t.axes[0].label : xChannel_,
-                         yChannel_.empty() ? t.axes[1].label : yChannel_);
+    view_->setTable(tablePath_);   // the grid IS that table: its axes, its units, its views
 
     seedGrid();
     eng_.setFilters(fs);
@@ -707,5 +706,5 @@ void AutotunePanel::refresh() {
     if (status_) status_->setText(statusText());
     if (stats_)  stats_->setText(statsText());
     if (applyBtn_) applyBtn_->setEnabled(eng_.hasProposal());
-    if (view_) view_->invalidate();
+    if (view_) { view_->setPlane(plane_); view_->invalidate(); }
 }
