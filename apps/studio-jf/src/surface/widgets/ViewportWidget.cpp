@@ -13,6 +13,7 @@
 #include "../WidgetRegistry.h"
 #include "../../model/Cache.h"
 #include "../../model/MathEvaluator.h"
+#include <unordered_map>
 #include "../../model/EditorSettings.h"
 #include "../PanelLibrary.h"
 
@@ -274,6 +275,11 @@ void ViewportWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const
         const std::vector<LayoutChild> lc = mirroredLayoutChildren(pm);
         const jf::JRect pageBox{ ox, oy, view.pageW, view.pageH };
         int lcIndex = -1;
+        // A caption's hover help through its grouped control, as on the page itself (see PanelWidget).
+        std::unordered_map<int, std::string> groupBind;
+        for (const auto& e : pm->elements())
+            if (e.groupId != 0)
+                if (std::string s = e.prop("signalName"); !s.empty()) groupBind.emplace(e.groupId, std::move(s));
         buf.pushClip(content.x, content.y, content.width, content.height);
         for (const auto& pe : pm->elements()) {
             ++lcIndex;
@@ -286,6 +292,10 @@ void ViewportWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const
             // Asked of the CHILD, because on a template page the condition names "[*]" and only the child
             // knows which element this viewport is showing.
             if (!s_editMode && !child->visibleNow()) continue;
+            if (pe.groupId != 0 && pe.prop("signalName").empty()) {
+                const auto gb = groupBind.find(pe.groupId);
+                child->setHelpBind(gb == groupBind.end() ? std::string() : gb->second);
+            }
             const jf::JRect cr = mirroredChildRect(pageLayout, pageBox, lc, lcIndex, pm->gridColumns(),
                                                   pm->focusIndex(), pe, sc, ox, oy);
             const std::string sig = child->bindPath();   // the child already carries this viewport's sensor

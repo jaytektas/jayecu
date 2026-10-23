@@ -11,6 +11,7 @@
 #include "../../model/Cache.h"
 #include "../../model/MathEvaluator.h"
 #include <j/config/Json.h>
+#include <unordered_map>
 
 // A panel's children are authored as a JSON array in the "children" prop. rebuildChildren() reparses it into
 // persistent, OWNED child instances (m_children ‖ m_childData) — but only when the spec actually changes, so
@@ -36,6 +37,7 @@ void PanelWidget::loadContent(const PanelElement& el) {
             ce.uid = w["uid"].str();                    // usually absent (then not @-addressable)
             ce.x = static_cast<float>(w["x"].number()); ce.y = static_cast<float>(w["y"].number());
             ce.w = static_cast<float>(w["w"].number(80)); ce.h = static_cast<float>(w["h"].number(40));
+            ce.groupId = static_cast<int>(w["groupId"].number(0));   // pairs a caption with its control (help below)
             for (const auto& [k, v] : w["props"].obj()) ce.props[k] = v.str();
             m_childData.push_back(std::move(ce));
         }
@@ -102,11 +104,23 @@ void PanelWidget::render(jf::JPrimitiveBuffer& buf, const jf::JRect& r, const Ca
     // because there the whole point is that the drawing keeps the shape it was authored in.
     const float z = (m_layoutMode == 0) ? basis.z : 1.f;
     const std::vector<LayoutChild>& lc = basis.lc;
+    // A CAPTION'S HELP, as the Surface gives it on a page (Surface::paintElements_): a label binds nothing,
+    // so it answers on hover through the control it is grouped with. Without this every caption inside a
+    // panel — most settings pages put their fields in one — was silent while the box beside it explained
+    // itself.
+    std::unordered_map<int, std::string> groupBind;
+    for (const PanelElement& e : m_childData)
+        if (e.groupId != 0)
+            if (std::string sig = e.prop("signalName"); !sig.empty()) groupBind.emplace(e.groupId, std::move(sig));
     bool any = false;
     for (size_t i = 0; i < m_children.size(); ++i) {
         CanvasWidget* child = m_children[i].get();
         if (!child) continue;
         const PanelElement& ce = m_childData[i];
+        if (ce.groupId != 0 && ce.prop("signalName").empty()) {
+            const auto gb = groupBind.find(ce.groupId);
+            child->setHelpBind(gb == groupBind.end() ? std::string() : gb->second);
+        }
         // WHAT THE CHILD IS, BEFORE ASKING WHAT IT SAYS. Its element and its data have to be in place before
         // any condition on it is evaluated: a condition is an expression about THIS element.
         //

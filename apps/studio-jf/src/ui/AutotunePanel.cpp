@@ -88,7 +88,7 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
     row->setVSizePolicy(JSizePolicyMode::Fixed, 0);
 
     // WHICH TABLE. Filled from the definition on attach (VE Table, Predicted MAP, …).
-    row->add(std::make_unique<JLabel>(g, "Tune", 34.f, 22.f));
+    auto* tuneLbl = row->add(std::make_unique<JLabel>(g, "Tune", 34.f, 22.f));
     targetBox_ = row->add(std::make_unique<JComboBox>(g, std::vector<std::string>{}, 130.f, 22.f));
     startBtn_ = row->add(std::make_unique<JButton>(g, "Start Auto Tune", 128.f, 22.f));
     applyBtn_ = row->add(std::make_unique<JButton>(g, "Apply", 70.f, 22.f));
@@ -106,7 +106,7 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
     // it reads as a setting rather than a view selector, and "where is the proposed VE table" is then
     // a question with no answer on screen — the proposal is right there, under a dropdown nothing
     // identified. (Asked within a minute of the panel first being looked at.)
-    row->add(std::make_unique<JLabel>(g, "  Show", 44.f, 22.f));
+    auto* showLbl = row->add(std::make_unique<JLabel>(g, "  Show", 44.f, 22.f));
     // SESSION % FIRST: how far each cell has moved since Start (or the last Reset), however many times
     // it was revised on the way — the view a tuner driving with Apply continuously actually reads. The
     // per-write proposal (Change %) is the second view, not the first.
@@ -121,10 +121,33 @@ void AutotunePanel::buildControls(JSceneGraph& g) {
         const int saved = JSettings::instance().get<int>("autotune.show", 1);
         modeBox_->setCurrentIndex(saved >= 0 && saved <= 4 && saved != 0 ? saved : 1);
     }
-    row->add(std::make_unique<JLabel>(g, "Resistance", 68.f, 22.f));
+    auto* resistLbl = row->add(std::make_unique<JLabel>(g, "Resistance", 68.f, 22.f));
     resistBox_ = row->add(std::make_unique<JComboBox>(
         g, std::vector<std::string>{ "Easy", "Normal", "Hard" }, 90.f, 22.f));
     resistBox_->setCurrentIndex(1);
+
+    // HOVER HELP on every control, and on the words beside it: the label is what you point at.
+    const auto tip = [](std::initializer_list<JWidget*> ws, const char* text) {
+        for (JWidget* w : ws) w->setTooltip(text);
+    };
+    tip({ tuneLbl, targetBox_ }, "The table Auto Tune works on.");
+    tip({ startBtn_ }, "Start or stop collecting readings. Collecting changes nothing in the tune.");
+    tip({ applyBtn_ }, "Write the proposed changes into the table.");
+    tip({ resetBtn_ }, "Throw away the readings so far and start again. Session % is measured from the "
+                       "table as it is now.");
+    tip({ openLoopBtn_ }, "Open Loop turns the ECU's fuel trims off while tuning. Restore Trims puts back "
+                          "the trims that were on before.");
+    tip({ liveBox_ }, "Write proposed changes into the table every couple of seconds while collecting, "
+                      "instead of waiting for Apply.");
+    tip({ showLbl, modeBox_ }, "What each cell shows.\n"
+                               "Session %: how far the cell has moved since Start or Reset.\n"
+                               "Change %: the change Apply would make now.\n"
+                               "Proposed: the value after Apply.\n"
+                               "Base: the value in the table now.\n"
+                               "Records: how many readings the cell has collected (a reading between cells is shared).");
+    tip({ resistLbl, resistBox_ }, "How many readings a cell needs before it gets its full correction. "
+                                   "Easy trusts one reading, Normal wants about 4, Hard about 12. "
+                                   "With fewer, the cell moves only part of the way.");
 
     // THE STATUS IS A SENTENCE ("No ego correction: this ECU does not publish ..."), so it has a line
     // of its own under the buttons and WRAPS there. Squeezed in beside them it was cut off mid-word.
@@ -194,7 +217,8 @@ void AutotunePanel::buildFilters(JSceneGraph& g, const std::vector<autotune::Fil
     };
     JContainer* row = newRow();
     int rows = 1;
-    row->add(std::make_unique<JLabel>(g, "Reject when", 74.f, 22.f));
+    row->add(std::make_unique<JLabel>(g, "Reject when", 74.f, 22.f))
+        ->setTooltip("Readings taken while any of these is true are ignored.");
     for (size_t k = 0; k < fs.size(); ++k) {
         const autotune::Filter& f = fs[k];
         if (k > 0 && k % kPerRow == 0) {
@@ -203,20 +227,30 @@ void AutotunePanel::buildFilters(JSceneGraph& g, const std::vector<autotune::Fil
         }
         // THE COMPARISON IS ON SCREEN, not implied by the name. "Minimum RPM 500" and "dTPS 50" are
         // opposite tests, and a bare number beside a name gives no way to tell which way one runs.
-        row->add(std::make_unique<JLabel>(
+        auto* fl = row->add(std::make_unique<JLabel>(
             g, f.name + (f.op == autotune::Filter::Op::Above ? " >" : " <"),
             static_cast<float>(f.name.size()) * 7.f + 16.f, 22.f));
         auto* sp = row->add(std::make_unique<JDoubleSpinBox>(g, -10000.0, 30000.0, 1.0, 1, 76.f, 22.f));
+        const std::string why = "Ignore readings while " + f.name +
+                                (f.op == autotune::Filter::Op::Above ? " is above this." : " is below this.");
+        fl->setTooltip(why);
+        sp->setTooltip(why);
         sp->setValue(st.get<double>(settingKey(f.channel), f.value));
         sp->onValueChanged.connect([this](double) { applySettings(); refresh(); });
         filterSpins_.push_back(sp);
     }
-    row->add(std::make_unique<JLabel>(g, "    Max change %", 100.f, 22.f));
+    auto* pctLbl = row->add(std::make_unique<JLabel>(g, "    Max change %", 100.f, 22.f));
     maxPct_ = row->add(std::make_unique<JDoubleSpinBox>(g, 0.0, 100.0, 1.0, 1, 70.f, 22.f));
+    for (JWidget* w : { static_cast<JWidget*>(pctLbl), static_cast<JWidget*>(maxPct_) })
+        w->setTooltip("The most one cell can change in one pass, as a percent of its value. "
+                      "This and Max change both apply; the smaller limit wins.");
     maxPct_->setValue(st.get<double>(settingPrefix() + "maxCellPct", eng_.settings().maxCellPct));
     maxPct_->onValueChanged.connect([this](double) { applySettings(); refresh(); });
-    row->add(std::make_unique<JLabel>(g, "Max change", 72.f, 22.f));
+    auto* absLbl = row->add(std::make_unique<JLabel>(g, "Max change", 72.f, 22.f));
     maxAbs_ = row->add(std::make_unique<JDoubleSpinBox>(g, 0.0, 1000.0, 1.0, 1, 70.f, 22.f));
+    for (JWidget* w : { static_cast<JWidget*>(absLbl), static_cast<JWidget*>(maxAbs_) })
+        w->setTooltip("The most one cell can change in one pass, in the table's own units. "
+                      "This and Max change % both apply; the smaller limit wins.");
     maxAbs_->setValue(st.get<double>(settingPrefix() + "maxCellAbs", eng_.settings().maxCellAbs));
     maxAbs_->onValueChanged.connect([this](double) { applySettings(); refresh(); });
     filterRow_->setBounds({ 0.f, 0.f, 640.f, rows * 24.f + (rows - 1) * 2.f });
