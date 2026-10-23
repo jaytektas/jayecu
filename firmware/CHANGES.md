@@ -10,13 +10,6 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 
 ## Unreleased
 
-- A new ECU, a recovery, or an update onto an ECU with no tune now starts from a real running tune: a 1JZ-GTE
-  (2.5 L six, coil-on-plug, 86 mm bore) on E85 flex fuel with an 8-speed auto, taken from a car that drives on
-  it. That includes fuel, ignition, flex/E85 compensation, warm-up, cranking, idle, boost, closed loop, wall film
-  and transients, limits, launch, protection, knock monitoring (logging only), the datalog channel set and the
-  Haltech-dash/TurboLamik CAN frames. Wiring is NOT included: outputs, which pin each sensor reads and whether it
-  is fitted, trigger inputs, and drive-by-wire hardware stay unassigned until you set them for your car. It is a
-  starting point for a similar engine, not a tune for yours.
 - The engine can no longer start on an electronic throttle that hasn't passed its key-on check. Fuel and spark
   stay off while it cranks, whatever is turning it; a check cut short by cranking runs again as soon as the
   engine stops, and every key-off starts the check from scratch. Before, cranking during the check left the
