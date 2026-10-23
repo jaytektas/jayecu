@@ -648,7 +648,15 @@ private:
         JComboBox* lvl = f->add(std::make_unique<JComboBox>(m_graph, std::vector<std::string>{ "Trace", "Debug", "Info", "Warn", "Error", "Off" }));
         lvl->setCurrentIndex(std::clamp(static_cast<int>(JLog::instance().globalLevel()), 0, 5));
         lvl->onIndexChanged.connect([](int i){ JLog::instance().setGlobalLevel(static_cast<JLogLevel>(i)); });
-        m_rows[5] = 1;
+        // The AI bus as a SETTING. It was an environment variable only, and a launcher is not a place a
+        // setting can live: the studio rewrites its own desktop entry, the dock caches it, and a new
+        // version is a new path — so it was on for one launch and gone the next. Read at startup
+        // (main.cpp), before the window exists; the variable still turns it on for a single run.
+        f->add(std::make_unique<JLabel>(m_graph, "Automation bus (next start)", 150.f));
+        JCheckBox* bus = f->add(std::make_unique<JCheckBox>(m_graph, "", 30.f));
+        bus->setChecked(JSettings::instance().get<bool>("automation.aiBus", false));
+        bus->onStateChanged.connect([](bool on){ JSettings::instance().set("automation.aiBus", on); });
+        m_rows[5] = 2;
     }
 
     // Datalog — recording what the ECU is STREAMING, for the person tuning the engine. The other half

@@ -112,9 +112,11 @@ The headless studio prints one line of JSON when it is ready, and another when a
 When several ECUs answer `--connect` and you did not say which, it lists them in an `"error"` line and
 stops. It stops on Ctrl+C, on `SIGTERM`, or on `jf-busctl call quit`.
 
-**With the window**, start the studio with the bus on: `JF_AI_BUS=1 studio` (on Windows, set
-`JF_AI_BUS=1` in the environment first).
-<!-- src: apps/studio-jf/src/app/Headless.cpp (--ecu by uid or car, --tune, --connect with scan, ready/connected lines, quit); apps/studio-jf/main.cpp (kUsage) -->
+**With the window**, tick **Edit ▸ Preferences ▸ Diagnostics ▸ Automation bus** and start the studio again:
+from then on the bus is on every time it starts, however it is started (menu, dock, file manager, a newer
+version). For a single run without the setting, start it as `JF_AI_BUS=1 studio` (on Windows, set
+`JF_AI_BUS=1` in the environment first); `JF_AI_BUS=0` keeps it off for that run even with the setting on.
+<!-- src: apps/studio-jf/src/app/Headless.cpp (--ecu by uid or car, --tune, --connect with scan, ready/connected lines, quit); apps/studio-jf/main.cpp (kUsage, automation.aiBus); apps/studio-jf/src/ui/PreferencesDialog.h (buildDiagnostics) -->
 
 ### 3 · Ask it something
 

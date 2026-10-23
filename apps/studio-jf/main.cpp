@@ -1001,7 +1001,8 @@ static const char* kUsage =
     "  studio --headless --connect [--port P]  no window: connect to the ECU (with --ecu <uid> to pick one)\n"
     "  studio --headless --meta <file>         no window: a definition's defaults\n"
     "\n"
-    "  JF_AI_BUS=1 studio                      the studio with the AI bus on (headless always has it)\n"
+    "  JF_AI_BUS=1 studio                      the studio with the AI bus on (headless always has it);\n"
+    "                                          Preferences > Diagnostics > Automation bus turns it on for good\n"
     "  jf-busctl call help                     the bus's commands: settings, tables, live channels...\n"
     "\n"
     "Window options for scripted screenshots: --open-meta <file> --node <page path> --set path=value\n"
@@ -1109,6 +1110,16 @@ int main(int argc, char** argv) {
     // bar disagreeing with it is the same confusion as the WM_CLASS one below, in a place the user
     // reads constantly. (The grouping identity comes from the executable name — see
     // JLinuxPlatformWindow::applicationClass — which is already "studio", matching StartupWMClass.)
+    // THE AUTOMATION BUS, FROM A SETTING (Preferences ▸ Diagnostics). The window turns the bus on when it
+    // sees JF_AI_BUS, so a setting that says "always" sets it for this process before the window exists.
+    // An explicit JF_AI_BUS (even "0") is left alone: the environment still decides a single run.
+    if (settings.get<bool>("automation.aiBus", false) && !std::getenv("JF_AI_BUS")) {
+#ifdef _WIN32
+        _putenv_s("JF_AI_BUS", "1");
+#else
+        setenv("JF_AI_BUS", "1", 0);
+#endif
+    }
     JAppWindow win("jayECU Studio (JF)", settings.get<int>("window.w", 1280), settings.get<int>("window.h", 800));
     // The image cache uploads textures, and a widget's render() is handed a primitive buffer, not the hal.
     // Give it the one the window owns, once, here — before anything can ask it for a picture.
