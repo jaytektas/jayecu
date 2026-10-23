@@ -1771,7 +1771,7 @@ add_executable(autotune_grid_test EXCLUDE_FROM_ALL
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/AutotunePanel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/AutotuneView.cpp
     )
-target_link_libraries(autotune_grid_test PRIVATE studio_model)
+target_link_libraries(autotune_grid_test PRIVATE studio_surface studio_model)
 target_include_directories(autotune_grid_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(autotune_grid_test PRIVATE JFramework::platform ${STUDIO_TLS_LIBS})
 target_compile_definitions(autotune_grid_test PRIVATE
