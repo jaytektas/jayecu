@@ -1336,6 +1336,10 @@ MetaModel::Location MetaModel::locateUncached(const std::string &path) const
         const ConfigField &f = it->second;
         L.kind = Location::Kind::Scalar;
         L.offset = f.offset; L.datatype = f.datatype; L.scale = f.scale;
+        // The byte length, as 6d carries it for an element's field. Left out here, every module-level
+        // blob located as 0 bytes long: the AI bus refused any Arm When / condition program ("24 bytes
+        // of 0") and an ASCII name at module level could never be put back from a tune.
+        L.size = f.size;
         L.minV = f.minV; L.maxV = f.maxV; L.bits = f.bits;
         L.units = f.units; L.label = f.label; L.help = f.help; L.digits = f.digits;
         L.valueKind = f.kind; L.options = f.options; L.optionIds = f.optionIds;

@@ -67,6 +67,15 @@ int main() {
     ck(call("get sensors.sensor[clt].interface")["id"].str() == "digital_freq", "…and reads back by id and label");
     ck(call("set sensors.sensor[clt].interface Analogue Voltage")["ok"].boolean()
        && call("get sensors.sensor[clt].interface")["id"].str() == "analog_voltage", "…or by its label");
+    // A MODULE-LEVEL condition program. Its byte length was never carried for a plain module field, so
+    // the bus judged every program "too long: N bytes of 0" — Kelly's launch Arm When could not be set.
+    {
+        const auto e = call("set launch.arm_expr brake_sw > 0.5 and vehicle_spd < 5 and pedal_demand > 20");
+        ck(e["ok"].boolean(), "a module-level expression (launch Arm When) is set", e.dump());
+        ck(call("get launch.arm_expr")["value"].str().find("brake_sw") != std::string::npos, "…and reads back");
+        ck(call("set launch.arm_expr ")["ok"].boolean() && call("get launch.arm_expr")["value"].str().empty(),
+           "…and empty puts the built-in rule back");
+    }
     ck(call("set vehicle.Name Bench Car")["ok"].boolean()
        && call("get vehicle.Name")["value"].str() == "Bench Car", "text is written whole, spaces and all");
 
