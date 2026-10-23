@@ -82,6 +82,7 @@ private:
 
     State    state_       = IDLE;
     float    start_load_  = 0.0f;    // load captured at event start (drives the rate/ign axes)
+    bool     rising_      = false;   // ENRICH: the load is still moving up past the trip rate (this push)
     float    enrich_pct_  = 0.0f;    // current transient %, signed (+enrich / -disenrich)
     float    detect_ms_   = 0.0f;    // accumulated time the trigger condition has held
     float    ign_corr_    = 0.0f;    // current ignition correction [deg], decays over ign_corr_decay_ms

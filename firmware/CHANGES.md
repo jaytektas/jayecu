@@ -13,6 +13,9 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 - Lifting off the throttle no longer adds fuel. With disenrichment off, the tip-in's enrichment carried on
   through a lift and, when the throttle settled closed, came back at full strength: a rich stumble after every
   lift. A lift now ends the tip-in.
+- Each new push of the throttle gets its own tip-in fuel, judged from where that push started. A small
+  throttle movement on boost was enriched as if it were a stab from idle, because the enrichment remembered
+  where an earlier stab began: far too much fuel and a rich stumble.
 - The closed-loop fuel trim now holds still during throttle transients and wall-film corrections, instead of
   chasing the brief rich or lean reading they cause and leaving the mixture off afterwards.
 - The closed-loop fuel trim starts from zero after the engine stops, so a restart doesn't begin on the last

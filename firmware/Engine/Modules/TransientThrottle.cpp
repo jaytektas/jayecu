@@ -132,6 +132,24 @@ void TransientThrottle::update(const EnginePosition& pos, SignalBus& bus, Engine
     } else {
         detect_ms_ = 0.0f;
     }
+    // EVERY PUSH IS ITS OWN TIP-IN. An enrich event outlives the push that started it (the decay runs for
+    // seconds), and its start load stayed latched at wherever THAT push began — so on boost at 30 % throttle,
+    // inside an event that began at a closed throttle, a 4 % wiggle was enriched off the table's
+    // from-idle row: +90..140 % fuel at 190 kPa, a rich stumble (Kelly, drive 7). A fresh rise past the trip
+    // rate, after the last one had stopped, re-latches the start load at where this push began.
+    if (state_ == ENRICH) {
+        if (rate_ <= rate_db) rising_ = false;
+        else if (!rising_) {
+            rising_ = true;
+            if (!enrich_triggered) {
+                start_load_ = base_load ? *base_load : load;
+                bus.set(wk::tt_start_load, start_load_, true, now, ttl());
+            }
+        }
+    } else {
+        rising_ = false;
+    }
+    if (enrich_triggered) rising_ = true;
     // A LIFT ENDS A TIP-IN, whether or not disenrichment is in use. With disenrich off nothing above can
     // flip the event, so the tip-in's enrichment used to ride on through the whole lift — and re-peaked
     // at its end (see `maintaining` below). The closing rate is judged against the disenrich threshold

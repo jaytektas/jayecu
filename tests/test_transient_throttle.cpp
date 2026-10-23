@@ -104,6 +104,31 @@ int main() {
         CHECK(state_after == 0.0f);                                // the event ended
     }
 
+    SECTION("a wiggle on boost, inside an event that began at a closed throttle, is judged from where it began");
+    {
+        // Drive 7: reopen from 3.6 % (start load latched 4.2), settle at 30 %, then a 30 -> 39 % wiggle.
+        // Old: enriched off the from-idle row (+140 %). Now: the push re-latches its start at ~30 %.
+        cfg.enabled = 1; cfg.load_source = 0; cfg.enable_disenrich = 0; cfg.enable_decay = 1; cfg.enable_async = 0;
+        TransientThrottle tt; tt.init(cfg);
+        EngineFrame f{};
+        uint32_t cyc = 0;
+        float start_seen = -1.0f;
+        auto step = [&](float tps) {
+            g_ms += 10; SignalBus b{}; b.set(SIG_TPS, tps); b.set(SIG_CLT, 80.0f); b.set(SIG_RPM, 4200.0f);
+            tt.update(pos(cyc++ / 3), b, f);
+            start_seen = b.get(SIG_TT_START_LOAD, -1.0f);
+            return b.get(SIG_FUEL_CORR_ACCEL, 1.0f);
+        };
+        g_ms = 9000;
+        for (int i = 0; i < 5; ++i) step(3.6f);
+        for (float t : {10.0f, 16.0f, 20.0f, 21.0f}) step(t);          // the reopen: a real tip-in from closed
+        for (int i = 0; i < 12; ++i) step(30.0f);                       // settle, event still decaying
+        float peak = 1.0f, start = 0.0f;
+        for (float t : {31.9f, 35.8f, 39.0f}) { peak = std::max(peak, step(t)); start = std::max(start, start_seen); }
+        fprintf(stdout, "    wiggle 30 -> 39 %%: start load %.1f, peak fuel_corr_accel %.3f\n", (double)start, (double)peak);
+        CHECK(start > 25.0f);                                            // judged from ~30 %, not from 3.6 %
+    }
+
     SECTION("async enabled -> tip-in arms an async injection burst (pulses + per-pulse pw)");
     {
         cfg.enabled = 1; cfg.load_source = 0; cfg.enable_async = 1; cfg.max_async_pulses = 2;
