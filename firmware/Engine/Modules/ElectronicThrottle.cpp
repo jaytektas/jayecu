@@ -288,7 +288,8 @@ void ElectronicThrottle::adopt_stored_cal() {
 // which sets ac_phase_ to AC_OFF and so silently cancelled a findlimits started before the module's
 // first update. init() already arms the verify, so a boot with the key on needs no edge at all; what the
 // edge is for is the key being turned on LATER, which is the case reset could never cover.
-static bool key_now() { extern bool g_system_active; return g_system_active; }
+extern bool g_system_active;   // key-on: battery over threshold, owned by EngineTask
+static bool key_now() { return g_system_active; }
 void ElectronicThrottle::init(const ElectronicThrottleConfig& cfg) { cfg_ = &cfg; reset_state(true); adopt_stored_cal(); key_prev_ = key_now(); }
 void ElectronicThrottle::on_config_change(const ElectronicThrottleConfig& cfg) { cfg_ = &cfg; reset_state(); adopt_stored_cal(); key_prev_ = key_now(); }
 // An engine stop resets the LOOP (integrator, slew, timers) — it is not a reason to forget a calibration
@@ -839,6 +840,7 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
         bus.set_bool(wk::fuel_cut, true, now, ttl());
     }
 
+
     // Pedal trust, read from the App module's OWN published state rather than inferred from the demand
     // value -- 0 is a perfectly legitimate demand and is exactly what App publishes when it faults, so
     // the value cannot distinguish "foot off" from "cannot be believed". app_state 2 = correlation
@@ -863,10 +865,29 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
     // So: park while the key is off (nothing to read, nothing that can drive), and re-arm the stored-cal
     // verify on the rising edge, when the sensors are live and the answer means something. The latch
     // itself is NOT cleared here -- a genuine fault still demands a reset, not a key cycle.
-    extern bool g_system_active;               // key-on: battery over threshold, owned by EngineTask
     const bool key_on = g_system_active;
-    if (key_on && !key_prev_) { reset_state(); adopt_stored_cal(); }
+    // EVERY KEY CYCLE RE-PROVES THE THROTTLE. The rising edge forgets the last cycle's pass (adopt_stored_cal
+    // marks every body unproven) and any half-done check, so no start is ever let through on yesterday's test.
+    if (key_on && !key_prev_) {
+        reset_state(); adopt_stored_cal();
+        for (unsigned i = 0; i < N; i++) verify_interrupted_[i] = false;
+    }
     key_prev_ = key_on;
+
+    // NO START ON A THROTTLE THAT HAS NOT PASSED. Whatever turns the engine -- the ECU's own starter output
+    // (which should be gated on etb_state READY as well), a hard-wired starter, a push start -- an enabled
+    // body that has not proved itself since the key went on holds fuel and spark off. A RUNNING engine is
+    // never cut here: this refuses a start, it does not stall a car on the move after a mid-drive fault or
+    // an ECU restart (those keep the limp-home spring, and their own codes).
+    if (key_on && engine_state != EngineRunState::RUNNING) {
+        bool unproven = false;
+        for (unsigned i = 0; i < N; i++)
+            if (cfg_->etb[i].enabled && !calibrated_[i]) unproven = true;
+        if (unproven) {
+            bus.set_bool(wk::ign_cut,  true, now, ttl());
+            bus.set_bool(wk::fuel_cut, true, now, ttl());
+        }
+    }
 
     for (unsigned i = 0; i < N; i++) {
         const EtbConfig& e = cfg_->etb[i];
@@ -940,6 +961,11 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
         pos_primed_[i] = have_pos;
         bus.set(POS_SIG[i], out_pos, have_pos, now, ttl());
 
+        if (verify_interrupted_[i] && engine_stopped && !routine_busy()) {   // stopped again: rerun the check
+            verify_interrupted_[i] = false;
+            cal_pending_[i] = feedback_calibrated(e);
+        }
+
         // --- key-on verify: validate the STORED cal before the loop is allowed to close ---
         // Passive. No movement, so it needs neither a feed-forward table nor tuned gains to be correct,
         // and it cannot fling the plate. What it proves is that the cal in the tune still describes THIS
@@ -967,11 +993,18 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
                     if (engine_stopped && !routine_busy()) {
                         start_autocal(static_cast<uint8_t>(i), /*verify=*/true);
                         g_text_log.printf("ETB%u key-on sweep: checking travel to both stops\n", i);
-                    } else {
-                        // Cannot sweep (engine alive, or another routine holds the plate). Take the
-                        // passive result: a running engine is worse off with a dead throttle than with
-                        // an unswept one.
+                    } else if (engine_state == EngineRunState::RUNNING) {
+                        // THE ENGINE IS ALREADY RUNNING: the ECU has restarted under it (a supply dip on
+                        // the move). Take the passive result -- a running engine is worse off with a dead
+                        // throttle than with an unswept one, and this is not a START to refuse.
                         calibrated_[i] = true;
+                    } else if (!engine_stopped) {
+                        // CRANKING. Never sweep a turning engine, and never let it start on a throttle that
+                        // has not passed: the start interlock below holds fuel and spark, and the check
+                        // reruns the moment the engine is stopped again.
+                        verify_interrupted_[i] = true;
+                    } else {
+                        cal_pending_[i] = true;   // another body's routine holds the plate: ask again next frame
                     }
                 } else {
                     latch_fault(i, P_TPS_CORRELATION, now);
@@ -1014,17 +1047,17 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
         if (ac_phase_[i] != AC_OFF) {                       // autocal/fillff/autotune owns the ETB while running
             if (!engine_stopped) {
                 ac_phase_[i] = AC_OFF; duty_cmd_[i] = 0.0f; dis = true;
-                // AN INTERRUPTED KEY-ON SWEEP FALLS BACK TO THE PASSIVE RESULT, exactly as a sweep that
-                // could not start does (the key-on verify above). The sweep only begins once the passive
-                // check has accepted the stored cal, so that much is proven; aborting it used to leave
-                // calibrated_ false for the rest of the key cycle -- no code, no message, plate on its
-                // limp rest, no idle control and no pedal. Found on the car: key cycled and cranked at
-                // once (to start on a primed rail), hot idle hung at 2400 rpm with etb_target 0 throughout.
+                // AN INTERRUPTED KEY-ON CHECK IS RUN AGAIN, NOT FORGOTTEN AND NOT WAIVED. Aborting it used to
+                // leave calibrated_ false for the rest of the key cycle -- no code, no message, plate on its
+                // limp rest, no idle control and no pedal (the car: key cycled and cranked at once, hot idle
+                // hung at 2400 rpm). Waiving it would start an engine on a throttle that never proved it can
+                // move. So the start interlock below holds fuel and spark while it cranks, and the check
+                // reruns as soon as the engine is stopped -- let go of the key, the blade test runs, start.
                 if (ac_verify_[i]) {
                     ac_verify_[i] = false;
-                    calibrated_[i] = true;
-                    g_text_log.printf("ETB%u key-on sweep interrupted by engine start - passive verify "
-                                      "accepted, throttle live\n", i);
+                    verify_interrupted_[i] = true;
+                    g_text_log.printf("ETB%u key-on check interrupted by cranking - engine held off; "
+                                      "it reruns when the engine stops\n", i);
                 }
             }
             else if (ac_phase_[i] == AT_CHECK || ac_phase_[i] == AT_SETTLE || ac_phase_[i] == AT_RELAY)

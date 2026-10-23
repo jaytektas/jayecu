@@ -438,40 +438,76 @@ int main() {
         CHECK(g_config.electronic_throttle.etb[0].relax_pct == cfg.etb[0].relax_pct);
     }
 
-    SECTION("a key-on sweep interrupted by cranking leaves the throttle LIVE, not dead for the key cycle");
+    SECTION("no start on a throttle that has not passed: cranking mid-check is held off, the check reruns, key-off resets");
     {
-        // The car: key cycled and cranked straight away. The engine leaving STOPPED aborts the sweep (right:
-        // never sweep a turning engine), but calibrated_ stayed false -- etb_target 0, plate on its limp
-        // rest, a 2400 rpm hot idle and a pedal that did nothing, with no code raised.
+        // The car: key cycled and cranked at once, the blade test was cut short and the throttle sat dead on
+        // its limp rest (2400 rpm hot idle, no pedal, no code). The rule now: the engine is never allowed to
+        // START on a throttle that has not passed since the key went on -- whatever turns it.
         ElectronicThrottleConfig cfg = make_cfg();
         cfg.etb[0].kp = 1.0f; cfg.etb[0].ki = 2.0f;
         ElectronicThrottle tc; SignalBus bus;
         DtcManager dtc; tc.set_dtc(&dtc);
         calibrate(tc, bus, cfg);
         cfg.etb[0].relax_pct = g_config.electronic_throttle.etb[0].relax_pct;
-        g_system_active = false;
-        for (int i = 0; i < 20; i++) { bus.set(SIG_ENGINE_STATE, 0.0f, true, g_ms); run(tc, bus, 10); }
-        g_system_active = true;                       // key on: verify -> sweep starts
+        auto frame = [&](float state) {
+            bus.set(SIG_TPS, g_plate, true, g_ms); bus.set(SIG_AUX_1, g_plate, true, g_ms);
+            bus.set(SIG_ENGINE_STATE, state, true, g_ms);
+            bus.expire_stale(g_ms);                                // as the engine frame does: cuts end when not renewed
+            run(tc, bus, 10); plant_step(bus.get(SIG_ETB_DUTY_1));
+        };
+        auto held = [&]() { return bus.valid(SIG_IGN_CUT) && bus.get_bool(SIG_IGN_CUT)
+                                && bus.valid(SIG_FUEL_CUT) && bus.get_bool(SIG_FUEL_CUT); };
+        auto state = [&]() { return static_cast<int>(bus.get(SIG_ETB_STATE_1)); };
+        auto key_cycle = [&]() {
+            g_system_active = false; for (int i = 0; i < 20; i++) frame(0.0f);
+            g_system_active = true;
+        };
+
+        // 1 -- crank in the middle of the blade test: aborted, NOT waived, engine held off throughout.
+        key_cycle();
         bool sweeping = false;
-        for (int i = 0; i < 300 && !sweeping; i++) {
-            bus.set(SIG_TPS, g_plate, true, g_ms); bus.set(SIG_AUX_1, g_plate, true, g_ms);
-            bus.set(SIG_ENGINE_STATE, 0.0f, true, g_ms);
-            run(tc, bus, 10); plant_step(bus.get(SIG_ETB_DUTY_1));
-            sweeping = static_cast<int>(bus.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_AUTOCAL;
-        }
+        for (int i = 0; i < 300 && !sweeping; i++) { frame(0.0f); sweeping = state() == ElectronicThrottle::ST_AUTOCAL; }
         CHECK(sweeping);
-        for (int i = 0; i < 200; i++) {                // crank (1) then run (2) mid-sweep
-            bus.set(SIG_TPS, g_plate, true, g_ms); bus.set(SIG_AUX_1, g_plate, true, g_ms);
-            bus.set(SIG_ENGINE_STATE, i < 50 ? 1.0f : 2.0f, true, g_ms);
-            bus.set(SIG_THROTTLE_DEMAND, 20.0f, true, g_ms);
-            run(tc, bus, 10); plant_step(bus.get(SIG_ETB_DUTY_1));
+        bool held_all = true;
+        for (int i = 0; i < 150; i++) { frame(1.0f); if (!held()) held_all = false; }   // CRANKING 1.5 s
+        CHECK(held_all);                                           // fuel + spark off while it cranked
+        CHECK(state() != ElectronicThrottle::ST_READY);            // and the throttle is not "passed"
+
+        // 2 -- let go of the key: the test reruns by itself, passes, and the engine may start.
+        bool reran = false;
+        for (int i = 0; i < 600 && state() != ElectronicThrottle::ST_READY; i++) {
+            frame(0.0f); if (state() == ElectronicThrottle::ST_AUTOCAL) reran = true;
         }
-        const int st = static_cast<int>(bus.get(SIG_ETB_STATE_1));
-        fprintf(stdout, "    after interrupted sweep: state %d, plate %.1f%%, bridge %d\n",
-                st, (double)g_plate, (int)bus.get_bool(SIG_ETB_EN_1));
-        CHECK(st == ElectronicThrottle::ST_READY);     // the loop is closed and driving
-        CHECK(bus.get_bool(SIG_ETB_EN_1));
+        CHECK(reran);
+        CHECK(state() == ElectronicThrottle::ST_READY);
+        for (int i = 0; i < 150; i++) frame(1.0f);                 // crank now (past the 500 ms spring-home hold)
+        fprintf(stdout, "    after the rerun: state %d, cut %d\n", state(), (int)held());
+        CHECK(!held());                                            // passed -> nothing held
         CHECK(dtc.code_severity(0x2135) == 0 && dtc.code_severity(0x2111) == 0 && dtc.code_severity(0x2112) == 0);
+
+        // 3 -- every key-off resets the pass: unproven again, held off until it passes again.
+        key_cycle();
+        frame(0.0f);
+        CHECK(state() != ElectronicThrottle::ST_READY);
+        CHECK(held());
+        for (int i = 0; i < 600 && state() != ElectronicThrottle::ST_READY; i++) frame(0.0f);
+        CHECK(state() == ElectronicThrottle::ST_READY);
+
+        // 4 -- the ECU restarting under a RUNNING engine (a supply dip on the move) is not a start to refuse:
+        //      passive verify, throttle live, never a cut.
+        ElectronicThrottle tc2; tc2.set_dtc(&dtc);
+        tc2.init(cfg);
+        SignalBus bus2;
+        bool cut_running = false;
+        for (int i = 0; i < 100; i++) {
+            bus2.set(SIG_TPS, g_plate, true, g_ms); bus2.set(SIG_AUX_1, g_plate, true, g_ms);
+            bus2.set(SIG_ENGINE_STATE, 2.0f, true, g_ms);
+            bus2.expire_stale(g_ms);
+            run(tc2, bus2, 10); plant_step(bus2.get(SIG_ETB_DUTY_1));
+            if (bus2.valid(SIG_IGN_CUT) && bus2.get_bool(SIG_IGN_CUT)) cut_running = true;
+        }
+        CHECK(!cut_running);
+        CHECK(static_cast<int>(bus2.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_READY);
     }
 
     SECTION("a default 2-point sensor cal is NOT a findlimits — the loop stays open");

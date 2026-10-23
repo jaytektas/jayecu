@@ -152,6 +152,7 @@ private:
     bool routine_busy() const noexcept;
     void adopt_stored_cal();   // cal_pending_ <- whether the tune holds a feedback cal
     bool     cal_pending_[N]   = {};   // stored cal found, awaiting key-on verify
+    bool     verify_interrupted_[N] = {};   // key-on check cut short by the engine turning: rerun once stopped
     // KEY-ON, not boot, is what arms the verify. Tracked so the rising edge can re-arm it: the ECU can
     // sit powered with the key off for as long as you like, and the check has to happen when the
     // throttle actually becomes drivable, not once at reset and never again.

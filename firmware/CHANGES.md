@@ -10,10 +10,12 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 
 ## Unreleased
 
-- Starting the engine while the throttle is still doing its key-on check no longer leaves the throttle dead.
-  The check was abandoned (correctly, the engine was turning), but the throttle was then never driven for
-  the rest of that key cycle: no idle control, a high idle on the throttle's rest opening, and no pedal,
-  with no fault code. It now takes the passive check it had already passed and drives normally.
+- The engine can no longer start on an electronic throttle that hasn't passed its key-on check. Fuel and spark
+  stay off while it cranks, whatever is turning it; a check cut short by cranking runs again as soon as the
+  engine stops, and every key-off starts the check from scratch. Before, cranking during the check left the
+  throttle dead for that key cycle (high idle on its rest opening, no pedal, no fault code). An engine that is
+  already running is never cut by this. Gate the starter output on the throttle being ready as well
+  (`etb_state_1 == 2`) so the starter waits for the check instead of cranking against it.
 - Lifting off the throttle no longer adds fuel. With disenrichment off, the tip-in's enrichment carried on
   through a lift and, when the throttle settled closed, came back at full strength: a rich stumble after every
   lift. A lift now ends the tip-in.
