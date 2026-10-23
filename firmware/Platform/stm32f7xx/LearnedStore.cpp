@@ -4,7 +4,7 @@
 #include "ff.h"
 #include "../../../generated/schema_meta.h"   // JAYECU_LAYOUT_HASH — rejects a totem from another layout
 
-extern "C" uint32_t get_fattime(void);   // packed FAT datetime from the RTC (0 if no RTC) — informational stamp
+extern "C" uint32_t get_fattime(void);   // packed FAT datetime from the RTC (2026-01-01 if no RTC) — informational stamp
 
 // 8.3 names only (FF_USE_LFN=0): "learnN.jlt" → stem 6 chars + ext 3 = valid.
 static const char* totem_path(uint8_t slot) {

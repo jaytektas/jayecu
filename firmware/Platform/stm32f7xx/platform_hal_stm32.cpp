@@ -378,8 +378,12 @@ extern "C" bool platform_rtc_set(const uint8_t in[7]) {
 // Strong override of the weak get_fattime() in diskio.c — gives FatFS real
 // timestamps for created/modified files when the RTC is running.
 extern "C" uint32_t get_fattime(void) {
+    // NO CLOCK IS NOT DATE ZERO. 0 packs as month 0 / day 0, which FAT does not have — a board with no
+    // RTC (proteus_f7) gets the fixed date FatFS itself used before it was asked.
+    constexpr uint32_t kNoClock = ((2026u - 1980u) << 25) | (1u << 21) | (1u << 16);
     uint8_t r[8];
-    if (!platform_rtc_get(r)) return 0;
+    if (!platform_rtc_get(r)) return kNoClock;
+    if (r[5] < 1 || r[5] > 12 || r[4] < 1 || r[4] > 31) return kNoClock;
     uint32_t year = 2000u + r[6];
     if (year < 1980u) year = 1980u;
     return ((year - 1980u) << 25) | ((uint32_t)r[5] << 21) | ((uint32_t)r[4] << 16)

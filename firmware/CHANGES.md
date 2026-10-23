@@ -10,6 +10,9 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 
 ## Unreleased
 
+- Log files on the SD card now carry the ECU clock's date and time (the clock Studio sets on connect)
+  instead of all reading 1 January 2026.
+
 ## 0.4.16
 - Vehicle Speed is in the default datalog. It never was, so no log recorded road speed even on a car that has one.
 - A custom datalog channel set can now include every channel. The list had room for 456 and there are 519, so the newest 63 (injector duty, lambda overall and per bank, the wastegate and CAN health channels among them) could not be chosen, without any warning. An update keeps the channels you had picked.

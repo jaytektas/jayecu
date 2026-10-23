@@ -53,8 +53,9 @@
 #define FF_LFN_BUF        255
 #define FF_SFN_BUF        12
 #define FF_STRF_ENCODE    3
-#define FF_FS_NORTC       1   // No RTC available
-#define FF_NORTC_MON      1
+#define FF_FS_NORTC       0   // get_fattime() (platform_hal_stm32.cpp) reads the RTC. With 1, FatFS never asked:
+                              // every file was stamped 2026-01-01 whatever Studio set the clock to.
+#define FF_NORTC_MON      1   // (unused with FF_FS_NORTC 0)
 #define FF_NORTC_MDAY     1
 #define FF_NORTC_YEAR     2026
 #define FF_FS_NOFSINFO    0
