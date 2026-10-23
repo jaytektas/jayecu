@@ -10,6 +10,10 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
 
 ## Unreleased
 
+- Starting the engine while the throttle is still doing its key-on check no longer leaves the throttle dead.
+  The check was abandoned (correctly, the engine was turning), but the throttle was then never driven for
+  the rest of that key cycle: no idle control, a high idle on the throttle's rest opening, and no pedal,
+  with no fault code. It now takes the passive check it had already passed and drives normally.
 - Lifting off the throttle no longer adds fuel. With disenrichment off, the tip-in's enrichment carried on
   through a lift and, when the throttle settled closed, came back at full strength: a rich stumble after every
   lift. A lift now ends the tip-in.

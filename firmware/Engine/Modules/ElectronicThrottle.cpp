@@ -1012,7 +1012,21 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
         bool dis;
         bool ran_loop = false;                              // closed_loop() ran this frame (D-term continuity)
         if (ac_phase_[i] != AC_OFF) {                       // autocal/fillff/autotune owns the ETB while running
-            if (!engine_stopped) { ac_phase_[i] = AC_OFF; duty_cmd_[i] = 0.0f; dis = true; }
+            if (!engine_stopped) {
+                ac_phase_[i] = AC_OFF; duty_cmd_[i] = 0.0f; dis = true;
+                // AN INTERRUPTED KEY-ON SWEEP FALLS BACK TO THE PASSIVE RESULT, exactly as a sweep that
+                // could not start does (the key-on verify above). The sweep only begins once the passive
+                // check has accepted the stored cal, so that much is proven; aborting it used to leave
+                // calibrated_ false for the rest of the key cycle -- no code, no message, plate on its
+                // limp rest, no idle control and no pedal. Found on the car: key cycled and cranked at
+                // once (to start on a primed rail), hot idle hung at 2400 rpm with etb_target 0 throughout.
+                if (ac_verify_[i]) {
+                    ac_verify_[i] = false;
+                    calibrated_[i] = true;
+                    g_text_log.printf("ETB%u key-on sweep interrupted by engine start - passive verify "
+                                      "accepted, throttle live\n", i);
+                }
+            }
             else if (ac_phase_[i] == AT_CHECK || ac_phase_[i] == AT_SETTLE || ac_phase_[i] == AT_RELAY)
                 run_autotune(i, e, bus, out_pos, now, dt_ms, dis);   // PID autotune (relay feedback)
             else run_autocal(i, e, bus, out_pos, now, dt_ms, dis);

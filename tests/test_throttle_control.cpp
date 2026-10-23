@@ -438,6 +438,42 @@ int main() {
         CHECK(g_config.electronic_throttle.etb[0].relax_pct == cfg.etb[0].relax_pct);
     }
 
+    SECTION("a key-on sweep interrupted by cranking leaves the throttle LIVE, not dead for the key cycle");
+    {
+        // The car: key cycled and cranked straight away. The engine leaving STOPPED aborts the sweep (right:
+        // never sweep a turning engine), but calibrated_ stayed false -- etb_target 0, plate on its limp
+        // rest, a 2400 rpm hot idle and a pedal that did nothing, with no code raised.
+        ElectronicThrottleConfig cfg = make_cfg();
+        cfg.etb[0].kp = 1.0f; cfg.etb[0].ki = 2.0f;
+        ElectronicThrottle tc; SignalBus bus;
+        DtcManager dtc; tc.set_dtc(&dtc);
+        calibrate(tc, bus, cfg);
+        cfg.etb[0].relax_pct = g_config.electronic_throttle.etb[0].relax_pct;
+        g_system_active = false;
+        for (int i = 0; i < 20; i++) { bus.set(SIG_ENGINE_STATE, 0.0f, true, g_ms); run(tc, bus, 10); }
+        g_system_active = true;                       // key on: verify -> sweep starts
+        bool sweeping = false;
+        for (int i = 0; i < 300 && !sweeping; i++) {
+            bus.set(SIG_TPS, g_plate, true, g_ms); bus.set(SIG_AUX_1, g_plate, true, g_ms);
+            bus.set(SIG_ENGINE_STATE, 0.0f, true, g_ms);
+            run(tc, bus, 10); plant_step(bus.get(SIG_ETB_DUTY_1));
+            sweeping = static_cast<int>(bus.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_AUTOCAL;
+        }
+        CHECK(sweeping);
+        for (int i = 0; i < 200; i++) {                // crank (1) then run (2) mid-sweep
+            bus.set(SIG_TPS, g_plate, true, g_ms); bus.set(SIG_AUX_1, g_plate, true, g_ms);
+            bus.set(SIG_ENGINE_STATE, i < 50 ? 1.0f : 2.0f, true, g_ms);
+            bus.set(SIG_THROTTLE_DEMAND, 20.0f, true, g_ms);
+            run(tc, bus, 10); plant_step(bus.get(SIG_ETB_DUTY_1));
+        }
+        const int st = static_cast<int>(bus.get(SIG_ETB_STATE_1));
+        fprintf(stdout, "    after interrupted sweep: state %d, plate %.1f%%, bridge %d\n",
+                st, (double)g_plate, (int)bus.get_bool(SIG_ETB_EN_1));
+        CHECK(st == ElectronicThrottle::ST_READY);     // the loop is closed and driving
+        CHECK(bus.get_bool(SIG_ETB_EN_1));
+        CHECK(dtc.code_severity(0x2135) == 0 && dtc.code_severity(0x2111) == 0 && dtc.code_severity(0x2112) == 0);
+    }
+
     SECTION("a default 2-point sensor cal is NOT a findlimits — the loop stays open");
     {
         // Every sensor in the catalog ships cal_n = 2, so "cal_n >= 2" was true on a factory ECU that
