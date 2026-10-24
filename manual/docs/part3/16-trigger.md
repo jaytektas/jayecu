@@ -126,23 +126,32 @@ consecutive places in the pattern. Event 0, the start of cell 0, is the stream's
 A sequence whose steps are all equal has no unique point. Like an even Gap wheel, it only locks
 relatively.
 
-**Width** picks out one pulse by how long it is, measured in **degrees** (its time multiplied by the
-crank's current speed), so one band works at every engine speed. A pulse whose width falls between
-**WIDTH min** and **WIDTH max** is the reference, and every other pulse is ignored. **WIDTH target
-angle** says where the reference pulse's leading edge sits in the stream's cycle. A cam with a single
-pulse uses Width with a band wide enough to accept anything (0 to 720°).
+**Width** is for a cam whose reference is one pulse per cycle. **WIDTH target angle** says where the
+reference pulse's leading edge sits in the stream's cycle. How the pulse is found depends on
+**Capture Edge**:
+
+- On **Rising** or **Falling**, only that edge is captured, and every one of them is the reference.
+  A width can't be measured from one edge, so **WIDTH min** and **WIDTH max** don't apply. This is
+  the setting for a cam with a single pulse, and the only one for a VR cam (below).
+- On **Both**, the pulse is measured in **degrees** between its two edges (its time multiplied by the
+  crank's current speed), so one band works at every engine speed. A pulse whose width falls between
+  **WIDTH min** and **WIDTH max** is the reference, and every other pulse is ignored. The cam is then
+  timed from its leading edge. Use this only when both edges are reliable, as on a Hall sensor.
 <!-- src: firmware/Scheduler/WidthMatcher.h; firmware/Scheduler/GenericTrigger.h -->
 
 <figure markdown>
   ![A Width stream with three 40° pulses and one 85° pulse; only the 85° pulse falls in the 70 to 100° band](../img/diagrams/trigger-width.svg)
-  <figcaption>Figure 16.5 — A Width stream. The width is only known when the pulse ends, so the ECU
-  anchors on the trailing edge, at the target angle plus the width.</figcaption>
+  <figcaption>Figure 16.5 — A Width stream on Both edges. The width is only known when the pulse ends;
+  the cam is timed from its leading edge, the target angle.</figcaption>
 </figure>
 
-A Width stream always captures **both** edges of the signal, whatever **Capture Edge** says, because
-it needs both to measure a width. For Width, Capture Edge only says which edge **starts** the pulse:
-**Falling** means the pulse is low-going.
-<!-- src: firmware/Platform/AssignmentResolver.cpp; firmware/Scheduler/GenericTriggerBuilder.h -->
+**Only the edges selected in Capture Edge are captured or believed**, on every stream. Choose the
+edges the signal makes reliably. On a VR input (VR1, VR2) that's **Rising** only. The VR interface's
+rising edge is the sensor's zero crossing and sits on the tooth. Its falling edge comes wherever the
+signal next crosses a threshold re-armed from the previous pulse's peak, so it moves with every change
+of speed and can come late after a weaker pulse. Timing a cam from that edge made the cam look late
+and dropped phase sync (P0341) on quick throttle stabs through the phase-sync rpm.
+<!-- src: firmware/Platform/AssignmentResolver.cpp; firmware/Scheduler/GenericTrigger.h; firmware/Scheduler/WidthMatcher.h -->
 
 ### 3 · Proving every tooth: the match window
 
