@@ -522,7 +522,7 @@ int main() {
         calibrate(tc, bus, cfg);
         cfg.etb[0].relax_pct = g_config.electronic_throttle.etb[0].relax_pct;
         StartControlConfig sc_cfg{};
-        sc_cfg.prime_enable = 0; sc_cfg.give_up_ms = 8000;
+        sc_cfg.enabled = 1; sc_cfg.prime_enable = 0; sc_cfg.give_up_ms = 8000;
         StartControl sc; sc.init(sc_cfg, &tc);
         float start_sw = 0.0f;
         auto frame = [&]() {

@@ -5829,7 +5829,8 @@ modules:
   # (Prime Before Crank) the fuel pump has had the rail up — to the pressure below when a rail sensor is
   # reading, for Prime Time when there is none. The pump is asked for with start_pump; the starter output
   # reads crank_req instead of the button. Nothing here drives a pin: the outputs do, through their
-  # conditions, which is why a car with a hard-wired starter is untouched by it.
+  # conditions, which is why a car with a hard-wired starter is untouched by it. Off (the default), crank_req
+  # is the start button passed straight through, so the starter template works on every ECU either way.
   StartControl:
     cadence_hz: 100    # control cadence (firmware constant, not a tune field)
     requires: [start_sw, engine_state]
@@ -5839,7 +5840,8 @@ modules:
     - start_state
     config:
       scalars:
-      - {name: prime_enable, type: uint8, label: Prime Before Crank, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'Run the fuel pump and wait for rail pressure before the starter engages. A rail that has bled down since key-on (a pump with no check valve, a long wait before pressing start) otherwise meets the first crank empty, and the prime pulse and the first cranking pulses go into a rail with nothing behind them. Off, the press only waits for the throttle check. The pump has to be asked for: its output condition needs `start_pump` — the Fuel Pump template includes it.'}
+      - {name: enabled, type: uint8, label: Start Sequence Enabled, units: '', scale: 1.0, min: 0, max: 1, default: 0, help: 'Hold a start-button press until the engine is fit to crank: every electronic throttle has passed its key-on check and, with Prime Before Crank, the fuel rail is up. Off, Crank Request simply follows the start button, so a starter output reading it cranks exactly as one reading the button does. The module publishes `crank_req`, `start_pump` and `start_state` only — the starter and pump are driven by outputs whose conditions read them (the Starter Motor and Fuel Pump templates do).'}
+      - {name: prime_enable, type: uint8, label: Prime Before Crank, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'Run the fuel pump and wait for rail pressure before the starter engages. A rail that has bled down since key-on (a pump with no check valve, a long wait before pressing start) otherwise meets the first crank empty, and the prime pulse and the first cranking pulses go into a rail with nothing behind them. Off, a press only waits for the throttle check. The pump has to be asked for: its output condition needs `start_pump` — the Fuel Pump template includes it.'}
       - {name: press_src, type: uint8, label: Rail Pressure Signal, units: '', scale: 1.0, min: 0, max: 255, default: fuel_pressure, help: 'The rail pressure the start waits for. While it is reading, the starter engages as soon as the rail reaches Crank Above Pressure — at once, if a warm rail is still up. While it is not (no sensor, unwired, failed), the wait is Prime Time instead: a dead sensor never stops the engine starting.'}
       - {name: min_press_kpa, type: uint16, label: Crank Above Pressure, units: kPa, scale: 0.1, min: 0, max: 10000, digits: 1, default: 2500, help: 'Rail pressure, as GAUGE pressure (what a gauge on the rail reads), at which the starter may engage. Set it a little under the regulator — 250 kPa for a 300 kPa (3 bar) rail — so a pump that is up to pressure is not kept waiting on the last few kPa.'}
       - {name: max_wait_ms, type: uint16, label: Longest Pressure Wait, units: ms, scale: 1.0, min: 0, max: 10000, default: 3000, help: 'How long to wait for the rail to reach Crank Above Pressure before cranking anyway. A pump that cannot make pressure will not be helped by refusing to crank, and a sensor that reads low would otherwise leave the engine unstartable; this is the bound.'}
@@ -7640,7 +7642,7 @@ output_templates:
 - id: fuel_pump
   name: Fuel Pump
   blurb: 'Primes at key-on and when start is pressed, then runs while the engine is turning. Stops when the teeth stop.'
-  detail: 'The last part is the one that matters: it watches TEETH, not sync, so it keeps running from the first tooth to the last — and it stops when the wheel stops, however the engine stopped. The middle part is the start sequence asking for pressure (start_pump): a press of the start button runs the pump and holds the starter until the rail is up, so a rail that bled down after the key-on prime is full again before the first crank.'
+  detail: 'The last part is the one that matters: it watches TEETH, not sync, so it keeps running from the first tooth to the last — and it stops when the wheel stops, however the engine stopped. The middle part is the start sequence asking for pressure (start_pump): with Engine Start enabled, a press of the start button runs the pump and holds the starter until the rail is up, so a rail that bled down after the key-on prime is full again before the first crank. With it off, start_pump never asks.'
   kind: 1
   value_source: 2
   fixed_pct: 100
@@ -7707,7 +7709,7 @@ output_templates:
 - id: starter
   name: Starter Motor
   blurb: 'Cranks once the engine is ready, and never for too long. Interlocks to taste.'
-  detail: 'It reads the start sequence (crank_req), not the button: a press is held until every electronic throttle has passed its key-on check and the fuel rail is up (Engine Start), and only then does the starter engage. A press LATCHES the crank: the starter runs until the engine is running and above Release Above, or until Maximum Crank runs out, whichever comes first — you do not have to hold the button, and letting go does not stop it. Hold it and you get another crank after the Rest, and another, until you let go. The maximum on time is what makes that safe. The interlocks are the part that varies between cars, so they are ticked rather than assumed — on a manual leave at least one on, because that is what stops the car being started in gear. An interlock you tick and do not wire reads as false, which is a starter that never cranks; the wizard says which of them are wired.'
+  detail: 'It reads the start sequence (crank_req), not the button. With Engine Start enabled, a press is held until every electronic throttle has passed its key-on check and the fuel rail is up, and only then does the starter engage; with it off, crank_req is the button itself. A press LATCHES the crank: the starter runs until the engine is running and above Release Above, or until Maximum Crank runs out, whichever comes first — you do not have to hold the button, and letting go does not stop it. Hold it and you get another crank after the Rest, and another, until you let go. The maximum on time is what makes that safe. The interlocks are the part that varies between cars, so they are ticked rather than assumed — on a manual leave at least one on, because that is what stops the car being started in gear. An interlock you tick and do not wire reads as false, which is a starter that never cranks; the wizard says which of them are wired.'
   kind: 1
   value_source: 2
   fixed_pct: 100
@@ -7724,7 +7726,8 @@ output_templates:
   - {name: crank_s, label: Maximum Crank, units: s, default: 10, min: 1, max: 30, digits: 0, help: 'How long one attempt may last before the output releases, whatever the button says.'}
   - {name: rest_s,  label: Rest Before Retry, units: s, default: 3, min: 0, max: 60, digits: 0, help: 'How long the slot is locked out afterwards — the motor cooling down.'}
   - {name: release_rpm, label: Release Above, units: RPM, default: 700, min: 0, max: 2000, digits: 0, help: 'The starter lets go once the engine is running AND turning faster than this. A warm engine fires at not much over cranking speed, and a starter that drops out the moment the ECU calls it running (the cranking threshold, ~450 rpm) can leave it to stumble and die before it has caught. Set it at or below the cranking threshold for the old behaviour: release as soon as it is running. Maximum Crank still ends a crank that never gets here.'}
-  # THE BUTTON IS READ THROUGH THE START SEQUENCE. crank_req is the press, held by StartControl until the
+  # THE BUTTON IS READ THROUGH THE START SEQUENCE. With Engine Start off, crank_req IS the button (passed
+  # straight through), so this template is the old one there. On, crank_req is the press, held until the
   # throttle has passed its check and the rail is up, then true until the starter has had its chance — and
   # from then on it follows the button, so holding it still gives another crank after the Rest and a
   # released button does not. Naming start_sw here instead cranked against a throttle mid-sweep (the ETB

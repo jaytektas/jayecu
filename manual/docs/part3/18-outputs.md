@@ -386,12 +386,17 @@ any output's conditions.
 #### The start sequence (Engine Start)
 
 The Starter Motor and Fuel Pump templates work together through the start sequence, on
-**Configuration ▸ Engine Functions ▸ Engine Start**. A press of the start button is **held** until the
-engine is fit to crank, and only then does **Crank Request** `crank_req` come on for the starter:
+**Configuration ▸ Engine Functions ▸ Engine Start**. Switch it on with **Start Sequence Enabled** at the top
+of that page, or with its tick on the **Configuration** or **Engine Functions** switchboard; the page is in
+the tree once it is on. It is **off by default**, and off, **Crank Request** `crank_req` is simply the start
+button, so a starter output reading it cranks exactly as one reading the button does.
+
+On, a press of the start button is **held** until the engine is fit to crank, and only then does **Crank
+Request** come on for the starter:
 
 1. **Every electronic throttle has passed its key-on check** (chapter 22). Cranking during the check
    only meets the interlock that holds fuel and spark off, so the starter waits for it instead.
-2. **The fuel rail is up** (**Prime Before Crank**, on by default). From the press, **Start Pump**
+2. **The fuel rail is up** (**Prime Before Crank**, on by default; its settings grey out when it is off). From the press, **Start Pump**
    `start_pump` runs the fuel pump. A pump with no check valve bleeds the rail down after its key-on
    prime, and the first crank, with the prime pulse, then goes into an empty rail.
    - With a rail pressure sensor reading (**Rail Pressure Signal**, `fuel_pressure` by default), the

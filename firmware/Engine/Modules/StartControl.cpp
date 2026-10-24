@@ -32,10 +32,24 @@ void StartControl::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineF
     sw_prev_ = sw;
     const auto run = static_cast<EngineRunState>(static_cast<int>(bus.get(wk::engine_state, 0.0f)));
 
-    // ENDS: key off, the engine running, or no config. Each leaves the next press to start from scratch.
-    if (!cfg_ || !g_system_active || run == EngineRunState::RUNNING) state_ = IDLE;
+    // OFF: the button straight through, so a starter output reading crank_req cranks exactly as one reading
+    // start_sw would, and nothing asks for the pump. A code this module raised goes with it (enabled ->
+    // disabled edge), as every module's does.
+    if (!cfg_ || !cfg_->enabled) {
+        if (was_enabled_ && dtc_) dtc_->heal(P_START_RAIL_LOW);
+        was_enabled_ = false;
+        state_ = IDLE;
+        bus.set_bool(SIG_START_PUMP, false, now, ttl());
+        bus.set_bool(SIG_CRANK_REQ, sw, now, ttl());
+        bus.set(SIG_START_STATE, static_cast<float>(IDLE), true, now, ttl());
+        return;
+    }
+    was_enabled_ = true;
 
-    if (state_ == IDLE && press && cfg_ && g_system_active && run != EngineRunState::RUNNING) {
+    // ENDS: key off or the engine running. Each leaves the next press to start from scratch.
+    if (!g_system_active || run == EngineRunState::RUNNING) state_ = IDLE;
+
+    if (state_ == IDLE && press && g_system_active && run != EngineRunState::RUNNING) {
         state_ = WAIT_THROTTLE; press_ms_ = now; follow_sw_ = false;
     }
 
@@ -87,7 +101,7 @@ void StartControl::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineF
         if (follow_sw_ && !sw) { state_ = IDLE; crank = false; }
     }
 
-    bus.set_bool(SIG_START_PUMP, state_ != IDLE && cfg_ && cfg_->prime_enable, now, ttl());
+    bus.set_bool(SIG_START_PUMP, state_ != IDLE && cfg_->prime_enable, now, ttl());
     bus.set_bool(SIG_CRANK_REQ, crank, now, ttl());
     bus.set(SIG_START_STATE, static_cast<float>(state_), true, now, ttl());
 }

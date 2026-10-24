@@ -25,6 +25,7 @@ ROOT_GROUPS = [
         ('Lambda / O2 Control',   'lambda.enabled',            f'{CFG}/Fuel Tuning/O2 Control'),
         ('Transient Throttle',    'transient_throttle.enabled',    f'{CFG}/Fuel Tuning/Transient Throttle'),
         ('Deceleration Fuel Cut', 'dfco.enabled',                  f'{CFG}/Engine Functions/Deceleration Fuel Cut'),
+        ('Engine Start',          'start_control.enabled',         f'{CFG}/Engine Functions/Engine Start'),
     ]),
     ('Spark', [
         ('Ignition',              '',                              f'{CFG}/Ignition Tuning'),
@@ -408,6 +409,7 @@ CATEGORY_PAGES = [
         ('Fuelling Behaviour', [
             ('Deceleration Fuel Cut', 'dfco.enabled',                     f'{CFG}/Engine Functions/Deceleration Fuel Cut'),
             ('Torque Model',        'torque_model.enabled',               f'{CFG}/Engine Functions/Torque Model'),
+            ('Engine Start',        'start_control.enabled',              f'{CFG}/Engine Functions/Engine Start'),
         ]),
         ('Power Adders', [
             ('Anti-Lag',            'anti_lag.enabled',                   f'{CFG}/Engine Functions/Anti-Lag'),

@@ -21,7 +21,7 @@ static std::string console() { size_t n = 0; const char* t = g_text_log.swap_dra
 
 static StartControlConfig make_cfg() {
     StartControlConfig c{};
-    c.prime_enable = 1; c.press_src = SIG_FUEL_PRESSURE; c.min_press_kpa = 2500;   // 250 kPa
+    c.enabled = 1; c.prime_enable = 1; c.press_src = SIG_FUEL_PRESSURE; c.min_press_kpa = 2500;   // 250 kPa
     c.max_wait_ms = 3000; c.prime_ms = 1000; c.give_up_ms = 8000;
     return c;
 }
@@ -52,6 +52,23 @@ struct Rig {
 
 int main() {
     fprintf(stdout, "=== StartControl ===\n");
+
+    SECTION("switched off (the default): crank_req is the button, nothing waits and nothing asks for the pump");
+    { Rig r; r.cfg.enabled = 0; r.press = 20.0f; r.step();
+      CHECK(!r.crank());
+      r.sw = 1; r.step();
+      CHECK(r.crank()); CHECK(!r.pump()); CHECK(r.st() == StartControl::IDLE);
+      r.sw = 0; r.step();
+      CHECK(!r.crank()); }                                     // a tap is a tap: no latch when off
+
+    SECTION("switching it off heals the code it raised");
+    { Rig r; DtcManager dtc; r.sc.set_dtc(&dtc); r.press = 30.0f; r.step();
+      r.sw = 1; r.step(); r.sw = 0;
+      CHECK(r.until_crank(5000) >= 0);
+      CHECK(dtc.code_severity(0x0087) == 1);
+      r.cfg.enabled = 0; r.step();
+      CHECK(dtc.code_severity(0x0087) == 0);
+      console(); }
 
     SECTION("prime off: a press is a crank request at once, and nothing asks for the pump");
     { Rig r; r.cfg.prime_enable = 0; r.step();

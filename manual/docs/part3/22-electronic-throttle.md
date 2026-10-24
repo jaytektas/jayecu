@@ -152,9 +152,9 @@ start. If you crank during the check, the check stops (the plate is never swept 
 turns) and runs again as soon as the engine stops: let go of the key, wait for the throttle to go
 quiet, then start. Every key-off forgets the last pass, so each key-on checks again.
 
-If the ECU's starter output cranks the engine, it waits for the check: the Starter Motor template cranks
-on **Crank Request** `crank_req`, which holds a start press until every enabled throttle has passed (the
-start sequence, chapter 18). A starter output set up before this firmware reads the button directly; run
+If the ECU's starter output cranks the engine, make it wait for the check: switch on **Engine Start**
+(chapter 18). The Starter Motor template cranks on **Crank Request** `crank_req`, which then holds a start
+press until every enabled throttle has passed. With Engine Start off, Crank Request is the button itself. A starter output set up before this firmware reads the button directly; run
 the output wizard on it to take the new condition.
 
 An engine that is already **running** when the check starts (the ECU restarted on the move, after a

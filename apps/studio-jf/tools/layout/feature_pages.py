@@ -36,6 +36,13 @@ FIELD_GATES = {
     # Bank 2 needs a bank 1: it is also the banked/unbanked switch, so setting it while the first
     # source is Disabled asks for two loops when there is not yet one.
     'lambda.o2_src_2':                 '[#lambda.o2_src_1] != 0',
+    # THE FUEL HALF OF THE START SEQUENCE has its own switch. StartControl.cpp reads the rail signal, its
+    # threshold, the wait and the prime time only inside `cfg_->prime_enable`; the throttle wait and
+    # Give Up After apply either way.
+    'start_control.press_src':         '[#start_control.prime_enable] == 1',
+    'start_control.min_press_kpa':     '[#start_control.prime_enable] == 1',
+    'start_control.max_wait_ms':       '[#start_control.prime_enable] == 1',
+    'start_control.prime_ms':          '[#start_control.prime_enable] == 1',
     # Target Voltage divides rich from lean and Warm Voltage is a Nernst cell's readiness test; neither
     # means anything to a wideband, which measures lambda and takes its target from the lambda table.
     'lambda.nb_target_mv':             '[#lambda.o2_src_1] > 0 and [#lambda.o2_src_1] < 3',
@@ -222,9 +229,8 @@ FEATURES = [
       ('MAP', 'map', '%.0f'), ('Throttle', 'tps', '%.1f'), ('Air Temp', 'iat', '%.0f')],
      'Ramps the pump between a start and a full-flow boost pressure.'),
 
-    # NO SWITCH OF ITS OWN: the throttle half of the wait always applies (the interlock already refuses fuel and
-    # spark to a crank on an unproven throttle; this only stops the starter turning for nothing), so the page
-    # is never hidden. Prime Before Crank switches the fuel half.
+    # Its switch is the page's (header), the node's and the switchboard's, like every feature. Prime Before
+    # Crank is the second switch, for the fuel half: its settings grey with it (FIELD_GATES).
     ('Engine Start', 'start_control', 'Configuration/Engine Functions/Engine Start',
      [('Fuel Before Crank', ['prime_enable', 'press_src', 'min_press_kpa', 'max_wait_ms', 'prime_ms']),
       ('Waiting', ['give_up_ms'])],
@@ -234,7 +240,7 @@ FEATURES = [
      'A press of the start button is held until the engine is fit to crank: every electronic throttle has '
      'passed its key-on check, and the fuel pump has brought the rail up. The starter output reads Crank '
      'Request rather than the button, and the fuel pump output runs on Start Pump — the Starter Motor '
-     'and Fuel Pump templates both do, so re-run the output wizard on each to take it.'),
+     'and Fuel Pump templates both do. Off, Crank Request is the start button itself.'),
 
     ('Anti-Lag', 'anti_lag', 'Configuration/Engine Functions/Anti-Lag',
      [('Arming', ['arm_sig', 'min_rpm', 'max_tps']), ('Action', ['retard_deg', 'max_time_ms'])],

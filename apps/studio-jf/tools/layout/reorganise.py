@@ -42,6 +42,7 @@ PLAN = [
     ('AntiLag',               'Engine Functions',   'Anti-Lag'),
     ('Nitrous',               'Engine Functions',   'Nitrous'),
     ('Wmi',                   'Engine Functions',   'Water & Methanol'),
+    ('StartControl',          'Engine Functions',   'Engine Start'),
     ('TorqueModel',           'Engine Functions',   'Torque Model'),
 
     # Protection — the limits.

@@ -5,8 +5,9 @@
 class ElectronicThrottle;
 class DtcManager;
 
-// StartControl — the start sequence. A press of the start button is LATCHED, and the crank request
-// (crank_req, what the starter output reads) is held back until the engine is fit to crank:
+// StartControl — the start sequence. Enabled (off by default; off, crank_req is the button passed straight
+// through): a press of the start button is LATCHED, and the crank request (crank_req, what the starter
+// output reads) is held back until the engine is fit to crank:
 //   - every enabled electronic throttle has passed its key-on check (ElectronicThrottle::start_proven —
 //     cranking into a sweep only meets the interlock that holds fuel and spark), and
 //   - with Prime Before Crank, the fuel rail is up: to Crank Above Pressure while a rail sensor reads
@@ -35,6 +36,7 @@ private:
     DtcManager* dtc_ = nullptr;
     State    state_      = IDLE;
     bool     sw_prev_    = false;
+    bool     was_enabled_ = false;  // enabled -> disabled edge: heal P0087 once
     bool     follow_sw_  = false;   // CRANK: the starter has had its chance — the request follows the button
     uint32_t press_ms_   = 0;       // when the press was latched (the pump started then)
     uint32_t grant_ms_   = 0;       // when crank_req was granted
