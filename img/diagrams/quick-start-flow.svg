@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Quick start: eight stages from box to first start</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- ===== Row 1: before the engine turns ===== -->
+  <text x="20" y="26" class="muted head">Engine off</text>
+
+  <rect x="20" y="40" width="225" height="150" rx="6" class="box"/>
+  <text x="36" y="66" class="fg head">1 · Wire it</text>
+  <text x="36" y="90" class="muted">power, grounds, sensors,</text>
+  <text x="36" y="110" class="muted">trigger, injectors, coils</text>
+  <text x="36" y="146" class="fg">Done: every pin checked</text>
+  <text x="36" y="166" class="fg">against the pin-out</text>
+  <text x="36" y="183" class="mono muted">ch. 7, 10–12</text>
+
+  <rect x="280" y="40" width="225" height="150" rx="6" class="box"/>
+  <text x="296" y="66" class="fg head">2 · Power up, connect</text>
+  <text x="296" y="90" class="muted">key on, engine off,</text>
+  <text x="296" y="110" class="muted">studio on USB</text>
+  <text x="296" y="146" class="fg">Done: live values</text>
+  <text x="296" y="166" class="fg">update on the dash</text>
+  <text x="296" y="183" class="mono muted">ch. 3–5</text>
+
+  <rect x="540" y="40" width="225" height="150" rx="6" class="tgt"/>
+  <text x="556" y="66" class="fg head">3 · Base configuration</text>
+  <text x="556" y="90" class="muted">engine, trigger, sensors,</text>
+  <text x="556" y="110" class="muted">fuel, ignition, outputs</text>
+  <text x="556" y="146" class="fg">Done: burned, and no</text>
+  <text x="556" y="166" class="fg">P1650–P1654 codes</text>
+  <text x="556" y="183" class="mono muted">ch. 15–20</text>
+
+  <rect x="800" y="40" width="240" height="150" rx="6" class="pid"/>
+  <text x="816" y="66" class="fg head">4 · Check the sensors</text>
+  <text x="816" y="90" class="muted">read them against</text>
+  <text x="816" y="110" class="muted">the room and the gauge</text>
+  <text x="816" y="146" class="fg">Done: every reading</text>
+  <text x="816" y="166" class="fg">is believable</text>
+  <text x="816" y="183" class="mono muted">ch. 17</text>
+
+  <path d="M245 115 H278" class="line" marker-end="url(#a)"/>
+  <path d="M505 115 H538" class="line" marker-end="url(#a)"/>
+  <path d="M765 115 H798" class="line" marker-end="url(#a)"/>
+  <!-- wrap to row 2 -->
+  <path d="M920 190 V218 H210 V248" class="line" marker-end="url(#a)"/>
+
+  <!-- ===== Row 2: outputs and the engine turning ===== -->
+  <text x="20" y="240" class="muted head">Outputs and cranking</text>
+
+  <rect x="20" y="250" width="225" height="150" rx="6" class="ff"/>
+  <text x="36" y="276" class="fg head">5 · Output test</text>
+  <text x="36" y="300" class="muted">engine stopped: click each</text>
+  <text x="36" y="320" class="muted">injector, spark each coil</text>
+  <text x="36" y="356" class="fg">Done: the right cylinder</text>
+  <text x="36" y="376" class="fg">answers each button</text>
+  <text x="36" y="393" class="mono muted">ch. 18, 43</text>
+
+  <rect x="280" y="250" width="225" height="150" rx="6" class="pid"/>
+  <text x="296" y="276" class="fg head">6 · Crank with no fuel</text>
+  <text x="296" y="300" class="muted">Injector Outputs: Off</text>
+  <text x="296" y="320" class="muted">watch Trigger Diagnostics</text>
+  <text x="296" y="356" class="fg">Done: sync holds, RPM</text>
+  <text x="296" y="376" class="fg">steady, error rate 0 %</text>
+  <text x="296" y="393" class="mono muted">ch. 16</text>
+
+  <rect x="540" y="250" width="225" height="150" rx="6" class="ff"/>
+  <text x="556" y="276" class="fg head">7 · First start</text>
+  <text x="556" y="300" class="muted">fuel back on, Fixed</text>
+  <text x="556" y="320" class="muted">Timing on, light on #1</text>
+  <text x="556" y="356" class="fg">Done: runs, and the light</text>
+  <text x="556" y="376" class="fg">reads the fixed advance</text>
+  <text x="556" y="393" class="mono muted">ch. 16, 20</text>
+
+  <rect x="800" y="250" width="240" height="150" rx="6" class="pid"/>
+  <text x="816" y="276" class="fg head">8 · First fixes</text>
+  <text x="816" y="300" class="muted">idle, warm-up, VE near</text>
+  <text x="816" y="320" class="muted">idle, lambda, log it</text>
+  <text x="816" y="356" class="fg">Done: starts and idles</text>
+  <text x="816" y="376" class="fg">cold and warm by itself</text>
+  <text x="816" y="393" class="mono muted">ch. 21, 23, 38, 42</text>
+
+  <path d="M245 325 H278" class="line" marker-end="url(#a)"/>
+  <path d="M505 325 H538" class="line" marker-end="url(#a)"/>
+  <path d="M765 325 H798" class="line" marker-end="url(#a)"/>
+
+  <!-- ===== Safety band ===== -->
+  <rect x="20" y="420" width="1020" height="38" rx="6" class="safe"/>
+  <text x="36" y="444" class="fg">Every stage: when a check fails, stop there and fix it. The next stage assumes this one passed.</text>
+</svg>

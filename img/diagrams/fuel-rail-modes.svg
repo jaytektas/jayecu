@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Injector pressure differential against manifold pressure for each regulator type</title>
+  <style>
+    .fg { fill: #1d1f23; } .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .fixed { stroke: #d9822b; stroke-width: 3; fill: none; }
+    .ref   { stroke: #3b82c4; stroke-width: 3; fill: none; }
+    .rr    { stroke: #2e9d4f; stroke-width: 3; fill: none; stroke-dasharray: 9 5; }
+    .baro  { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; } .grid { stroke: #2c3038; }
+      .baro { stroke: #9aa1ab; }
+    }
+  </style>
+
+  <!-- plot area: x 90..690 = MAP 20..250 kPa; y 440..40 = dP 100..500 kPa -->
+  <line x1="90" y1="340" x2="690" y2="340" class="grid"/>
+  <line x1="90" y1="240" x2="690" y2="240" class="grid"/>
+  <line x1="90" y1="140" x2="690" y2="140" class="grid"/>
+  <line x1="90" y1="40"  x2="690" y2="40"  class="grid"/>
+  <line x1="90" y1="440" x2="690" y2="440" class="axis"/>
+  <line x1="90" y1="40"  x2="90"  y2="440" class="axis"/>
+
+  <text x="80" y="444" text-anchor="end" class="muted">100</text>
+  <text x="80" y="344" text-anchor="end" class="muted">200</text>
+  <text x="80" y="244" text-anchor="end" class="muted">300</text>
+  <text x="80" y="144" text-anchor="end" class="muted">400</text>
+  <text x="80" y="44"  text-anchor="end" class="muted">500</text>
+  <text x="20" y="24" class="muted">Injector dP (kPa)</text>
+
+  <text x="168" y="462" text-anchor="middle" class="muted">50</text>
+  <text x="299" y="462" text-anchor="middle" class="muted">100</text>
+  <text x="429" y="462" text-anchor="middle" class="muted">150</text>
+  <text x="560" y="462" text-anchor="middle" class="muted">200</text>
+  <text x="690" y="462" text-anchor="middle" class="muted">250</text>
+  <text x="390" y="490" text-anchor="middle" class="muted">Manifold pressure, kPa absolute</text>
+
+  <!-- baro -->
+  <line x1="302" y1="40" x2="302" y2="440" class="baro"/>
+  <text x="308" y="428" class="muted">atmosphere (101.3)</text>
+  <text x="196" y="60" text-anchor="middle" class="muted">vacuum</text>
+  <text x="496" y="60" text-anchor="middle" class="muted">boost</text>
+
+  <!-- Fixed regulator: dP = 300 + 101.3 - MAP -->
+  <line x1="90" y1="158.7" x2="690" y2="388.7" class="fixed"/>
+  <!-- Rising rate 1.0:1 (manifold referenced): dP = 300 -->
+  <line x1="90" y1="240" x2="690" y2="240" class="ref"/>
+  <!-- Rising rate 2.0:1: dP = 300 + 1.0 x boost -->
+  <path d="M90 240 L302 240 L690 91.3" class="rr"/>
+
+  <!-- legend -->
+  <line x1="715" y1="110" x2="755" y2="110" class="rr"/>
+  <text x="765" y="106" class="fg head">Rising Rate 2.0:1</text>
+  <text x="765" y="126" class="muted">differential climbs with boost</text>
+
+  <line x1="715" y1="200" x2="755" y2="200" class="ref"/>
+  <text x="765" y="196" class="fg head">Rising Rate 1.0:1</text>
+  <text x="765" y="216" class="muted">manifold-referenced: constant</text>
+
+  <line x1="715" y1="300" x2="755" y2="300" class="fixed"/>
+  <text x="765" y="296" class="fg head">Fixed Regulator</text>
+  <text x="765" y="316" class="muted">rail constant: dP falls with MAP</text>
+
+  <text x="715" y="380" class="fg">All three with Base Fuel</text>
+  <text x="715" y="400" class="fg">Pressure = 300 kPa.</text>
+  <text x="715" y="424" class="muted">Published as</text>
+  <text x="810" y="424" class="mono muted">inj_press_diff</text>
+</svg>

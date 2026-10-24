@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 360" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>A WIDTH stream</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .tooth { fill: #5f6670; }
+    .ref  { fill: #d9822b; }
+    .reds { stroke: #c8412d; stroke-width: 2; fill: none; }
+    .redf { fill: #c8412d; }
+    .band { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 1.5; }
+    .blueline { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .grnline { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .orgline { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .band { fill: #13291a; } .tooth { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d9822b"/>
+    </marker>
+  </defs>
+  <text x="20.0" y="30.0" class="muted head">A WIDTH stream: only the pulse whose angular width falls inside the band is the reference</text>
+  <path d="M40.0 140 H138.3 V90 H190.6 V140 H373.3 V90 H484.3 V140 H608.3 V90 H660.6 V140 H843.3 V90 H895.6 V140 H1010.0" class="sig2"/>
+  <text x="164.4" y="82.0" text-anchor="middle" class="fg small">40°</text>
+  <text x="164.4" y="162.0" text-anchor="middle" class="muted small">ignored</text>
+  <text x="428.8" y="82.0" text-anchor="middle" class="fg small">85°</text>
+  <text x="634.4" y="82.0" text-anchor="middle" class="fg small">40°</text>
+  <text x="634.4" y="162.0" text-anchor="middle" class="muted small">ignored</text>
+  <text x="869.4" y="82.0" text-anchor="middle" class="fg small">40°</text>
+  <text x="869.4" y="162.0" text-anchor="middle" class="muted small">ignored</text>
+  <path d="M373.3 60 V180" class="orgline"/>
+  <text x="367.3" y="198.0" text-anchor="end" class="fg small">leading edge</text>
+  <text x="367.3" y="216.0" text-anchor="end" class="fg small">= WIDTH target angle</text>
+  <path d="M484.3 60 V180" class="grnline"/>
+  <text x="490.3" y="198.0" class="fg small">trailing edge: width now known →</text>
+  <text x="490.3" y="216.0" class="fg small">anchor applied here, at target + width</text>
+  <text x="20.0" y="270.0" class="fg head">Band on the page: WIDTH min 70°, WIDTH max 100°</text>
+  <path d="M60.0 320 H690.0" class="thin"/>
+  <path d="M60.0 316 V324" class="thin"/>
+  <text x="60.0" y="342.0" text-anchor="middle" class="mono muted">0°</text>
+  <path d="M150.0 316 V324" class="thin"/>
+  <text x="150.0" y="342.0" text-anchor="middle" class="mono muted">20°</text>
+  <path d="M240.0 316 V324" class="thin"/>
+  <text x="240.0" y="342.0" text-anchor="middle" class="mono muted">40°</text>
+  <path d="M330.0 316 V324" class="thin"/>
+  <text x="330.0" y="342.0" text-anchor="middle" class="mono muted">60°</text>
+  <path d="M420.0 316 V324" class="thin"/>
+  <text x="420.0" y="342.0" text-anchor="middle" class="mono muted">80°</text>
+  <path d="M510.0 316 V324" class="thin"/>
+  <text x="510.0" y="342.0" text-anchor="middle" class="mono muted">100°</text>
+  <path d="M600.0 316 V324" class="thin"/>
+  <text x="600.0" y="342.0" text-anchor="middle" class="mono muted">120°</text>
+  <path d="M690.0 316 V324" class="thin"/>
+  <text x="690.0" y="342.0" text-anchor="middle" class="mono muted">140°</text>
+  <rect x="375.0" y="300" width="135.0" height="20" class="band"/>
+  <circle cx="240.0" cy="310" r="6" class="node"/>
+  <text x="240.0" y="292.0" text-anchor="middle" class="muted small">40° pulses</text>
+  <circle cx="442.5" cy="310" r="6" class="redf"/>
+  <text x="442.5" y="292.0" text-anchor="middle" class="fg small">85°</text>
+  <text x="735.0" y="300.0" class="muted">Width is measured in DEGREES — the pulse's</text>
+  <text x="735.0" y="320.0" class="muted">time scaled by the crank's current speed —</text>
+  <text x="735.0" y="340.0" class="muted">so one band holds at every rpm.</text>
+</svg>

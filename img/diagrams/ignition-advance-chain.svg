@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>How the ignition advance is built, step by step</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .fix  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 7 4; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .sub  { font-size: 13px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .fix { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="24" class="muted head">Once per engine cycle, in this order</text>
+  <text x="700" y="24" class="muted head">What you can log</text>
+
+  <!-- 1 · base -->
+  <rect x="20" y="40" width="640" height="62" rx="6" class="tgt"/>
+  <text x="36" y="64" class="fg head">1 · Base: Advance Table, Cranking Advance or the launch map</text>
+  <text x="36" y="87" class="muted sub">cranking (when switched on) wins, then launch, otherwise the Advance Table</text>
+  <text x="700" y="64" class="mono muted">ign_base_adv</text>
+  <text x="700" y="84" class="mono muted">ign_base_kind</text>
+
+  <line x1="340" y1="102" x2="340" y2="122" class="line" marker-end="url(#a)"/>
+
+  <!-- 2 · rev limiter -->
+  <rect x="20" y="124" width="640" height="62" rx="6" class="tgt"/>
+  <text x="36" y="148" class="fg head">2 · + Rev Limiter correction</text>
+  <text x="36" y="171" class="muted sub">every cycle, read on RPM Before Cut · not on a cranking or launch base</text>
+  <text x="700" y="148" class="mono muted">ign_corr_revlimit</text>
+
+  <line x1="340" y1="186" x2="340" y2="206" class="line" marker-end="url(#a)"/>
+
+  <!-- 3 · slow trims etc -->
+  <rect x="20" y="208" width="640" height="62" rx="6" class="tgt"/>
+  <text x="36" y="232" class="fg head">3 · + Advance Trim, Transient, Idle and Overall Trim</text>
+  <text x="36" y="255" class="muted sub">Advance Trim is the nine slow correction tables summed · not on a cranking or launch base *</text>
+  <text x="700" y="228" class="mono muted">ign_advance_trim</text>
+  <text x="700" y="246" class="mono muted">ign_corr_transient</text>
+  <text x="700" y="264" class="mono muted">idle_ign_corr</text>
+
+  <line x1="340" y1="270" x2="340" y2="290" class="line" marker-end="url(#a)"/>
+
+  <!-- 4 · retards -->
+  <rect x="20" y="292" width="640" height="62" rx="6" class="safe"/>
+  <text x="36" y="316" class="fg head">4 · − Retards</text>
+  <text x="36" y="339" class="muted sub">knock + engine protection + nitrous + anti-lag + traction control</text>
+  <text x="700" y="316" class="mono muted">spark_retard_total</text>
+
+  <line x1="340" y1="354" x2="340" y2="374" class="line" marker-end="url(#a)"/>
+
+  <!-- 5 · clamp -->
+  <rect x="20" y="376" width="640" height="62" rx="6" class="safe"/>
+  <text x="36" y="400" class="fg head">5 · Clamp between Min Advance and Max Advance</text>
+  <text x="36" y="423" class="muted sub">the backstop: nothing above can take the engine past it</text>
+  <text x="700" y="400" class="mono muted">advance</text>
+  <text x="700" y="420" class="muted sub">the commanded advance</text>
+
+  <line x1="340" y1="438" x2="340" y2="458" class="line" marker-end="url(#a)"/>
+
+  <!-- 6 · fixed timing -->
+  <rect x="20" y="460" width="640" height="62" rx="6" class="fix"/>
+  <text x="36" y="484" class="fg head">6 · Fixed Timing, when it is on, replaces all of it</text>
+  <text x="36" y="507" class="muted sub">one number: no correction, no retard, no clamp, no cylinder trim</text>
+  <text x="700" y="484" class="muted sub">for setting base timing with a</text>
+  <text x="700" y="502" class="muted sub">timing light, never for driving</text>
+
+  <line x1="340" y1="522" x2="340" y2="542" class="line" marker-end="url(#a)"/>
+
+  <!-- 7 · per cylinder -->
+  <rect x="20" y="544" width="640" height="62" rx="6" class="ff"/>
+  <text x="36" y="568" class="fg head">7 · Each cylinder: + its Cylinder Trim + its knock relief, clamped again</text>
+  <text x="36" y="591" class="muted sub">the spark angle that cylinder's coil fires at, with the one dwell for every coil</text>
+  <text x="700" y="568" class="muted sub">to the scheduler (per cylinder)</text>
+
+  <text x="20" y="640" class="muted sub">* On a launch base the coolant and air-temperature corrections still apply when they RETARD; they are dropped when they would advance.</text>
+  <text x="20" y="662" class="muted sub">Blue: what the tables ask for · red: safety (retards and limits) · orange: what is driven · dashed: a setup override.</text>
+</svg>

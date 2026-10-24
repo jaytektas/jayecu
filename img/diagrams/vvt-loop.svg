@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 400" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Cam control loop</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="30" width="200" height="64" rx="6" class="tgt"/>
+  <text x="120" y="55" text-anchor="middle" class="fg head">Target table</text>
+  <text x="120" y="77" text-anchor="middle" class="muted">RPM (× MAP, × coolant)</text>
+  <rect x="250" y="30" width="180" height="64" rx="6" class="tgt"/>
+  <text x="340" y="55" text-anchor="middle" class="fg">+ Overall Correction</text>
+  <text x="340" y="77" text-anchor="middle" class="muted">then rate limit</text>
+  <path d="M220 62 H248" class="line" marker-end="url(#a)"/>
+  <circle cx="490" cy="62" r="20" class="node"/>
+  <text x="490" y="68" text-anchor="middle" class="fg" font-size="20">−</text>
+  <path d="M430 62 H468" class="line" marker-end="url(#a)"/>
+  <rect x="550" y="30" width="200" height="64" rx="6" class="pid"/>
+  <text x="650" y="55" text-anchor="middle" class="fg head">PID</text>
+  <text x="650" y="77" text-anchor="middle" class="muted">gains by coolant; dead band</text>
+  <path d="M510 62 H548" class="line" marker-end="url(#a)"/>
+
+  <rect x="550" y="130" width="200" height="64" rx="6" class="ff"/>
+  <text x="650" y="155" text-anchor="middle" class="fg head">Base Duty</text>
+  <text x="650" y="177" text-anchor="middle" class="muted">by coolant, per cam</text>
+  <rect x="550" y="215" width="200" height="64" rx="6" class="ff"/>
+  <text x="650" y="240" text-anchor="middle" class="fg head">Long-Term Trim</text>
+  <text x="650" y="262" text-anchor="middle" class="muted">learned, by coolant</text>
+  <circle cx="810" cy="162" r="20" class="node"/>
+  <text x="810" y="168" text-anchor="middle" class="fg" font-size="20">+</text>
+  <path d="M750 62 H810 V140" class="line" marker-end="url(#a)"/>
+  <path d="M750 162 H788" class="line" marker-end="url(#a)"/>
+  <path d="M750 247 H810 V184" class="line" marker-end="url(#a)"/>
+  <rect x="860" y="130" width="220" height="64" rx="6" class="safe"/>
+  <text x="970" y="155" text-anchor="middle" class="fg head">Duty Min … Max</text>
+  <text x="970" y="177" text-anchor="middle" class="muted">× Cam Target Scalar</text>
+  <path d="M830 162 H858" class="line" marker-end="url(#a)"/>
+  <rect x="860" y="230" width="220" height="64" rx="6" class="box"/>
+  <text x="970" y="255" text-anchor="middle" class="fg head">Output (PWM)</text>
+  <text x="970" y="277" text-anchor="middle" class="mono muted">vvt_duty_1 … _4</text>
+  <path d="M970 194 V228" class="line" marker-end="url(#a)"/>
+  <rect x="860" y="316" width="220" height="64" rx="6" class="box"/>
+  <text x="970" y="341" text-anchor="middle" class="fg head">Phaser + cam sensor</text>
+  <text x="970" y="363" text-anchor="middle" class="muted">measured from Nominal Angle</text>
+  <path d="M970 294 V314" class="line" marker-end="url(#a)"/>
+  <path d="M860 348 H490 V84" class="line" marker-end="url(#a)"/>
+  <text x="520" y="340" class="mono muted">vvt_angle_1 … _4 (degrees of advance)</text>
+</svg>

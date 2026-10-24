@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 320" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Match windows</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .tooth { fill: #5f6670; }
+    .ref  { fill: #d9822b; }
+    .reds { stroke: #c8412d; stroke-width: 2; fill: none; }
+    .redf { fill: #c8412d; }
+    .band { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 1.5; }
+    .blueline { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .grnline { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .orgline { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .band { fill: #13291a; } .tooth { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d9822b"/>
+    </marker>
+  </defs>
+  <text x="20.0" y="28.0" class="muted head">Left: where the next tooth is accepted. Right: how the window narrows as the engine picks up.</text>
+  <path d="M50 170 H515.0" class="line" marker-end="url(#a)"/>
+  <path d="M50.0 165 V175" class="thin"/>
+  <text x="50.0" y="194.0" text-anchor="middle" class="mono muted">0</text>
+  <path d="M125.0 165 V175" class="thin"/>
+  <text x="125.0" y="194.0" text-anchor="middle" class="mono muted">0.5</text>
+  <path d="M200.0 165 V175" class="thin"/>
+  <text x="200.0" y="194.0" text-anchor="middle" class="mono muted">1</text>
+  <path d="M275.0 165 V175" class="thin"/>
+  <text x="275.0" y="194.0" text-anchor="middle" class="mono muted">1.5</text>
+  <path d="M350.0 165 V175" class="thin"/>
+  <text x="350.0" y="194.0" text-anchor="middle" class="mono muted">2</text>
+  <path d="M425.0 165 V175" class="thin"/>
+  <text x="425.0" y="194.0" text-anchor="middle" class="mono muted">2.5</text>
+  <path d="M500.0 165 V175" class="thin"/>
+  <text x="500.0" y="194.0" text-anchor="middle" class="mono muted">3</text>
+  <text x="275.0" y="218.0" text-anchor="middle" class="muted small">interval, in tooth pitches</text>
+  <rect x="162.5" y="110" width="75.0" height="22" class="band"/>
+  <text x="245.5" y="126.0" class="fg small">±25 % at speed (Match Window)</text>
+  <rect x="87.5" y="140" width="225.0" height="22" class="tgt"/>
+  <text x="320.5" y="156.0" class="fg small">±75 % cranking</text>
+  <path d="M200.0 90 V170" class="orgline"/>
+  <text x="200.0" y="84.0" text-anchor="middle" class="fg small">due: 1 pitch</text>
+  <text x="50.0" y="260.0" class="muted small">At a gap the expected interval is the gap ratio (2 on a 36-1),</text>
+  <text x="50.0" y="278.0" class="muted small">and the same ± band, in pitches, is laid around it.</text>
+  <path d="M600 240 H1010" class="line" marker-end="url(#a)"/>
+  <path d="M600 240 V50" class="line" marker-end="url(#a)"/>
+  <path d="M600.0 236 V244" class="thin"/>
+  <text x="600.0" y="260.0" text-anchor="middle" class="mono muted">0</text>
+  <path d="M680.0 236 V244" class="thin"/>
+  <text x="680.0" y="260.0" text-anchor="middle" class="mono muted">400</text>
+  <path d="M800.0 236 V244" class="thin"/>
+  <text x="800.0" y="260.0" text-anchor="middle" class="mono muted">1000</text>
+  <path d="M900.0 236 V244" class="thin"/>
+  <text x="900.0" y="260.0" text-anchor="middle" class="mono muted">1500</text>
+  <path d="M1000.0 236 V244" class="thin"/>
+  <text x="1000.0" y="260.0" text-anchor="middle" class="mono muted">2000</text>
+  <text x="592.0" y="244.0" text-anchor="end" class="mono muted">0</text>
+  <text x="592.0" y="199.0" text-anchor="end" class="mono muted">25</text>
+  <text x="592.0" y="154.0" text-anchor="end" class="mono muted">50</text>
+  <text x="592.0" y="109.0" text-anchor="end" class="mono muted">75</text>
+  <text x="592.0" y="64.0" text-anchor="end" class="mono muted">100</text>
+  <text x="800.0" y="282.0" text-anchor="middle" class="muted small">engine speed, rpm</text>
+  <text x="560.0" y="44.0" class="muted small">± % of a pitch</text>
+  <path d="M600.0 105.0 H680.0 L900.0 195.0 H1000.0" class="grnline"/>
+  <text x="684.0" y="97.0" class="fg small">Match Window (cranking), 75</text>
+  <text x="904.0" y="185.0" class="fg small">Match Window, 25</text>
+  <path d="M680.0 60 V240" class="dash"/>
+  <path d="M900.0 60 V240" class="dash"/>
+</svg>

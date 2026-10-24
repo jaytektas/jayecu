@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 540" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>A relay on a low-side output, a relay on a high-side output, and a PWM valve on LS13</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .ecu  { fill: none; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .dio  { fill: #2e9d4f; }
+    .panel { fill: none; stroke: #c9ced6; stroke-width: 1.5; }
+    .edge { stroke: #5f6670; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .w-br { stroke: #8b5a2b; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .w-y  { stroke: #e0b000; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .w-r  { stroke: #d0312d; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .w-b  { stroke: #1d1f23; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { stroke: #9aa1ab; } .panel { stroke: #3a3f48; } .edge { stroke: #9aa1ab; }
+      .w-b { stroke: #000000; }
+      .ff { fill: #33240f; } .pid { fill: #13291a; }
+    }
+  </style>
+
+  <!-- ================= A · RELAY ON LS ================= -->
+  <rect x="10" y="10" width="360" height="520" rx="8" class="panel"/>
+  <text x="190" y="38" text-anchor="middle" class="fg head">A · Relay on a low-side pin</text>
+  <text x="190" y="58" text-anchor="middle" class="muted small">e.g. a thermo fan on LS5 · Kind: Digital</text>
+
+  <rect x="120" y="150" width="150" height="150" rx="6" class="ff"/>
+  <text x="195" y="176" text-anchor="middle" class="fg head">Relay</text>
+  <text x="132" y="212" class="fg small">86</text><text x="132" y="282" class="fg small">85</text>
+  <text x="246" y="212" class="fg small">30</text><text x="246" y="282" class="fg small">87</text>
+  <path d="M150 222 V262" class="line"/><rect x="140" y="230" width="20" height="24" class="box"/>
+  <path d="M240 222 L226 262 M240 262 V270" class="line"/>
+  <text x="40" y="100" class="fg small">+12 V switched (fused)</text>
+  <path d="M60 108 V207 H120" class="edge"/><path d="M60 108 V207 H120" class="w-r"/>
+  <path d="M120 277 H60 V380" class="edge"/><path d="M120 277 H60 V380" class="w-br"/>
+  <text x="72" y="340" class="muted small">brown / green</text>
+  <circle cx="60" cy="390" r="9" class="node"/>
+  <text x="60" y="424" text-anchor="middle" class="fg head">CN2-5</text>
+  <text x="60" y="442" text-anchor="middle" class="mono muted">LS5</text>
+  <text x="250" y="100" class="fg small">fused battery</text>
+  <path d="M290 108 V207 H270" class="edge"/><path d="M290 108 V207 H270" class="w-r"/>
+  <path d="M270 277 H300 V360" class="line"/>
+  <rect x="250" y="362" width="100" height="40" rx="6" class="box"/>
+  <text x="300" y="387" text-anchor="middle" class="fg">Fan</text>
+  <path d="M300 402 V420 M286 420 H314 M291 426 H309 M296 432 H304" class="line"/>
+  <text x="30" y="480" class="fg small">The ECU grounds the relay coil. The load's</text>
+  <text x="30" y="498" class="fg small">current never passes through the ECU.</text>
+
+  <!-- ================= B · RELAY ON HS ================= -->
+  <rect x="380" y="10" width="360" height="520" rx="8" class="panel"/>
+  <text x="560" y="38" text-anchor="middle" class="fg head">B · Relay on a high-side pin</text>
+  <text x="560" y="58" text-anchor="middle" class="muted small">e.g. a fuel pump on HS1 · Kind: Digital</text>
+
+  <rect x="490" y="150" width="150" height="150" rx="6" class="ff"/>
+  <text x="565" y="176" text-anchor="middle" class="fg head">Relay</text>
+  <text x="502" y="212" class="fg small">86</text><text x="502" y="282" class="fg small">85</text>
+  <text x="616" y="212" class="fg small">30</text><text x="616" y="282" class="fg small">87</text>
+  <path d="M520 222 V262" class="line"/><rect x="510" y="230" width="20" height="24" class="box"/>
+  <path d="M610 222 L596 262 M610 262 V270" class="line"/>
+  <path d="M490 207 H430 V380" class="edge"/><path d="M490 207 H430 V380" class="w-y"/>
+  <text x="442" y="340" class="muted small">yellow / black</text>
+  <circle cx="430" cy="390" r="9" class="node"/>
+  <text x="430" y="424" text-anchor="middle" class="fg head">CN4-7</text>
+  <text x="430" y="442" text-anchor="middle" class="mono muted">HS1</text>
+  <path d="M490 277 H470 V300" class="edge"/><path d="M490 277 H470 V300" class="w-b"/>
+  <path d="M456 302 H484 M461 308 H479 M466 314 H474" class="line"/>
+  <text x="620" y="100" class="fg small">fused battery</text>
+  <path d="M660 108 V207 H640" class="edge"/><path d="M660 108 V207 H640" class="w-r"/>
+  <path d="M640 277 H670 V360" class="line"/>
+  <rect x="620" y="362" width="100" height="40" rx="6" class="box"/>
+  <text x="670" y="387" text-anchor="middle" class="fg">Pump</text>
+  <path d="M670 402 V420 M656 420 H684 M661 426 H679 M666 432 H674" class="line"/>
+  <text x="400" y="480" class="fg small">The ECU feeds +12 V to the relay coil; the</text>
+  <text x="400" y="498" class="fg small">coil's other end goes to ground.</text>
+
+  <!-- ================= C · PWM VALVE ON LS13 ================= -->
+  <rect x="750" y="10" width="360" height="520" rx="8" class="panel"/>
+  <text x="930" y="38" text-anchor="middle" class="fg head">C · PWM valve on LS13</text>
+  <text x="930" y="58" text-anchor="middle" class="muted small">boost or idle solenoid · Kind: PWM</text>
+
+  <text x="770" y="100" class="fg small">main relay, fused +12 V</text>
+  <path d="M790 108 V150" class="edge"/><path d="M790 108 V150" class="w-r"/>
+  <path d="M790 150 H900" class="edge"/><path d="M790 150 H900" class="w-r"/>
+  <rect x="900" y="126" width="120" height="48" rx="6" class="ff"/>
+  <text x="960" y="155" text-anchor="middle" class="fg head">Valve</text>
+  <path d="M960 174 V300" class="edge"/><path d="M960 174 V300" class="w-br"/>
+  <text x="972" y="240" class="muted small">brown / black</text>
+  <circle cx="960" cy="310" r="9" class="node"/>
+  <text x="976" y="300" class="fg small">CN2-8 · <tspan class="mono">LS13</tspan></text>
+  <rect x="765" y="330" width="330" height="110" rx="6" class="ecu"/>
+  <text x="775" y="432" class="muted small">inside the ECU</text>
+  <path d="M960 319 V396" class="line"/>
+  <rect x="925" y="396" width="70" height="26" rx="4" class="ff"/>
+  <text x="960" y="414" text-anchor="middle" class="fg small">driver</text>
+  <path d="M995 409 H1030 M1030 402 V416 M1035 405 V413" class="line"/>
+  <text x="770" y="474" class="fg small">Only the driver is on the pin: the board has no</text>
+  <text x="770" y="492" class="fg small">freewheel diode. If the valve's maker calls for one,</text>
+  <text x="770" y="510" class="fg small">fit it across the valve, band to the +12 V side.</text>
+</svg>

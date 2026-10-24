@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 480" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Sync levels</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .tooth { fill: #5f6670; }
+    .ref  { fill: #d9822b; }
+    .reds { stroke: #c8412d; stroke-width: 2; fill: none; }
+    .redf { fill: #c8412d; }
+    .band { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 1.5; }
+    .blueline { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .grnline { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .orgline { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .band { fill: #13291a; } .tooth { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d9822b"/>
+    </marker>
+  </defs>
+  <rect x="40" y="150" width="220" height="84" rx="10" class="safe"/>
+  <text x="150.0" y="182.0" text-anchor="middle" class="fg head">0 · None</text>
+  <text x="150.0" y="206.0" text-anchor="middle" class="muted">nothing fires, rpm 0</text>
+  <rect x="420" y="150" width="220" height="84" rx="10" class="tgt"/>
+  <text x="530.0" y="182.0" text-anchor="middle" class="fg head">1 · Crank</text>
+  <text x="530.0" y="206.0" text-anchor="middle" class="muted">position in a revolution</text>
+  <rect x="800" y="150" width="220" height="84" rx="10" class="pid"/>
+  <text x="910.0" y="182.0" text-anchor="middle" class="fg head">2 · Phase</text>
+  <text x="910.0" y="206.0" text-anchor="middle" class="muted">position in the whole cycle</text>
+  <path d="M260 175 H418" class="line" marker-end="url(#a)"/>
+  <text x="339.0" y="140.0" text-anchor="middle" class="fg small">crank locks on a</text>
+  <text x="339.0" y="158.0" text-anchor="middle" class="fg small">unique feature (or anchor)</text>
+  <path d="M640 175 H798" class="line" marker-end="url(#a)"/>
+  <text x="719.0" y="140.0" text-anchor="middle" class="fg small">the cam says which</text>
+  <text x="719.0" y="158.0" text-anchor="middle" class="fg small">revolution</text>
+  <path d="M798 215 H642" class="safeline" marker-end="url(#r)"/>
+  <text x="719.0" y="238.0" text-anchor="middle" class="fg small">cam overdue, or cam</text>
+  <text x="719.0" y="256.0" text-anchor="middle" class="fg small">not where the crank says</text>
+  <path d="M530 234 V300 H150 V236" class="safeline" marker-end="url(#r)"/>
+  <path d="M910 234 V330 H130 V236" class="safeline" marker-end="url(#r)"/>
+  <text x="340.0" y="292.0" text-anchor="middle" class="fg small">a tooth outside its window · a tooth that never came · no signal</text>
+  <text x="520.0" y="352.0" text-anchor="middle" class="muted small">any crank error drops straight to None, from either level: firing stops on that edge</text>
+  <text x="40.0" y="390.0" class="muted head">What the ECU can do at each level</text>
+  <text x="40.0" y="416.0" class="fg small">None — no spark, no injection, rpm reads 0.</text>
+  <text x="40.0" y="436.0" class="fg small">Crank — wasted spark (coil-on-plug fires companion pairs together); injection as its mode allows without phase.</text>
+  <text x="40.0" y="456.0" class="fg small">Phase — every event once per cycle at its own cylinder: sequential injection and coil-on-plug.</text>
+  <text x="40.0" y="40.0" class="muted head">The sync level (sync_level) and how it moves</text>
+  <text x="40.0" y="64.0" class="muted">It can only go up by proof. It goes down the moment the proof fails.</text>
+</svg>

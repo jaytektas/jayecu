@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 480" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Start-up fuelling sequence: prime, cranking, post-start and warm-up</title>
+  <style>
+    .fg { fill: #1d1f23; } .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .phA { fill: #f1f2f4; } .phB { fill: #fdf0e3; } .phC { fill: #eef7ee; }
+    .bar  { fill: #3b82c4; opacity: 0.85; }
+    .barO { fill: #d9822b; opacity: 0.85; }
+    .edge { stroke: #1d1f23; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .spike { stroke: #d9822b; stroke-width: 4; fill: none; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; } .grid { stroke: #2c3038; }
+      .phA { fill: #1c1f25; } .phB { fill: #33240f; } .phC { fill: #13291a; }
+      .edge { stroke: #e4e6ea; }
+    }
+  </style>
+
+  <!-- phases -->
+  <rect x="200" y="30" width="120" height="330" class="phA"/>
+  <rect x="320" y="30" width="230" height="330" class="phB"/>
+  <rect x="550" y="30" width="530" height="330" class="phC"/>
+  <text x="260" y="52" text-anchor="middle" class="fg head">STOPPED</text>
+  <text x="260" y="70" text-anchor="middle" class="muted">key on</text>
+  <text x="435" y="52" text-anchor="middle" class="fg head">CRANKING</text>
+  <text x="435" y="70" text-anchor="middle" class="muted">rpm below threshold</text>
+  <text x="815" y="52" text-anchor="middle" class="fg head">RUNNING</text>
+  <text x="815" y="70" text-anchor="middle" class="muted">held until the engine stops</text>
+
+  <!-- transition edges -->
+  <line x1="320" y1="80" x2="320" y2="360" class="edge"/>
+  <line x1="550" y1="80" x2="550" y2="360" class="edge"/>
+  <text x="326" y="376" class="muted">trigger syncs</text>
+  <text x="556" y="376" class="muted">rpm ≥ Cranking Threshold</text>
+
+  <!-- row labels -->
+  <text x="20" y="112" class="fg head">Prime pulse</text>
+  <text x="20" y="162" class="fg head">Cranking</text>
+  <text x="20" y="212" class="fg head">Post-start</text>
+  <text x="20" y="262" class="fg head">Warm-up</text>
+  <text x="20" y="312" class="fg head">Main calculation</text>
+  <text x="20" y="130" class="muted">once per power-up</text>
+  <text x="20" y="180" class="muted">× Cranking table</text>
+  <text x="20" y="230" class="muted">+ table, fades by run time</text>
+  <text x="20" y="280" class="muted">+ coolant table</text>
+  <text x="20" y="330" class="muted">air model, VE, λ target</text>
+
+  <!-- prime: a single squirt just after sync -->
+  <line x1="332" y1="94" x2="332" y2="124" class="spike"/>
+  <text x="344" y="114" class="fg">all injectors together</text>
+
+  <!-- cranking enrichment -->
+  <rect x="320" y="146" width="230" height="22" class="barO"/>
+
+  <!-- post-start: starts at catch, decays -->
+  <path d="M550 194 L550 218 L900 218 C820 216 700 200 550 194 Z" class="bar"/>
+  <text x="910" y="212" class="muted">table reaches 0</text>
+
+  <!-- warm-up: from key-on, tapering over a long time -->
+  <path d="M200 244 L1060 268 L200 268 Z" class="bar"/>
+  <text x="870" y="254" class="muted">coolant warm</text>
+
+  <!-- main calc: always -->
+  <rect x="200" y="296" width="860" height="22" class="bar" opacity="0.45"/>
+
+  <!-- flood clear note -->
+  <line x1="200" y1="410" x2="240" y2="410" class="safeline"/>
+  <text x="250" y="415" class="fg">Flood clear: cranking with the throttle at or above its threshold cuts fuel,</text>
+  <text x="250" y="436" class="fg">and holds the prime back until a crank with the throttle closed.</text>
+  <text x="250" y="460" class="muted">Run time</text>
+  <text x="318" y="460" class="mono muted">run_time</text>
+  <text x="382" y="460" class="muted">counts from the RUNNING edge and reads 0 while not running.</text>
+</svg>

@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 410" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The virtual grid</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .tooth { fill: #5f6670; }
+    .ref  { fill: #d9822b; }
+    .reds { stroke: #c8412d; stroke-width: 2; fill: none; }
+    .redf { fill: #c8412d; }
+    .band { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 1.5; }
+    .blueline { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .grnline { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .orgline { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .band { fill: #13291a; } .tooth { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d9822b"/>
+    </marker>
+  </defs>
+  <text x="20.0" y="28.0" class="muted head">The scheduler never sees the real wheel. It sees a steady grid, one virtual tooth every 10°.</text>
+  <text x="20.0" y="84.0" class="fg small head">60-2 crank</text>
+  <path d="M150.0 92 H1030.0" class="thin"/>
+  <path d="M150.0 92 V70" class="sig"/>
+  <path d="M164.7 92 V70" class="sig"/>
+  <path d="M179.3 92 V70" class="sig"/>
+  <path d="M194.0 92 V70" class="sig"/>
+  <path d="M208.7 92 V70" class="sig"/>
+  <path d="M223.3 92 V70" class="sig"/>
+  <path d="M238.0 92 V70" class="sig"/>
+  <path d="M252.7 92 V70" class="sig"/>
+  <path d="M267.3 92 V70" class="sig"/>
+  <path d="M282.0 92 V70" class="sig"/>
+  <path d="M296.7 92 V70" class="sig"/>
+  <path d="M311.3 92 V70" class="sig"/>
+  <path d="M326.0 92 V70" class="sig"/>
+  <path d="M340.7 92 V70" class="sig"/>
+  <path d="M355.3 92 V70" class="sig"/>
+  <path d="M370.0 92 V70" class="sig"/>
+  <path d="M384.7 92 V70" class="sig"/>
+  <path d="M399.3 92 V70" class="sig"/>
+  <path d="M414.0 92 V70" class="sig"/>
+  <path d="M428.7 92 V70" class="sig"/>
+  <path d="M443.3 92 V70" class="sig"/>
+  <path d="M458.0 92 V70" class="sig"/>
+  <path d="M472.7 92 V70" class="sig"/>
+  <path d="M487.3 92 V70" class="sig"/>
+  <path d="M502.0 92 V70" class="sig"/>
+  <path d="M516.7 92 V70" class="sig"/>
+  <path d="M531.3 92 V70" class="sig"/>
+  <path d="M546.0 92 V70" class="sig"/>
+  <path d="M560.7 92 V70" class="sig"/>
+  <path d="M575.3 92 V70" class="sig"/>
+  <path d="M590.0 92 V70" class="sig"/>
+  <path d="M604.7 92 V70" class="sig"/>
+  <path d="M619.3 92 V70" class="sig"/>
+  <path d="M634.0 92 V70" class="sig"/>
+  <path d="M648.7 92 V70" class="sig"/>
+  <path d="M663.3 92 V70" class="sig"/>
+  <path d="M678.0 92 V70" class="sig"/>
+  <path d="M692.7 92 V70" class="sig"/>
+  <path d="M707.3 92 V70" class="sig"/>
+  <path d="M722.0 92 V70" class="sig"/>
+  <path d="M736.7 92 V70" class="sig"/>
+  <path d="M751.3 92 V70" class="sig"/>
+  <path d="M766.0 92 V70" class="sig"/>
+  <path d="M780.7 92 V70" class="sig"/>
+  <path d="M795.3 92 V70" class="sig"/>
+  <path d="M810.0 92 V70" class="sig"/>
+  <path d="M824.7 92 V70" class="sig"/>
+  <path d="M839.3 92 V70" class="sig"/>
+  <path d="M854.0 92 V70" class="sig"/>
+  <path d="M868.7 92 V70" class="sig"/>
+  <path d="M883.3 92 V70" class="sig"/>
+  <path d="M898.0 92 V70" class="sig"/>
+  <path d="M912.7 92 V70" class="sig"/>
+  <path d="M927.3 92 V70" class="sig"/>
+  <path d="M942.0 92 V70" class="sig"/>
+  <path d="M956.7 92 V70" class="sig"/>
+  <path d="M971.3 92 V70" class="sig"/>
+  <path d="M986.0 92 V70" class="sig"/>
+  <text x="1028.0" y="112.0" text-anchor="end" class="muted small">denser than the grid: the grid decimates</text>
+  <text x="20.0" y="164.0" class="fg small head">4-1 crank</text>
+  <path d="M150.0 172 H1030.0" class="thin"/>
+  <path d="M150.0 172 V150" class="sig"/>
+  <path d="M370.0 172 V150" class="sig"/>
+  <path d="M590.0 172 V150" class="sig"/>
+  <text x="1028.0" y="192.0" text-anchor="end" class="muted small">sparser: the grid runs on between teeth</text>
+  <text x="20.0" y="244.0" class="fg small head">virtual grid</text>
+  <path d="M150.0 252 H1030.0" class="thin"/>
+  <path d="M150.0 252 V230" class="sig3"/>
+  <path d="M174.4 252 V230" class="sig3"/>
+  <path d="M198.9 252 V230" class="sig3"/>
+  <path d="M223.3 252 V230" class="sig3"/>
+  <path d="M247.8 252 V230" class="sig3"/>
+  <path d="M272.2 252 V230" class="sig3"/>
+  <path d="M296.7 252 V230" class="sig3"/>
+  <path d="M321.1 252 V230" class="sig3"/>
+  <path d="M345.6 252 V230" class="sig3"/>
+  <path d="M370.0 252 V230" class="sig3"/>
+  <path d="M394.4 252 V230" class="sig3"/>
+  <path d="M418.9 252 V230" class="sig3"/>
+  <path d="M443.3 252 V230" class="sig3"/>
+  <path d="M467.8 252 V230" class="sig3"/>
+  <path d="M492.2 252 V230" class="sig3"/>
+  <path d="M516.7 252 V230" class="sig3"/>
+  <path d="M541.1 252 V230" class="sig3"/>
+  <path d="M565.6 252 V230" class="sig3"/>
+  <path d="M590.0 252 V230" class="sig3"/>
+  <path d="M614.4 252 V230" class="sig3"/>
+  <path d="M638.9 252 V230" class="sig3"/>
+  <path d="M663.3 252 V230" class="sig3"/>
+  <path d="M687.8 252 V230" class="sig3"/>
+  <path d="M712.2 252 V230" class="sig3"/>
+  <path d="M736.7 252 V230" class="sig3"/>
+  <path d="M761.1 252 V230" class="sig3"/>
+  <path d="M785.6 252 V230" class="sig3"/>
+  <path d="M810.0 252 V230" class="sig3"/>
+  <path d="M834.4 252 V230" class="sig3"/>
+  <path d="M858.9 252 V230" class="sig3"/>
+  <path d="M883.3 252 V230" class="sig3"/>
+  <path d="M907.8 252 V230" class="sig3"/>
+  <path d="M932.2 252 V230" class="sig3"/>
+  <path d="M956.7 252 V230" class="sig3"/>
+  <path d="M981.1 252 V230" class="sig3"/>
+  <path d="M1005.6 252 V230" class="sig3"/>
+  <text x="1028.0" y="272.0" text-anchor="end" class="muted small">phase-locked to the real teeth</text>
+  <text x="150.0" y="300.0" text-anchor="middle" class="mono muted">0°</text>
+  <text x="370.0" y="300.0" text-anchor="middle" class="mono muted">90°</text>
+  <text x="590.0" y="300.0" text-anchor="middle" class="mono muted">180°</text>
+  <text x="810.0" y="300.0" text-anchor="middle" class="mono muted">270°</text>
+  <text x="1030.0" y="300.0" text-anchor="middle" class="mono muted">360°</text>
+  <rect x="20" y="320" width="1020" height="70" rx="6" class="pid"/>
+  <text x="36.0" y="348.0" class="fg small">At crank sync the grid is 36 teeth over 360°; at phase sync, one tooth every 10° over the whole cycle (72 on a four-stroke).</text>
+  <text x="36.0" y="370.0" class="fg small">RPM is worked out from the grid's speed, so it reads 0 whenever sync is lost.</text>
+</svg>

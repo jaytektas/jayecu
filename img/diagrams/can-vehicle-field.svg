@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 420" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Where a field sits in a CAN frame: start bit numbering</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .cell { fill: #ffffff; stroke: #b9bec6; stroke-width: 1; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .hit  { fill: #cfe2f6; stroke: #3b82c4; stroke-width: 1; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .cell { fill: #20232a; stroke: #4a505a; }
+      .tgt { fill: #16283b; } .hit { fill: #1f3d5c; stroke: #3b82c4; } .safe { fill: #361512; } .pid { fill: #13291a; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+  <text x="20" y="26" class="fg head">Frame 0x2B1 (Haltech WB1): lambda, 16 bits, big-endian, Start Bit 7</text>
+  <text x="114.0" y="60" text-anchor="middle" class="mono muted">bit 7</text>
+  <text x="162.0" y="60" text-anchor="middle" class="mono muted">bit 6</text>
+  <text x="210.0" y="60" text-anchor="middle" class="mono muted">bit 5</text>
+  <text x="258.0" y="60" text-anchor="middle" class="mono muted">bit 4</text>
+  <text x="306.0" y="60" text-anchor="middle" class="mono muted">bit 3</text>
+  <text x="354.0" y="60" text-anchor="middle" class="mono muted">bit 2</text>
+  <text x="402.0" y="60" text-anchor="middle" class="mono muted">bit 1</text>
+  <text x="450.0" y="60" text-anchor="middle" class="mono muted">bit 0</text>
+  <text x="78" y="93" text-anchor="end" class="mono muted">byte 0</text>
+  <rect x="90" y="70" width="48" height="36" class="hit"/>
+  <text x="114.0" y="93" text-anchor="middle" class="mono fg">7</text>
+  <rect x="138" y="70" width="48" height="36" class="hit"/>
+  <text x="162.0" y="93" text-anchor="middle" class="mono fg">6</text>
+  <rect x="186" y="70" width="48" height="36" class="hit"/>
+  <text x="210.0" y="93" text-anchor="middle" class="mono fg">5</text>
+  <rect x="234" y="70" width="48" height="36" class="hit"/>
+  <text x="258.0" y="93" text-anchor="middle" class="mono fg">4</text>
+  <rect x="282" y="70" width="48" height="36" class="hit"/>
+  <text x="306.0" y="93" text-anchor="middle" class="mono fg">3</text>
+  <rect x="330" y="70" width="48" height="36" class="hit"/>
+  <text x="354.0" y="93" text-anchor="middle" class="mono fg">2</text>
+  <rect x="378" y="70" width="48" height="36" class="hit"/>
+  <text x="402.0" y="93" text-anchor="middle" class="mono fg">1</text>
+  <rect x="426" y="70" width="48" height="36" class="hit"/>
+  <text x="450.0" y="93" text-anchor="middle" class="mono fg">0</text>
+  <text x="78" y="129" text-anchor="end" class="mono muted">byte 1</text>
+  <rect x="90" y="106" width="48" height="36" class="hit"/>
+  <text x="114.0" y="129" text-anchor="middle" class="mono fg">15</text>
+  <rect x="138" y="106" width="48" height="36" class="hit"/>
+  <text x="162.0" y="129" text-anchor="middle" class="mono fg">14</text>
+  <rect x="186" y="106" width="48" height="36" class="hit"/>
+  <text x="210.0" y="129" text-anchor="middle" class="mono fg">13</text>
+  <rect x="234" y="106" width="48" height="36" class="hit"/>
+  <text x="258.0" y="129" text-anchor="middle" class="mono fg">12</text>
+  <rect x="282" y="106" width="48" height="36" class="hit"/>
+  <text x="306.0" y="129" text-anchor="middle" class="mono fg">11</text>
+  <rect x="330" y="106" width="48" height="36" class="hit"/>
+  <text x="354.0" y="129" text-anchor="middle" class="mono fg">10</text>
+  <rect x="378" y="106" width="48" height="36" class="hit"/>
+  <text x="402.0" y="129" text-anchor="middle" class="mono fg">9</text>
+  <rect x="426" y="106" width="48" height="36" class="hit"/>
+  <text x="450.0" y="129" text-anchor="middle" class="mono fg">8</text>
+  <text x="78" y="165" text-anchor="end" class="mono muted">byte 2</text>
+  <rect x="90" y="142" width="48" height="36" class="cell"/>
+  <text x="114.0" y="165" text-anchor="middle" class="mono muted">23</text>
+  <rect x="138" y="142" width="48" height="36" class="cell"/>
+  <text x="162.0" y="165" text-anchor="middle" class="mono muted">22</text>
+  <rect x="186" y="142" width="48" height="36" class="cell"/>
+  <text x="210.0" y="165" text-anchor="middle" class="mono muted">21</text>
+  <rect x="234" y="142" width="48" height="36" class="cell"/>
+  <text x="258.0" y="165" text-anchor="middle" class="mono muted">20</text>
+  <rect x="282" y="142" width="48" height="36" class="cell"/>
+  <text x="306.0" y="165" text-anchor="middle" class="mono muted">19</text>
+  <rect x="330" y="142" width="48" height="36" class="cell"/>
+  <text x="354.0" y="165" text-anchor="middle" class="mono muted">18</text>
+  <rect x="378" y="142" width="48" height="36" class="cell"/>
+  <text x="402.0" y="165" text-anchor="middle" class="mono muted">17</text>
+  <rect x="426" y="142" width="48" height="36" class="cell"/>
+  <text x="450.0" y="165" text-anchor="middle" class="mono muted">16</text>
+  <text x="78" y="201" text-anchor="end" class="mono muted">byte 3</text>
+  <rect x="90" y="178" width="48" height="36" class="cell"/>
+  <text x="114.0" y="201" text-anchor="middle" class="mono muted">31</text>
+  <rect x="138" y="178" width="48" height="36" class="cell"/>
+  <text x="162.0" y="201" text-anchor="middle" class="mono muted">30</text>
+  <rect x="186" y="178" width="48" height="36" class="cell"/>
+  <text x="210.0" y="201" text-anchor="middle" class="mono muted">29</text>
+  <rect x="234" y="178" width="48" height="36" class="cell"/>
+  <text x="258.0" y="201" text-anchor="middle" class="mono muted">28</text>
+  <rect x="282" y="178" width="48" height="36" class="cell"/>
+  <text x="306.0" y="201" text-anchor="middle" class="mono muted">27</text>
+  <rect x="330" y="178" width="48" height="36" class="cell"/>
+  <text x="354.0" y="201" text-anchor="middle" class="mono muted">26</text>
+  <rect x="378" y="178" width="48" height="36" class="cell"/>
+  <text x="402.0" y="201" text-anchor="middle" class="mono muted">25</text>
+  <rect x="426" y="178" width="48" height="36" class="cell"/>
+  <text x="450.0" y="201" text-anchor="middle" class="mono muted">24</text>
+  <text x="78" y="237" text-anchor="end" class="mono muted">byte 4</text>
+  <rect x="90" y="214" width="48" height="36" class="cell"/>
+  <text x="114.0" y="237" text-anchor="middle" class="mono muted">39</text>
+  <rect x="138" y="214" width="48" height="36" class="cell"/>
+  <text x="162.0" y="237" text-anchor="middle" class="mono muted">38</text>
+  <rect x="186" y="214" width="48" height="36" class="cell"/>
+  <text x="210.0" y="237" text-anchor="middle" class="mono muted">37</text>
+  <rect x="234" y="214" width="48" height="36" class="cell"/>
+  <text x="258.0" y="237" text-anchor="middle" class="mono muted">36</text>
+  <rect x="282" y="214" width="48" height="36" class="cell"/>
+  <text x="306.0" y="237" text-anchor="middle" class="mono muted">35</text>
+  <rect x="330" y="214" width="48" height="36" class="cell"/>
+  <text x="354.0" y="237" text-anchor="middle" class="mono muted">34</text>
+  <rect x="378" y="214" width="48" height="36" class="cell"/>
+  <text x="402.0" y="237" text-anchor="middle" class="mono muted">33</text>
+  <rect x="426" y="214" width="48" height="36" class="cell"/>
+  <text x="450.0" y="237" text-anchor="middle" class="mono muted">32</text>
+  <text x="78" y="273" text-anchor="end" class="mono muted">byte 5</text>
+  <rect x="90" y="250" width="48" height="36" class="cell"/>
+  <text x="114.0" y="273" text-anchor="middle" class="mono muted">47</text>
+  <rect x="138" y="250" width="48" height="36" class="cell"/>
+  <text x="162.0" y="273" text-anchor="middle" class="mono muted">46</text>
+  <rect x="186" y="250" width="48" height="36" class="cell"/>
+  <text x="210.0" y="273" text-anchor="middle" class="mono muted">45</text>
+  <rect x="234" y="250" width="48" height="36" class="cell"/>
+  <text x="258.0" y="273" text-anchor="middle" class="mono muted">44</text>
+  <rect x="282" y="250" width="48" height="36" class="cell"/>
+  <text x="306.0" y="273" text-anchor="middle" class="mono muted">43</text>
+  <rect x="330" y="250" width="48" height="36" class="cell"/>
+  <text x="354.0" y="273" text-anchor="middle" class="mono muted">42</text>
+  <rect x="378" y="250" width="48" height="36" class="cell"/>
+  <text x="402.0" y="273" text-anchor="middle" class="mono muted">41</text>
+  <rect x="426" y="250" width="48" height="36" class="cell"/>
+  <text x="450.0" y="273" text-anchor="middle" class="mono muted">40</text>
+  <text x="78" y="309" text-anchor="end" class="mono muted">byte 6</text>
+  <rect x="90" y="286" width="48" height="36" class="cell"/>
+  <text x="114.0" y="309" text-anchor="middle" class="mono muted">55</text>
+  <rect x="138" y="286" width="48" height="36" class="cell"/>
+  <text x="162.0" y="309" text-anchor="middle" class="mono muted">54</text>
+  <rect x="186" y="286" width="48" height="36" class="cell"/>
+  <text x="210.0" y="309" text-anchor="middle" class="mono muted">53</text>
+  <rect x="234" y="286" width="48" height="36" class="cell"/>
+  <text x="258.0" y="309" text-anchor="middle" class="mono muted">52</text>
+  <rect x="282" y="286" width="48" height="36" class="cell"/>
+  <text x="306.0" y="309" text-anchor="middle" class="mono muted">51</text>
+  <rect x="330" y="286" width="48" height="36" class="cell"/>
+  <text x="354.0" y="309" text-anchor="middle" class="mono muted">50</text>
+  <rect x="378" y="286" width="48" height="36" class="cell"/>
+  <text x="402.0" y="309" text-anchor="middle" class="mono muted">49</text>
+  <rect x="426" y="286" width="48" height="36" class="cell"/>
+  <text x="450.0" y="309" text-anchor="middle" class="mono muted">48</text>
+  <text x="78" y="345" text-anchor="end" class="mono muted">byte 7</text>
+  <rect x="90" y="322" width="48" height="36" class="cell"/>
+  <text x="114.0" y="345" text-anchor="middle" class="mono muted">63</text>
+  <rect x="138" y="322" width="48" height="36" class="cell"/>
+  <text x="162.0" y="345" text-anchor="middle" class="mono muted">62</text>
+  <rect x="186" y="322" width="48" height="36" class="cell"/>
+  <text x="210.0" y="345" text-anchor="middle" class="mono muted">61</text>
+  <rect x="234" y="322" width="48" height="36" class="cell"/>
+  <text x="258.0" y="345" text-anchor="middle" class="mono muted">60</text>
+  <rect x="282" y="322" width="48" height="36" class="cell"/>
+  <text x="306.0" y="345" text-anchor="middle" class="mono muted">59</text>
+  <rect x="330" y="322" width="48" height="36" class="cell"/>
+  <text x="354.0" y="345" text-anchor="middle" class="mono muted">58</text>
+  <rect x="378" y="322" width="48" height="36" class="cell"/>
+  <text x="402.0" y="345" text-anchor="middle" class="mono muted">57</text>
+  <rect x="426" y="322" width="48" height="36" class="cell"/>
+  <text x="450.0" y="345" text-anchor="middle" class="mono muted">56</text>
+  <path d="M114.0 88 m-16 0 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0" class="line"/>
+  <path d="M484 88 H514" class="line" marker-start="url(#a)"/>
+  <text x="522" y="84" class="fg">Start Bit <tspan class="mono">7</tspan> = byte 0, bit 7:</text>
+  <text x="522" y="102" class="muted">the field's most significant bit</text>
+  <path d="M484 124 H514" class="line" marker-start="url(#a)"/>
+  <text x="522" y="120" class="fg">…runs down through byte 1 to bit <tspan class="mono">8</tspan></text>
+  <text x="522" y="138" class="muted">Bit Length 16 · Big Endian (Motorola)</text>
+
+  <rect x="504" y="170" width="530" height="104" rx="6" class="tgt"/>
+  <text x="524" y="196" class="fg head">A reading</text>
+  <text x="524" y="220" class="mono fg">bytes 0–1 = 0x04 0x19  →  raw 1049</text>
+  <text x="524" y="242" class="mono fg">value = (1049 − 0) ÷ 1024 = 1.024 λ</text>
+  <text x="524" y="262" class="muted">Multiplier 1024, Offset 0, as the template sets them</text>
+
+  <rect x="504" y="290" width="530" height="96" rx="6" class="safe"/>
+  <text x="524" y="316" class="fg head">Free air</text>
+  <text x="524" y="340" class="mono fg">bytes 0–1 = 0x7F 0xFF  →  raw 32767 = No Reading code</text>
+  <text x="524" y="362" class="muted">not decoded: the reading goes stale after Valid For (300 ms)</text>
+  <text x="524" y="380" class="muted">instead of reading as 32 λ</text>
+</svg>

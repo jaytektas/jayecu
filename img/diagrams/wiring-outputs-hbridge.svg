@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 480" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Wiring the two H-bridges: an electronic throttle on bridge A, or a stepper across both</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .ecu  { fill: none; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .panel { fill: none; stroke: #c9ced6; stroke-width: 1.5; }
+    .edge { stroke: #5f6670; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .w-v  { stroke: #8e44ad; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .w-vb { stroke: #5b2c6f; stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-dasharray: 10 5; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { stroke: #9aa1ab; } .panel { stroke: #3a3f48; } .edge { stroke: #9aa1ab; }
+      .w-v { stroke: #b57edc; } .w-vb { stroke: #b57edc; }
+      .ff { fill: #33240f; }
+    }
+  </style>
+
+  <!-- ================= LEFT · ETB ================= -->
+  <rect x="10" y="10" width="545" height="460" rx="8" class="panel"/>
+  <text x="282" y="38" text-anchor="middle" class="fg head">Electronic throttle on Half Bridge A</text>
+  <text x="282" y="58" text-anchor="middle" class="muted small">one DC motor across one bridge's two pins</text>
+
+  <rect x="40" y="86" width="240" height="120" rx="6" class="ecu"/>
+  <text x="52" y="106" class="muted small">inside the ECU</text>
+  <rect x="80" y="118" width="170" height="52" rx="6" class="ff"/>
+  <text x="165" y="140" text-anchor="middle" class="fg head">Half Bridge A</text>
+  <text x="165" y="159" text-anchor="middle" class="muted small">PWM, direction, disable</text>
+  <path d="M120 170 V230" class="line"/><path d="M210 170 V230" class="line"/>
+  <circle cx="120" cy="240" r="9" class="node"/><circle cx="210" cy="240" r="9" class="node"/>
+  <text x="120" y="226" text-anchor="end" dx="-14" class="fg small">CN4-20</text>
+  <text x="210" y="226" dx="14" class="fg small">CN4-21</text>
+  <path d="M120 249 V330 H270" class="edge"/><path d="M120 249 V330 H270" class="w-v"/>
+  <path d="M210 249 V300 H330 V330" class="edge"/><path d="M210 249 V300 H330 V330" class="w-vb"/>
+  <text x="60" y="290" class="muted small">violet</text>
+  <text x="222" y="290" class="muted small">violet / black</text>
+  <rect x="260" y="330" width="170" height="80" rx="6" class="box"/>
+  <circle cx="300" cy="370" r="20" class="box"/>
+  <text x="300" y="376" text-anchor="middle" class="fg head">M</text>
+  <text x="330" y="364" class="fg">Throttle</text>
+  <text x="330" y="382" class="fg">body</text>
+  <text x="30" y="438" class="fg small">If the plate drives the wrong way, swap the two wires or tick</text>
+  <text x="30" y="456" class="fg small"><tspan class="head">Direction Invert</tspan>. Half Bridge B (CN4-18, CN4-19) is the same.</text>
+
+  <!-- ================= RIGHT · STEPPER ================= -->
+  <rect x="565" y="10" width="545" height="460" rx="8" class="panel"/>
+  <text x="837" y="38" text-anchor="middle" class="fg head">Stepper idle valve across both bridges</text>
+  <text x="837" y="58" text-anchor="middle" class="muted small">4-wire bipolar stepper: one coil on each bridge</text>
+
+  <rect x="595" y="86" width="485" height="120" rx="6" class="ecu"/>
+  <text x="607" y="106" class="muted small">inside the ECU</text>
+  <rect x="625" y="118" width="170" height="52" rx="6" class="ff"/>
+  <text x="710" y="140" text-anchor="middle" class="fg head">Half Bridge A</text>
+  <text x="710" y="159" text-anchor="middle" class="mono muted">step_demand_a</text>
+  <rect x="885" y="118" width="170" height="52" rx="6" class="ff"/>
+  <text x="970" y="140" text-anchor="middle" class="fg head">Half Bridge B</text>
+  <text x="970" y="159" text-anchor="middle" class="mono muted">step_demand_b</text>
+  <path d="M665 170 V230" class="line"/><path d="M755 170 V230" class="line"/>
+  <path d="M925 170 V230" class="line"/><path d="M1015 170 V230" class="line"/>
+  <circle cx="665" cy="240" r="9" class="node"/><circle cx="755" cy="240" r="9" class="node"/>
+  <circle cx="925" cy="240" r="9" class="node"/><circle cx="1015" cy="240" r="9" class="node"/>
+  <text x="665" y="226" text-anchor="end" dx="-14" class="fg small">CN4-20</text>
+  <text x="755" y="226" dx="14" class="fg small">CN4-21</text>
+  <text x="925" y="226" text-anchor="end" dx="-14" class="fg small">CN4-19</text>
+  <text x="1015" y="226" dx="14" class="fg small">CN4-18</text>
+  <path d="M665 249 V330" class="edge"/><path d="M665 249 V330" class="w-v"/>
+  <path d="M755 249 V330" class="edge"/><path d="M755 249 V330" class="w-vb"/>
+  <path d="M925 249 V330" class="edge"/><path d="M925 249 V330" class="w-v"/>
+  <path d="M1015 249 V330" class="edge"/><path d="M1015 249 V330" class="w-vb"/>
+  <rect x="640" y="330" width="140" height="56" rx="6" class="box"/>
+  <text x="710" y="355" text-anchor="middle" class="fg head">Coil A</text>
+  <text x="710" y="374" text-anchor="middle" class="muted small">one wire pair</text>
+  <rect x="900" y="330" width="140" height="56" rx="6" class="box"/>
+  <text x="970" y="355" text-anchor="middle" class="fg head">Coil B</text>
+  <text x="970" y="374" text-anchor="middle" class="muted small">the other pair</text>
+  <text x="585" y="420" class="fg small">Find the pairs with a meter: the two ends of one coil read a</text>
+  <text x="585" y="438" class="fg small">few ohms, wires from different coils read open. If the valve</text>
+  <text x="585" y="456" class="fg small">runs backwards, tick <tspan class="head">Rotation Invert</tspan> on Idle Stepper.</text>
+</svg>

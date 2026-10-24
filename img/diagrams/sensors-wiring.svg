@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 500" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Where Interface and Source point: three sensors on the jaytek_v1 connectors</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .cn3  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .cn4  { fill: #eceef1; stroke: #1d1f23; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .case { stroke: #5f6670; stroke-width: 7; fill: none; stroke-linejoin: round; }
+    .w-ow { stroke: #e8892a; stroke-width: 4; fill: none; stroke-linejoin: round; }
+    .w-gb { stroke: #2e9d4f; stroke-width: 4; fill: none; stroke-linejoin: round; }
+    .w-b  { stroke: #1d1f23; stroke-width: 4; fill: none; stroke-linejoin: round; }
+    .w-gy { stroke: #9aa1ab; stroke-width: 4; fill: none; stroke-linejoin: round; }
+    .w-or { stroke: #e8892a; stroke-width: 4; fill: none; stroke-linejoin: round; }
+    .stripe-w { stroke: #ffffff; stroke-width: 2; fill: none; stroke-dasharray: 6 10; }
+    .stripe-b { stroke: #1d1f23; stroke-width: 2; fill: none; stroke-dasharray: 6 10; }
+    .stripe-r { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 10; }
+    .dash { stroke: #5f6670; stroke-width: 2; fill: none; stroke-dasharray: 5 5; }
+    .pin  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .box, .pin { fill: #20232a; stroke: #9aa1ab; }
+      .cn3, .tgt { fill: #16283b; } .cn4 { fill: #2a2d33; stroke: #9aa1ab; }
+      .case { stroke: #9aa1ab; }
+    }
+  </style>
+
+  <text x="20" y="24" class="muted head">ECU connectors</text>
+  <text x="520" y="24" class="muted head">Sensors</text>
+  <text x="790" y="24" class="muted head">What the sensor's page says</text>
+
+  <!-- ===== CN4 (black) ===== -->
+  <rect x="20" y="40" width="230" height="62" rx="6" class="cn4"/>
+  <text x="32" y="60" class="fg head">CN4 (black)</text>
+  <text x="32" y="86" class="fg">pin 14 · 5V Sensor 1</text>
+  <circle cx="250" cy="81" r="5" class="pin"/>
+
+  <!-- ===== CN3 (blue) ===== -->
+  <rect x="20" y="130" width="230" height="330" rx="6" class="cn3"/>
+  <text x="32" y="152" class="fg head">CN3 (blue)</text>
+  <text x="32" y="186" class="fg">pin 27 · AV1</text>
+  <text x="32" y="226" class="fg">pin 10 · GND</text>
+  <text x="32" y="306" class="fg">pin 14 · AT1</text>
+  <text x="32" y="346" class="fg">pin 11 · GND</text>
+  <text x="32" y="426" class="fg">pin 21 · DIG3</text>
+  <circle cx="250" cy="181" r="5" class="pin"/>
+  <circle cx="250" cy="221" r="5" class="pin"/>
+  <circle cx="250" cy="301" r="5" class="pin"/>
+  <circle cx="250" cy="341" r="5" class="pin"/>
+  <circle cx="250" cy="421" r="5" class="pin"/>
+
+  <!-- ===== wires ===== -->
+  <!-- 5 V reference, O/W -->
+  <path d="M255 81 H380 V91 H520" class="case"/>
+  <path d="M255 81 H380 V91 H520" class="w-ow"/>
+  <path d="M255 81 H380 V91 H520" class="stripe-w"/>
+  <text x="300" y="72" class="muted">O/W orange/white</text>
+  <!-- MAP signal, G/B -->
+  <path d="M255 181 H380 V141 H520" class="case"/>
+  <path d="M255 181 H380 V141 H520" class="w-gb"/>
+  <path d="M255 181 H380 V141 H520" class="stripe-b"/>
+  <text x="270" y="172" class="muted">G/B green/black</text>
+  <!-- MAP ground, B -->
+  <path d="M255 221 H400 V191 H520" class="case"/>
+  <path d="M255 221 H400 V191 H520" class="w-b"/>
+  <text x="270" y="241" class="muted">B black</text>
+  <!-- CLT signal, Gy/B -->
+  <path d="M255 301 H520" class="case"/>
+  <path d="M255 301 H520" class="w-gy"/>
+  <path d="M255 301 H520" class="stripe-b"/>
+  <text x="270" y="292" class="muted">Gy/B grey/black</text>
+  <!-- CLT ground, B -->
+  <path d="M255 341 H520" class="case"/>
+  <path d="M255 341 H520" class="w-b"/>
+  <text x="270" y="362" class="muted">B black</text>
+  <!-- clutch switch, O/R -->
+  <path d="M255 421 H520" class="case"/>
+  <path d="M255 421 H520" class="w-or"/>
+  <path d="M255 421 H520" class="stripe-r"/>
+  <text x="270" y="412" class="muted">O/R orange/red</text>
+
+  <!-- ===== sensors ===== -->
+  <rect x="520" y="60" width="200" height="160" rx="6" class="box"/>
+  <text x="620" y="84" text-anchor="middle" class="fg head">MAP sensor</text>
+  <text x="532" y="96" class="muted">+5 V</text>
+  <text x="532" y="146" class="muted">signal</text>
+  <text x="532" y="196" class="muted">ground</text>
+  <text x="706" y="146" text-anchor="end" class="muted">3-wire</text>
+
+  <rect x="520" y="280" width="200" height="82" rx="6" class="box"/>
+  <text x="620" y="273" text-anchor="middle" class="fg head">Coolant sensor</text>
+  <text x="532" y="306" class="muted">signal</text>
+  <text x="532" y="346" class="muted">ground</text>
+  <text x="706" y="326" text-anchor="end" class="muted">2-wire</text>
+
+  <rect x="520" y="400" width="200" height="42" rx="6" class="box"/>
+  <text x="620" y="468" text-anchor="middle" class="fg head">Clutch switch</text>
+  <text x="532" y="426" class="muted">switch</text>
+  <path d="M720 421 H760" class="dash"/>
+  <text x="620" y="488" text-anchor="middle" class="muted">other side: chapter 11</text>
+
+  <!-- ===== studio settings ===== -->
+  <rect x="790" y="80" width="250" height="84" rx="6" class="tgt"/>
+  <text x="802" y="102" class="fg head">Manifold Pressure</text>
+  <text x="802" y="124" class="fg">Interface: <tspan class="head">Engine Sync Voltage</tspan></text>
+  <text x="802" y="146" class="fg">Source: <tspan class="head">AV1</tspan></text>
+
+  <rect x="790" y="280" width="250" height="84" rx="6" class="tgt"/>
+  <text x="802" y="302" class="fg head">Coolant Temperature</text>
+  <text x="802" y="324" class="fg">Interface: <tspan class="head">Analogue Voltage</tspan></text>
+  <text x="802" y="346" class="fg">Source: <tspan class="head">AT1</tspan></text>
+
+  <rect x="790" y="380" width="250" height="84" rx="6" class="tgt"/>
+  <text x="802" y="402" class="fg head">Clutch Pedal Switch</text>
+  <text x="802" y="424" class="fg">Interface: <tspan class="head">Digital</tspan></text>
+  <text x="802" y="446" class="fg">Source: <tspan class="head">DIG3</tspan></text>
+</svg>

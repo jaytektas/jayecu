@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 640" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Idle control signal flow</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- 1 target -->
+  <text x="20" y="28" class="muted head">1 · What speed to idle at</text>
+  <rect x="20" y="42" width="170" height="58" rx="6" class="tgt"/>
+  <text x="105" y="66" text-anchor="middle" class="fg head">Target RPM</text>
+  <text x="105" y="87" text-anchor="middle" class="muted">table · coolant</text>
+  <rect x="220" y="42" width="170" height="58" rx="6" class="tgt"/>
+  <text x="305" y="66" text-anchor="middle" class="fg">+ Start Target Offset</text>
+  <text x="305" y="87" text-anchor="middle" class="muted">run time</text>
+  <rect x="420" y="42" width="150" height="58" rx="6" class="tgt"/>
+  <text x="495" y="66" text-anchor="middle" class="fg">+ Idle Up RPM</text>
+  <text x="495" y="87" text-anchor="middle" class="muted">A/C, fans …</text>
+  <rect x="600" y="42" width="150" height="58" rx="6" class="tgt"/>
+  <text x="675" y="66" text-anchor="middle" class="fg">Rate limit</text>
+  <text x="675" y="87" text-anchor="middle" class="muted">rise / fall</text>
+  <path d="M190 71 H218" class="line" marker-end="url(#a)"/>
+  <path d="M390 71 H418" class="line" marker-end="url(#a)"/>
+  <path d="M570 71 H598" class="line" marker-end="url(#a)"/>
+  <path d="M750 71 H880 V148" class="line" marker-end="url(#a)"/>
+  <text x="760" y="62" class="mono muted">idle_target_rpm</text>
+
+  <!-- error and PID -->
+  <circle cx="880" cy="170" r="20" class="node"/>
+  <text x="880" y="176" text-anchor="middle" class="fg" font-size="20">−</text>
+  <text x="880" y="212" text-anchor="middle" class="mono muted">idle_rpm_error</text>
+  <path d="M860 170 H772" class="line" marker-end="url(#a)"/>
+  <rect x="560" y="140" width="210" height="64" rx="6" class="pid"/>
+  <text x="665" y="164" text-anchor="middle" class="fg head">PI(+D) trim</text>
+  <text x="665" y="186" text-anchor="middle" class="muted">Closed Loop, while idling</text>
+  <path d="M900 522 H1060 V170 H902" class="line" marker-end="url(#a)"/>
+  <text x="1068" y="330" class="mono muted" transform="rotate(90 1068 330)">rpm (measured)</text>
+
+  <!-- 2 air -->
+  <text x="20" y="252" class="muted head">2 · How much air</text>
+  <rect x="20" y="266" width="150" height="58" rx="6" class="ff"/>
+  <text x="95" y="290" text-anchor="middle" class="fg head">Base Duty</text>
+  <text x="95" y="311" text-anchor="middle" class="muted">table · coolant</text>
+  <rect x="190" y="266" width="150" height="58" rx="6" class="ff"/>
+  <text x="265" y="290" text-anchor="middle" class="fg">+ Start Base Offset</text>
+  <text x="265" y="311" text-anchor="middle" class="muted">+ Idle Up duty</text>
+  <rect x="360" y="266" width="160" height="58" rx="6" class="ff"/>
+  <text x="440" y="290" text-anchor="middle" class="fg">+ Throttle Follower</text>
+  <text x="440" y="311" text-anchor="middle" class="muted">+ Decel Offset</text>
+  <rect x="540" y="266" width="140" height="58" rx="6" class="ff"/>
+  <text x="610" y="290" text-anchor="middle" class="fg">+ Long-Term Trim</text>
+  <text x="610" y="311" text-anchor="middle" class="muted">learned, per coolant</text>
+  <circle cx="720" cy="295" r="20" class="node"/>
+  <text x="720" y="301" text-anchor="middle" class="fg" font-size="20">+</text>
+  <path d="M170 295 H188" class="line" marker-end="url(#a)"/>
+  <path d="M340 295 H358" class="line" marker-end="url(#a)"/>
+  <path d="M520 295 H538" class="line" marker-end="url(#a)"/>
+  <path d="M680 295 H698" class="line" marker-end="url(#a)"/>
+  <path d="M665 204 V240 H720 V273" class="line" marker-end="url(#a)"/>
+  <rect x="770" y="266" width="200" height="58" rx="6" class="box"/>
+  <text x="870" y="290" text-anchor="middle" class="fg">Clamp</text>
+  <text x="870" y="311" text-anchor="middle" class="muted">Min Output … Max Duty</text>
+  <path d="M740 295 H768" class="line" marker-end="url(#a)"/>
+
+  <!-- overrides -->
+  <rect x="740" y="350" width="260" height="72" rx="6" class="safe"/>
+  <text x="870" y="374" text-anchor="middle" class="fg head">Overrides</text>
+  <text x="870" y="394" text-anchor="middle" class="muted">below Stall Save RPM: Max Duty</text>
+  <text x="870" y="412" text-anchor="middle" class="muted">MAP above Boost Close: 0 %</text>
+  <path d="M870 324 V348" class="line" marker-end="url(#a)"/>
+  <text x="880" y="446" class="mono muted">idle_duty</text>
+
+  <!-- 3 actuator -->
+  <text x="20" y="470" class="muted head">3 · What moves the air</text>
+  <path d="M870 422 V460 H190 V488" class="line" marker-end="url(#a)"/>
+  <path d="M470 460 V488" class="line" marker-end="url(#a)"/>
+  <path d="M760 460 V488" class="line" marker-end="url(#a)"/>
+  <rect x="60" y="490" width="260" height="64" rx="6" class="box"/>
+  <text x="190" y="514" text-anchor="middle" class="fg head">PWM idle valve</text>
+  <text x="190" y="536" text-anchor="middle" class="muted">an output given idle_duty (ch. 18)</text>
+  <rect x="340" y="490" width="260" height="64" rx="6" class="box"/>
+  <text x="470" y="514" text-anchor="middle" class="fg head">Stepper idle valve</text>
+  <text x="470" y="536" text-anchor="middle" class="muted">Idle Stepper, both H-bridges</text>
+  <rect x="620" y="490" width="280" height="64" rx="6" class="box"/>
+  <text x="760" y="514" text-anchor="middle" class="fg head">Electronic throttle</text>
+  <text x="760" y="536" text-anchor="middle" class="muted">idle floor × Idle Authority (ch. 22)</text>
+
+  <!-- ignition -->
+  <rect x="20" y="578" width="600" height="46" rx="6" class="pid"/>
+  <text x="320" y="598" text-anchor="middle" class="fg head">Ignition Correction · timing vs idle RPM error, while idling</text>
+  <text x="320" y="616" text-anchor="middle" class="mono muted">idle_ign_corr → added to spark advance (ch. 20)</text>
+</svg>
