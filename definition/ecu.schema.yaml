@@ -6006,7 +6006,7 @@ modules:
           - Falling
           - Both
           default: 0
-          help: 'Which edge of this input the capture takes. A GAP or SEQUENCE stream counts EVERY event it is handed, so Both doubles the events per tooth and the pattern must then be described in those terms — it is not a way to be more tolerant. WIDTH always measures both edges (it needs the high time) and reads this only as which edge LEADS the pulse: Falling means the pulse is low-going.'
+          help: 'Which edge of this input the capture takes. A GAP or SEQUENCE stream counts EVERY event it is handed, so Both doubles the events per tooth and the pattern must then be described in those terms — it is not a way to be more tolerant. Only the edges selected here are captured or believed, for every pattern: pick the edges the signal makes reliably. A VR input (MAX9924) makes its RISING edge at the zero crossing and its falling edge wherever a threshold re-armed from the last pulse lands, so on VR choose Rising. A WIDTH stream on Rising or Falling takes every selected edge as its reference (one pulse per cycle; nothing can measure a width from one edge, so WIDTH min/max are not applied); on Both it measures the width between the edges and uses it to pick out the reference, timed from the rising edge.'
         - name: primitive
           type: enum
           label: Primitive
@@ -6061,7 +6061,7 @@ modules:
           min: 0
           max: 7200
           default: 0
-          help: 'WIDTH only. The narrowest pulse, in degrees of stream angle, that counts as THE reference. Width is measured as an ANGLE rather than a time, so one band holds across the rev range. A pulse outside [min, max] is ignored outright — it neither anchors nor breaks an existing lock — so the band wants to be wide enough for real jitter and narrow enough to exclude every other pulse on the wheel.'
+          help: 'WIDTH only, and only with Edge = Both (a width needs both edges to be reliable; on Rising or Falling every selected edge is the reference). The narrowest pulse, in degrees of stream angle, that counts as THE reference. Width is measured as an ANGLE rather than a time, so one band holds across the rev range. A pulse outside [min, max] is ignored outright — it neither anchors nor breaks an existing lock — so the band wants to be wide enough for real jitter and narrow enough to exclude every other pulse on the wheel.'
         - name: width_max
           type: int16
           units: deg

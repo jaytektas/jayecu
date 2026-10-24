@@ -53,6 +53,11 @@ public:
         }
     }
 
+    // A pulse on ONE reliable edge: no width can be measured (the other edge is not to be relied on), so the
+    // edge itself is the reference. Only a stream whose pattern is one pulse per period may be read this way —
+    // which is every WIDTH entry in the wheel library (width 0..720 deg: the width never decided anything).
+    void accept_edge() noexcept { locked_ = true; angle_ = target_; matched_ = true; last_width_ = 0; }
+
     // WHERE THE ENGINE IS *NOW*, as opposed to where the pulse STARTED.
     //
     // angle() reports target_ — the angle of the pulse's REFERENCE (leading) edge — but a width can

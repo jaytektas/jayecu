@@ -169,6 +169,40 @@ int main() {
     // edge moves with every change of speed and comes late after a weak pulse. Four P0341s on four drives,
     // each a stab through ~1500 rpm, each with no rejected edge: the decoder timed the cam from the falling
     // edge and counted it overdue. It must time a WIDTH cam from the edge `edge` names.
+    SECTION("VR single-pulse cam on RISING only: every rising edge is the reference, the falling edge is never seen");
+    {
+        // What Kelly's tune says: Edge = Rising. Only the zero crossing is captured, so there is no width to
+        // measure and none is needed: one pulse per cycle, and that edge is it.
+        auto run = [](bool drop_one, int jitter_tenths) {
+            GenericTrigger g;
+            uint8_t gi[1] = {0}, gr[1] = {3};
+            int cr  = g.add_gap(0, 2, 36, gi, gr, 1, 25);
+            int cam = g.add_width(2, REPEATS_PHASE, 0, 7200, 3600, true, /*both_edges*/false);
+            g.set_phase_meta(2, 4950, false, 0, 450);
+            struct E { uint32_t tick; int idx; };
+            std::vector<E> ev;
+            for (int c = 0; c < 40; c++) {
+                for (int rev = 0; rev < 2; rev++) for (int slot = 0; slot < 36; slot++) {
+                    if (slot >= 34) continue;
+                    ev.push_back({(uint32_t)((c*7200 + rev*3600 + slot*100)*K), cr});
+                }
+                if (drop_one && c == 30) continue;
+                const int j = (c % 3 - 1) * jitter_tenths;                    // a little honest wander
+                ev.push_back({(uint32_t)((c*7200 + 4950 + j)*K), cam});
+            }
+            std::stable_sort(ev.begin(), ev.end(), [](const E& a, const E& b) { return a.tick < b.tick; });
+            for (auto& e : ev) g.on_edge((uint8_t)e.idx, e.tick, true);
+            return std::make_tuple(g.phase_lost_total(), g.noise_total(), g.level(), (int)g.phase_residual(2));
+        };
+        const auto [lost, noise, lvl, resid] = run(false, 30);
+        fprintf(stdout, "    rising only: phase lost %u, noise %u, level %d, residual %d\n", lost, noise, (int)lvl, resid);
+        CHECK(lost == 0); CHECK(noise == 0); CHECK(lvl == SyncLvl::PHASE);
+        CHECK(resid >= -40 && resid <= 40);
+        const auto [lost2, n2, l2, r2] = run(true, 0);
+        (void)n2; (void)l2; (void)r2;
+        CHECK(lost2 >= 1);                                                      // a pulse that never comes is still lost
+    }
+
     SECTION("VR single-pulse cam: a wandering FALLING edge never costs phase; the RISING edge times the cam");
     {
         auto run = [](std::vector<int> close_after_deg, bool drop_one) {

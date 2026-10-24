@@ -66,7 +66,7 @@ inline void build_generic(GenericTrigger& g,
             g.add_seq(i, rate, cell, nc, c.window_pct);
         } else {                                          // WIDTH (pulse-width id)
             const bool lead_rising = (c.edge != 1);       // 0 rising / 1 falling / 2 both
-            g.add_width(i, rate, c.width_min, c.width_max, c.width_target, lead_rising);
+            g.add_width(i, rate, c.width_min, c.width_max, c.width_target, lead_rising, c.edge == 2);
         }
     }
 }

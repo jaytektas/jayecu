@@ -156,12 +156,15 @@ public:
     }
     // WIDTH stream: identify a reference pulse by angular width. Fed BOTH edges via on_edge's
     // `rising` flag (leading edge opens the window, the other closes it → high-time).
+    // both_edges: the user selected BOTH edges as reliable, so the width can be measured and identifies the
+    // reference. Otherwise only the leading edge (`leading_rising`) is captured and every one IS the reference.
     int add_width(int slot, StreamRepeats repeats, AngleDeg10 min_deg10, AngleDeg10 max_deg10,
-                  AngleDeg10 target_angle, bool leading_rising = true) noexcept {
+                  AngleDeg10 target_angle, bool leading_rising = true, bool both_edges = true) noexcept {
         if (slot < 0 || slot >= MAX_STREAMS) return -1;
         const int i = slot; Stream& s = st_[i];
         if (i >= n_) n_ = i + 1;
-        s.enabled = true; s.kind = PrimKind::WIDTH; s.lead_rising_ = leading_rising; set_repeats(s, repeats);
+        s.enabled = true; s.kind = PrimKind::WIDTH; s.lead_rising_ = leading_rising; s.both_edges_ = both_edges;
+        set_repeats(s, repeats);
         s.window_pct_ = 25;
         s.width.configure(min_deg10, max_deg10, target_angle);
         if (repeats > REPEATS_PHASE) has_crank_ = true;
@@ -246,6 +249,17 @@ public:
         ++edges_total_;
         Stream& s = st_[idx];
         if (s.kind == PrimKind::WIDTH) {                 // measure high-time, feed at the trailing edge
+            // ONE SELECTED EDGE: it is the only edge there is to rely on, so it is the reference. The other is
+            // not captured (AssignmentResolver captures only the selected edge), so every edge here IS the
+            // selected one — and its reported direction is not consulted: it is read from the pin level when
+            // the interrupt runs, and a short pulse can already have ended by then.
+            if (!s.both_edges_) {
+                s.lead_tick_ = tick; s.lead_primed_ = true; s.lead_open_ = false;
+                s.lead_teeth_ = crank_teeth_; s.lead_crank_ = crank_angle_at(tick);
+                s.width.accept_edge();
+                fuse(idx, tick);
+                return;
+            }
             if (rising == s.lead_rising_) {
                 s.lead_tick_ = tick; s.lead_primed_ = true; s.lead_open_ = true;
                 s.lead_teeth_ = crank_teeth_; s.lead_crank_ = crank_angle_at(tick);
@@ -391,6 +405,7 @@ private:
         uint16_t   lead_teeth_ = 0;         // crank_teeth_ at the leading edge
         AngleDeg10 lead_crank_ = 0;         // crank cycle angle at the leading edge
         bool       lead_open_  = false;     // a pulse has opened and not yet closed
+        bool       both_edges_ = true;      // both edges selected (reliable): measure the width
         uint8_t    gidx_[MAX_ANOMALIES] = {}, gratio_[MAX_ANOMALIES] = {};   // GAP cell (copied)
         AngleDeg10 cell_[MAX_PATTERN_TEETH] = {};                            // SEQUENCE cell (copied)
         bool       locked()   const noexcept {

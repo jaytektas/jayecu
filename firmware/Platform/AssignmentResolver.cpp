@@ -28,22 +28,15 @@ void descriptor_to_assignment(const BoardProfile&    profile,
         if (taken[st.capture_index]) continue;                          // first claim wins
         taken[st.capture_index] = true;
         ICaptureChannel* ch    = profile.capture_resources[st.capture_index].channel;
-        // A WIDTH STREAM ALWAYS CAPTURES BOTH EDGES, whatever `edge` says. It identifies its
-        // reference by PULSE LENGTH, so it needs the high time, so it needs the closing edge — and
-        // `edge` means something different here: it says which edge LEADS the pulse (Falling = the
-        // pulse is low-going), which is a property of the signal, not a capture setting. The schema
-        // has always documented exactly that; this took the field literally anyway and handed the
-        // hardware RISING, so the matcher was fed opening edges with no closes, never measured a
-        // width, never locked, and never became absolute.
-        //
-        // The symptom is quiet and points the wrong way: the cam edges ARE captured and show up in
-        // the engine-cycle view, sync sits at CRANK for ever, and the error counters read zero —
-        // because nothing is being REJECTED. Nothing is being decoded. A 36-2 crank plus a
-        // single-pulse cam on the bench sat at sync level 1 with a perfectly good cam signal on the
-        // pin, and everything downstream that needs phase (sequential fuel, wasted-spark pairing,
-        // the cycle view's second revolution) silently did without it.
-        const CaptureEdge edge = (st.primitive == 2) ? CaptureEdge::BOTH
-                                                     : static_cast<CaptureEdge>(st.edge);
+        // ONLY THE EDGES THE USER SELECTED ARE CAPTURED — for every primitive. `edge` is a statement about
+        // the SIGNAL: which of its edges sit where they should. On a VR input that is the zero crossing
+        // alone (the MAX9924 makes its rising edge there and its falling edge wherever a threshold re-armed
+        // from the last pulse's peak happens to fall), so Rising means "the falling edge is not to be relied
+        // on", not "start the pulse on rising". A WIDTH stream used to capture both edges whatever this said
+        // and time its cam from the closing one: Kelly's Hilux lost phase (P0341) on every stab through the
+        // phase-sync rpm. A WIDTH stream on one edge takes every selected edge as its reference (nothing
+        // measures a width from one edge — see GenericTrigger::add_width); on Both it measures the width.
+        const CaptureEdge edge = static_cast<CaptureEdge>(st.edge);
         const int crank_slot = crank_slot_of(s);
         const int cam_slot   = cam_slot_of(s);
         if (crank_slot == 0)      { out.crank_primary   = ch; out.crank_primary_edge   = edge; }

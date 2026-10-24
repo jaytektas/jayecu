@@ -9,14 +9,15 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
-- A cam with one pulse per cycle on a VR input (the 2JZ / 1JZ front or rear cam, and any cam using a pulse-width
-  pattern) is now timed from the edge set in Edge, the rising edge on these boards. That's the VR zero crossing,
-  which sits on the tooth. It used to be timed from the pulse's closing edge, which a VR interface makes wherever
-  the signal crosses a threshold re-armed from the previous pulse. That edge moves with every change of speed and
-  comes late after a weaker pulse. A stab through the cam's phase-sync rpm read it as a cam that hadn't arrived:
-  phase lost (P0341), a moment on wasted spark, then a re-sync. The cam position (VVT angle) is also measured at
-  that edge, so it no longer moves with the closing edge. The closing edge still measures the pulse width that
-  identifies the reference pulse.
+- Trigger inputs use only the edges selected in Edge. A pulse-width cam (the 2JZ / 1JZ front or rear cam, and every
+  "+ cam" wheel) used to capture both edges whatever Edge said, and timed itself from the pulse's closing edge.
+  On a VR input that edge is where the signal crosses a threshold re-armed from the last pulse, so it moves with
+  every change of speed and comes late after a weaker pulse. A quick stab through the cam's phase-sync rpm read
+  that as a cam that hadn't arrived: phase lost (P0341), a moment on wasted spark, then a re-sync. Now:
+  - With Edge on Rising or Falling, only that edge is captured, and each one is the cam's reference. On a VR
+    input that's the zero crossing, which sits on the tooth. WIDTH min/max don't apply.
+  - With Edge on Both, the width is measured and picks out the reference, which is timed from the rising edge.
+  The VVT angle is measured at the same edge.
 - VVT cam angles (VVT Cam 1-4 Advance) are published in degrees. They were in tenths of a degree, so a cam 4.3°
   from nominal read 43°, and cam control would have closed its loop on a value ten times too large.
 
