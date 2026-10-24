@@ -66,6 +66,9 @@ public:
     void setLabel(const std::string& l);
     std::string currentTune()    const { return j_["current_tune"].str(); }
     std::string lastActiveTune() const { return j_["last_active_tune"].str(); }
+    // THE TUNE OPEN ECU OPENS: the one on the hardware. current_tune when its file exists, else the last
+    // one worked on, else the most recently written. Empty only when the ECU has no tunes at all.
+    std::string ecuTune()        const;
     std::string lastSeen()       const { return j_["last_seen"].str(); }
 
     std::string dir()            const { return dir_; }

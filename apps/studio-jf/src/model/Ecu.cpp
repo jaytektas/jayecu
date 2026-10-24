@@ -69,6 +69,29 @@ std::vector<std::string> Ecu::tuneNames() const
 }
 
 
+// WHY NOT ASK. Open ECU used to list every tune and make the user choose, and the list was a trap: the
+// one on the ECU sat among older tunes whose files were written later (opening a tune auto-saves it), so
+// the newest-looking entry was the stale one. The studio already knows which tune the ECU carries — it
+// records it each time a connection settles — so Open ECU opens that, and File > Open Tune is the way
+// to any other.
+std::string Ecu::ecuTune() const
+{
+    const std::vector<std::string> names = tuneNames();
+    const auto has = [&names](const std::string &n) {
+        return !n.empty() && std::find(names.begin(), names.end(), n) != names.end();
+    };
+    if (has(currentTune()))    return currentTune();
+    if (has(lastActiveTune())) return lastActiveTune();
+    std::string newest;
+    fs::file_time_type at{};
+    std::error_code ec;
+    for (const std::string &n : names) {
+        const auto t = fs::last_write_time(dir_ + "/tunes/" + n + ".tune", ec);
+        if (!ec && (newest.empty() || t > at)) { newest = n; at = t; }
+    }
+    return newest;
+}
+
 std::vector<uint8_t> Ecu::loadTune(const std::string &name) const
 {
     return readAllBytes(dir_ + "/tunes/" + name + ".tune");

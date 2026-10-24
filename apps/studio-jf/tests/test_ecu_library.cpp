@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -48,6 +49,23 @@ int main() {
     ck(s.uid == uid && s.board == "jaytek_v1", "seen once, it names the ECU and its board", s.uid + " " + s.board);
     ck(Ecu::byDfuSerial("").uid.empty(), "an empty serial names nothing");
     ck(Ecu::byDfuSerial("000000000000").uid.empty(), "nor does another bootloader");
+
+    std::printf("=== the tune Open ECU opens ===\n");
+    {
+        std::unique_ptr<Ecu> e(Ecu::open(uid));
+        ck(e && e->ecuTune().empty(), "no tunes: nothing to open");
+        const std::vector<uint8_t> b{ 1, 2, 3 };
+        e->saveTune("old", b);
+        e->saveTune("on-ecu", b);
+        e->saveTune("stale-but-newer", b);    // written last, as opening an old tune does
+        ck(e->ecuTune() == "stale-but-newer", "nothing recorded: the most recently written", e->ecuTune());
+        e->setLastActiveTune("old");
+        ck(e->ecuTune() == "old", "the last one worked on beats the newest file", e->ecuTune());
+        e->setCurrentTune("on-ecu");
+        ck(e->ecuTune() == "on-ecu", "the one on the ECU beats both", e->ecuTune());
+        e->setCurrentTune("deleted");
+        ck(e->ecuTune() == "old", "a recorded tune whose file is gone is skipped", e->ecuTune());
+    }
 
     fs::remove_all(home, ec);
     std::printf(fails ? "=== %d FAILED ===\n" : "=== the library knows its boards ===\n", fails);

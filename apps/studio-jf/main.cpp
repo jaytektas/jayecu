@@ -1843,8 +1843,9 @@ int main(int argc, char** argv) {
 
         std::vector<std::string> labels, kinds, names;
         for (const std::string& n : ecu->tuneNames()) {
-            const bool open = (n == activeTuneName);
-            labels.push_back((open ? "\xE2\x97\x8F " : "   ") + n + (open ? "   (open)" : ""));
+            const bool open = (n == activeTuneName), onEcu = (n == ecu->currentTune());
+            labels.push_back((open ? "\xE2\x97\x8F " : "   ") + n + (open ? "   (open)" : "")
+                             + (onEcu ? "   (on the ECU)" : ""));
             kinds.push_back("tune");
             names.push_back(n);
         }
@@ -2212,15 +2213,14 @@ int main(int argc, char** argv) {
             seedAndOpen(metaPath);
             return;
         }
-        // NEXT FRAME. This runs inside the ECU picker's own accept callback, and a modal that is
-        // mid-close swallows one opened from under it — so picking an ECU dismissed the list and
-        // nothing else ever appeared. File ▸ Open ECU… could not open a project at all.
-        jf::jPostToNextFrame([&win, opened, tunes, openTune] {
-        win.openModal<ListPickerDialog>(std::string("Choose a tune"), tunes, false,
-            std::function<void(int, std::string)>([&win, opened, tunes, openTune](int ti, std::string) {
-                if (ti < 0 || ti >= static_cast<int>(tunes.size())) return;
-                if (g_openProject) g_openProject(opened, tunes[ti]);
-            }));
+        // THE ECU'S OWN TUNE, NOT A LIST. This used to ask "Choose a tune" from every tune the ECU had,
+        // and the one on the hardware sat among older ones whose files were written later. The studio
+        // knows which it is (Ecu::ecuTune), so it opens that; File ▸ Open Tune reaches any other.
+        // Next frame: this runs inside the ECU picker's own accept callback, and a project opened while
+        // that modal is mid-close is swallowed.
+        const std::string tune = opened->ecuTune();
+        jf::jPostToNextFrame([opened, tune] {
+            if (g_openProject) g_openProject(opened, tune);
         });
     };
     // Open ECU…: browse the local ECU library → pick an ECU → open it.
@@ -3152,17 +3152,23 @@ int main(int argc, char** argv) {
 
         // RECONCILE — the shared routine, so this path asks exactly what the native one asks.
         reconcileTune(win, targetTune, localImg, img, &meta, target,
-            [goLive, abandon, img, localImg, targetTune, &win](JTuneSync d) {
+            [goLive, abandon, img, localImg, targetTune, target, &win](JTuneSync d) {
+                // Every answer but Cancel (and a failed push, which abandons) leaves the ECU carrying
+                // targetTune: the one Open ECU opens next time.
+                const auto mark = [target, targetTune] { if (target) target->setCurrentTune(targetTune); };
                 switch (d) {
                     case JTuneSync::NothingLocal:                 // first connect to this ECU
                         goLive(img, /*saveAfter=*/false);
+                        mark();
                         break;
                     case JTuneSync::InSync:
                         goLive(img, /*saveAfter=*/false);
+                        mark();
                         win.showStatus("\xE2\x97\x8F In sync \xC2\xB7 " + targetTune, 4000);
                         break;
                     case JTuneSync::Pull:
                         goLive(img, /*saveAfter=*/true);
+                        mark();
                         win.showStatus("Pulled the ECU image into \"" + targetTune + "\"", 4000);
                         break;
                     case JTuneSync::Push: {
@@ -3174,6 +3180,7 @@ int main(int argc, char** argv) {
                         // rather than going live over bytes of unknown provenance.
                         if (!burned) { abandon("Push FAILED \xC2\xB7 " + tsLink.lastError()); break; }
                         goLive(localImg, /*saveAfter=*/false);
+                        mark();
                         win.showStatus("Pushed \"" + targetTune + "\" to the ECU", 4000);
                         break;
                     }
@@ -6569,6 +6576,9 @@ int main(int argc, char** argv) {
         };
         reconcileTune(win, activeTuneName, candidate, img, m, ecu,
             [&win, &connectBtn, img, candidate, m, saveActiveTune, pullLearned](JTuneSync d) {
+                // Every answer but Cancel leaves the ECU and the active tune the same calibration, so
+                // that tune is now the ECU's: the one Open ECU opens next time.
+                if (d != JTuneSync::Cancel && ecu && !activeTuneName.empty()) ecu->setCurrentTune(activeTuneName);
                 switch (d) {
                     case JTuneSync::NothingLocal:
                         JLOGC("ui.connect", jf::JLogLevel::Info) << "no comparable local tune \xE2\x86\x92 adopting ECU image ("
