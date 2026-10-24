@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.20
 - Trigger inputs use only the edges selected in Edge. A pulse-width cam (the 2JZ / 1JZ front or rear cam, and every
   "+ cam" wheel) used to capture both edges whatever Edge said, and timed itself from the pulse's closing edge.
   On a VR input that edge is where the signal crosses a threshold re-armed from the last pulse, so it moves with
