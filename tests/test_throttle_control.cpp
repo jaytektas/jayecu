@@ -1,5 +1,6 @@
 #include "test_helpers.h"
 #include "../firmware/Engine/Modules/ElectronicThrottle.h"
+#include "../firmware/Engine/Modules/StartControl.h"   // the start sequence waits on start_proven()
 #include <algorithm>
 #include "../firmware/Signal/EnginePosition.h"
 #include "../firmware/Signal/SignalBus.h"
@@ -508,6 +509,62 @@ int main() {
         }
         CHECK(!cut_running);
         CHECK(static_cast<int>(bus2.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_READY);
+    }
+
+    SECTION("the start sequence holds a press until the key-on check has passed, then asks for the crank");
+    {
+        // The starter used to read the button (or `etb_state_1 == 2` written into its condition by hand). A
+        // press during the blade test now waits for it, and the crank follows the pass without a second press.
+        ElectronicThrottleConfig cfg = make_cfg();
+        cfg.etb[0].kp = 1.0f; cfg.etb[0].ki = 2.0f;
+        ElectronicThrottle tc; SignalBus bus;
+        DtcManager dtc; tc.set_dtc(&dtc);
+        calibrate(tc, bus, cfg);
+        cfg.etb[0].relax_pct = g_config.electronic_throttle.etb[0].relax_pct;
+        StartControlConfig sc_cfg{};
+        sc_cfg.prime_enable = 0; sc_cfg.give_up_ms = 8000;
+        StartControl sc; sc.init(sc_cfg, &tc);
+        float start_sw = 0.0f;
+        auto frame = [&]() {
+            bus.set(SIG_TPS, g_plate, true, g_ms); bus.set(SIG_AUX_1, g_plate, true, g_ms);
+            bus.set(SIG_ENGINE_STATE, 0.0f, true, g_ms);
+            bus.set(SIG_START_SW, start_sw, true, g_ms);
+            bus.expire_stale(g_ms);
+            run(tc, bus, 10); plant_step(bus.get(SIG_ETB_DUTY_1));
+            EnginePosition pos{}; EngineFrame fr{};
+            sc.update(pos, bus, fr);
+        };
+        auto state = [&]() { return static_cast<int>(bus.get(SIG_ETB_STATE_1)); };
+        g_system_active = false; for (int i = 0; i < 20; i++) frame();
+        g_system_active = true;
+        bool sweeping = false;
+        for (int i = 0; i < 300 && !sweeping; i++) { frame(); sweeping = state() == ElectronicThrottle::ST_AUTOCAL; }
+        CHECK(sweeping);
+        start_sw = 1.0f; frame(); start_sw = 0.0f;                 // a tap, mid-sweep
+        bool early = false, waited = false;
+        for (int i = 0; i < 600 && state() != ElectronicThrottle::ST_READY; i++) {
+            frame();
+            if (state() != ElectronicThrottle::ST_READY) {
+                if (bus.get_bool(SIG_CRANK_REQ)) early = true;
+                if (static_cast<int>(bus.get(SIG_START_STATE)) == StartControl::WAIT_THROTTLE) waited = true;
+            }
+        }
+        CHECK(!early);                                             // never asked to crank into the sweep
+        CHECK(waited);
+        CHECK(state() == ElectronicThrottle::ST_READY);
+        CHECK(bus.get_bool(SIG_CRANK_REQ));                        // passed: the latched tap becomes the crank
+
+        // …and the pass is THIS key cycle's: a press read in the key-on frame, before the throttle module has
+        // seen the key, must not find the last cycle's pass still standing.
+        g_system_active = false; for (int k = 0; k < 20; k++) frame();
+        CHECK(!bus.get_bool(SIG_CRANK_REQ));
+        g_system_active = true;
+        start_sw = 1.0f;
+        bus.set(SIG_START_SW, 1.0f, true, g_ms);
+        { EnginePosition pos{}; EngineFrame fr{}; sc.update(pos, bus, fr); }   // start sequence first this frame
+        CHECK(!tc.start_proven());
+        CHECK(!bus.get_bool(SIG_CRANK_REQ));
+        start_sw = 0.0f;
     }
 
     SECTION("a default 2-point sensor cal is NOT a findlimits — the loop stays open");

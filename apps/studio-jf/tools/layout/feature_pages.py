@@ -222,6 +222,20 @@ FEATURES = [
       ('MAP', 'map', '%.0f'), ('Throttle', 'tps', '%.1f'), ('Air Temp', 'iat', '%.0f')],
      'Ramps the pump between a start and a full-flow boost pressure.'),
 
+    # NO SWITCH OF ITS OWN: the throttle half of the wait always applies (the interlock already refuses fuel and
+    # spark to a crank on an unproven throttle; this only stops the starter turning for nothing), so the page
+    # is never hidden. Prime Before Crank switches the fuel half.
+    ('Engine Start', 'start_control', 'Configuration/Engine Functions/Engine Start',
+     [('Fuel Before Crank', ['prime_enable', 'press_src', 'min_press_kpa', 'max_wait_ms', 'prime_ms']),
+      ('Waiting', ['give_up_ms'])],
+     [('Start Sequence', 'start_state', '%.0f'), ('Crank Request', 'crank_req', '%.0f'),
+      ('Start Pump', 'start_pump', '%.0f'), ('Fuel Pressure', 'fuel_pressure', '%.0f'),
+      ('Start Button', 'start_sw', '%.0f'), ('Throttle A State', 'etb_state_1', '%.0f')],
+     'A press of the start button is held until the engine is fit to crank: every electronic throttle has '
+     'passed its key-on check, and the fuel pump has brought the rail up. The starter output reads Crank '
+     'Request rather than the button, and the fuel pump output runs on Start Pump — the Starter Motor '
+     'and Fuel Pump templates both do, so re-run the output wizard on each to take it.'),
+
     ('Anti-Lag', 'anti_lag', 'Configuration/Engine Functions/Anti-Lag',
      [('Arming', ['arm_sig', 'min_rpm', 'max_tps']), ('Action', ['retard_deg', 'max_time_ms'])],
      [('Anti-Lag Active', 'antilag_active', '%.0f'), ('Engine RPM', 'rpm', '%.0f'),

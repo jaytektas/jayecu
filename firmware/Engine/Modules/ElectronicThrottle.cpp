@@ -129,6 +129,15 @@ void ElectronicThrottle::set_manual(uint8_t etb, float pct, uint32_t hold_ms) no
     manual_until_ms_[etb] = (until == 0) ? 1u : until;
 }
 
+bool ElectronicThrottle::start_proven() const noexcept {
+    if (!cfg_) return true;
+    // key_prev_: this module has seen the key on, so a pass from the LAST key cycle has been forgotten. A
+    // caller running earlier in the key-on frame would otherwise read that stale pass as this cycle's.
+    for (unsigned i = 0; i < N; i++)
+        if (cfg_->etb[i].enabled && (!calibrated_[i] || !key_prev_)) return false;
+    return true;
+}
+
 // ONE ROUTINE AT A TIME, ACROSS BOTH BODIES. The sweep and autotune accumulators (ff_down_/ff_up_,
 // the at_* relay measurements, ff_prev_pos_) are single-instance by design, tagged with ff_etb_/at_etb_
 // to say whose they are -- and nothing stopped a second body claiming them mid-sweep. Starting a
@@ -879,14 +888,9 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
     // body that has not proved itself since the key went on holds fuel and spark off. A RUNNING engine is
     // never cut here: this refuses a start, it does not stall a car on the move after a mid-drive fault or
     // an ECU restart (those keep the limp-home spring, and their own codes).
-    if (key_on && engine_state != EngineRunState::RUNNING) {
-        bool unproven = false;
-        for (unsigned i = 0; i < N; i++)
-            if (cfg_->etb[i].enabled && !calibrated_[i]) unproven = true;
-        if (unproven) {
-            bus.set_bool(wk::ign_cut,  true, now, ttl());
-            bus.set_bool(wk::fuel_cut, true, now, ttl());
-        }
+    if (key_on && engine_state != EngineRunState::RUNNING && !start_proven()) {
+        bus.set_bool(wk::ign_cut,  true, now, ttl());
+        bus.set_bool(wk::fuel_cut, true, now, ttl());
     }
 
     for (unsigned i = 0; i < N; i++) {

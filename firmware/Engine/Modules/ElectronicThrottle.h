@@ -68,6 +68,11 @@ public:
     // The one error table — the L2 supervisor raises throttle P-codes (feedback / stuck) into it.
     void set_dtc(DtcManager* d) noexcept { dtc_ = d; }
 
+    // EVERY ENABLED BODY HAS PASSED ITS KEY-ON CHECK — the same test the start interlock holds fuel and
+    // spark on, so the start sequence (StartControl) can hold the starter for it instead of cranking into it.
+    // True with no body enabled.
+    bool start_proven() const noexcept;
+
     // ETB state-machine values published on etb_state_N.
     enum State : uint8_t { ST_UNCAL = 0, ST_AUTOCAL = 1, ST_READY = 2, ST_FAULT = 3 };
 

@@ -336,11 +336,11 @@ run. With this firmware they are:
 
 | Template | Kind | Value | Fails | What it asks for |
 |---|---|---|---|---|
-| **Fuel Pump** | Digital | Fixed 100 % | Off | **Prime Time** (3 s), **Stop After** (1500 ms without a trigger tooth) |
+| **Fuel Pump** | Digital | Fixed 100 % | Off | **Prime Time** (3 s), **Stop After** (1500 ms without a trigger tooth); also runs while the start sequence asks for pressure (**Start Pump** `start_pump`) |
 | **Thermo Fan** | Digital | Fixed 100 % | On | **Switch On Above** (95 °C), **Switch Off Below** (90 °C); 5 s minimum on and off |
 | **Thermo Fan with A/C** | Digital | Fixed 100 % | On | the same, plus the A/C request as a reason to run |
 | **Variable-Speed Fan** | PWM 200 Hz | Generic Table 1 | On | switch-on and switch-off temperatures (92 / 86 °C); duty from the table |
-| **Starter Motor** | Digital | Fixed 100 % | Off | **Maximum Crank** (10 s), **Rest Before Retry** (3 s), **Release Above** (700 rpm: the starter lets go once the engine is running *and* above this); interlocks to tick: in neutral, clutch down, brake pressed |
+| **Starter Motor** | Digital | Fixed 100 % | Off | cranks on **Crank Request** `crank_req` (the start sequence, below), not the button itself; **Maximum Crank** (10 s), **Rest Before Retry** (3 s), **Release Above** (700 rpm: the starter lets go once the engine is running *and* above this); interlocks to tick: in neutral, clutch down, brake pressed |
 | **Main Relay** | Digital | Fixed 100 % | On | nothing: on whenever the ECU is awake |
 | **Shift Light** | Digital | Fixed 100 % | Off | **Light On Above** (6500 rpm), **Light Off Below** (6300 rpm) |
 | **Check Engine Light** | Digital | Fixed 100 % | On | **Bulb Check** (3 s): lit at key-on; then on for any current code or level 3, fast flash for level 2 and slow flash for level 1 once their codes have cleared |
@@ -382,6 +382,40 @@ any output's conditions.
     runs out. On a manual gearbox, keep at least one interlock (neutral or clutch) ticked and wired,
     or the car can be started in gear.
     <!-- src: definition/ecu.schema.yaml -->
+
+#### The start sequence (Engine Start)
+
+The Starter Motor and Fuel Pump templates work together through the start sequence, on
+**Configuration ▸ Engine Functions ▸ Engine Start**. A press of the start button is **held** until the
+engine is fit to crank, and only then does **Crank Request** `crank_req` come on for the starter:
+
+1. **Every electronic throttle has passed its key-on check** (chapter 22). Cranking during the check
+   only meets the interlock that holds fuel and spark off, so the starter waits for it instead.
+2. **The fuel rail is up** (**Prime Before Crank**, on by default). From the press, **Start Pump**
+   `start_pump` runs the fuel pump. A pump with no check valve bleeds the rail down after its key-on
+   prime, and the first crank, with the prime pulse, then goes into an empty rail.
+   - With a rail pressure sensor reading (**Rail Pressure Signal**, `fuel_pressure` by default), the
+     starter engages as soon as the rail reaches **Crank Above Pressure** (250 kPa gauge). A warm rail
+     that is still up does not wait at all. A rail that never gets there cranks anyway after
+     **Longest Pressure Wait** (3 s).
+   - With no reading (no sensor, unwired, or failed), the starter engages after **Prime Time** (1 s).
+     A dead sensor never stops the engine starting.
+
+A tap is enough: the press is latched while the sequence waits. Once the engine starts turning,
+Crank Request follows the button again, so holding it still gives another crank after **Rest Before
+Retry** and letting go does not. If the starter's own interlock refuses the crank (not in neutral),
+the request is dropped after 1.5 s rather than left waiting. Key-off or a running engine ends the
+sequence. If the engine is not fit to crank within **Give Up After** (8 s), for example because the
+throttle failed its check, the press is dropped; press again to retry.
+
+**Start Sequence** `start_state` shows what a press is waiting on: *Idle*, *Waiting for Throttle*,
+*Building Fuel Pressure* or *Cranking*. All three channels are in the default logs.
+
+The sequence only drives pins through the outputs that read it. A starter output set up before this
+firmware still reads the button: run the wizard on the starter and the fuel pump outputs to take the
+new conditions. A starter wired straight to the key is not affected; the most the ECU can do there
+is run the pump while it sees the start signal.
+<!-- src: firmware/Engine/Modules/StartControl.cpp; definition/ecu.schema.yaml (StartControl, output_templates) -->
 
 ### Step 5 — How Much: the value
 
@@ -562,7 +596,7 @@ These are the settings as the page shows them. Check each against your own wirin
 
     | Output | Template | Numbers | What you get |
     |---|---|---|---|
-    | HS1 "Fuel Pump" | Fuel Pump | Prime Time 3 s, Stop After 1500 ms | Digital, on for 3 s at key-on, then on while trigger teeth are arriving; off 1.5 s after the last tooth. Fails **off**. |
+    | HS1 "Fuel Pump" | Fuel Pump | Prime Time 3 s, Stop After 1500 ms | Digital, on for 3 s at key-on, on from a start press until the starter engages, then on while trigger teeth are arriving; off 1.5 s after the last tooth. Fails **off**. |
     | LS6 "Fan" | Thermo Fan | On Above 95 °C, Off Below 90 °C | Digital, on above 95 °C, off below 90 °C, at least 5 s on and 5 s off. Fails **on** if coolant temperature is lost. |
 
     The pump watches trigger teeth, not sync, so the rail is up before the decoder locks, and the pump

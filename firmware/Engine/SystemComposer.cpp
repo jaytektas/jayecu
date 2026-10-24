@@ -23,6 +23,7 @@ void SystemComposer::compose(EngineTask& task, CanBroker& can_broker,
     pit_limiter_.init(g_config.pit_limiter);
     nitrous_.init(g_config.nitrous);
     wmi_.init(g_config.wmi);
+    start_control_.init(g_config.start_control, &electronic_throttle_);   // waits on the throttle's key-on check
     anti_lag_.init(g_config.anti_lag);
     vvl_.init(g_config.vvl);
     egt_protect_.init(g_config.egt_protect);
@@ -145,6 +146,7 @@ void SystemComposer::compose(EngineTask& task, CanBroker& can_broker,
     // position PID; owns autocal + limp. No pin handling — publishes a duty HBridge realises.
     task.add_participant(&electronic_throttle_,  "throttle",  EngineTask::Phase::MODULE,
                          EngineTask::Cadence::KHZ_1, cadence::ElectronicThrottle);
+    task.add_participant(&start_control_, "start",     EngineTask::Phase::MODULE, EngineTask::Cadence::KHZ_1, cadence::StartControl);   // after the throttle (start_proven is this frame's answer): crank_req / start_pump for the starter and pump outputs
     // TransientThrottle on 1 kHz: throttle/MAP-movement transient (enrich + disenrich) needs a fast,
     // un-windowed source; publishes fuel_corr_accel + ign_corr_transient, which the per-cycle
     // FuelCalculator and Ignition aggregate off the bus.

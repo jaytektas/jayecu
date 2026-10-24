@@ -177,6 +177,7 @@ file(GLOB ENGINE_SRC
     ${FW_DIR}/Engine/Modules/PitLimiter.cpp
     ${FW_DIR}/Engine/Modules/Nitrous.cpp
     ${FW_DIR}/Engine/Modules/Wmi.cpp
+    ${FW_DIR}/Engine/Modules/StartControl.cpp
     ${FW_DIR}/Engine/Modules/AntiLag.cpp
     ${FW_DIR}/Engine/Modules/Vvl.cpp
     ${FW_DIR}/Engine/Modules/EgtProtect.cpp

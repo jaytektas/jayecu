@@ -133,6 +133,11 @@ enums:
   - {id: none, label: "None"}
   - {id: crank, label: "Crank"}
   - {id: phase, label: "Phase"}
+  start_sequence_state:              # StartControl's state (start_state): what a pressed start is waiting on
+  - {id: idle,     label: "Idle"}
+  - {id: throttle, label: "Waiting for Throttle"}
+  - {id: priming,  label: "Building Fuel Pressure"}
+  - {id: crank,    label: "Cranking"}
   bool_active:                       # shared by the 0/1 flag signals (no firmware enum — they publish 0/1)
   - {id: false, label: "Off"}
   - {id: true, label: "On"}
@@ -839,7 +844,7 @@ signals:
 - {id: abs_mode, label: "ABS Mode", category: "Sensors - Other", bus_type: float}
 - {id: ac_pressure, label: "Air Conditioner Pressure", category: "Sensors - Air Con", bus_type: float}
 - {id: ac_request, label: "Air Conditioner Request", category: "Sensors - Air Con", bus_type: float}
-- {id: start_sw, label: "Start Button", category: "Sensors - Chassis", bus_type: float}
+- {id: start_sw, label: "Start Button", category: "Sensors - Chassis", bus_type: float, owner: firmware}
 - {id: switch_1, label: "Generic Switch 1", category: "Sensors - Other", bus_type: float}
 - {id: switch_2, label: "Generic Switch 2", category: "Sensors - Other", bus_type: float}
 - {id: switch_3, label: "Generic Switch 3", category: "Sensors - Other", bus_type: float}
@@ -1367,6 +1372,14 @@ signals:
 # times itself from. Not uptime: with USB plugged in the ECU is awake long before the key turns, so a
 # prime on "uptime_s < 3" had already run out by the time the ignition came on, and the pump never primed.
 - {id: key_on_s, label: "Time Since Key On", units: 's', scale: 0.1, telem_type: uint16, min: 0.0, max: 6500.0, category: "Engine", bus_type: float, datalog: false, owner: firmware}
+# THE START SEQUENCE (StartControl). A start button press is LATCHED and held until the engine is fit to
+# crank: the throttle has passed its key-on check and the rail has pressure. start_pump runs the fuel pump
+# for that wait (a pump without a check valve bleeds the rail to nothing between key-on and the press, and
+# the prime pulse then goes into an empty rail); crank_req is what the starter output reads instead of the
+# button; start_state says which of the two it is waiting on.
+- {id: start_pump, label: "Start Pump Request", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 1.0, category: "Engine", bus_type: float, datalog: true, enum: bool_active, owner: firmware}
+- {id: crank_req, label: "Crank Request", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 1.0, category: "Engine", bus_type: float, datalog: true, enum: bool_active, owner: firmware}
+- {id: start_state, label: "Start Sequence", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 3.0, category: "Engine", bus_type: float, datalog: true, enum: start_sequence_state, owner: firmware}
 # A COUNT, so no units — and deliberately: what a condition asks of this channel is its AGE, and
 # age() answers in milliseconds whatever it was asked about (expr_units::unitOf). Giving the count
 # itself a time unit would make "age(trigger_teeth) < 1500ms" convert against the wrong thing.
@@ -5810,6 +5823,27 @@ modules:
           - Cut Both
           default: 0
           help: 'What happens while the condition holds: nothing, record only, cut fuel, cut ignition, or both. Record-only is worth using first — it proves the condition is right before it is given the authority to stop the engine. There is no debounce: the VM is stateless by design, so a condition true for one frame cuts for one frame, and a noisy signal wants margin rather than a tight limit.'
+  # StartControl — the start sequence. A press of the start button is LATCHED, and the starter is held off
+  # until the engine is fit to crank: every enabled electronic throttle has passed its key-on check, and
+  # (Prime Before Crank) the fuel pump has had the rail up — to the pressure below when a rail sensor is
+  # reading, for Prime Time when there is none. The pump is asked for with start_pump; the starter output
+  # reads crank_req instead of the button. Nothing here drives a pin: the outputs do, through their
+  # conditions, which is why a car with a hard-wired starter is untouched by it.
+  StartControl:
+    cadence_hz: 100    # control cadence (firmware constant, not a tune field)
+    requires: [start_sw, engine_state]
+    provides:
+    - start_pump
+    - crank_req
+    - start_state
+    config:
+      scalars:
+      - {name: prime_enable, type: uint8, label: Prime Before Crank, units: '', scale: 1.0, min: 0, max: 1, default: 1, help: 'Run the fuel pump and wait for rail pressure before the starter engages. A rail that has bled down since key-on (a pump with no check valve, a long wait before pressing start) otherwise meets the first crank empty, and the prime pulse and the first cranking pulses go into a rail with nothing behind them. Off, the press only waits for the throttle check. The pump has to be asked for: its output condition needs `start_pump` — the Fuel Pump template includes it.'}
+      - {name: press_src, type: uint8, label: Rail Pressure Signal, units: '', scale: 1.0, min: 0, max: 255, default: fuel_pressure, help: 'The rail pressure the start waits for. While it is reading, the starter engages as soon as the rail reaches Crank Above Pressure — at once, if a warm rail is still up. While it is not (no sensor, unwired, failed), the wait is Prime Time instead: a dead sensor never stops the engine starting.'}
+      - {name: min_press_kpa, type: uint16, label: Crank Above Pressure, units: kPa, scale: 0.1, min: 0, max: 10000, digits: 1, default: 2500, help: 'Rail pressure, as GAUGE pressure (what a gauge on the rail reads), at which the starter may engage. Set it a little under the regulator — 250 kPa for a 300 kPa (3 bar) rail — so a pump that is up to pressure is not kept waiting on the last few kPa.'}
+      - {name: max_wait_ms, type: uint16, label: Longest Pressure Wait, units: ms, scale: 1.0, min: 0, max: 10000, default: 3000, help: 'How long to wait for the rail to reach Crank Above Pressure before cranking anyway. A pump that cannot make pressure will not be helped by refusing to crank, and a sensor that reads low would otherwise leave the engine unstartable; this is the bound.'}
+      - {name: prime_ms, type: uint16, label: Prime Time, units: ms, scale: 1.0, min: 0, max: 10000, default: 1000, help: 'How long the pump runs before the starter engages when there is no rail pressure reading. Most pumps fill a rail in well under a second.'}
+      - {name: give_up_ms, type: uint16, label: Give Up After, units: ms, scale: 1.0, min: 1000, max: 30000, default: 8000, help: 'How long a press waits, in all, for the engine to be fit to crank. A throttle that never passes its check (a fault, a jammed blade) ends the request here rather than leaving a start pending that would crank whenever the throttle came good. Press again to retry.'}
   Trigger:
     shadow:
       default: true
@@ -7604,8 +7638,8 @@ datalog_templates:
 output_templates:
 - id: fuel_pump
   name: Fuel Pump
-  blurb: 'Primes at key-on, then runs while the engine is turning. Stops when the teeth stop.'
-  detail: 'The second half is the one that matters: it watches TEETH, not sync, so the rail is up before the decoder has locked and long before the first spark. It also stops when the wheel stops — however the engine stopped.'
+  blurb: 'Primes at key-on and when start is pressed, then runs while the engine is turning. Stops when the teeth stop.'
+  detail: 'The last part is the one that matters: it watches TEETH, not sync, so it keeps running from the first tooth to the last — and it stops when the wheel stops, however the engine stopped. The middle part is the start sequence asking for pressure (start_pump): a press of the start button runs the pump and holds the starter until the rail is up, so a rail that bled down after the key-on prime is full again before the first crank.'
   kind: 1
   value_source: 2
   fixed_pct: 100
@@ -7613,8 +7647,8 @@ output_templates:
   params:
   - {name: prime_s, label: Prime Time, units: s, default: 3, min: 0, max: 30, digits: 1, help: 'How long the pump runs at key-on to bring the rail up before cranking.'}
   - {name: stop_ms, label: Stop After, units: ms, default: 1500, min: 200, max: 10000, digits: 0, help: 'How long after the last trigger tooth the pump is switched off. Long enough to ride out a slow crank, short enough to be off promptly when the engine stops.'}
-  on_when:  'key_on_s < {prime_s} or age(trigger_teeth) < {stop_ms}'
-  off_when: 'key_on_s >= {prime_s} and age(trigger_teeth) >= {stop_ms}'
+  on_when:  'key_on_s < {prime_s} or start_pump > 0.5 or age(trigger_teeth) < {stop_ms}'
+  off_when: 'key_on_s >= {prime_s} and start_pump < 0.5 and age(trigger_teeth) >= {stop_ms}'
 
 - id: thermo_fan
   name: Thermo Fan
@@ -7671,8 +7705,8 @@ output_templates:
 
 - id: starter
   name: Starter Motor
-  blurb: 'Cranks while the button is held, and never for too long. Interlocks to taste.'
-  detail: 'A press LATCHES the crank: the starter runs until the engine is running and above Release Above, or until Maximum Crank runs out, whichever comes first — you do not have to hold the button, and letting go does not stop it. Hold it and you get another crank after the Rest, and another, until you let go. The maximum on time is what makes that safe. The interlocks are the part that varies between cars, so they are ticked rather than assumed — on a manual leave at least one on, because that is what stops the car being started in gear. An interlock you tick and do not wire reads as false, which is a starter that never cranks; the wizard says which of them are wired.'
+  blurb: 'Cranks once the engine is ready, and never for too long. Interlocks to taste.'
+  detail: 'It reads the start sequence (crank_req), not the button: a press is held until every electronic throttle has passed its key-on check and the fuel rail is up (Engine Start), and only then does the starter engage. A press LATCHES the crank: the starter runs until the engine is running and above Release Above, or until Maximum Crank runs out, whichever comes first — you do not have to hold the button, and letting go does not stop it. Hold it and you get another crank after the Rest, and another, until you let go. The maximum on time is what makes that safe. The interlocks are the part that varies between cars, so they are ticked rather than assumed — on a manual leave at least one on, because that is what stops the car being started in gear. An interlock you tick and do not wire reads as false, which is a starter that never cranks; the wizard says which of them are wired.'
   kind: 1
   value_source: 2
   fixed_pct: 100
@@ -7689,6 +7723,12 @@ output_templates:
   - {name: crank_s, label: Maximum Crank, units: s, default: 10, min: 1, max: 30, digits: 0, help: 'How long one attempt may last before the output releases, whatever the button says.'}
   - {name: rest_s,  label: Rest Before Retry, units: s, default: 3, min: 0, max: 60, digits: 0, help: 'How long the slot is locked out afterwards — the motor cooling down.'}
   - {name: release_rpm, label: Release Above, units: RPM, default: 700, min: 0, max: 2000, digits: 0, help: 'The starter lets go once the engine is running AND turning faster than this. A warm engine fires at not much over cranking speed, and a starter that drops out the moment the ECU calls it running (the cranking threshold, ~450 rpm) can leave it to stumble and die before it has caught. Set it at or below the cranking threshold for the old behaviour: release as soon as it is running. Maximum Crank still ends a crank that never gets here.'}
+  # THE BUTTON IS READ THROUGH THE START SEQUENCE. crank_req is the press, held by StartControl until the
+  # throttle has passed its check and the rail is up, then true until the starter has had its chance — and
+  # from then on it follows the button, so holding it still gives another crank after the Rest and a
+  # released button does not. Naming start_sw here instead cranked against a throttle mid-sweep (the ETB
+  # interlock then held fuel and spark: a crank that cannot start) and into an empty rail.
+  #
   # THE CRANK IS LATCHED, and both of these say so.
   #
   # `off_when` no longer names the button. That is what turns a momentary press into a crank: the gate
@@ -7709,7 +7749,7 @@ output_templates:
   # is turning properly, and a running engine that dips under it cannot re-engage it, because the on
   # side still needs engine_state < 2. A warm restart released at the 450 rpm "running" edge stumbled,
   # ran rich and backfired; held to 700 it catches.
-  on_when:  'start_sw > 0.5 and engine_state < 2{@options}'
+  on_when:  'crank_req > 0.5 and engine_state < 2{@options}'
   off_when: 'engine_state >= 2 and rpm > {release_rpm}'
   max_on_from: crank_s
   rearm_from: rest_s

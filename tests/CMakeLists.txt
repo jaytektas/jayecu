@@ -392,6 +392,7 @@ add_test(NAME idle_control COMMAND test_idle_control)
 # (links default_config.cpp for g_config — autocal writes the sensor cal).
 add_executable(test_throttle_control test_throttle_control.cpp
     ${FW_DIR}/Engine/Modules/ElectronicThrottle.cpp
+    ${FW_DIR}/Engine/Modules/StartControl.cpp      # the start sequence waits on the key-on check
     ${FW_DIR}/Diagnostics/DtcManager.cpp
     ${FW_DIR}/Diagnostics/ReconfigCost.cpp
     ${FW_DIR}/Diagnostics/TextLog.cpp      # g_text_log — autocal publishes findlimits/fillff results
@@ -731,6 +732,12 @@ add_executable(test_nitrous test_nitrous.cpp ${FW_DIR}/Engine/Modules/Nitrous.cp
 target_include_directories(test_nitrous PRIVATE ${GEN_DIR} ${GEN_DIR}/modules ${FW_DIR})
 add_test(NAME nitrous COMMAND test_nitrous)
 target_link_libraries(test_nitrous PRIVATE platform_stub)
+
+# StartControl — the start sequence (latched press, rail pressure / prime time before crank_req)
+add_executable(test_start_control test_start_control.cpp ${FW_DIR}/Engine/Modules/StartControl.cpp)
+target_include_directories(test_start_control PRIVATE ${GEN_DIR} ${GEN_DIR}/modules ${FW_DIR})
+add_test(NAME start_control COMMAND test_start_control)
+target_link_libraries(test_start_control PRIVATE platform_stub)
 
 # Wmi — water/methanol injection
 add_executable(test_wmi test_wmi.cpp ${FW_DIR}/Engine/Modules/Wmi.cpp)

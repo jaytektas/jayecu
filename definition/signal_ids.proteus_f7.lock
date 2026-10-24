@@ -497,6 +497,9 @@
     "blink_fast": 493,
     "fuel_temp_flex_raw": 494,
     "key_on_s": 495,
-    "fuel_learn_block": 496
+    "fuel_learn_block": 496,
+    "start_pump": 497,
+    "crank_req": 498,
+    "start_state": 499
   }
 }

@@ -16,6 +16,7 @@
 #include "Modules/PitLimiter.h"           // PitLimiter (vehicle-speed limiter)
 #include "Modules/Nitrous.h"               // Nitrous (single-stage nitrous control)
 #include "Modules/Wmi.h"                   // Wmi (water/methanol injection)
+#include "Modules/StartControl.h"          // StartControl (the start sequence)
 #include "Modules/AntiLag.h"               // AntiLag (ALS ignition retard)
 #include "Modules/Vvl.h"                   // Vvl (variable valve lift / VTEC)
 #include "Modules/EgtProtect.h"            // EgtProtect (EGT over-temp enrich + cut)
@@ -98,6 +99,7 @@ private:
     PitLimiter  pit_limiter_;      // vehicle-speed limiter
     Nitrous     nitrous_;          // single-stage nitrous (solenoid + timing retard)
     Wmi         wmi_;              // water/methanol injection
+    StartControl start_control_;   // start sequence: latched press, throttle check + rail pressure before crank_req
     AntiLag     anti_lag_;         // anti-lag (ALS) ignition retard
     Vvl         vvl_;              // variable valve lift (VTEC) cam engagement
     EgtProtect  egt_protect_;      // EGT over-temp enrichment + fuel cut

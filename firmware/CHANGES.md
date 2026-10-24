@@ -9,6 +9,15 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- New start sequence (Configuration ▸ Engine Functions ▸ Engine Start). A press of the start button is held
+  until the engine is fit to crank: every electronic throttle has passed its key-on check, and the fuel pump
+  has brought the rail up — to 250 kPa when a rail pressure sensor is reading (at once if it is still up;
+  cranking anyway after 3 s), or for 1 s when there is none. A rail that bled down after the key-on prime
+  used to meet the first crank, and the prime pulse, empty. The starter output now cranks on Crank Request
+  (`crank_req`) and the fuel pump also runs on Start Pump (`start_pump`): run the output wizard on the
+  Starter Motor and Fuel Pump outputs to take the new conditions (an output set up before keeps reading the
+  button). A tap is enough; holding the button still gives another crank after the rest. New channels
+  Start Sequence, Crank Request and Start Pump are in the default logs.
 
 ## 0.4.17
 - The engine can no longer start on an electronic throttle that hasn't passed its key-on check. Fuel and spark
