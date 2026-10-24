@@ -483,13 +483,16 @@ void EngineTask::update_telemetry(const EnginePosition& pos, SignalBus& bus, con
     bus.set(wk::trigger_last_error_kind,  static_cast<float>(pos.last_error_kind), true, now_up);
     // Cam angles carry the measurement's own validity — invalid until a cam stream is locked, and again
     // once it is lost — so VvtControl holds on base duty rather than closing on a stale or absent angle.
-    { const VvtResult v = epos_hal_.get_vvt_result(0); bus.set(wk::vvt_angle_1, v.displacement, v.valid, now_up); }
-    { const VvtResult v = epos_hal_.get_vvt_result(1); bus.set(wk::vvt_angle_2, v.displacement, v.valid, now_up); }
-    { const VvtResult v = epos_hal_.get_vvt_result(2); bus.set(wk::vvt_angle_3, v.displacement, v.valid, now_up); }
+    // IN DEGREES. The displacement is an AngleDeg10 (tenths); the channels are degrees and VvtControl
+    // compares them with targets in degrees. Published raw, every reading was ten times its size — a
+    // parked cam 4.3 deg from nominal logged as 43 — and a VVT loop would have closed on that.
+    { const VvtResult v = epos_hal_.get_vvt_result(0); bus.set(wk::vvt_angle_1, v.displacement * 0.1f, v.valid, now_up); }
+    { const VvtResult v = epos_hal_.get_vvt_result(1); bus.set(wk::vvt_angle_2, v.displacement * 0.1f, v.valid, now_up); }
+    { const VvtResult v = epos_hal_.get_vvt_result(2); bus.set(wk::vvt_angle_3, v.displacement * 0.1f, v.valid, now_up); }
     // (Per-cylinder firing TDC is NOT streamed as telemetry — it is ordinary config: the resolver
     //  writes the even-fire angles back into engine.cyl[].tdc_angle on a stopped-engine reconfigure and
     //  the studio reads them like any config field. See EnginePositionHal::reconfigure.)
-    { const VvtResult v = epos_hal_.get_vvt_result(3); bus.set(wk::vvt_angle_4, v.displacement, v.valid, now_up); }
+    { const VvtResult v = epos_hal_.get_vvt_result(3); bus.set(wk::vvt_angle_4, v.displacement * 0.1f, v.valid, now_up); }
 
     // Firing-order validity. EnginePositionHal refuses to fire while the order is not a clean permutation;
     // surface that so it isn't a silent dead cylinder. Publish the fault bit every frame (ttl 0) for the

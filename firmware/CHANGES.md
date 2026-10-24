@@ -9,6 +9,16 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- A cam with one pulse per cycle on a VR input (the 2JZ / 1JZ front or rear cam, and any cam using a pulse-width
+  pattern) is now timed from the edge set in Edge, the rising edge on these boards. That's the VR zero crossing,
+  which sits on the tooth. It used to be timed from the pulse's closing edge, which a VR interface makes wherever
+  the signal crosses a threshold re-armed from the previous pulse. That edge moves with every change of speed and
+  comes late after a weaker pulse. A stab through the cam's phase-sync rpm read it as a cam that hadn't arrived:
+  phase lost (P0341), a moment on wasted spark, then a re-sync. The cam position (VVT angle) is also measured at
+  that edge, so it no longer moves with the closing edge. The closing edge still measures the pulse width that
+  identifies the reference pulse.
+- VVT cam angles (VVT Cam 1-4 Advance) are published in degrees. They were in tenths of a degree, so a cam 4.3°
+  from nominal read 43°, and cam control would have closed its loop on a value ten times too large.
 
 ## 0.4.19
 - Engine Start has its own switch, Start Sequence Enabled, like every other feature: at the top of its page and

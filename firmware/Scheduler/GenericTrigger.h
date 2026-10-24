@@ -94,7 +94,7 @@ public:
             Stream& s = st_[i];
             s.gap.reset(); s.seq.reset(); s.width.reset();          // matchers -> ACQUIRING (config kept)
             s.primed = false; s.last = 0; s.last_period_ = 0;       // per-tooth timing; fresh period next edge
-            s.lead_primed_ = false; s.lead_tick_ = 0;               // WIDTH lead state (keep lead_rising_ config)
+            s.lead_primed_ = false; s.lead_tick_ = 0; s.lead_open_ = false;   // WIDTH lead state (keep lead_rising_ config)
         }
         level_ = SyncLvl::NONE; angle_ = 0; velocity_ = 0;
         phase_marked_ = false; phase_expect_teeth_ = 0;
@@ -246,7 +246,12 @@ public:
         ++edges_total_;
         Stream& s = st_[idx];
         if (s.kind == PrimKind::WIDTH) {                 // measure high-time, feed at the trailing edge
-            if (rising == s.lead_rising_) { s.lead_tick_ = tick; s.lead_primed_ = true; return; }
+            if (rising == s.lead_rising_) {
+                s.lead_tick_ = tick; s.lead_primed_ = true; s.lead_open_ = true;
+                s.lead_teeth_ = crank_teeth_; s.lead_crank_ = crank_angle_at(tick);
+                return;
+            }
+            s.lead_open_ = false;
             if (!s.lead_primed_) return;
             const uint32_t w = tick - s.lead_tick_;
             // The crank rate as a RATIO. fine_pitch_/velocity_ are the last fine tooth's pitch and
@@ -376,6 +381,16 @@ private:
         bool       phased_    = false;      // is a phaser able to move it at all?
         bool       lead_rising_ = true, lead_primed_ = false;
         uint32_t   lead_tick_ = 0;
+        // WHERE THE CRANK WAS AT THE LEADING EDGE, taken when that edge arrives. The leading edge is the one
+        // `edge` names, and on a VR input it is the only one that means anything: the MAX9924 makes its
+        // rising edge at the zero crossing, and the falling edge wherever the waveform next crosses a
+        // threshold re-armed from the LAST pulse's peak (2/3 of it) — so it moves with every change of
+        // speed, and after a weak pulse it can come tens of degrees late. Everything that TIMES this cam
+        // (the window, one-cycle-later, the overdue count, the measured displacement) reads these; the
+        // closing edge only measures the width that says whether this pulse is the reference.
+        uint16_t   lead_teeth_ = 0;         // crank_teeth_ at the leading edge
+        AngleDeg10 lead_crank_ = 0;         // crank cycle angle at the leading edge
+        bool       lead_open_  = false;     // a pulse has opened and not yet closed
         uint8_t    gidx_[MAX_ANOMALIES] = {}, gratio_[MAX_ANOMALIES] = {};   // GAP cell (copied)
         AngleDeg10 cell_[MAX_PATTERN_TEETH] = {};                            // SEQUENCE cell (copied)
         bool       locked()   const noexcept {
@@ -511,17 +526,18 @@ private:
                         ? static_cast<AngleDeg10>(s.nominal_ % ANGLE_360) : cam_seen_fine_;
                     const int32_t d = wrap_rev(static_cast<int32_t>(fine) - want);
                     if (s.nominal_ != 0) note_residual(idx, d);
-                    if (d > band || d < -band) { stray_cam_edge(s, idx, fine, band); return; }
+                    if (d > band || d < -band) { stray_cam_edge(s, idx, fine, band, ref_teeth(s)); return; }
                 }
-                const uint16_t since = static_cast<uint16_t>(crank_teeth_ - cam_seen_teeth_);
+                const uint16_t at    = ref_teeth(s);
+                const uint16_t since = static_cast<uint16_t>(at - cam_seen_teeth_);
                 const bool one_cycle = cam_sightings_ > 0 &&
                                        since + 1u >= phase_expect_teeth_ && since <= phase_expect_teeth_ + 1u;
                 if (!one_cycle) {
                     if (confirmed) { reject_cam_edge(idx); return; }    // right place, wrong revolution
-                    cam_sightings_ = 1; cam_seen_teeth_ = crank_teeth_; cam_seen_fine_ = fine;
+                    cam_sightings_ = 1; cam_seen_teeth_ = at; cam_seen_fine_ = fine;
                     return;                                              // a first sighting: trust nothing
                 }
-                cam_sightings_ = 2; cam_seen_teeth_ = crank_teeth_; cam_seen_fine_ = fine;
+                cam_sightings_ = 2; cam_seen_teeth_ = at; cam_seen_fine_ = fine;
             }
             // WHICH revolution of the cycle we are in. Two for a four-stroke, ONE for a two-stroke,
             // THREE for a rotary — so this is a counter, not the bit it used to be: a rotary's three
@@ -579,7 +595,7 @@ private:
                 // Judged again here it is measured against angle_ BEFORE it is recomputed below, so
                 // the acquiring edge reads a revolution out and faults the very lock it just made.
                 if (!windowed) check_phase_position(s, idx, /*demote*/true, tick);
-                phase_mark_   = crank_teeth_;    // liveness is measured on the cycle's spokesman
+                phase_mark_   = ref_teeth(s);    // liveness is measured on the cycle's spokesman, at its timing edge
                 phase_marked_ = true;
             }
             if (!has_crank_) {                            // cam-only sensor: cam is everything
@@ -658,8 +674,15 @@ private:
                     static_cast<uint16_t>(crank_teeth_ - cam_seen_teeth_) >= phase_expect_teeth_)
                     cam_seen_teeth_ = static_cast<uint16_t>(cam_seen_teeth_ + phase_expect_teeth_);
             }
+            // A WIDTH cam that has OPENED is not overdue while it is still open: its timing edge arrived, and
+            // only the closing edge — the one that wanders — is outstanding. Once it closes the mark is set
+            // from the leading edge; if it never opens, the count runs on and the cam is overdue as before.
+            uint16_t mark = phase_mark_;
+            if (const int ps = nominated_phase_stream(); ps >= 0 && st_[ps].kind == PrimKind::WIDTH &&
+                st_[ps].lead_open_ && static_cast<uint16_t>(st_[ps].lead_teeth_ - phase_mark_) <= phase_expect_teeth_ + 1)
+                mark = st_[ps].lead_teeth_;
             if (rev_known_ && phase_marked_ && phase_expect_teeth_ && phase_stream_valid_ &&
-                static_cast<uint16_t>(crank_teeth_ - phase_mark_) > phase_expect_teeth_ + 1) {
+                static_cast<uint16_t>(crank_teeth_ - mark) > phase_expect_teeth_ + 1) {
                 record_error(TriggerErrorKind::PHASE_LOST);
                 rev_known_    = false;
                 phase_marked_ = false;
@@ -862,12 +885,21 @@ private:
     // Where within the revolution this cam's REFERENCE edge fell, by the crank. A WIDTH stream is fed at
     // its trailing edge, so the pulse is taken back off — the same like-for-like as check_phase_position.
     AngleDeg10 cam_fine_angle(const Stream& s, uint32_t tick) const noexcept {
-        int32_t a = static_cast<int32_t>(crank_angle_at(tick))
+        // A WIDTH stream reads the crank as it stood at its LEADING edge (taken then). Subtracting the
+        // measured width from the crank at the closing edge gives the same number only when the closing
+        // edge is honest; on a VR input it is not (see lead_crank_).
+        int32_t a = s.kind == PrimKind::WIDTH ? static_cast<int32_t>(s.lead_crank_)
+                  : static_cast<int32_t>(crank_angle_at(tick))
                   - (static_cast<int32_t>(s.event_angle()) - static_cast<int32_t>(s.angle()));
         a %= ANGLE_360;
         if (a < 0) a += ANGLE_360;
         return static_cast<AngleDeg10>(a);
     }
+
+    // The crank tooth count at this stream's TIMING edge: the leading edge for a WIDTH stream (see
+    // lead_crank_), the edge being processed for everything else.
+    uint16_t ref_teeth(const Stream& s) const noexcept {
+        return s.kind == PrimKind::WIDTH ? s.lead_teeth_ : crank_teeth_; }
 
     // How far a cam may sit from where it should: a phaser's authority, or a fixed cam's mechanical
     // allowance, never tighter than the decoder's own measurement floor (one crank pitch).
@@ -891,18 +923,18 @@ private:
     // a cycle later is not noise, it is the cam — a chain that has jumped, a phaser that has stuck
     // out — and that is a fault to report, not an edge to hide: PHASE_LOST, as it always was. With
     // no nominal to judge it by, the cam has simply moved, and it is learned again from there.
-    void stray_cam_edge(const Stream& s, uint8_t idx, AngleDeg10 fine, int32_t band) noexcept {
-        const uint16_t since = static_cast<uint16_t>(crank_teeth_ - stray_teeth_);
+    void stray_cam_edge(const Stream& s, uint8_t idx, AngleDeg10 fine, int32_t band, uint16_t at) noexcept {
+        const uint16_t since = static_cast<uint16_t>(at - stray_teeth_);
         const int32_t  moved = wrap_rev(static_cast<int32_t>(fine) - stray_fine_);
         const bool again = stray_seen_ && since + 1u >= phase_expect_teeth_ &&
                            since <= phase_expect_teeth_ + 1u && moved <= band && moved >= -band;
-        stray_seen_ = true; stray_teeth_ = crank_teeth_; stray_fine_ = fine;
+        stray_seen_ = true; stray_teeth_ = at; stray_fine_ = fine;
         if (!again) { reject_cam_edge(idx); return; }
         record_error(TriggerErrorKind::PHASE_LOST, idx);
         rev_known_ = false;
         if (level_ == SyncLvl::PHASE)
             level_ = any_crank_locked() ? SyncLvl::CRANK : SyncLvl::NONE;
-        if (s.nominal_ == 0) { cam_sightings_ = 1; cam_seen_teeth_ = crank_teeth_; cam_seen_fine_ = fine; }
+        if (s.nominal_ == 0) { cam_sightings_ = 1; cam_seen_teeth_ = at; cam_seen_fine_ = fine; }
         else cam_sightings_ = 0;
     }
 
@@ -923,12 +955,12 @@ private:
         // chain stretch all measured 0.0 and were invisible, while 45 degrees measured 40.0 and
         // passed a 40 degree band. Interpolating with the same elapsed-time arithmetic the anchor
         // uses makes the residual mean what it says, which is the whole point of recording it.
-        const AngleDeg10 crank_now = crank_angle_at(tick);
-        // nominal_ names where the REFERENCE edge sits, the same edge the matcher's angle() reports.
-        // A WIDTH stream is fed at the trailing edge, a whole pulse later, so compare like with like
-        // or every width cam reads a pulse-width out.
-        const int32_t ref = static_cast<int32_t>(s.nominal_)
-                          + (static_cast<int32_t>(s.event_angle()) - static_cast<int32_t>(s.angle()));
+        // nominal_ names where the REFERENCE edge sits, the same edge the matcher's angle() reports. A WIDTH
+        // stream compares the crank as it stood AT that edge (taken there, see lead_crank_); anything else
+        // is processed at its reference edge already.
+        const bool width = s.kind == PrimKind::WIDTH;
+        const AngleDeg10 crank_now = width ? s.lead_crank_ : crank_angle_at(tick);
+        const int32_t ref = static_cast<int32_t>(s.nominal_);
         int32_t resid = static_cast<int32_t>(crank_now) - ref;
         const int32_t half = cycle_ / 2;
         while (resid >  half) resid -= cycle_;

@@ -163,6 +163,59 @@ int main() {
         CHECK(g.level() == SyncLvl::PHASE);
     }
 
+    // KELLY'S HILUX: a 36-2 crank and a single-pulse cam on a VR input (MAX9924), "2JZ 36-2 + Front Cam",
+    // nominal 495, allowance 45. The chip makes its RISING edge at the zero crossing and its FALLING edge
+    // wherever the waveform crosses a threshold re-armed at 2/3 of the LAST pulse's peak — so the falling
+    // edge moves with every change of speed and comes late after a weak pulse. Four P0341s on four drives,
+    // each a stab through ~1500 rpm, each with no rejected edge: the decoder timed the cam from the falling
+    // edge and counted it overdue. It must time a WIDTH cam from the edge `edge` names.
+    SECTION("VR single-pulse cam: a wandering FALLING edge never costs phase; the RISING edge times the cam");
+    {
+        auto run = [](std::vector<int> close_after_deg, bool drop_one) {
+            GenericTrigger g;
+            uint8_t gi[1] = {0}, gr[1] = {3};
+            int cr  = g.add_gap(0, 2, 36, gi, gr, 1, 25);                          // 36-2
+            int cam = g.add_width(2, REPEATS_PHASE, 0, 7200, 3600, true);           // Kelly: 0..720 deg, target 360
+            g.set_phase_meta(2, 4950, false, 0, 450);                               // nominal 495, allowance 45
+            struct E { uint32_t tick; int idx; bool rising; };
+            std::vector<E> ev;
+            const int cycles = 40;
+            for (int c = 0; c < cycles; c++) {
+                for (int rev = 0; rev < 2; rev++) for (int slot = 0; slot < 36; slot++) {
+                    if (slot >= 34) continue;
+                    ev.push_back({(uint32_t)((c*7200 + rev*3600 + slot*100)*K), cr, true});
+                }
+                if (drop_one && c == 30) continue;                                  // a pulse that never comes
+                const int w = close_after_deg[c % close_after_deg.size()];
+                ev.push_back({(uint32_t)((c*7200 + 4950)*K), cam, true});           // zero crossing: fixed
+                ev.push_back({(uint32_t)((c*7200 + 4950 + w*10)*K), cam, false});   // re-arm: anywhere after it
+            }
+            std::stable_sort(ev.begin(), ev.end(), [](const E& a, const E& b) { return a.tick < b.tick; });
+            int resid_lo = 1 << 30, resid_hi = -(1 << 30);
+            for (auto& e : ev) {
+                g.on_edge((uint8_t)e.idx, e.tick, e.rising);
+                if (e.idx == cam && !e.rising && g.phase_resid_valid(2) && e.tick > 10*7200*K) {
+                    resid_lo = std::min(resid_lo, (int)g.phase_residual(2));
+                    resid_hi = std::max(resid_hi, (int)g.phase_residual(2));
+                }
+            }
+            return std::make_tuple(g.phase_lost_total(), g.noise_total(), resid_lo, resid_hi, g.level());
+        };
+        // closes 5..95 deg after it opens, jumping around cycle to cycle — including 30 deg later than the
+        // one before, which used to be three teeth "overdue"
+        const auto [lost, noise, lo, hi, lvl] = run({10, 40, 15, 95, 5, 60, 20, 80, 35, 10}, false);
+        fprintf(stdout, "    wandering close: phase lost %u, noise %u, residual %d..%d\n", lost, noise, lo, hi);
+        CHECK(lost == 0);
+        CHECK(noise == 0);
+        CHECK(lvl == SyncLvl::PHASE);
+        CHECK(lo >= -10 && hi <= 10);       // the residual is the rising edge's: it does not move with the close
+        // ...and a pulse that really does not come is still a lost phase
+        const auto [lost2, noise2, lo2, hi2, lvl2] = run({10, 40, 15, 95, 5, 60, 20, 80, 35, 10}, true);
+        (void)noise2; (void)lo2; (void)hi2; (void)lvl2;
+        fprintf(stdout, "    one pulse missing: phase lost %u\n", lost2);
+        CHECK(lost2 >= 1);
+    }
+
     SECTION("after drop_sync() the CRANK is still the fine-angle source (stall -> re-acquire)");
     {
         // drop_sync() is the lost-trigger watchdog's path: it exists to forget SYNC while KEEPING

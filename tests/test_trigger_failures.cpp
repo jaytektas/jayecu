@@ -83,7 +83,9 @@ int main() {
             for (int rev = 0; rev < 2; ++rev) {
                 r.spin_to(10);
                 if (rev == 0) {
-                    const uint32_t lead  = static_cast<uint32_t>(static_cast<int32_t>(r.tick) + 500 + shift_ticks);
+                    // Placed AHEAD of the tooth just fed, whichever way it is shifted: edges reach the decoder in
+                    // time order on real hardware, and the crank is read AT the leading edge.
+                    const uint32_t lead  = static_cast<uint32_t>(static_cast<int32_t>(r.tick) + 1500 + shift_ticks);
                     const uint32_t trail = lead + 8000;               // an 80 degree pulse
                     bool led = false, trailed = false;
                     for (int k = 0; k < 20; ++k) {                    // edges in time order with the teeth
