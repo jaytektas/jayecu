@@ -8,11 +8,16 @@
 #include "../firmware/Signal/SignalBus.h"
 #include "../firmware/Engine/EngineFrame.h"
 #include "../generated/signal_ids.h"
+#include "../firmware/Diagnostics/DtcManager.h"
+#include "../firmware/Diagnostics/TextLog.h"
+#include <string>
 
 extern "C" uint32_t g_stub_tick_ms;
 bool g_system_active = true;
 // StartControl only calls this through a pointer this test never sets; the definition is for the linker.
 bool ElectronicThrottle::start_proven() const noexcept { return true; }
+
+static std::string console() { size_t n = 0; const char* t = g_text_log.swap_drain(&n); return std::string(t, n); }
 
 static StartControlConfig make_cfg() {
     StartControlConfig c{};
@@ -82,6 +87,28 @@ int main() {
       fprintf(stdout, "    granted after %d ms\n", t);
       CHECK(t >= 2980 && t <= 3010); }
 
+    SECTION("a rail cranked on low raises P0087 and says what it reached; a good start heals it");
+    { Rig r; DtcManager dtc; r.sc.set_dtc(&dtc); r.press = 30.0f; r.step(); console();
+      r.sw = 1; r.step(); r.sw = 0;
+      CHECK(r.until_crank(5000) >= 0);
+      CHECK(dtc.code_severity(0x0087) == 1);
+      const std::string c = console();
+      fprintf(stdout, "    console: %s", c.c_str());
+      CHECK(c.find("rail 30 kPa") != std::string::npos);
+      CHECK(c.find("cranking anyway") != std::string::npos);
+      r.state = 2.0f; r.step(); r.state = 0.0f; r.step();     // ran, stopped
+      r.press = 290.0f; r.sw = 1; r.step();                     // next start reaches pressure
+      CHECK(r.crank());
+      CHECK(dtc.code_severity(0x0087) == 0);
+      CHECK(console().empty()); }
+
+    SECTION("no reading is not a low rail: Prime Time runs out without a code");
+    { Rig r; DtcManager dtc; r.sc.set_dtc(&dtc); r.step(); console();
+      r.sw = 1; r.step();
+      CHECK(r.until_crank(2000) >= 0);
+      CHECK(dtc.code_severity(0x0087) == 0);
+      CHECK(console().empty()); }
+
     SECTION("the press is latched: a tap is enough");
     { Rig r; r.step();
       r.sw = 1; r.step(); r.sw = 0; r.step();
@@ -124,8 +151,13 @@ int main() {
     SECTION("a wait longer than Give Up After ends the request");
     { Rig r; r.cfg.prime_ms = 5000; r.cfg.give_up_ms = 2000; r.step();
       r.sw = 1; r.step(); r.sw = 0;
+      console();
       CHECK(r.until_crank(6000) < 0);
-      CHECK(r.st() == StartControl::IDLE); CHECK(!r.pump()); }
+      CHECK(r.st() == StartControl::IDLE); CHECK(!r.pump());
+      const std::string c = console();
+      fprintf(stdout, "    console: %s", c.c_str());
+      CHECK(c.find("prime time not finished") != std::string::npos);
+      CHECK(c.find("press dropped") != std::string::npos); }
 
     return test_summary();
 }

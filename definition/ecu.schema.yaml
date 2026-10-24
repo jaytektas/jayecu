@@ -1637,6 +1637,7 @@ dtc_indicators:
 # overboost) read as an unlabelled number. tests/test_dtc_descriptions guards the pairing: every
 # P-code the firmware declares must appear here or the build fails.
 firmware_dtc:
+- {code: P0087, label: "Start: fuel rail below Crank Above Pressure after Longest Pressure Wait (cranked anyway)"}
 - {code: P0107, label: "Protection: MAP signal timed out"}
 - {code: P0117, label: "Protection: coolant-temp signal timed out"}
 - {code: P0122, label: "Protection: TPS signal timed out"}

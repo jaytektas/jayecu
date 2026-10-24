@@ -74,6 +74,7 @@ void SystemComposer::compose(EngineTask& task, CanBroker& can_broker,
     // --- cross-wiring (kept as explicit injections; the bus-ify-these targets) ---
     sensors_.set_dtc(&diag_.table());                     // sensors raise P-codes into the one table
     electronic_throttle_.set_dtc(&diag_.table());            // ETB L2 supervisor raises throttle P-codes
+    start_control_.set_dtc(&diag_.table());                  // P0087: a start that cranked on a low rail
     engine_protection_.set_sensors(&sensors_);            // protection consumes sensor health/severity
     engine_protection_.set_dtc(&diag_.table());           // reactor: cuts from the table's worst severity
     egt_protect_.set_dtc(&diag_.table());                 // an EGT cut names the probe that caused it

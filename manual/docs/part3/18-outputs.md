@@ -411,6 +411,20 @@ throttle failed its check, the press is dropped; press again to retry.
 **Start Sequence** `start_state` shows what a press is waiting on: *Idle*, *Waiting for Throttle*,
 *Building Fuel Pressure* or *Cranking*. All three channels are in the default logs.
 
+A start that goes wrong leaves a record:
+
+- **Rail not up, cranked anyway.** The sensor was reading but the rail had not reached Crank Above
+  Pressure when Longest Pressure Wait ran out. This raises **P0087** at level 1: it is recorded and
+  lights the check engine lamp, but never limits the engine. The console shows the pressure reached,
+  for example `start: rail 40 kPa after 3000 ms (wanted 250) - cranking anyway`. The next start that
+  reaches pressure clears the code. Look at the pump, its relay and its condition (does it run on
+  `start_pump`?), the filter, and the sensor's calibration.
+- **Press dropped.** The console names what the press was still waiting on when Give Up After ran out,
+  for example `start: throttle not proven (key-on check) after 8000 ms - press dropped`. A throttle that
+  fails its check also raises its own code (chapter 22).
+
+A start with no rail pressure reading never raises P0087: it waits Prime Time and cranks.
+
 The sequence only drives pins through the outputs that read it. A starter output set up before this
 firmware still reads the button: run the wizard on the starter and the fuel pump outputs to take the
 new conditions. A starter wired straight to the key is not affected; the most the ECU can do there

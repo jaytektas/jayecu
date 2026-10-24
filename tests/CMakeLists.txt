@@ -734,7 +734,10 @@ add_test(NAME nitrous COMMAND test_nitrous)
 target_link_libraries(test_nitrous PRIVATE platform_stub)
 
 # StartControl — the start sequence (latched press, rail pressure / prime time before crank_req)
-add_executable(test_start_control test_start_control.cpp ${FW_DIR}/Engine/Modules/StartControl.cpp)
+add_executable(test_start_control test_start_control.cpp ${FW_DIR}/Engine/Modules/StartControl.cpp
+    ${FW_DIR}/Diagnostics/DtcManager.cpp
+    ${FW_DIR}/Diagnostics/ReconfigCost.cpp
+    ${FW_DIR}/Diagnostics/TextLog.cpp)     # P0087 + the console line for a slow or dropped start
 target_include_directories(test_start_control PRIVATE ${GEN_DIR} ${GEN_DIR}/modules ${FW_DIR})
 add_test(NAME start_control COMMAND test_start_control)
 target_link_libraries(test_start_control PRIVATE platform_stub)

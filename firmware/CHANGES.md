@@ -17,7 +17,9 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
   (`crank_req`) and the fuel pump also runs on Start Pump (`start_pump`): run the output wizard on the
   Starter Motor and Fuel Pump outputs to take the new conditions (an output set up before keeps reading the
   button). A tap is enough; holding the button still gives another crank after the rest. New channels
-  Start Sequence, Crank Request and Start Pump are in the default logs.
+  Start Sequence, Crank Request and Start Pump are in the default logs. A start that had to crank on a low
+  rail raises P0087 (level 1, cleared by the next start that reaches pressure) and the console says what
+  pressure it got to; a press dropped after the wait says what it was still waiting on.
 
 ## 0.4.17
 - The engine can no longer start on an electronic throttle that hasn't passed its key-on check. Fuel and spark
