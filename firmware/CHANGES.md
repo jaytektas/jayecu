@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.18
 - New start sequence (Configuration ▸ Engine Functions ▸ Engine Start). A press of the start button is held
   until the engine is fit to crank: every electronic throttle has passed its key-on check, and the fuel pump
   has brought the rail up — to 250 kPa when a rail pressure sensor is reading (at once if it is still up;
