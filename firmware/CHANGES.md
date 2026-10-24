@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.19
 - Engine Start has its own switch, Start Sequence Enabled, like every other feature: at the top of its page and
   on the Configuration and Engine Functions switchboards, and the page shows in the tree only while it is on.
   It is off by default; off, Crank Request is the start button itself, so a starter output reading it cranks
