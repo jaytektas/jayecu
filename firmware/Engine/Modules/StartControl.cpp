@@ -27,13 +27,20 @@ constexpr uint8_t  S_START_RAIL_LOW = DTC_SEV_LEVEL1;
 
 void StartControl::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& /*frame*/) {
     const uint32_t now = platform_get_tick_ms();
-    const bool sw      = bus.get_bool(SIG_START_SW);
+    // A PRESS IS SEEN TO HAPPEN. The button has to read released (a valid false) with the key on before
+    // any reading of it counts — so a button that is already "pressed" at key-on, whether held, stuck,
+    // shorted or a stale reading carried across a key-off, can never start a crank. It has to be let go
+    // and pressed again. Key off disarms it.
+    const bool key     = g_system_active;
+    if (!key) armed_ = false;
+    else if (bus.valid(SIG_START_SW) && !bus.get_bool(SIG_START_SW)) armed_ = true;
+    const bool sw      = armed_ && bus.get_bool(SIG_START_SW);
     const bool press   = sw && !sw_prev_;
     sw_prev_ = sw;
     const auto run = static_cast<EngineRunState>(static_cast<int>(bus.get(wk::engine_state, 0.0f)));
 
-    // OFF: the button straight through, so a starter output reading crank_req cranks exactly as one reading
-    // start_sw would, and nothing asks for the pump. A code this module raised goes with it (enabled ->
+    // OFF: the button straight through (armed, as above), so a starter output reading crank_req cranks
+    // exactly as one reading start_sw would, and nothing asks for the pump. A code this module raised goes with it (enabled ->
     // disabled edge), as every module's does.
     if (!cfg_ || !cfg_->enabled) {
         if (was_enabled_ && dtc_) dtc_->heal(P_START_RAIL_LOW);

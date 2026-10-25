@@ -151,6 +151,22 @@ void Sensors::retire_codes(uint8_t i) {
     }
 }
 
+// Every gated sensor back to the state it has at boot: pipeline state (debounce, filters, latches,
+// stuck and rate timers), its decimation slot and its diagnostic timers. Configuration-derived state
+// (the built pipelines, pin arbitration, conflicts) is kept — it describes the tune, not a moment. The
+// bootstrap battery is left alone: it ran this pass and the key was just decided from it. Codes are not
+// healed here; one still true re-trips after its delay, as it would after a power-on.
+void Sensors::reset_runtime() {
+    for (uint8_t i = 0; i < SENSOR_COUNT; i++) {
+        if (i == boot_idx_) continue;
+        pipelines_[i].reset_state();
+        fault_[i] = false; sev_[i] = 0; dtc_[i] = 0;
+        last_slot_[i] = 0; ran_once_[i] = false; last_run_[i] = 0;
+        for (auto& t : dtc_since_ms_[i]) t = 0;
+    }
+    for (auto& p : aux_pipelines_) p.reset_state();
+}
+
 // THIS SENSOR'S ROW OF THE THERMISTOR TABLE, or nullptr: only the temperature and generic analog inputs
 // have one (SENSOR_THERM_SLOT).
 const ThermistorConfig* Sensors::therm_row(uint8_t i) const {
@@ -587,10 +603,19 @@ void Sensors::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
             // The battery has just been through its pipeline THIS pass, so the value on the bus is this
             // frame's. Decide the key from it before any gated sensor is reached.
             const float vbat = bus.get(wk::battery, 0.0f);
+            const bool key_was = key_on_;
             key_on_ = key_on_ ? (vbat > KEY_OFF_V) : (vbat > KEY_ON_V);
             extern volatile int g_key_override;          // 'key' bench command: force on/off
             if      (g_key_override > 0) key_on_ = true;
             else if (g_key_override < 0) key_on_ = false;
+            // KEY-ON IS A POWER-ON. With USB holding the ECU up, key-off is not a reset: every gated
+            // sensor is skipped and its pipeline state (a switch's debounce count, a filter, a check's
+            // timer) sits frozen at whatever it read as the key went. A key-on resumed from that, so a
+            // start switch frozen PRESSED — the battery dropped out mid-crank — published "pressed" for
+            // three more samples after the pin read released, and the start sequence took it for a press
+            // and cranked with nobody on the key. Re-seed everything here, before any gated sensor runs
+            // in this pass: the first value after key-on is the first reading after key-on.
+            if (key_on_ && !key_was) reset_runtime();
             g_system_active = key_on_;
             // ON THE WIRE. Every channel below reads zero when the key is off and that is CORRECT —
             // but the studio cannot otherwise tell it from a broken sensor, so it has to be said.

@@ -33,10 +33,12 @@ struct Rig {
     EnginePosition pos{};
     EngineFrame frame{};
     float sw = 0.0f, state = 0.0f, press = -1.0f;   // press < 0 = no rail reading
+    bool  sw_live = true;                           // false = start_sw not published (key off: the sensor is skipped)
     Rig() { sc.init(cfg); }
     void step(int ms = 10) {
         g_stub_tick_ms += ms;
-        bus.set(SIG_START_SW, sw, true, g_stub_tick_ms);
+        if (sw_live) bus.set(SIG_START_SW, sw, true, g_stub_tick_ms);
+        else         bus.set(SIG_START_SW, 0.0f, false, g_stub_tick_ms);
         bus.set(SIG_ENGINE_STATE, state, true, g_stub_tick_ms);
         if (press >= 0.0f) bus.set(SIG_FUEL_PRESSURE, press, true, g_stub_tick_ms);
         else               bus.set(SIG_FUEL_PRESSURE, 0.0f, false, g_stub_tick_ms);
@@ -164,6 +166,46 @@ int main() {
       CHECK(!r.pump()); CHECK(r.st() == StartControl::IDLE);
       g_system_active = true; r.run(3000);
       CHECK(!r.crank()); CHECK(!r.pump()); }                   // still held from before: no edge, no start
+
+    // KELLY'S UTE, 25 Oct. The starter's draw pulled the battery terminal off mid-crank; USB held the ECU up.
+    // Key off (the start switch stops being read, so start_sw goes unpublished), terminal fixed, key on with
+    // nobody near the key: the switch's frozen debounce published "pressed" for its first samples, then
+    // released. That was taken for a press and the engine cranked. Replayed here, in both modes.
+    SECTION("a stale 'pressed' at key-on (power lost mid-crank) never cranks");
+    for (int en = 0; en <= 1; ++en) {
+      Rig r; r.cfg.enabled = static_cast<uint8_t>(en); r.press = 30.0f; r.step();
+      r.sw = 1; r.step();                                    // the real press: cranking
+      CHECK(r.crank() || en);                                // (on: the request may still be waiting)
+      g_system_active = false; r.sw_live = false; r.run(2000);   // battery gone: key off, switch unread
+      CHECK(!r.crank());
+      g_system_active = true; r.sw_live = true;
+      r.sw = 1; r.step(); r.step(); r.step();                // the frozen debounce: three samples of "pressed"
+      bool cranked = r.crank();
+      r.sw = 0;                                              // ...then the pin's real reading
+      for (int t = 0; t < 10000; t += 10) { r.step(); cranked = cranked || r.crank(); }
+      CHECK(!cranked);
+      r.sw = 1; r.step();                                    // and a real press after it still works
+      CHECK(r.until_crank(5000) >= 0);
+      r.sw = 0; r.run(2000);
+    }
+
+    SECTION("a button already pressed at key-on is not a press until it is let go and pressed again");
+    for (int en = 0; en <= 1; ++en) {
+      Rig r; r.cfg.enabled = static_cast<uint8_t>(en); r.press = 30.0f;
+      g_system_active = false; r.sw_live = false; r.run(500);
+      g_system_active = true; r.sw_live = true; r.sw = 1;   // held (or stuck) through key-on
+      CHECK(r.until_crank(3000) < 0);
+      r.sw = 0; r.step(); r.sw = 1; r.step();
+      CHECK(r.until_crank(5000) >= 0);
+      r.sw = 0; r.run(2000);
+    }
+
+    SECTION("power_on() is a fresh module: nothing of the last key cycle survives");
+    { Rig r; r.press = 30.0f; r.step();
+      r.sw = 1; r.step(); CHECK(r.st() != StartControl::IDLE);
+      EngineModule::power_on(r.sc); r.sc.init(r.cfg);
+      r.sw = 1; r.step();                                    // still held: not armed in a fresh module
+      CHECK(r.st() == StartControl::IDLE); CHECK(!r.crank()); }
 
     SECTION("a wait longer than Give Up After ends the request");
     { Rig r; r.cfg.prime_ms = 5000; r.cfg.give_up_ms = 2000; r.step();

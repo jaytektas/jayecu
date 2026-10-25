@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <new>
+#include <type_traits>
 
 // Forward declarations — modules only see what they need.
 struct EnginePosition;
@@ -62,6 +64,32 @@ public:
     virtual void update(const EnginePosition& pos,
                         SignalBus&      bus,
                               EngineFrame&    frame) = 0;
+
+    // KEY-ON IS A POWER-ON: the module as it was the moment it was constructed. With USB holding the ECU
+    // up, key-off is not a reset, so everything a module learned about the last key cycle — a latched
+    // press, an integrator, a timer, a state machine mid-sequence — was still there at the next key-on.
+    // On a car that loses power at key-off none of it would be. Destroyed and constructed in place (no
+    // temporary: some modules are kilobytes and the engine task's stack is not); the caller re-runs its
+    // init() and wiring exactly as compose() did. What survives is the scheduler's own bookkeeping —
+    // which list it is threaded into and at what cadence — because that is how it was REGISTERED, not
+    // anything it knows. State meant to outlive a power loss lives outside the module (the learned
+    // region, the DTC store, the tune) and init() maps it back in.
+    template <class T>
+    static void power_on(T& m) {
+        static_assert(std::is_base_of<EngineModule, T>::value, "an EngineModule");
+        const EngineModule& b = m;
+        EngineModule* const next = b.sched_next_;
+        const bool     linked = b.sched_linked_;
+        const uint16_t period = b.sched_period_, phase = b.sched_phase_;
+        const uint32_t ttl_ms = b.sched_ttl_, cyc = b.sched_cyc_;
+        const char*    name   = b.sched_name_;
+        m.~T();
+        ::new (static_cast<void*>(&m)) T();
+        EngineModule& r = m;
+        r.sched_next_ = next; r.sched_linked_ = linked;
+        r.sched_period_ = period; r.sched_phase_ = phase;
+        r.sched_ttl_ = ttl_ms; r.sched_cyc_ = cyc; r.sched_name_ = name;
+    }
 
 protected:
     // The freshness TTL (ms) the scheduler derived from this module's cadence. Pass it as the ttl_ms arg

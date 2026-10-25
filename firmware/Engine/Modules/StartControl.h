@@ -36,6 +36,7 @@ private:
     DtcManager* dtc_ = nullptr;
     State    state_      = IDLE;
     bool     sw_prev_    = false;
+    bool     armed_      = false;   // the button has read RELEASED since key-on: only then is a press a press
     bool     was_enabled_ = false;  // enabled -> disabled edge: heal P0087 once
     bool     follow_sw_  = false;   // CRANK: the starter has had its chance — the request follows the button
     uint32_t press_ms_   = 0;       // when the press was latched (the pump started then)

@@ -63,6 +63,12 @@ public:
                          Cadence cadence = Cadence::KHZ_1, uint16_t cadence_hz = 1000);
 
     void set_dtc(DtcManager* d) { dtc_ = d; }   // the one cross-cutting error store
+    // KEY-OFF IS A POWER-OFF. Called on the frame the key goes off, once per cadence and on that
+    // cadence's own task (so nothing is rebuilt under its own update()): the composer puts every module
+    // back to its power-on state, and the next key-on finds the ECU as a power-on would. A plain function
+    // pointer, so EngineTask still never sees the concrete module set.
+    using PowerOnFn = void (*)(void* ctx, Cadence cadence);
+    void set_power_on(PowerOnFn fn, void* ctx) { power_on_fn_ = fn; power_on_ctx_ = ctx; }
     // Output-side pin-conflict probe (OutputManager::conflict_ptr()) OR'd into the P1650 merge so the
     // code heals only when BOTH the input and output pin conflicts clear. A plain value probe, not a
     // manager back-ref — EngineTask never sees OutputManager's type.
@@ -165,6 +171,10 @@ private:
     volatile uint32_t  start_gen_ = 0;       // bumped on each RUNNING edge
     uint32_t           seen_stop_gen_  = 0;  // per-cycle task: last stop_gen_ it has dispatched
     uint32_t           seen_start_gen_ = 0;  // per-cycle task: last start_gen_ it has dispatched
+    volatile uint32_t  key_off_gen_      = 0;  // bumped on each key-off edge (1 kHz task)
+    uint32_t           seen_key_off_gen_ = 0;  // per-cycle task: last key-off it has rebuilt for
+    PowerOnFn          power_on_fn_  = nullptr;
+    void*              power_on_ctx_ = nullptr;
 
     SignalBus          signal_bus_;
     EnginePositionHal& epos_hal_;

@@ -199,6 +199,7 @@ private:
     void     rederive_shared();
     // Heal what an input raised, once, when it is switched off (see the .cpp).
     void     retire_codes(uint8_t i);
+    void     reset_runtime();                // key-on: every gated sensor's runtime state, as at boot
     void     rebuild_one(uint8_t i);         // pipeline + secondary outputs of one input
     uint32_t built_crc_[SENSOR_COUNT] = {};  // fingerprint of each element as its pipeline was built
     // Set by the rebuild that turned an input OFF, cleared by the frame that retires its codes. One

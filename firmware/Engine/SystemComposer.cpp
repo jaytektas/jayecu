@@ -7,6 +7,7 @@ void SystemComposer::compose(EngineTask& task, CanBroker& can_broker,
                              SoftPwm& soft_pwm, uint32_t soft_pwm_tps,
                              PinArbiter& pin_arbiter, Comms::CommsManager& comms,
                              IHBridge* hbridge_a, IHBridge* hbridge_b) {
+    hb_a_ = hbridge_a; hb_b_ = hbridge_b; comms_ = &comms;
     // --- init the concrete managers (the former EngineTask::start() body) ---
     engine_protection_.init(g_config.engine_protection);
     rev_limiter_.init(g_config.rev_limiter);
@@ -95,6 +96,8 @@ void SystemComposer::compose(EngineTask& task, CanBroker& can_broker,
     task.set_dtc(&diag_.table());
     // OUTPUT-side pin-conflict probe -> the P1650 merge (heals only when input+output both clear).
     task.set_output_conflict(output_manager_.conflict_ptr());
+
+    task.set_power_on(&SystemComposer::power_on, this);   // key-off = power-off (see power_on_khz1)
 
     // Engine run-state thresholds (schema Engine group) -> the STOPPED/CRANKING/RUNNING machine.
     task.set_engine_state_params({
@@ -202,3 +205,89 @@ void SystemComposer::compose(EngineTask& task, CanBroker& can_broker,
 // so scalars are live with nothing to do. A module with DERIVED state — a bound pin, a composed
 // pipeline, a scaled constant — watches g_config_generation itself and re-derives from update(). See
 // Sensors::update, OutputManager::update, ScriptEngine and CommsManager, each of which says so.
+
+void SystemComposer::power_on(void* self, EngineTask::Cadence cadence) {
+    auto* c = static_cast<SystemComposer*>(self);
+    if (cadence == EngineTask::Cadence::KHZ_1) c->power_on_khz1();
+    else                                       c->power_on_per_cycle();
+}
+
+// KEY-OFF IS A POWER-OFF, for the 1 kHz task's modules. On a car the ECU loses power at key-off and the
+// next key-on starts from nothing; with USB holding it up it used to start from whatever the last key
+// cycle left. That is how a start press frozen mid-crank (the battery dropped out under the starter)
+// came back at key-on as a fresh press and cranked the engine with nobody on the key.
+//
+// Each module is constructed in place and given the SAME init() and wiring compose() gives it, in the
+// same order. Anything meant to survive a power loss is outside the module and init() maps it back in:
+// the learned region (LTFT, idle/boost/VVT long-term trims), the DTC store, the tune.
+//
+// NOT REBUILT, each for a reason:
+//   sensors_          skipped while the key is off, so nothing in them drifts; they re-seed themselves
+//                     on the key-ON edge, before any gated sensor runs (Sensors::reset_runtime).
+//   output_manager_   already releases every pin at key-off and rebuilds from scratch at key-on, with
+//                     every conditioned gate born OFF (OutputManager::update) — the same thing, its own way.
+//   diag_             the DTC table IS the record of what happened; a power loss keeps it too (SD store).
+//   knock_            its measurement ring is written by the knock worker task; rebuilding it here would
+//                     race the producer. Its state is per-cylinder knock classification, which only means
+//                     anything with the engine running, and its noise floor is in the learned region.
+//   misfire_          the segment timer it reads is fed from the capture ISR and bound by main; its state
+//                     is per-cylinder classification, meaningful only while running.
+//   output_test_      bench-only, and cancels itself on its own rules.
+//   script_engine_    Lua runs on its own thread and owns its interpreter's lifetime.
+void SystemComposer::power_on_khz1() {
+    EngineModule::power_on(hardware_input_);
+    EngineModule::power_on(vehicle_speed_);   vehicle_speed_.init(g_config.vehicle_speed);
+    EngineModule::power_on(gear_detect_);     gear_detect_.init(g_config.gear_detect);
+    EngineModule::power_on(traction_);        traction_.init(g_config.traction_control);
+    traction_.set_dtc(&diag_.table());
+    EngineModule::power_on(engine_protection_);
+    engine_protection_.init(g_config.engine_protection);
+    engine_protection_.set_sensors(&sensors_);
+    engine_protection_.set_dtc(&diag_.table());
+    EngineModule::power_on(rev_limiter_);     rev_limiter_.init(g_config.rev_limiter);
+    EngineModule::power_on(launch_);          launch_.init(g_config.launch);
+    launch_.set_dtc(&diag_.table());
+    EngineModule::power_on(boost_);           boost_.init(g_config.boost);
+    boost_.set_dtc(&diag_.table());
+    EngineModule::power_on(dfco_);            dfco_.init(g_config.dfco);
+    EngineModule::power_on(lambda_protect_);  lambda_protect_.init(g_config.lambda_protect);
+    EngineModule::power_on(flat_shift_);      flat_shift_.init(g_config.flat_shift);
+    EngineModule::power_on(vvt_);             vvt_.init(g_config.vvt_control);
+    EngineModule::power_on(pit_limiter_);     pit_limiter_.init(g_config.pit_limiter);
+    EngineModule::power_on(nitrous_);         nitrous_.init(g_config.nitrous);
+    EngineModule::power_on(wmi_);             wmi_.init(g_config.wmi);
+    EngineModule::power_on(anti_lag_);        anti_lag_.init(g_config.anti_lag);
+    EngineModule::power_on(vvl_);             vvl_.init(g_config.vvl);
+    EngineModule::power_on(egt_protect_);     egt_protect_.init(g_config.egt_protect);
+    egt_protect_.set_dtc(&diag_.table());
+    EngineModule::power_on(cruise_control_);  cruise_control_.init(g_config.cruise_control);
+    cruise_control_.set_dtc(&diag_.table());
+    EngineModule::power_on(torque_model_);    torque_model_.init(g_config.torque_model);
+    EngineModule::power_on(alternator_);      alternator_.init(g_config.alternator);
+    EngineModule::power_on(lambda_);          lambda_.init(g_config.lambda);
+    lambda_.set_dtc(&diag_.table());
+    EngineModule::power_on(app_);             app_.init(g_config.app);
+    app_.set_dtc(&diag_.table());
+    EngineModule::power_on(electronic_throttle_);
+    electronic_throttle_.init(g_config.electronic_throttle);
+    electronic_throttle_.set_dtc(&diag_.table());
+    EngineModule::power_on(start_control_);   start_control_.init(g_config.start_control, &electronic_throttle_);
+    start_control_.set_dtc(&diag_.table());
+    EngineModule::power_on(transient_throttle_);
+    transient_throttle_.init(g_config.transient_throttle);
+    transient_throttle_.set_dtc(&diag_.table());
+    EngineModule::power_on(idle_);            idle_.init(g_config.idle);
+    EngineModule::power_on(stepper_);         stepper_.init(g_config.stepper);
+    stepper_.set_dtc(&diag_.table());
+    EngineModule::power_on(ignition_trim_);   ignition_trim_.init(g_config.ignition);
+    EngineModule::power_on(fuel_trim_);       fuel_trim_.init(g_config.fuel_calculator);
+    EngineModule::power_on(hbridge_control_); hbridge_control_.init(g_config.h_bridge, hb_a_, hb_b_, comms_);
+    hbridge_control_.set_dtc(&diag_.table());
+}
+
+// …and the per-cycle task's, on that task.
+void SystemComposer::power_on_per_cycle() {
+    EngineModule::power_on(fuel_calc_);       fuel_calc_.init(g_config.fuel_calculator);
+    fuel_calc_.set_dtc(&diag_.table());
+    EngineModule::power_on(ignition_);        ignition_.init(g_config.ignition);
+}

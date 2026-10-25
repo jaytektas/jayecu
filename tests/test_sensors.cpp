@@ -1060,6 +1060,42 @@ int main() {
         printf("ok  system-active gate: bench=battery-only, key-on=all sensors\n");
     }
 
+    // ---- 17c. KEY-ON IS A POWER-ON: a switch frozen PRESSED across a key-off reads its pin at key-on ----
+    // Kelly's ute, 25 Oct: the starter's draw pulled the battery terminal off mid-crank with USB holding the
+    // ECU up. The start switch was skipped from key-off on, its debounce frozen at "pressed"; at key-on the
+    // pin read released, but the debounce took three samples to count down, and published "pressed" for
+    // them — a press, to the start sequence. The first value after key-on must be the pin's.
+    {
+        SensorsConfig cfg{};
+        SensorConfig& b = cfg.sensor[BAT]; b.enabled = 1; b.interface = IFSEL_ANALOG_VOLTAGE;
+        b.source = 11; lin(b, 5000, 3025);
+        SensorConfig& c = cfg.sensor[SWP]; c.enabled = 1; c.interface = IFSEL_DIGITAL; c.source = 0;
+        Sensors s; s.init(cfg); SignalBus bus;
+        const SignalId ch = (SignalId)SENSOR_CATALOG[SWP].primary_channel;
+        const uint32_t sw_slot = slot_ms(SWP);
+        g_key_override = 0;
+        g_ain[11] = 2232; g_din[0] = true;                     // key on, switch pressed
+        for (int f = 0; f < 6; f++) { g_tick += sw_slot; pump(s, bus); }
+        assert(g_system_active && bus.get(ch) > 0.5f);
+        g_ain[11] = 50;                                        // the battery drops out: key off
+        g_tick += 1; pump(s, bus);
+        assert(!g_system_active);
+        g_din[0] = false;                                      // key released while the ECU cannot see it
+        for (int f = 0; f < 50; f++) { g_tick += sw_slot; pump(s, bus); }
+        g_ain[11] = 2232;                                      // terminal back on: key on
+        g_tick += sw_slot; pump(s, bus);
+        assert(g_system_active);
+        assert(bus.valid(ch) == false || bus.get(ch) < 0.5f);  // NOT the frozen "pressed"
+        for (int f = 0; f < 5; f++) { g_tick += sw_slot; pump(s, bus); assert(bus.get(ch) < 0.5f); }
+        // and a real press is still a press, after its debounce
+        g_din[0] = true;
+        for (int f = 0; f < 6; f++) { g_tick += sw_slot; pump(s, bus); }
+        assert(bus.get(ch) > 0.5f);
+        g_din[0] = false;
+        g_key_override = 1;
+        printf("ok  key-on is a power-on: a switch frozen pressed across key-off reads its pin\n");
+    }
+
     // ---- 18. sensor diagnostics raise/heal into the unified DTC table ----
     {
         SensorsConfig cfg{};

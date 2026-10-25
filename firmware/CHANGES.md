@@ -9,6 +9,16 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- **Key-on is a power-on.** With USB holding the ECU up, key-off used to leave every module and sensor as
+  it was, and the next key-on carried on from there. Now key-off puts every module back to its power-on
+  state and key-on re-reads every sensor from scratch. Only what survives a real power loss carries over:
+  the tune, learned trims, knock learning and stored fault codes.
+  - Found on a car: the battery terminal let go under the starter mid-crank. At key-on the start switch
+    still read "pressed" for its first few samples, the start sequence took that for a press, and the
+    engine cranked with nobody on the key.
+- **A start press has to be seen.** The start button must read released with the key on before any press
+  counts, with Engine Start on or off. A button already pressed at key-on (held, stuck, or stale) never
+  starts a crank: let it go and press again.
 
 ## 0.4.20
 - Trigger inputs use only the edges selected in Edge. A pulse-width cam (the 2JZ / 1JZ front or rear cam, and every

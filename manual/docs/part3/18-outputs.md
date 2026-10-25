@@ -413,6 +413,13 @@ the request is dropped after 1.5 s rather than left waiting. Key-off or a runnin
 sequence. If the engine is not fit to crank within **Give Up After** (8 s), for example because the
 throttle failed its check, the press is dropped; press again to retry.
 
+**A press has to be seen.** With the key on, the start button must read *released* before any press
+counts, whether the sequence is on or off. A button that is already pressed at key-on can never start a
+crank: let it go and press it again. That covers a key held in START while the ignition comes on, a
+stuck or shorted button, and the case that found it. On 0.4.20 and earlier, a battery that dropped out
+under the starter, with USB keeping the ECU up, could come back at key-on as a fresh press and crank
+with nobody on the key.
+
 **Start Sequence** `start_state` shows what a press is waiting on: *Idle*, *Waiting for Throttle*,
 *Building Fuel Pressure* or *Cranking*. All three channels are in the default logs.
 

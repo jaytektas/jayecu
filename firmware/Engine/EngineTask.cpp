@@ -202,6 +202,10 @@ void EngineTask::run_cycle() {
         // THIS task — so on_engine_start/on_engine_stop never race their update(). Stop is applied
         // before start (chronological order if both advanced since the last wake). The 50 ms timeout
         // guarantees the stop edge is seen even after cycle boundaries cease.
+        if (key_off_gen_ != seen_key_off_gen_) {   // key-off: this task's modules back to power-on
+            seen_key_off_gen_ = key_off_gen_;
+            if (power_on_fn_) power_on_fn_(power_on_ctx_, Cadence::PER_CYCLE);
+        }
         if (stop_gen_  != seen_stop_gen_ ) { seen_stop_gen_  = stop_gen_;  dispatch_lifecycle(Cadence::PER_CYCLE, /*started=*/false); }
         if (start_gen_ != seen_start_gen_) { seen_start_gen_ = start_gen_; dispatch_lifecycle(Cadence::PER_CYCLE, /*started=*/true);  }
 
@@ -266,8 +270,17 @@ void EngineTask::run_frame() {
     // had already been skipped as key-off but the modules ran anyway and found their inputs missing.
     // Reading it here instead of recomputing it keeps one owner: a second hysteresis on the same
     // battery could disagree with the first about exactly when the key turned.
+    const bool key_off_edge = key_on_ && !g_system_active;
     key_on_ = g_system_active;
     g_sd_arb.service(key_on_, platform_get_tick_ms());
+    // THE KEY WENT OFF: every module back to its power-on state, before the MODULE phase runs on this
+    // frame. This task's own modules here and now; the per-cycle task's on its next wake (key_off_gen_).
+    // Sensors re-seed themselves at the key-ON edge (Sensors::reset_runtime), because they are skipped
+    // while the key is off and so cannot drift.
+    if (key_off_edge && power_on_fn_) {
+        power_on_fn_(power_on_ctx_, Cadence::KHZ_1);
+        key_off_gen_++;
+    }
 
     // system-active = key-on: the master ACTUATION gate, set by Sensors in the INPUT phase above.
     // Closing the firing gate stops spark/injection immediately (a bench trigger on USB can't drive

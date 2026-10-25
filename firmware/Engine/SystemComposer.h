@@ -66,7 +66,10 @@ public:
                  PinArbiter& pin_arbiter, Comms::CommsManager& comms,
                  IHBridge* hbridge_a, IHBridge* hbridge_b);
 
-    // Re-apply tune constants to the concrete modules (called on a burn from the host).
+    // KEY-OFF IS A POWER-OFF: put every module of one cadence back to its power-on state — constructed
+    // afresh, init()ed and wired exactly as compose() does. EngineTask calls it on the key-off frame, on
+    // each cadence's own task. See power_on_khz1() for what is rebuilt and what is deliberately not.
+    static void power_on(void* self, EngineTask::Cadence cadence);
 
     // The unified DTC table (owned by the Diagnostics module).
     DtcManager& dtc() { return diag_.table(); }
@@ -82,6 +85,13 @@ public:
     Misfire& misfire() { return misfire_; }
 
 private:
+    void power_on_khz1();
+    void power_on_per_cycle();
+    // What compose() was handed that a module's init() needs again.
+    IHBridge*             hb_a_  = nullptr;
+    IHBridge*             hb_b_  = nullptr;
+    Comms::CommsManager*  comms_ = nullptr;
+
     HardwareInput      hardware_input_;   // INPUT phase, runs before sensors_ (publishes raw pins to the bus)
     Sensors            sensors_;
     EngineProtection   engine_protection_;
