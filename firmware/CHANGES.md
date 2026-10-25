@@ -9,6 +9,14 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- GM LS1 24x (and any Sequence crank with a cam) now reaches full sequential sync. It stayed on wasted
+  spark and batch fire for good, with no fault.
+- A trigger set up with only Width streams is now refused with P1652. It could never sync, but the ECU
+  reported it as able to run sequential.
+- Cam advance no longer carries a reading from before a sync loss or a trigger change; it waits for a
+  fresh cam edge.
+- After a trigger fault at speed, later key-offs and stops no longer report the trigger as missing
+  (P0338) on a healthy wire.
 - Trigger Last Error Kind now reads by name (Tooth Window, Missed Tooth, Phase Lost ...) and its range covers
   all seven kinds. It was declared 0 to 2, so Missed Tooth, Noise Edge, Signal Absent and Phase Lost fell outside
   it.

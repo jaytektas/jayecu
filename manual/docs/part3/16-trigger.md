@@ -224,9 +224,10 @@ crank wheel. The phaser moves the cam on purpose, so its position is not a fixed
 
 **The ECU checks your setup before it will fire.** Every time the trigger settings change, it works
 out the best sync level the setup can ever reach. If the answer is None (an even wheel with nothing
-to anchor it that cannot sync always, or only a phased cam to anchor it), it refuses to fire and
-raises **P1652**. You can see
-the answer live as **Trigger Sync Ceiling** `trigger_sync_ceiling`.
+to anchor it that cannot sync always, only a phased cam to anchor it, or only Width streams), it
+refuses to fire and raises **P1652**. A Width stream needs a Gap or Sequence stream beside it: it
+measures its pulse in degrees using the speed that stream measures, so on its own it can never
+lock. You can see the answer live as **Trigger Sync Ceiling** `trigger_sync_ceiling`.
 <!-- src: firmware/Scheduler/TriggerConfigCheck.h; firmware/Scheduler/EnginePositionHal.cpp; firmware/Engine/EngineTask.cpp -->
 
 **Checking the cam against the crank.** When the cam's reference arrives, the ECU compares where the

@@ -1666,7 +1666,7 @@ firmware_dtc:
 - {code: P1217, label: "Protection: coolant-temperature warning"}
 - {code: P1650, label: "Config: pin / output conflict (one pin claimed by two functions)"}
 - {code: P1651, label: "Config: invalid firing order (duplicate or missing cylinder)"}
-- {code: P1652, label: "Config: trigger cannot establish position — no absolute reference, or a single even wheel not set up as a distributor (Ignition Mode Distributor, injection Multi-Point or Sequential any sync)"}
+- {code: P1652, label: "Config: trigger cannot establish position — no absolute reference, only Width streams (nothing measures speed), or a single even wheel not set up as a distributor (Ignition Mode Distributor, injection Multi-Point or Sequential any sync)"}
 - {code: P1653, label: "Config: a cylinder in the firing order has no coil output"}
 - {code: P1654, label: "Config: a cylinder in the firing order has no stage 1 injector output"}
 # A broadcast on a bus running at the wrong rate is the cruellest failure on CAN: no frame ever

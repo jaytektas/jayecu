@@ -30,6 +30,14 @@ int main() {
       CHECK(r.ceiling == SyncLvl::PHASE);   // it cannot ANCHOR, but the crank already does that
       CHECK(r.fault == TriggerConfigFault::NONE); }
 
+    SECTION("a WIDTH cam ALONE is refused — nothing measures the speed its width is judged in");
+    { std::memset(st,0,sizeof st); st[2] = mk(1,2,0,0);
+      const auto r = check_trigger_config(st, MAX_STREAMS, ANGLE_720);
+      // It used to pass as a cam-only PHASE source. The decoder never locks it (no tooth rate), so
+      // the tune was promised sequential and the engine never started, with nothing recorded.
+      CHECK(r.ceiling == SyncLvl::NONE); CHECK(!r.can_fire());
+      CHECK(r.fault == TriggerConfigFault::NO_RATE_SOURCE); }
+
     SECTION("an even crank ALONE can never know where it is — refused");
     { std::memset(st,0,sizeof st); st[0] = mk(1,0,0,0);
       const auto r = check_trigger_config(st, MAX_STREAMS, ANGLE_720);

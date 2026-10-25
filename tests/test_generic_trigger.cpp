@@ -497,6 +497,65 @@ int main() {
         CHECK(g.rev_known());
     }
 
+    // A SEQUENCE crank had no teeth-per-cycle (present_teeth() knew only GAP), so the cam window
+    // never opened and PHASE could not be reached at all — the GM LS1 24x preset, as shipped, sat at
+    // CRANK for good. Its real cells, both edges, with its half-moon cam.
+    SECTION("crank SEQUENCE (GM LS1 24x) + cam WIDTH (half-moon) → PHASE");
+    {
+        AngleDeg10 cell[48] = {120,30,30,120,30,120,30,120,30,120,30,120,120,30,30,120,30,120,30,120,
+                               120,30,120,30,30,120,30,120,120,30,120,30,120,30,30,120,120,30,30,120,
+                               120,30,120,30,120,30,120,30};
+        GenericTrigger g;
+        int cr  = g.add_seq(0, 2, cell, 48, 25);
+        int cam = g.add_width(2, REPEATS_PHASE, 0, 7200, 0, /*leading_rising*/true);
+        struct E { uint32_t tick; int idx; bool rising; };
+        std::vector<E> ev;
+        for (int c=0;c<12;c++) {
+            for (int rev=0;rev<2;rev++) {
+                uint32_t a = 0;
+                for (int k=0;k<48;k++) { ev.push_back({(c*7200 + rev*3600 + a)*K, cr, true}); a += cell[k]; }
+            }
+            ev.push_back({(uint32_t)(c*7200)*K, cam, true});           // high for the first revolution
+            ev.push_back({(uint32_t)(c*7200 + 3600)*K, cam, false});
+        }
+        std::stable_sort(ev.begin(), ev.end(), [](const E&a,const E&b){return a.tick<b.tick;});
+        for (auto& e : ev) g.on_edge((uint8_t)e.idx, e.tick + 1000, e.rising);
+        CHECK(g.level() == SyncLvl::PHASE);
+        CHECK(g.rev_known());
+    }
+
+    // The cam's measured displacement survived a sync loss and a rebuild, and the HAL publishes it as
+    // cam advance the moment the cam stream locks again — a VVT loop closing on a number measured
+    // before the engine lost its position, or before the wheel was changed.
+    SECTION("a cam residual dies with the sync, and with a rebuild");
+    {
+        auto run = [](GenericTrigger& g) {
+            uint8_t gi[1]={0}, gr[1]={2};
+            int cr  = g.add_gap(0, 2, 36, gi, gr, 1, 25);
+            int cam = g.add_width(2, REPEATS_PHASE, 600, 1100, 5000, true);
+            g.set_phase_meta(2, 5000, true, 600);
+            struct E { uint32_t tick; int idx; bool rising; };
+            std::vector<E> ev;
+            for (int c=0;c<12;c++) {
+                for (int rev=0;rev<2;rev++) for (int slot=0;slot<35;slot++)
+                    ev.push_back({(c*7200 + rev*3600 + slot*100)*K, cr, true});
+                ev.push_back({(uint32_t)(c*7200 + 4900)*K, cam, true});    // 10 deg early
+                ev.push_back({(uint32_t)(c*7200 + 5700)*K, cam, false});
+            }
+            std::stable_sort(ev.begin(), ev.end(), [](const E&a,const E&b){return a.tick<b.tick;});
+            for (auto& e : ev) g.on_edge((uint8_t)e.idx, e.tick + 1000, e.rising);
+        };
+        GenericTrigger g; run(g);
+        CHECK(g.level() == SyncLvl::PHASE);
+        CHECK(g.phase_resid_valid(2));
+        CHECK(g.phase_residual(2) == -100);
+        g.drop_sync();
+        CHECK(!g.phase_resid_valid(2));
+        GenericTrigger h; run(h);
+        h.reset_all();
+        CHECK(!h.phase_resid_valid(2));
+    }
+
     // Audit T6. The revolution used to come from the cam's CONFIGURED angle alone. A wide cam pulse
     // configured at 320 deg is only recognised at its trailing edge, 400 deg — after the crank has
     // wrapped into revolution 1 — so the configured angle said "revolution 0" and the engine was placed

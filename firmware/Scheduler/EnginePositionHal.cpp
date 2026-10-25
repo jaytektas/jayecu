@@ -474,6 +474,15 @@ void EnginePositionHal::handle_sync_level_change(SyncLevel from, SyncLevel to) n
         // velocity behind. get_rpm_x10() gates on the level so nothing reads it — which is exactly
         // what was true of the stale velocity that reported 1348 rpm into a dead trigger for forty
         // minutes. A value that outlives the thing it was measured from is not worth keeping.
+        // WAS THAT A FAULT? The deadline answers this for itself; a loss the MATCHER decided (a late
+        // tooth rejected on arrival — the usual end of a stop) reaches here with the grid velocity
+        // still live, and must answer it too, or the follow-up below acts on whatever an earlier
+        // incident said and reports a stopped engine's trigger as absent. A deadline or gate loss
+        // has already cleared the velocity, and its own answer stands.
+        if (grid_tpv_) {
+            const uint32_t floor_x10 = static_cast<uint32_t>(g_config.engine.cranking_rpm) * 10u;
+            lost_at_speed_ = (grid_rpm_x10() >= floor_x10);
+        }
         grid_tpv_     = 0;
         grid_vt_step_ = 0;
         // There is no position left to lose, but there IS still a question worth answering: was
@@ -821,9 +830,14 @@ SyncLevel EnginePositionHal::get_sync_level() const noexcept
 
 uint32_t EnginePositionHal::get_rpm_x10() const noexcept
 {
-    if (!assignment_.timebase) return 0;
     // No position lock → no meaningful RPM (and don't report a stale period).
     if (get_sync_level() == SyncLevel::NONE) return 0;
+    return grid_rpm_x10();
+}
+
+uint32_t EnginePositionHal::grid_rpm_x10() const noexcept
+{
+    if (!assignment_.timebase) return 0;
 
     // SINGLE SOURCE OF TRUTH: RPM is derived from the PLL's live ticks-per-virtual-
     // tooth — the SAME value the fire-tick interpolation uses — not a second EMA.
@@ -1066,6 +1080,7 @@ void EnginePositionHal::on_gen_edge(uint8_t s, uint32_t tick) noexcept
         last_fine_tick_valid_ = true;
         tooth_overdue_reported_ = false;
         trigger_absent_       = false;   // a tooth arrived: whatever was wrong, it is not absence
+        lost_at_speed_        = false;   // ...and the last loss's verdict no longer applies
         arm_tooth_deadline(tick);
     }
     if (gtrig_.fine_advanced() && vtrig_feed) {

@@ -456,7 +456,12 @@ private:
     volatile bool trigger_absent_ = false;
     // Was the engine RUNNING (at or above the Cranking Threshold) when the last tooth went missing?
     // Decides whether that loss is a fault or just the engine stopping (see on_tooth_deadline).
+    // Answered at EVERY loss (the deadline, or the matcher via handle_sync_level_change) and cleared
+    // by the next tooth, so a "yes" from one incident cannot decide a later one.
     volatile bool lost_at_speed_  = false;
+    // The grid's speed, ungated by the sync level — what get_rpm_x10() reports while synced, and what
+    // a matcher-driven loss reads to answer lost_at_speed_ before the velocity is cleared.
+    [[nodiscard]] uint32_t grid_rpm_x10() const noexcept;
 
     // Arm the deadline for the next tooth this stream predicts; disarm when there is no position to
     // lose. Both cheap enough for the capture ISR (one CCR write).

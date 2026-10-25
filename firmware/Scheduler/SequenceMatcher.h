@@ -100,6 +100,7 @@ public:
     [[nodiscard]] AngleDeg10  next_pitch()  const noexcept {
         return (state_ == State::LOCKED && cell_ && n_) ? cell_[idx_] : 0; }
     [[nodiscard]] uint8_t     index()       const noexcept { return idx_; }   // current cell index
+    [[nodiscard]] uint8_t     events()      const noexcept { return n_; }     // events in one period
     [[nodiscard]] AngleDeg10  period()      const noexcept { return period_; }
 
 private:

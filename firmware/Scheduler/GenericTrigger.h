@@ -82,6 +82,7 @@ public:
         n_ = 0; level_ = SyncLvl::NONE; angle_ = 0; velocity_ = 0;
         rev_ = 0; rev_known_ = false; prev_fine_ = 0; primed_fine_ = false; has_crank_ = false;
         rep_ = 0; fine_period_ = ANGLE_360; fine_repeats_ = 2;
+        clear_residuals();   // measured against a position that is gone; VVT must not close on it
     }
 
     // RUNTIME sync loss that KEEPS the stream config — for a forced desync (lost-trigger watchdog) where
@@ -114,6 +115,7 @@ public:
         // build_generic re-adds every stream immediately after.
         rev_ = 0; rev_known_ = false; prev_fine_ = 0; primed_fine_ = false;
         rep_ = 0; fine_period_ = ANGLE_360; fine_repeats_ = 2;
+        clear_residuals();   // measured against a position that is gone; VVT must not close on it
     }
 
     // add_gap/add_seq COPY the cell into per-stream storage, so callers may pass stack
@@ -436,9 +438,12 @@ private:
             return kind == PrimKind::SEQUENCE ? (seq.index() == 0)
                  : kind == PrimKind::WIDTH    ? width.matched()
                                               : (gap.index() == 0); }
-        // Present teeth in ONE period of this stream (what actually arrives, gaps excluded).
+        // Present teeth in ONE period of this stream (what actually arrives, gaps excluded). A
+        // SEQUENCE has no gaps: every cell is an event. Leaving it out left a SEQUENCE crank with no
+        // teeth per cycle, so the cam window never opened and PHASE was unreachable (GM LS1 24x).
         uint16_t present_teeth() const noexcept {
-            return kind == PrimKind::GAP ? gap.present() : 0; }
+            return kind == PrimKind::GAP      ? gap.present()
+                 : kind == PrimKind::SEQUENCE ? seq.events() : 0; }
         // The engine angle of the edge being processed RIGHT NOW. For GAP and SEQUENCE that is
         // angle(), which advances per event. WIDTH is the exception: it is fed at the trailing edge
         // but reports the leading edge's angle, so anchoring on angle() lands a whole pulse early.
@@ -1070,6 +1075,9 @@ private:
     uint32_t   noise_total_ = 0, missed_total_ = 0, phase_lost_total_ = 0;
     AngleDeg10 phase_resid_[MAX_STREAMS] = {};    // measured cam displacement, per stream
     bool       phase_resid_ok_[MAX_STREAMS] = {};
+    void clear_residuals() noexcept {
+        for (int i = 0; i < MAX_STREAMS; ++i) { phase_resid_[i] = 0; phase_resid_ok_[i] = false; }
+    }
     uint8_t    last_err_stream_ = 0xFF;   // which stream raised the last fault (see last_error_stream)   // free-running; see noise_total()/missed_total()
     // Phase liveness, counted in CRANK TEETH — the primary is the clock, so this needs no timer.
     // ANCHOR STATE. Position is established or it is not; there is no third answer.

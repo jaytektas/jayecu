@@ -491,5 +491,62 @@ int main() {
         g_config.engine.cranking_rpm = keep;
     }
 
+    SECTION("a fault's verdict does not decide the NEXT loss (lost_at_speed_ went stale)");
+    {
+        // An at-speed loss answers "yes, that was running": a missed tooth, then absent.
+        auto fault_at_speed = [&] {
+            w = Wheel{};
+            w.spin_serviced(hal, 200); w.spin_to(10);
+            advance_by(3 * TPS);
+            hal.service();
+            CHECK(hal.get_decoder_telemetry().trigger_absent == true);
+        };
+
+        // KEY OFF. Closing the gate drops sync and clears the velocity, then the follow-up asks
+        // "absent?" — and used to read the earlier fault's "yes": every key-off after one at-speed
+        // loss reported a healthy trigger as missing (P0338) for as long as the key stayed off.
+        fault_at_speed();
+        w = Wheel{};
+        w.spin_serviced(hal, 200);
+        CHECK(hal.get_sync_level() != SyncLevel::NONE);
+        hal.set_firing_gate(false);
+        hal.service();
+        CHECK(hal.get_sync_level() == SyncLevel::NONE);
+        advance_by(3 * TPS);
+        hal.service();
+        CHECK(hal.get_decoder_telemetry().trigger_absent == false);
+        hal.set_firing_gate(true);
+
+        // A loss the MATCHER decides — here a gap that is not there — below the threshold. The
+        // deadline never runs, so the question is answered at the sync change, from the grid speed.
+        fault_at_speed();
+        const uint16_t keep = g_config.engine.cranking_rpm;
+        g_config.engine.cranking_rpm = 1000;
+        w = Wheel{};
+        w.spin_serviced(hal, 200); w.spin_to(Wheel::LAST_PRESENT);
+        CHECK(hal.get_sync_level() != SyncLevel::NONE);
+        advance_by(TOOTH_TICKS);                       // one pitch where the gap's two were due
+        g_crank.edge();
+        hal.service();
+        CHECK(hal.get_sync_level() == SyncLevel::NONE);
+        advance_by(3 * TPS);
+        hal.service();
+        CHECK(hal.get_decoder_telemetry().trigger_absent == false);
+        g_config.engine.cranking_rpm = keep;
+
+        // ...and the same loss ABOVE it is a running engine whose trigger then went silent: that
+        // still upgrades to absent. Clearing the verdict on every tooth without answering it here
+        // would lose this one.
+        w = Wheel{};
+        w.spin_serviced(hal, 200); w.spin_to(Wheel::LAST_PRESENT);
+        advance_by(TOOTH_TICKS);
+        g_crank.edge();
+        hal.service();
+        CHECK(hal.get_sync_level() == SyncLevel::NONE);
+        advance_by(3 * TPS);
+        hal.service();
+        CHECK(hal.get_decoder_telemetry().trigger_absent == true);
+    }
+
     return test_summary();
 }

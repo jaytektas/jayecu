@@ -30,6 +30,7 @@ enum class TriggerConfigFault : uint8_t {
     ONLY_PHASED_ANCHOR,  // the only absolute source is a phaser, which is not a reference
     EVEN_WHEEL_COILS,    // a single even wheel, but Ignition Mode is not Distributor (or the teeth do not fit it)
     EVEN_WHEEL_INJECTION,// a single even wheel, but an injection stage times each injector to its cylinder
+    NO_RATE_SOURCE,      // only WIDTH streams: a width is measured against a tooth rate nothing provides
 };
 
 // What the ENGINE is, as far as a single even wheel is concerned. Default-constructed it says nothing,
@@ -108,12 +109,14 @@ struct TriggerConfigCheck {
     bool phase_id = false;          // a cam that can identify the cycle (a phaser still can)
     bool phase_anchor_fixed = false;// a cam that can also ANCHOR (fixed phase only)
     uint8_t enabled_n = 0;          // how many streams the tune runs
+    bool rate_source = false;       // a GAP or SEQUENCE stream: the only kinds that measure a speed
     uint16_t even_tpc = 0;          // teeth per cycle of the last even (non-anchoring) stream
 
     for (uint8_t i = 0; i < n; ++i) {
         const StreamsConfig& c = streams[i];
         if (!c.enabled) continue;
         any = true;
+        if (c.primitive != 2) rate_source = true;
         // The slot is the role, and the role gives the default rate; `repeats` states it outright for
         // a wheel that is neither (a symmetrical pattern, a distributor on an odd-cylinder engine).
         const StreamRepeats dflt = role_is_cam_slot(i)
@@ -139,6 +142,10 @@ struct TriggerConfigCheck {
     }
 
     if (!any) { out.fault = TriggerConfigFault::NO_STREAMS; return out; }
+    // A WIDTH stream measures its pulse in crank degrees, against the tooth period a GAP or SEQUENCE
+    // stream supplies (WidthMatcher::feed returns at once without one). Alone it never matches, never
+    // locks, and the engine never starts — while this check used to call it a cam-only PHASE source.
+    if (!rate_source) { out.fault = TriggerConfigFault::NO_RATE_SOURCE; return out; }
 
     // One stream, and it is even: sync always, if the coils allow it (see even_wheel_sync_always).
     if (enabled_n == 1 && !crank_anchor && !phase_id) {
