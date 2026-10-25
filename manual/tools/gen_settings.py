@@ -76,9 +76,53 @@ def describe(name, f, signals):
     return rng, default, units
 
 
+def describe_member(f):
+    """A struct-array member: one definition shared by every element, so the default may differ per
+    element (a list) and the options may come from a picker rather than a fixed list."""
+    units = f.get("units", "")
+    d = f.get("default")
+    opts = f.get("options") or [o["label"] for s in f.get("picker", {}).get("sets", [])
+                                for o in s.get("options", [])]
+    if opts:
+        rng = "one of: " + ", ".join(o for o in opts if o and o != "INVALID")
+        default = f["options"][d] if f.get("options") and isinstance(d, int) and 0 <= d < len(f["options"]) else ""
+    elif f.get("kind") == "bool" or (f.get("min") == 0 and f.get("max") == 1 and f.get("scale", 1.0) == 1.0):
+        rng = "Off or On"
+        default = ("On" if d == 1 else "Off") if isinstance(d, int) else ""
+    else:
+        rng = f"{real(f['min'], f)} to {real(f['max'], f)}" if f.get("min") != f.get("max") else ""
+        default = real(d, f) if isinstance(d, (int, float)) else ""
+    if isinstance(d, list):
+        default = "set per element" if len(set(d)) > 1 else ""
+    return rng, default, units
+
+
+def members_of(group, name, sa):
+    """Rows for a struct array (trigger.streams[], engine.cyl[], sensors.sensor[] ...): one row per
+    member, path written with [] for the element, plus the element names when the array has them."""
+    rows = []
+    each = sa.get("element_labels")
+    note = f" Applies to each of: {', '.join(each)}." if each and len(each) <= 12 else ""
+    for fn, f in sa.get("fields", {}).items():
+        if fn.startswith("_") or f.get("hidden"):
+            continue
+        rng, default, units = describe_member(f)
+        rows.append((f.get("label") or fn, f"{group}.{name}[].{fn}", units, rng, default,
+                     (f.get("help", "") + note).strip()))
+    for an, a in sa.get("arrays", {}).items():
+        for fn, f in a.get("fields", {}).items():
+            rng, default, units = describe_member(f)
+            rows.append((f.get("label") or fn, f"{group}.{name}[].{an}[{a['count']}].{fn}", units, rng,
+                         default, f.get("help", "")))
+    return rows
+
+
 def settings_of(group, fields, signals):
     rows = []
     for name, f in fields.items():
+        if isinstance(f, dict) and f.get("type") == "struct_array":
+            rows += members_of(group, name, f)
+            continue
         if not isinstance(f, dict) or f.get("type") not in ("scalar", "table", "array", "bits"):
             continue
         if f.get("hidden"):
@@ -130,9 +174,8 @@ def main():
         (OUT / f"_{group}.table.md").write_text(body)
         index.append(f"| [{title_of(group)}]({group}.md) | {len(rows)} |")
     index += ["", f"**{total} settings** in total."]
-    missing = sum(1 for g in groups.values() if isinstance(g, dict)
-                  for f in g.values() if isinstance(f, dict) and f.get("type") in ("scalar", "table", "array", "bits")
-                  and not f.get("hidden") and not f.get("help"))
+    missing = sum(1 for g in groups for r in settings_of(g, groups[g], signals) if not r[5]) \
+        if all(isinstance(g, dict) for g in groups.values()) else 0
     (OUT / "index.md").write_text("\n".join(index) + "\n")
     print(f"settings reference: {missing} of {total} have no help text in the schema")
     print(f"settings reference: {total} settings in {len([g for g in groups if isinstance(groups[g], dict)])} groups -> {OUT.relative_to(ROOT)}")

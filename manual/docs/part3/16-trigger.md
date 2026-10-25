@@ -299,8 +299,9 @@ the grid, and a 4-1 has far fewer, but the scheduler works the same way for both
 
 ### 8 · When the teeth stop
 
-Each time a tooth arrives, the ECU sets a deadline for the next one, from the prediction and the
-match window. If the deadline passes with no tooth, sync drops and firing stops at once. What it
+Each time a tooth arrives, the ECU sets a deadline for the next one: where it predicts the tooth,
+plus half a tooth pitch. That margin is fixed — the Match Window does not move it — so at the 25 %
+default a late tooth is rejected by the window before the deadline fires. If the deadline passes with no tooth, sync drops and firing stops at once. What it
 means depends on how fast the engine was turning:
 
 - **Below the Cranking Threshold** (`engine.cranking_rpm`, default 400 rpm) the engine was winding
@@ -805,7 +806,8 @@ has died.
 
 ## Settings reference
 
-Every Trigger setting, generated from the definition the studio loads:
+Every Trigger setting, generated from the definition the studio loads. The first four apply to the
+whole trigger; the `streams[]` rows are per stream, and each of the six slots has its own copy:
 
 --8<-- "reference/settings/_trigger.table.md"
 

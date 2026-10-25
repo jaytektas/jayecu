@@ -144,7 +144,7 @@ nav:
       - Every setting, by module: reference/settings/index.md           # generated from ecu.schema.yaml
       - Output channels: reference/channels.md                          # generated: every telemetry channel
       - Trouble codes: reference/dtc.md                                 # generated: every DTC
-      - Trigger wheel library: reference/trigger-wheels.md              # generated: the 42 wheels, each with a diagram
+      - Trigger wheel library: reference/trigger-wheels.md              # generated: every wheel in the library, each with a diagram
       - Sensor types: reference/sensor-types.md                         # generated
       - Output templates: reference/output-templates.md                 # generated
       - Lua API: reference/lua-api.md                                   # generated

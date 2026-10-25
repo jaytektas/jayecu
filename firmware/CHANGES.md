@@ -9,6 +9,9 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- Trigger Last Error Kind now reads by name (Tooth Window, Missed Tooth, Phase Lost ...) and its range covers
+  all seven kinds. It was declared 0 to 2, so Missed Tooth, Noise Edge, Signal Absent and Phase Lost fell outside
+  it.
 
 ## 0.4.23
 - **A sensor check's Delay now means what it says while it has a Precondition.** The delay is how long a

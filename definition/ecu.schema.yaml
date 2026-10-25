@@ -138,6 +138,14 @@ enums:
   - {id: throttle, label: "Waiting for Throttle"}
   - {id: priming,  label: "Building Fuel Pressure"}
   - {id: crank,    label: "Cranking"}
+  trigger_error_kind:                # trigger_last_error_kind: what the decoder last saw go wrong
+  - {id: none, label: "None"}
+  - {id: tooth_window, label: "Tooth Window"}    # an interval fell outside the predicted window
+  - {id: gap_mismatch, label: "Gap Mismatch"}    # the gap pattern did not match the wheel
+  - {id: missed_tooth, label: "Missed Tooth"}    # a tooth that was due never arrived (the deadline fired)
+  - {id: noise_edge, label: "Noise Edge"}        # an edge too soon to be a tooth, rejected before the matcher
+  - {id: signal_absent, label: "Signal Absent"}  # no teeth at all past the floor: wheel stopped or wire gone
+  - {id: phase_lost, label: "Phase Lost"}        # a cam not where the crank says, or not there at all
   bool_active:                       # shared by the 0/1 flag signals (no firmware enum — they publish 0/1)
   - {id: false, label: "Off"}
   - {id: true, label: "On"}
@@ -213,6 +221,7 @@ enums:
 enum_cpp:
   engine_run_state: EngineRunState
   sync_level: SyncLevel
+  trigger_error_kind: TriggerErrorKind
   cruise_state: CruiseState
   idle_state: IdleState
 
@@ -1450,7 +1459,7 @@ signals:
 # anchor it reads None and will not be allowed to fire; one with no cam reads Crank, which is the
 # honest answer to "why will this not run sequential" given on the bench instead of by a car.
 - {id: trigger_sync_ceiling, label: "Trigger Sync Ceiling", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 2.0, category: "Trigger", bus_type: float, datalog: true, enum: sync_level, owner: firmware}
-- {id: trigger_last_error_kind, label: "Trigger Last Error Kind", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 2.0, category: "Trigger", bus_type: float, datalog: true, owner: firmware}
+- {id: trigger_last_error_kind, label: "Trigger Last Error Kind", units: '', scale: 1.0, telem_type: uint8, min: 0.0, max: 6.0, category: "Trigger", bus_type: float, datalog: true, enum: trigger_error_kind, owner: firmware}
 - {id: trigger_last_error_tooth, label: "Trigger Last Error Tooth", units: '', scale: 1.0, telem_type: uint16, min: 0.0, max: 1000.0, category: "Trigger", bus_type: float, datalog: true, owner: firmware}
 - {id: tumble_valve_1, label: "Tumble Generator Valve 1", category: "Sensors - Other", bus_type: float}
 - {id: tumble_valve_2, label: "Tumble Generator Valve 2", category: "Sensors - Other", bus_type: float}

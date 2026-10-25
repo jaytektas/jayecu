@@ -398,15 +398,9 @@ struct VvtResult {
 // reported GAP_MISMATCH and SEQUENCE reported TOOTH_WINDOW — so on a missing-tooth wheel (every
 // 60-2 and 36-1 there is) TOOTH_WINDOW was unreachable and the P-code gated on it was dead code.
 // A fault the operator can act on is a fault described in the wheel's terms, not the decoder's.
-enum class TriggerErrorKind : uint8_t {
-    NONE          = 0,
-    TOOTH_WINDOW  = 1,  // an interval fell outside the predicted window (values 1/2 kept stable:
-    GAP_MISMATCH  = 2,  //  telemetry and the DTC map are keyed on them)
-    MISSED_TOOTH  = 3,  // a tooth that was DUE never arrived (the deadline fired)
-    NOISE_EDGE    = 4,  // an edge arrived too soon to be a tooth — rejected before the matcher
-    SIGNAL_ABSENT = 5,  // no teeth at all past the floor bound: the wheel has stopped or the wire is gone
-    PHASE_LOST    = 6   // a cam is not where the crank says it should be, or did not arrive at all
-};
+// TriggerErrorKind (NONE=0 .. PHASE_LOST=6) is generated into signal_enums.h from the schema enum
+// `trigger_error_kind`, so the published trigger_last_error_kind and its declared range are one list.
+// Values 1/2 are kept stable: telemetry and the DTC map are keyed on them.
 
 struct DecoderTelemetry {
     SyncState  sync_state;
