@@ -803,8 +803,14 @@ void FirmwareUpgrade::finish() {
             if (!e->lastActiveTune().empty()) keptTune_ = e->lastActiveTune();
         }
         e->saveTune(name, TuneFile::serialise(pushed_, newMeta_));
-        e->setLastActiveTune(name);
-        e->setCurrentTune(name);
+        e->setCurrentTune(name);                         // what the ECU now carries
+        // YOUR TUNE STAYS THE OPEN ONE. When it is not the ECU's — changed offline, waiting to be sent — the
+        // update used to make the ECU's fresh copy the active tune, so the connect that follows compared the
+        // ECU with ITSELF, found them the same and asked nothing: the work in the open tune was parked behind
+        // one line of this dialog, and the car went on with the old values (Kelly, 25 Oct: an oil-pressure
+        // change made offline never reached the ECU). Now it stays active, the connect compares it with the
+        // ECU and asks which to keep, the way every connect does. The ECU's tune is on file either way.
+        e->setLastActiveTune(keptTune_.empty() ? name : keptTune_);
         savedTune_ = name;
     }
     // A RECOVERY THAT KEPT THE ECU'S OWN TUNE has nothing to report: no tune carried over, no backup, nothing
@@ -852,8 +858,8 @@ void FirmwareUpgrade::finish() {
     if (!report_.rescaled.empty())   body += "\n" + std::to_string(report_.rescaled.size()) + " converted to a new scale.";
     body += "\n\nThe ECU's tune is saved as \u201C" + savedTune_ + "\u201D.";
     if (!keptTune_.empty())
-        body += " \u201C" + keptTune_ + "\u201D was not the tune on the ECU, so it was left as it was: open it and "
-                "send it when you are ready.";
+        body += " Your tune \u201C" + keptTune_ + "\u201D is not the same as the ECU's: when the studio "
+                "reconnects it shows you the differences and asks which one to keep.";
     if (!sdNote_.empty()) body += "\n\n" + sdNote_;
     body += "\n\nFull report: " + reportPath;
     step_ = Step::Idle;

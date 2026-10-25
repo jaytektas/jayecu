@@ -931,7 +931,12 @@ private:
         JComboBox* onExit = f->add(std::make_unique<JComboBox>(m_graph, std::vector<std::string>{ "Ask", "Always save", "Always discard" }));
         onExit->setCurrentIndex(std::clamp(JSettings::instance().get<int>("saveOnExit", 0), 0, 2));
         onExit->onIndexChanged.connect([](int i){ JSettings::instance().set("saveOnExit", i); });
-        m_rows[3] = 11;
+        // The tune's own question at close (and before the studio installs an update, which closes it).
+        f->add(std::make_unique<JLabel>(m_graph, "On exit with a modified tune", 150.f));
+        JComboBox* tuneExit = f->add(std::make_unique<JComboBox>(m_graph, std::vector<std::string>{ "Ask", "Always save", "Always discard" }));
+        tuneExit->setCurrentIndex(std::clamp(JSettings::instance().get<int>("saveTuneOnExit", 0), 0, 2));
+        tuneExit->onIndexChanged.connect([](int i){ JSettings::instance().set("saveTuneOnExit", i); });
+        m_rows[3] = 12;
     }
 
     // Editor→Widget Defaults: MASTER-DETAIL. The master is a list of widget types; the detail is the ONE real

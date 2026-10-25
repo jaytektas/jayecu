@@ -78,6 +78,7 @@
 // close/save wiring in main() can share them without capture gymnastics. saveOnExit: 0=Ask,1=Save,2=Discard.
 static bool g_docDirty  = false;
 static int  g_closeState = 0;    // 0=none, 1=prompting, 2=confirmed (user chose save/discard)
+static int  g_tuneCloseState = 0;   // the same three states, for the TUNE's question (asked first)
 // SIGTERM/SIGINT land here (async-signal-safe flag); a main-thread timer routes them through the same
 // guarded requestClose() as the window ✕, so an external `kill -TERM` still gets the save prompt.
 static volatile std::sig_atomic_t g_termRequest = 0;
@@ -6029,6 +6030,17 @@ int main(int argc, char** argv) {
     // Save-on-close prompt (both ✕ and File▸Quit, via JAppWindow::onCloseRequest). Same rule as every
     // other ditch: ask, unless a preference already answers it. saveOnExit: 0 = Ask, 1 = Save, 2 = Discard,
     // set by the dialog's "remember" tick and editable in Preferences ▸ Editor.
+    // IS THE TUNE IN MEMORY DIFFERENT FROM ITS FILE? By value (TuneFile::sameValues), the way the firmware
+    // update asks the same question — a file written by another studio version may differ only in form.
+    // An image that is not this ECU's, or no tune at all, is nothing to ask about.
+    auto tuneModified = [&]() -> bool {
+        if (!ecu || activeTuneName.empty() || s_imageUid != ecu->uid()) return false;
+        const MetaModel* m = Cache::instance().meta();
+        if (!m || !Cache::instance().hasConfig()) return false;
+        const std::vector<uint8_t> file = ecu->loadTune(activeTuneName);
+        const std::vector<uint8_t> now  = TuneFile::serialise(Cache::instance().configImage(), *m);
+        return file.empty() || !TuneFile::sameValues(file, now);
+    };
     win.onCloseRequest = [&]() -> bool {
         // NEVER DURING A FIRMWARE UPDATE. Closing mid-flash stops the write partway: the ECU is left in
         // its bootloader with no working firmware, and its USB can hang until it is reset.
@@ -6038,7 +6050,30 @@ int main(int argc, char** argv) {
                         "without working firmware.\n\nPlease wait for the update to finish.");
             return false;
         }
-        saveActiveTune();                                       // the tune always auto-saves (silent)
+        // A MODIFIED TUNE IS ASKED ABOUT, not saved behind the person's back. Closing — the studio's own
+        // update closes the same way — used to write the tune in memory over its file without a word, so
+        // a change made to try something was kept whether it was wanted or not. Asked like the layout
+        // below: Save, Don't save, or Cancel to stay; "remember" sets Preferences > Editor > On exit with
+        // a modified tune. Not modified (the values equal the file's) asks nothing.
+        if (g_tuneCloseState != 2 && tuneModified()) {
+            const int tmode = settings.get<int>("saveTuneOnExit", 0);
+            if (tmode == 1) saveActiveTune();
+            else if (tmode == 0) {
+                if (g_tuneCloseState == 1) return false;        // prompt already up
+                g_tuneCloseState = 1;
+                win.openModal<SaveChangesDialog>(
+                    std::string("The tune \u201C") + activeTuneName + "\u201D has changes that are not saved. "
+                    "Save them before closing?",
+                    std::function<void(int, bool)>([&](int result, bool remember) {
+                        if (result == 0) { g_tuneCloseState = 0; return; }   // Cancel → stay open
+                        if (remember) settings.set("saveTuneOnExit", jf::JVariant(result));   // 1=Save / 2=Discard
+                        if (result == 1) saveActiveTune();
+                        g_tuneCloseState = 2;
+                        win.requestClose();
+                    }));
+                return false;
+            }
+        }
         if (!g_docDirty || g_closeState == 2) return true;      // nothing unsaved, or the user already chose
         const int mode = settings.get<int>("saveOnExit", 0);
         if (mode == 1) { saveAllFn(); return true; }            // remembered: always save
