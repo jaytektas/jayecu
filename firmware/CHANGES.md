@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.22
 - **Fuel asked for while an injector is open is now added, and the dead time is paid once per opening.**
   When an async transient squirt landed while an injector was in its normal pulse, the injector closed at
   the squirt's earlier close and the rest of the normal pulse was lost: on the bench, a 1 ms squirt cut an
