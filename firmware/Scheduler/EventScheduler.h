@@ -189,7 +189,14 @@ public:
     // stage's channels: every injector (multi-point), one bank's worth (bank), or one cylinder's own
     // (sequential family). Use inj_event_stage()/inj_event_ref_cyl()/inj_event_base_angle() to find the
     // stage, the fuel, and the TDC the event's firing angle is measured from.
-    void arm_injection        (uint8_t event, AngleDeg10 open_angle, uint32_t pw_us) noexcept;
+    // fuel_us is SPRAY time only. The opening price (dead time + short-pulse adder) is the scheduler's
+    // to pay, and only when it actually opens the injector — see open_inj. open_cost_us is that price for
+    // THIS pulse (the fuel calc works it out per cylinder and stage).
+    void arm_injection        (uint8_t event, AngleDeg10 open_angle, uint32_t fuel_us,
+                               uint32_t open_cost_us) noexcept;
+    // The opening price of each injector stage right now (dead time, from battery voltage and fuel
+    // pressure), for the pulses that do not carry their own: the prime and the async squirts.
+    void set_open_cost_us(uint8_t stage, uint32_t us) noexcept;
     // Arm the per-cylinder knock sampling window (fires the ADC burst at window_angle; drives no pin).
     void arm_knock_window     (uint8_t cyl, AngleDeg10 window_angle) noexcept;
 
@@ -198,15 +205,16 @@ public:
     // next on_virtual_tooth (ISR) consumes — so the actual fire + close-list mutation stay in ISR
     // context (no task/ISR race on the time list). Fires once per request, on the next grid tooth
     // (i.e. as soon as the engine is turning/synced). Used for the cold-start prime.
-    void request_prime(uint32_t pw_us) noexcept { prime_req_pw_us_ = pw_us; prime_req_pending_ = true; }
+    void request_prime(uint32_t fuel_us) noexcept { prime_req_pw_us_ = fuel_us; prime_req_pending_ = true; }
 
     // ---- Async transient injection train (TASK context) --------------------
     // Request up to num_pulses extra simultaneous squirts of every active injector (pw_us each),
     // SPREAD across the coming engine cycle — the asynchronous transient enrichment: extra injections
     // inserted BETWEEN the sequential events. Distinct from the one-shot cold-start prime. Latched and
     // fired in on_virtual_tooth (ISR, TIM5 prio 2) so the open + close-list mutation stay serialized.
-    void request_async_injection(uint32_t pw_us, uint8_t num_pulses) noexcept {
-        async_req_pw_us_ = pw_us; async_req_pulses_ = num_pulses; async_req_pending_ = true;
+    // fuel_us per squirt, spray time only (the scheduler adds each injector's opening price).
+    void request_async_injection(uint32_t fuel_us, uint8_t num_pulses) noexcept {
+        async_req_pw_us_ = fuel_us; async_req_pulses_ = num_pulses; async_req_pending_ = true;
     }
 
     // ---- ISR callbacks ------------------------------------------------------
@@ -344,9 +352,17 @@ private:
     // polarity, so one mask may mix active-high and active-low drivers.
     void drive_ign(OutputMask m, bool energize) noexcept;
     void drive_inj(OutputMask m, bool energize) noexcept;
-    // Open injectors and book their close — the ONE way an injector is opened (sequential, prime, async),
-    // so an injector opened twice stays open until the LATER of its closes (see open_inj).
-    void open_inj(OutputMask m, uint32_t close_tick) noexcept;
+    // Deliver fuel_ticks of spray on every injector in m — the ONE way an injector is opened (sequential,
+    // prime, async). A closed one opens and pays its opening price (cost_ticks, or its stage's price when
+    // the request carries none); one already open just stays open fuel_ticks longer (see open_inj).
+    // fold_key: a SCHEDULED event's 360-folded position (kNoFold for the prime and async squirts) — at
+    // crank sync two events on the same injector at the same folded angle are one pulse visited twice.
+    static constexpr uint32_t kNoFold = 0xFFFFFFFFu;
+    void open_inj(OutputMask m, uint32_t now, uint32_t fuel_ticks, int32_t cost_ticks,
+                  uint32_t fold_key = kNoFold) noexcept;
+    void link_close(uint8_t ci, uint32_t tick) noexcept;     // (re)book channel ci's one close event
+    void unlink_close(uint8_t ci) noexcept;                  // take it off the close list
+    [[nodiscard]] uint32_t us_to_ticks(uint32_t us) const noexcept;
     void fire_prime() noexcept;   // Timer ISR (pri 2): open all active injectors, schedule the close
     void fire_async_pulse() noexcept;  // Timer ISR (pri 2): one async squirt of all active injectors (slot-guarded)
 
@@ -368,7 +384,7 @@ private:
 
     // ---- Time list (injector close), small sorted intrusive list ------------
     struct TimeEvt { TimeEvt* next; uint32_t tick; OutputMask mask; };
-    void insert_close(uint32_t tick, OutputMask mask) noexcept;
+
 
     // 720°→bucket helpers (full cycle, no fold).
     [[nodiscard]] uint8_t  bucket_of(AngleDeg10 angle720) const noexcept;
@@ -432,7 +448,7 @@ private:
     SchedNode*           angle_c_;         // rotary at CRANK sync: the third revolution
     SchedNode*           pending_angle_;   // node the angle alarm is currently armed for
     volatile uint32_t    late_fired_ = 0;  // events fired late by flush_angle_walk (would have been lost)
-    volatile uint32_t    inj_no_close_ = 0; // injections skipped: no close slot free
+    volatile uint32_t    inj_no_close_ = 0; // kept for telemetry: always 0 now (one close slot per channel)
     // Coils charging right now, and since when — for the maximum-dwell cutoff (on_virtual_tooth).
     volatile OutputMask  charging_ = 0;
     uint32_t             charge_start_[MAX_IGN_CHANNELS > 0 ? MAX_IGN_CHANNELS : 1] = {};
@@ -446,13 +462,17 @@ private:
     volatile uint32_t    tooth_seq_;
     CycleRecorder*       recorder_;        // optional one-cycle output capture (null = off)
 
-    // Time list (injector close). One slot per injector channel (≤1 pending each).
+    // Time list (injector close): EXACTLY ONE event per injector channel, time_pool_[ci] for channel ci,
+    // sorted by tick. An injector has one close at a time — when it is open, the moment it closes — so a
+    // request that keeps it open longer MOVES that event rather than adding another, and the list can
+    // never run out of slots.
     TimeEvt              time_pool_[MAX_INJ_CHANNELS];
-    TimeEvt*             time_free_;
     TimeEvt*             time_head_;
-    // Which injectors are open, and until when (the latest close booked for each). Timer-ISR only.
+    OutputMask           inj_linked_ = 0;                      // channels whose event is on the list
+    // Which injectors are open, and the tick each closes at. Timer-ISR only.
     OutputMask           inj_open_ = 0;
     uint32_t             inj_open_until_[MAX_INJ_CHANNELS] = {};
+    uint32_t             inj_fold_key_[MAX_INJ_CHANNELS] = {};    // folded position of the scheduled open that last fed it
 
     volatile bool        phase_known_;
     volatile bool        firing_enabled_;
@@ -500,6 +520,11 @@ private:
     volatile bool        async_req_pending_;
     volatile uint32_t    async_req_pw_us_;
     volatile uint8_t     async_req_pulses_;
+    // Each injector channel's opening price (ticks), from its stage's set_open_cost_us. Used by the pulses
+    // that carry no price of their own (prime, async).
+    volatile uint32_t    stage_cost_us_[MAX_INJ_STAGES] = {};
+    // The opening price armed with each injection event (µs), alongside its spray time.
+    uint32_t             inj_cost_us_[MAX_INJ_EVENTS] = {};
     uint32_t             async_pw_us_;          // latched per-pulse pw
     volatile uint8_t     async_pulses_left_;    // pulses still to fire this train (task may clear on firing-off)
     uint16_t             async_countdown_;      // teeth until the next pulse

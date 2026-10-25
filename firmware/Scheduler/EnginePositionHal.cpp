@@ -108,24 +108,46 @@ void EnginePositionHal::set_inj_pw_us(uint8_t cyl, uint32_t pw_us) noexcept
     shadow_[cyl].inj_pw_us = pw_us;
 }
 
+void EnginePositionHal::set_inj_open_cost_us(uint8_t cyl, uint32_t us) noexcept
+{
+    if (cyl >= scheduler_.cylinder_count()) return;
+    shadow_[cyl].inj_open_cost_us = us;
+}
+
+void EnginePositionHal::set_stage_open_cost_us(uint8_t stage, uint32_t us) noexcept
+{
+    if (stage >= MAX_INJ_STAGES) return;
+    stage_open_cost_us_[stage] = us;
+    scheduler_.set_open_cost_us(stage, us);
+}
+
 void EnginePositionHal::prime_injectors(uint32_t pw_us) noexcept
 {
     // Hardware-agnostic prime: hand the request to the scheduler, which fires every active injector
-    // simultaneously on its next grid tooth (ISR). Firmware never touches a pin.
-    scheduler_.request_prime(pw_us);
+    // simultaneously on its next grid tooth (ISR). Firmware never touches a pin. The scheduler takes
+    // SPRAY time and adds each injector's opening price itself, so the primary's is taken back off here:
+    // a primary injector gets exactly the pulse the fuel calc built.
+    const uint32_t cost = stage_open_cost_us_[0];
+    scheduler_.request_prime(pw_us > cost ? pw_us - cost : 0u);
 }
 
-void EnginePositionHal::request_async_injection(uint32_t pw_us, uint8_t num_pulses) noexcept
+void EnginePositionHal::request_async_injection(uint32_t fuel_us, uint8_t num_pulses) noexcept
 {
     // Hardware-agnostic async transient delivery: the scheduler spreads num_pulses extra all-injector
     // squirts across the cycle (ISR-fired between the sequential events). No pin handling here.
-    scheduler_.request_async_injection(pw_us, num_pulses);
+    scheduler_.request_async_injection(fuel_us, num_pulses);
 }
 
 void EnginePositionHal::set_staged_pw_us(uint8_t cyl, uint8_t stage, uint32_t pw_us) noexcept
 {
     if (cyl >= scheduler_.cylinder_count() || stage >= MAX_STAGED_STAGES) return;
     shadow_[cyl].inj_secondary_pw_us[stage] = pw_us;
+}
+
+void EnginePositionHal::set_staged_open_cost_us(uint8_t cyl, uint8_t stage, uint32_t us) noexcept
+{
+    if (cyl >= scheduler_.cylinder_count() || stage >= MAX_STAGED_STAGES) return;
+    shadow_[cyl].inj_secondary_open_cost_us[stage] = us;
 }
 
 void EnginePositionHal::set_staged_enabled(uint8_t cyl, uint8_t stage, bool enabled) noexcept
@@ -721,24 +743,29 @@ void EnginePositionHal::recompute_injection(uint8_t event) noexcept
     // PW + open angle come from THIS event's stage — each event is one stage now. A staged stage that
     // the fuel calc's duty progression did not engage this cycle (staged_enabled) delivers nothing: leave
     // its open node unscheduled rather than arm a zero pulse.
-    uint32_t   pw;
+    uint32_t   pw, cost;
     AngleDeg10 open_btdc;
     if (stage == 0) {
         pw        = shadow_[ref].inj_pw_us;
+        cost      = shadow_[ref].inj_open_cost_us;
         open_btdc = shadow_[ref].inj_open_btdc;
     } else {
         const uint8_t si = static_cast<uint8_t>(stage - 1);
         if (si >= MAX_STAGED_STAGES || !shadow_[ref].staged_enabled[si]) return;
         pw        = shadow_[ref].inj_secondary_pw_us[si];
+        cost      = shadow_[ref].inj_secondary_open_cost_us[si];
         open_btdc = shadow_[ref].inj_secondary_open_btdc[si];
     }
+    if (cost > pw) cost = pw;                  // a torn read of the pair must never make spray negative
 
     // Injector Timing Method. The firing-angle table is END OF INJECTION by default, so the injector must
     // OPEN a pulse-width of angle earlier for the close to land on the set angle (extra BTDC = pw as angle
     // at live RPM). Start-of-injection opens AT the angle (offset 0).
     const AngleDeg10 off = scheduler_.inj_end_of_injection() ? pw_angle_dd(rpm, pw) : 0;
+    // The whole pulse places it (end of injection is where a lone pulse closes); the scheduler is told
+    // the spray and the price separately, so a pulse landing on an injector already open adds spray only.
     scheduler_.arm_injection(
-        event, angle_btdc(base, static_cast<AngleDeg10>(open_btdc + off), cyc), pw);
+        event, angle_btdc(base, static_cast<AngleDeg10>(open_btdc + off), cyc), pw - cost, cost);
 }
 
 // ---------------------------------------------------------------------------

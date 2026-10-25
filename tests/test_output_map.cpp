@@ -77,7 +77,7 @@ struct Rig {
         sched.assign_time_alarm(time);
         sched.register_compute_hook([](void* ud, uint8_t idx, EventAction k) noexcept {
             auto* s = static_cast<EventScheduler*>(ud);
-            if (k == EventAction::INJ_SCHEDULE) s->arm_injection(idx, s->inj_event_base_angle(idx), 2000);
+            if (k == EventAction::INJ_SCHEDULE) s->arm_injection(idx, s->inj_event_base_angle(idx), 2000, 0);
         }, &sched);
         sched.build_skeleton(100);
         sched.set_firing_enabled(true);

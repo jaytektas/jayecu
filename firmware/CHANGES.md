@@ -9,12 +9,17 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
-- **Overlapping injector pulses no longer cut each other short.** When an async transient squirt landed
-  while an injector was in its normal pulse, the injector closed at the squirt's earlier close and the
-  rest of the normal pulse was lost: on the bench, a 1 ms squirt cut an 8 ms pulse to 3 ms. That cylinder
-  ran lean for the cycle, on exactly the tip-ins the squirt was meant to help. The same happened to a
-  normal pulse starting during a squirt, and with the cold-start prime. An injector now stays open until
-  the later of its closes.
+- **Fuel asked for while an injector is open is now added, and the dead time is paid once per opening.**
+  When an async transient squirt landed while an injector was in its normal pulse, the injector closed at
+  the squirt's earlier close and the rest of the normal pulse was lost: on the bench, a 1 ms squirt cut an
+  8 ms pulse to 3 ms. That cylinder ran lean for the cycle, on exactly the tip-ins the squirt was meant to
+  help. The same happened with the cold-start prime.
+  - The scheduler now pays the opening price (dead time) only when it actually opens an injector. A
+    request that lands while the injector is open adds its spray time: 1 ms into a 5 ms pulse, 3 ms more
+    leaves 7 ms to run. Once an injector has closed, the next request opens it again and pays again.
+  - Async squirts are asked for as spray time (the scheduler adds each injector's dead time).
+  - Before cam sync, events that fold onto the same angle (a rotary's faces, a two-event batch) are still
+    one pulse, not two added together.
 - **A lift no longer throws away the tip-in enrichment.** With disenrichment off, the enrichment was set
   to zero the moment the throttle started to close, while MAP (which lags the throttle) was still at its
   peak. A quick stab and lift went briefly lean: λ 0.99 to 1.34, about 20 AFR on the 14.7 scale. The lift

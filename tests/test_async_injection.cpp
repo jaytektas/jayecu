@@ -37,8 +37,9 @@ struct MockChannel final : ITimerChannel {
 };
 
 struct MockAlarm final : IAlarmTimer {
-    void arm(uint32_t) noexcept override {}
-    void disarm() noexcept override {}
+    bool armed = false;
+    void arm(uint32_t) noexcept override { armed = true; }
+    void disarm() noexcept override { armed = false; }
     [[nodiscard]] uint32_t now() const noexcept override { return g_now; }
     void register_callback(MatchCallback, void*) noexcept override {}
 };
@@ -78,6 +79,10 @@ std::vector<int> run_burst(uint8_t cycle_type, AngleDeg10 vt_step, uint8_t pulse
         g_now += 1000;                                        // 1 ms per tooth; value is irrelevant
         sched.on_virtual_tooth(static_cast<uint16_t>(t % teeth_per_rev), g_now, 1000);
         if (inj[0].opens > before) fired.push_back(t);
+        // Serve the closes, as the timer would. Without this the injectors never closed, and each squirt
+        // was only "seen" because it re-drove a pin that was still high; a squirt landing on an open
+        // injector now just keeps it open (it adds spray), so an unclosed injector shows no new opening.
+        while (time_alarm.armed) { time_alarm.armed = false; sched.on_time_alarm(); }
     }
     return fired;
 }

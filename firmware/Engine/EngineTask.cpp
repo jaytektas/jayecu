@@ -436,11 +436,14 @@ void EngineTask::commit_ignition(const EngineFrame& frame) {
 }
 
 void EngineTask::commit_injection(const EngineFrame& frame) {
+    for (uint8_t s = 0; s < MAX_INJ_STAGES; ++s) epos_hal_.set_stage_open_cost_us(s, frame.stage_open_cost_us[s]);
     for (uint8_t c = 0; c < num_cylinders_; c++) {
         epos_hal_.set_inj_open_angle(c, frame.cyl[c].inj_btdc_x10);
         epos_hal_.set_inj_pw_us(c,      frame.cyl[c].inj_pw_us);
+        epos_hal_.set_inj_open_cost_us(c, frame.cyl[c].inj_open_cost_us);
         for (uint8_t s = 0; s < MAX_STAGED_STAGES; ++s) {
             epos_hal_.set_staged_pw_us(c, s,      frame.cyl[c].staged_pw_us[s]);
+            epos_hal_.set_staged_open_cost_us(c, s, frame.cyl[c].staged_open_cost_us[s]);
             epos_hal_.set_staged_open_angle(c, s, frame.cyl[c].staged_btdc_x10[s]);
             epos_hal_.set_staged_enabled(c, s,    frame.cyl[c].staged_enabled[s]);
         }

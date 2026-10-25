@@ -277,8 +277,10 @@ There are two ways to do it. Use **one**, not both.
 7. **Async** (off by default): at the start of an enrichment event, the ECU can also fire up to **Max
    Async Injector Pulses** extra squirts from every injector, sized by the **Async Amount** table,
    each with its own dead time. **Async Holdoff Time** is the minimum time between bursts. A squirt
-   that lands while an injector is already open (its normal pulse, or the prime) keeps it open until
-   the later of the two closes, so it never shortens the pulse it overlaps.
+   that lands while an injector is already open (its normal pulse, or the prime) adds its fuel to that
+   pulse: the injector stays open for the squirt's spray time longer. Its dead time is not paid twice,
+   because the injector is already open. An injector that has closed pays its dead time again when the
+   next squirt opens it.
 8. **Ignition Correction** adds timing (degrees, by load × speed) while enriching, and after the
    event it fades away over **Ign Corr Decay Time** (default 500 ms).
 

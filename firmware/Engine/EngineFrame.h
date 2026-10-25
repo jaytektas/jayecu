@@ -29,7 +29,10 @@ struct EngineFrame {
     float    base_fuel_pw_us = 0.0f;     // Base pulse width before corrections [µs]
     float    clt_fuel_corr   = 0.0f;     // CLT enrichment correction [%]
     uint32_t prime_pw_us     = 0;        // One-shot prime squirt request this cycle (0 = none); fired by EngineTask
-    uint32_t async_inj_pw_us = 0;        // Async transient: per-pulse PW (TransientThrottle sets it, EngineTask fires)
+    // Each injector stage's opening price right now (dead time) — what the scheduler charges a pulse that
+    // carries none of its own (the prime, the async squirts) when it opens an injector of that stage.
+    uint32_t stage_open_cost_us[MAX_INJ_STAGES] = {};
+    uint32_t async_inj_pw_us = 0;        // Async transient: per-pulse SPRAY time (the scheduler adds the opening price)
     uint8_t  async_inj_pulses = 0;       // Async transient: number of extra squirts to spread across the cycle (0 = none)
 
     // ---- Ignition computation ----
@@ -50,10 +53,12 @@ struct EngineFrame {
         AngleDeg10  trail_btdc_x10  = 0;   // Trailing spark [decidegrees BTDC]
         uint32_t    dwell_us        = 3000;
         AngleDeg10  inj_btdc_x10    = 3550; // Injection open angle [decidegrees BTDC]
-        uint32_t    inj_pw_us       = 0;
+        uint32_t    inj_pw_us       = 0;   // the whole pulse: spray + opening price
+        uint32_t    inj_open_cost_us = 0;  // of which the opening price (dead time + short-pulse adder)
         // Staged stages 2..4 (index 0 = stage 2) — each its own PW + open angle; enabled per-cylinder by
         // the fuel calc's duty progression (0 / false when below threshold or staging off).
         uint32_t    staged_pw_us[MAX_STAGED_STAGES]    = {};
+        uint32_t    staged_open_cost_us[MAX_STAGED_STAGES] = {};
         AngleDeg10  staged_btdc_x10[MAX_STAGED_STAGES] = { 3550, 3550, 3550 };
         bool        staged_enabled[MAX_STAGED_STAGES]  = {};
     };

@@ -235,10 +235,10 @@ int main() {
         CHECK(f2.async_inj_pulses == 0);               // no re-fire without a new tip-in edge
     }
 
-    SECTION("async pulses: the percentage is of FUEL, and every pulse carries its own dead time");
+    SECTION("async pulses: the percentage is of FUEL, asked for as spray time (the scheduler adds the opening price)");
     {
-        // base_pw includes the dead time, so scaling it scaled the opening time too; and each async
-        // pulse is a separate opening, so each needs the dead time or a short burst delivers nothing.
+        // base_pw includes the dead time, so scaling it scaled the opening time too. The squirt is SPRAY
+        // time: the scheduler adds the opening price only when it opens an injector (test_injector_overlap).
         cfg.enabled = 1; cfg.load_source = 0; cfg.enable_async = 1; cfg.max_async_pulses = 2;
         cfg.async_holdoff_ms = 0;
         auto burst = [&](float dead) {
@@ -255,7 +255,7 @@ int main() {
         const double none = burst(0.0f), with = burst(1000.0f);
         fprintf(stdout, "    per-pulse pw: no dead time %g us, 1000 us dead time %g us\n", none, with);
         CHECK(none > 0.0);
-        CHECK_NEAR(with - none, 1000.0, 1.0);          // same fuel, plus one dead time per pulse
+        CHECK_NEAR(with, none, 1.0);                   // same spray whatever the dead time: it is not the module's to add
     }
 
     SECTION("disabled -> neutral fuel_corr_accel 1.0 + ign_corr_transient 0");

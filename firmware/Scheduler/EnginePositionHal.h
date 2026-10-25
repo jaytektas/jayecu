@@ -65,17 +65,25 @@ public:
     // Injection: opening angle and pulse width.
     void set_inj_open_angle(uint8_t cyl, AngleDeg10 open_btdc) noexcept;
     void set_inj_pw_us     (uint8_t cyl, uint32_t   pw_us)     noexcept;
-    // One-shot cold-start prime: fire every active injector simultaneously for pw_us (delegated to
-    // the scheduler, fired in ISR on the next grid tooth). HW-agnostic — no pin handling in firmware.
+    // Of that pulse, the opening price (dead time + short-pulse adder). The scheduler pays it only when it
+    // actually opens the injector; a request landing on one already open adds spray time only.
+    void set_inj_open_cost_us(uint8_t cyl, uint32_t us)        noexcept;
+    // Each stage's opening price now, charged to the pulses that carry none (prime, async).
+    void set_stage_open_cost_us(uint8_t stage, uint32_t us)    noexcept;
+    // One-shot cold-start prime: fire every active injector simultaneously for pw_us — the WHOLE pulse,
+    // primary dead time included, as the fuel calc builds it (delegated to the scheduler, fired in ISR on
+    // the next grid tooth). HW-agnostic — no pin handling in firmware.
     void prime_injectors   (uint32_t   pw_us)                  noexcept;
-    // Asynchronous transient injection: up to num_pulses extra all-injector squirts (pw_us each),
-    // spread across the cycle between the sequential events (TransientThrottle's async enrichment).
-    void request_async_injection(uint32_t pw_us, uint8_t num_pulses) noexcept;
+    // Asynchronous transient injection: up to num_pulses extra all-injector squirts of fuel_us SPRAY
+    // each (the scheduler adds each injector's opening price), spread across the cycle between the
+    // sequential events (TransientThrottle's async enrichment).
+    void request_async_injection(uint32_t fuel_us, uint8_t num_pulses) noexcept;
 
     // Staged secondary injection — enabled per-cylinder by the fuel calc's duty-based staging,
     // orthogonal to the firing mode. The secondary fires at its own open angle (own table).
     // stage: 0 = stage 2, 1 = stage 3, 2 = stage 4 (see MAX_STAGED_STAGES).
     void set_staged_pw_us    (uint8_t cyl, uint8_t stage, uint32_t pw_us)      noexcept;
+    void set_staged_open_cost_us(uint8_t cyl, uint8_t stage, uint32_t us)    noexcept;
     void set_staged_enabled  (uint8_t cyl, uint8_t stage, bool     enabled)    noexcept;
     void set_staged_open_angle(uint8_t cyl, uint8_t stage, AngleDeg10 btdc_x10) noexcept;
 
@@ -389,6 +397,7 @@ private:
     // a STATIC schedule node re-arms its cylinder. No active_[] snapshot — the
     // self-correcting chain reads the freshest shadow value at the moment of use.
     CylinderShadowParams shadow_[MAX_CYLINDERS];
+    volatile uint32_t    stage_open_cost_us_[MAX_INJ_STAGES] = {};   // mirror of what the scheduler was given
 
     volatile VvtResult vvt_results_[MAX_CAM_CHANNELS];
 

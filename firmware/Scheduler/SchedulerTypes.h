@@ -325,7 +325,7 @@ struct SchedNode {
     EventAction   action;
     EventPriority priority;
     uint8_t       cyl_index;
-    uint8_t       bucket;          // 0..MAX_VTEETH-1 (360°-folded for CRANK reach)
+    uint8_t       bucket;          // 0..MAX_VTEETH-1 over the FULL cycle (the crank-sync walk folds, not this)
     FractionQ0_15 sub_offset;      // fraction into the bucket (Q0.15)
     AngleDeg10    target_angle;    // full 720° angle (PHASE half-discrimination)
     OutputMask    crank_mask;      // channels fired when phase_known_ == false (wasted)
@@ -365,10 +365,12 @@ struct CylinderShadowParams {
     volatile AngleDeg10 trailing_spark_btdc;
     volatile uint32_t   trailing_dwell_us;
     volatile AngleDeg10 inj_open_btdc;
-    volatile uint32_t   inj_pw_us;
+    volatile uint32_t   inj_pw_us;            // whole pulse (spray + opening price)
+    volatile uint32_t   inj_open_cost_us;     // of which the opening price
     // Staged stages 2..4 (index 0 = stage 2), each its own pulse width + firing angle (own tables) and
     // an engaged flag the fuel calc's duty progression sets.
     volatile uint32_t   inj_secondary_pw_us[MAX_STAGED_STAGES];
+    volatile uint32_t   inj_secondary_open_cost_us[MAX_STAGED_STAGES];
     volatile AngleDeg10 inj_secondary_open_btdc[MAX_STAGED_STAGES];
     volatile bool       staged_enabled[MAX_STAGED_STAGES];
 };

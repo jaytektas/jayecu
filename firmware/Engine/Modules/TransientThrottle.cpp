@@ -189,16 +189,16 @@ void TransientThrottle::update(const EnginePosition& pos, SignalBus& bus, Engine
             (last_async_ms_ == 0 || (now_ms - last_async_ms_) >= cfg_->async_holdoff_ms)) {
             const float async_amt = tbl::table_eval(tt_enrich_async_table_desc(cfg_), bus);   // %
             const float async_pct = rate_pct * (async_amt * 0.01f) * (1.0f + clt_corr * 0.01f) * overall;
-            // FUEL, THEN OPENING TIME PER PULSE. base_pw already carries the injector dead time, so the
-            // percentage is taken of the fuel part alone — and every async pulse is a separate opening of
-            // the injector, so each needs its OWN dead time. Without it a burst of short pulses could each
-            // be shorter than the dead time and deliver almost nothing: a tip-in that stayed lean however
-            // the table was tuned.
+            // FUEL ONLY. base_pw already carries the injector dead time, so the percentage is taken of the
+            // fuel part alone. The squirt is asked for as SPRAY time: the scheduler adds the opening price
+            // when it actually opens an injector — and charges none to one already open (a squirt landing
+            // inside a cylinder's own pulse just keeps it open longer), so the price is paid once per
+            // opening, not once per request.
             const float dead      = std::max(0.0f, bus.get(wk::pw_add_deadtime, 0.0f));
             const float fuel_pw   = std::max(0.0f, bus.get(wk::base_pw, 0.0f) - dead);           // µs/cyl fuel
             const float total_us  = (async_pct * 0.01f) * fuel_pw;
             if (total_us > 0.0f) {
-                frame.async_inj_pw_us  = static_cast<uint32_t>(total_us / cfg_->max_async_pulses + dead + 0.5f);
+                frame.async_inj_pw_us  = static_cast<uint32_t>(total_us / cfg_->max_async_pulses + 0.5f);
                 frame.async_inj_pulses = cfg_->max_async_pulses;
                 last_async_ms_         = now_ms;
             }

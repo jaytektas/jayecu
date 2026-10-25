@@ -62,7 +62,7 @@ void compute_hook(void* ud, uint8_t index, EventAction kind) noexcept {
     // One event = one stage now; arm it at its own base angle with a fixed PW (the HAL gates staged
     // engagement on staged_enabled — the test drives every event so all stages are observable at the pins).
     const AngleDeg10 base = s->inj_event_base_angle(index);
-    s->arm_injection(index, base, 2000);
+    s->arm_injection(index, base, 2000, 0);
 }
 
 // Build an engine and run exactly one engine cycle of virtual teeth, returning every injector open.
@@ -235,9 +235,12 @@ int main() {
         std::printf("    rotor 1 opens at teeth %s, rotor 2 at %s (phase sync)\n",
                     join(teeth_of(ph, 0)).c_str(), join(teeth_of(ph, 1)).c_str());
         ck(ph.opens.size() == 6, "phase sync: one squirt per face", std::to_string(ph.opens.size()));
-        // Crank sync: every face event every revolution -> 18 drive calls, and the three faces of a
-        // rotor coincide, so each injector still opens once a revolution: 3 per cycle, as with the cam.
-        ck(cr.opens.size() == 18, "crank sync: all faces every revolution, 720-1080 included",
+        // Crank sync: every face event every revolution, and the three faces of a rotor coincide on one
+        // injector at one angle — ONE opening a revolution, 3 per rotor per cycle, as with the cam (and as
+        // injection_deliveries_per_cycle divides the fuel). This counted 18 drive calls when a coinciding
+        // face re-drove a pin already high; the scheduler now opens an injector once and treats the other
+        // faces as the same pulse (test_injector_overlap checks it is ONE pulse long, not three).
+        ck(cr.opens.size() == 6, "crank sync: all faces every revolution, 720-1080 included",
            std::to_string(cr.opens.size()));
         std::vector<int> u = teeth_of(cr, 0);
         u.erase(std::unique(u.begin(), u.end()), u.end());   // the three coincident face events are one opening

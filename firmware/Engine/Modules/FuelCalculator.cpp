@@ -822,6 +822,13 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
     float   staged_add_arr[MAX_STAGED_STAGES]  = {};   // dead time + short-pulse: opening, not fuel
     bool    staged_active[MAX_STAGED_STAGES]   = {};
     int16_t staged_btdc_arr[MAX_STAGED_STAGES] = { 3550, 3550, 3550 };
+    // EACH STAGE'S OPENING PRICE, for the pulses that carry none of their own (the prime and the async
+    // squirts, which fire every injector of every stage). Dead time only: those squirts are not this
+    // cycle's pulse, so the short-pulse adder evaluated on this cycle's width does not describe them.
+    frame.stage_open_cost_us[0] = static_cast<uint32_t>(pw_add);
+    for (uint8_t st = 0; st < MAX_STAGED_STAGES; ++st)
+        frame.stage_open_cost_us[st + 1] = (static_cast<uint8_t>(st + 1) < nstages)
+            ? static_cast<uint32_t>(std::clamp(tbl::table_eval(STAGE_DEAD[st](cfg_), bus), 0.0f, 65000.0f)) : 0u;
     for (uint8_t st = 0; st < MAX_STAGED_STAGES; ++st) {
         const uint8_t s = static_cast<uint8_t>(st + 1);
         if (s >= nstages || stage_fuel_pw[s] <= 0.0f) continue;
@@ -923,6 +930,8 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
         const float prim_add = pw_add + prim_short;
         frame.cyl[i].inj_pw_us    = static_cast<uint32_t>(std::max(0.0f,
                                         prim_fuel_pw * trim(prim_bank, prim_cyl) + prim_add));
+        frame.cyl[i].inj_open_cost_us = std::min(frame.cyl[i].inj_pw_us,
+                                                 static_cast<uint32_t>(std::max(0.0f, prim_add)));
         frame.cyl[i].inj_btdc_x10 = inj_btdc_x10;
         // Staged stages 2..N: each carries the PW the sequential fill gave it, trimmed per THAT stage's
         // mode. A fuel cut gates the staged injectors (a separate injector decision, not the output cut
@@ -931,6 +940,8 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
             frame.cyl[i].staged_pw_us[st]    = (staged_active[st] && !cut)
                 ? static_cast<uint32_t>(std::max(0.0f, staged_fuel_arr[st] * trim(staged_bank[st], staged_cyl[st])
                                                        + staged_add_arr[st])) : 0u;
+            frame.cyl[i].staged_open_cost_us[st] = std::min(frame.cyl[i].staged_pw_us[st],
+                                                            static_cast<uint32_t>(std::max(0.0f, staged_add_arr[st])));
             frame.cyl[i].staged_btdc_x10[st] = staged_btdc_arr[st];
             frame.cyl[i].staged_enabled[st]  = staged_active[st] && !cut;
         }
