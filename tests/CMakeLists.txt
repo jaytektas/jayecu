@@ -574,6 +574,14 @@ target_include_directories(test_async_injection PRIVATE
 target_link_libraries(test_async_injection PRIVATE platform_stub)
 add_test(NAME async_injection COMMAND test_async_injection)
 
+# Overlapping injector pulses: an injector opened twice stays open until the later close.
+add_executable(test_injector_overlap test_injector_overlap.cpp
+    ${SCHED_DIR}/EventScheduler.cpp ${SCHED_DIR}/CycleRecorder.cpp ${GEN_DIR}/default_config.cpp)
+target_include_directories(test_injector_overlap PRIVATE
+    ${GEN_DIR} ${GEN_DIR}/modules ${GEN_DIR}/boards ${SCHED_DIR} ${FW_DIR})
+target_link_libraries(test_injector_overlap PRIVATE platform_stub)
+add_test(NAME injector_overlap COMMAND test_injector_overlap)
+
 # The four injection distribution modes: which channels fire, and how often, at the pins.
 add_executable(test_injection_modes test_injection_modes.cpp
     ${SCHED_DIR}/EventScheduler.cpp ${SCHED_DIR}/CycleRecorder.cpp ${GEN_DIR}/default_config.cpp)

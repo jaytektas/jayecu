@@ -124,7 +124,9 @@ void TransientThrottle::update(const EnginePosition& pos, SignalBus& bus, Engine
         if (detect_ms_ >= need) {
             state_      = enr_trip ? ENRICH : DISENRICH;
             enrich_triggered = enr_trip;
-            enrich_pct_ = 0.0f;                                     // flipping direction → start the new event fresh
+            // Flipping direction starts the new event fresh. A tip-in landing on the TAIL of a lifted one
+            // (IDLE, still decaying — see "A LIFT ENDS A TIP-IN") keeps that tail: it only adds.
+            enrich_pct_ = enr_trip ? std::max(0.0f, enrich_pct_) : 0.0f;
             start_load_ = load;                                     // latch the load at event start
             bus.set(wk::tt_start_load, start_load_, true, now, ttl());
             detect_ms_  = 0.0f;
@@ -154,10 +156,17 @@ void TransientThrottle::update(const EnginePosition& pos, SignalBus& bus, Engine
     // flip the event, so the tip-in's enrichment used to ride on through the whole lift — and re-peaked
     // at its end (see `maintaining` below). The closing rate is judged against the disenrich threshold
     // when one is set, else the enrich threshold mirrored. The wall-film model owns the lift's fuel.
+    //
+    // ENDED, NOT ZEROED. The event stops (no more peak, no re-taking the table — the drive 7 fix stands),
+    // but what it had put on is handed to the decay below and bleeds off at the Decay Rate, as it would
+    // have with the throttle held. Zeroing it on the lift's first frame took the extra fuel away while
+    // MAP — which lags the throttle — was still at its peak and the port walls were still loading:
+    // λ 0.99 → 1.34 within 60 ms on every quick stab-and-lift (Kelly, 25 Oct, "20 AFR when I lift").
     {
         const float lift_db = (dis_db < 0.0f) ? dis_db : -rate_db;
         if (state_ == ENRICH && !cfg_->enable_disenrich && rate_ < lift_db) {
-            state_ = IDLE; enrich_pct_ = 0.0f; detect_ms_ = 0.0f; start_load_ = load;
+            state_ = IDLE; detect_ms_ = 0.0f; start_load_ = load;
+            if (!cfg_->enable_decay) enrich_pct_ = 0.0f;   // no decay model → nothing to hand it to
         }
     }
 
@@ -229,6 +238,20 @@ void TransientThrottle::update(const EnginePosition& pos, SignalBus& bus, Engine
             for (int i = 0; i < steps; ++i) enrich_pct_ *= std::max(0.0f, 1.0f - decay_pct * 0.01f);
         }
         if (std::fabs(enrich_pct_) < 0.1f) { enrich_pct_ = 0.0f; state_ = IDLE; }       // event finished
+    } else if (enrich_pct_ > 0.0f) {
+        // THE TAIL OF A LIFTED TIP-IN (IDLE): only the bleed-off, at the enrich Decay Rate, per engine
+        // cycle. Nothing here can raise it — a new push has to be detected as a tip-in of its own.
+        if (cfg_->enable_decay && pos.cycle_count != last_cycle_) {
+            const float decay_pct = tbl::table_eval(tt_enrich_decay_table_desc(cfg_), bus);   // %/ECyc
+            int steps = static_cast<int>(pos.cycle_count - last_cycle_);
+            steps = std::clamp(steps, 1, 8);
+            for (int i = 0; i < steps; ++i) enrich_pct_ *= std::max(0.0f, 1.0f - decay_pct * 0.01f);
+        } else if (!cfg_->enable_decay) {
+            enrich_pct_ = 0.0f;
+        }
+        if (enrich_pct_ < 0.1f) enrich_pct_ = 0.0f;
+    } else if (enrich_pct_ < 0.0f) {
+        enrich_pct_ = 0.0f;                                // IDLE never holds a disenrichment
     }
     last_cycle_ = pos.cycle_count;
     enrich_pct_ = std::clamp(enrich_pct_, -100.0f, 300.0f);

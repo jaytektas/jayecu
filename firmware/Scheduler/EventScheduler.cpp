@@ -936,9 +936,8 @@ void EventScheduler::dispatch_fire(SchedNode* n) noexcept {
         // had this guard. A skipped squirt is lean for one cycle; a stuck one is a hydrolock.
         if (!m || !pw_ticks) return;
         if (!time_free_) { ++inj_no_close_; return; }
-        drive_inj(m, true);   // open = energize (each injector at its own polarity)
         const uint32_t now = angle_alarm_ ? angle_alarm_->now() : tooth_tick_;
-        insert_close(now + pw_ticks, m);
+        open_inj(m, now + pw_ticks);
         return;
     }
 
@@ -1057,9 +1056,8 @@ void EventScheduler::fire_prime() noexcept {
         : 0u;
     if (!pw_ticks) return;                           // zero/invalid pw → nothing to deliver
     if (!time_free_) { ++inj_no_close_; return; }    // no close slot → don't open (see INJ_OPEN)
-    drive_inj(all_inj, true);                        // open = energize (per-injector polarity)
     const uint32_t now = angle_alarm_ ? angle_alarm_->now() : tooth_tick_;
-    insert_close(now + pw_ticks, all_inj);
+    open_inj(all_inj, now + pw_ticks);
 }
 
 // ---------------------------------------------------------------------------
@@ -1076,9 +1074,34 @@ void EventScheduler::fire_async_pulse() noexcept {
         ? static_cast<uint32_t>(((uint64_t)async_pw_us_ * ticks_per_second_) / 1000000ULL)
         : 0u;
     if (!pw_ticks) return;                            // zero pw → nothing to deliver
-    drive_inj(all_inj, true);                        // open = energize (per-injector polarity)
     const uint32_t now = angle_alarm_ ? angle_alarm_->now() : tooth_tick_;
-    insert_close(now + pw_ticks, all_inj);           // slot guaranteed (time_free_ checked above)
+    open_inj(all_inj, now + pw_ticks);               // slot guaranteed (time_free_ checked above)
+}
+
+// ---------------------------------------------------------------------------
+// open_inj — open injectors and book their close, remembering each one's LATEST close.
+//
+// OVERLAPPING PULSES MUST NOT CUT EACH OTHER SHORT. A close used to drive its whole mask low whoever
+// had opened it, so an async squirt landing inside a cylinder's sequential pulse closed that injector
+// at the squirt's (earlier) close: the rest of the sequential pulse was lost and the cylinder went lean
+// for the cycle — on a tip-in, the moment the async fuel exists for, and on boost, where injectors are
+// open most of the cycle, nearly every squirt clipped a pulse. Same for a sequential pulse starting
+// inside a squirt, and for the prime. Now an injector stays open until the later of the closes booked
+// for it: overlapping requests take the UNION of their open times, never less than the longest one.
+// (Not the sum: an injector already open spends no second dead time, and the scheduler does not know
+// the dead time, so adding the full second pulse would over-fuel by it.)
+// ---------------------------------------------------------------------------
+void EventScheduler::open_inj(OutputMask m, uint32_t close_tick) noexcept {
+    drive_inj(m, true);                              // open = energize (an open one just stays open)
+    for (OutputMask r = m; r; r &= (r - 1)) {
+        const uint8_t ci = static_cast<uint8_t>(__builtin_ctz(r));
+        if (ci >= MAX_INJ_CHANNELS) break;
+        const OutputMask bit = OutputMask(1) << ci;
+        if (!(inj_open_ & bit) || static_cast<int32_t>(close_tick - inj_open_until_[ci]) > 0)
+            inj_open_until_[ci] = close_tick;
+    }
+    inj_open_ = static_cast<OutputMask>(inj_open_ | m);
+    insert_close(close_tick, m);
 }
 
 // ---------------------------------------------------------------------------
@@ -1106,7 +1129,19 @@ void EventScheduler::on_time_alarm() noexcept {
     TimeEvt* e = time_head_;
     if (!e) return;
     time_head_ = e->next;
-    drive_inj(e->mask, false);   // close = de-energize (per-injector polarity)
+    // Close only the injectors whose LATEST booked close this is (open_inj). One with a later close
+    // still to come — a second pulse overlapped this one — stays open for it. One not marked open at
+    // all (released by emergency_off) is driven low again, as before: closing is always safe.
+    OutputMask close = 0;
+    for (OutputMask r = e->mask; r; r &= (r - 1)) {
+        const uint8_t ci = static_cast<uint8_t>(__builtin_ctz(r));
+        const OutputMask bit = OutputMask(1) << ci;
+        if (ci < MAX_INJ_CHANNELS && (inj_open_ & bit) &&
+            static_cast<int32_t>(inj_open_until_[ci] - e->tick) > 0) continue;   // a later close owns it
+        close = static_cast<OutputMask>(close | bit);
+    }
+    inj_open_ = static_cast<OutputMask>(inj_open_ & ~close);
+    drive_inj(close, false);     // close = de-energize (per-injector polarity)
     e->next = time_free_;                    // return to the pool
     time_free_ = e;
     if (time_head_ && time_alarm_) time_alarm_->arm(time_head_->tick);
@@ -1128,6 +1163,7 @@ void EventScheduler::emergency_off() noexcept {
     for (uint8_t i = 0; i < MAX_INJ_CHANNELS; ++i) {
         if (inj_channels_[i]) inj_channels_[i]->force_output_now(inj_level(i, false));  // de-energized
     }
+    inj_open_ = 0;     // nothing is open now; a stale close still drives low (safe), and owns nothing
 }
 
 // ---------------------------------------------------------------------------

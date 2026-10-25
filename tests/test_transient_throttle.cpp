@@ -93,15 +93,97 @@ int main() {
         for (float t : {12.0f, 24.0f, 36.0f}) tip = std::max(tip, step(t).first);
         step(36.0f);                                               // lift straight after, as on the road
         CHECK(tip > 1.05f);                                        // the stab enriched
-        step(25.0f);                                               // first lift frame: the rate filter's lag
-        float worst = 0.0f; float state_after = -1.0f;
+        const float at_lift = step(25.0f).first;                  // first lift frame: the rate filter's lag
+        // The drive 7 bug was a RE-PEAK on the lift (1.95). Since 25 Oct the lift no longer zeroes what
+        // the tip-in put on — it bleeds off at the Decay Rate — so the guard is: never above where it
+        // stood when the lift began, never rising frame to frame, and the event over.
+        float worst = 0.0f, prev = at_lift, state_after = -1.0f; bool rose = false;
         for (float t : {12.0f, 1.8f, 2.4f, 2.7f, 2.7f, 2.9f, 3.0f, 3.3f, 3.5f, 3.6f, 3.6f}) {
             auto r = step(t); worst = std::max(worst, r.first); state_after = r.second;
+            rose = rose || r.first > prev + 1e-4f; prev = r.first;
         }
-        fprintf(stdout, "    tip-in peak %.3f, worst during/after lift %.3f, state %.0f\n",
-                (double)tip, (double)worst, (double)state_after);
-        CHECK(worst <= 1.0f + 1e-3f);                              // nothing added once the lift is seen
+        fprintf(stdout, "    tip-in peak %.3f, at lift %.3f, worst during/after lift %.3f, state %.0f\n",
+                (double)tip, (double)at_lift, (double)worst, (double)state_after);
+        CHECK(worst <= at_lift + 1e-4f);                           // no re-peak on the lift or the rebound
+        CHECK(!rose);                                              // only ever bleeding off
         CHECK(state_after == 0.0f);                                // the event ended
+        float tail = prev;
+        for (int i = 0; i < 120; ++i) tail = step(3.6f).first;    // ~20 engine cycles at rest
+        CHECK_NEAR(tail, 1.0, 0.001);                              // ...and it runs out
+    }
+
+    SECTION("a stab and lift: the enrichment bleeds off through the lift instead of vanishing (25 Oct)");
+    {
+        // Kelly, 25 Oct: stab 13 -> 22 %, MAP 67 -> 98 kPa, lift at the top. fuel_corr_accel went from 1.08
+        // to 1.000 on the lift's first frame while MAP was still 98 kPa, and lambda 0.99 -> 1.34.
+        cfg.enabled = 1; cfg.load_source = 0; cfg.enable_disenrich = 0; cfg.enable_decay = 1; cfg.enable_async = 0;
+        TransientThrottle tt; tt.init(cfg);
+        EngineFrame f{};
+        uint32_t cyc = 0;
+        auto step = [&](float tps) {
+            g_ms += 10; SignalBus b{}; b.set(SIG_TPS, tps); b.set(SIG_CLT, 85.0f); b.set(SIG_RPM, 1500.0f);
+            b.set(SIG_MAP, 95.0f);
+            tt.update(pos(cyc++ / 8), b, f);                       // 1500 rpm: one engine cycle per 8 frames
+            return b.get(SIG_FUEL_CORR_ACCEL, 1.0f);
+        };
+        g_ms = 9000;
+        for (int i = 0; i < 5; ++i) step(13.0f);
+        float tip = 1.0f;
+        for (float t : {16.0f, 19.0f, 22.0f}) tip = std::max(tip, step(t));
+        float before_lift = step(22.0f);
+        CHECK(tip > 1.02f);
+        float l1 = step(18.0f), l2 = step(12.0f), l3 = step(8.0f);  // the lift
+        fprintf(stdout, "    peak %.3f, before lift %.3f, lift frames %.3f %.3f %.3f\n",
+                (double)tip, (double)before_lift, (double)l1, (double)l2, (double)l3);
+        CHECK(l2 > 1.0f + 1e-3f);                                  // still there on the lift, not zeroed
+        CHECK(l3 <= l2 + 1e-4f && l2 <= l1 + 1e-4f);               // and only falling
+        float later = l3;
+        for (int i = 0; i < 80; ++i) later = step(8.0f);           // 10 engine cycles on
+        CHECK(later < l3);                                         // bled off by the Decay Rate
+    }
+
+    SECTION("decay switched off: a lift still ends the enrichment at once (nothing to hand it to)");
+    {
+        cfg.enabled = 1; cfg.load_source = 0; cfg.enable_disenrich = 0; cfg.enable_decay = 0; cfg.enable_async = 0;
+        TransientThrottle tt; tt.init(cfg);
+        EngineFrame f{};
+        auto step = [&](float tps) {
+            g_ms += 10; SignalBus b{}; b.set(SIG_TPS, tps); b.set(SIG_CLT, 85.0f); b.set(SIG_RPM, 1500.0f);
+            tt.update(pos(0), b, f); return b.get(SIG_FUEL_CORR_ACCEL, 1.0f);
+        };
+        g_ms = 12000;
+        for (int i = 0; i < 5; ++i) step(13.0f);
+        for (float t : {16.0f, 19.0f, 22.0f, 22.0f}) step(t);
+        step(18.0f); const float l2 = step(12.0f);
+        CHECK_NEAR(l2, 1.0, 0.001);
+        cfg.enable_decay = 1;
+    }
+
+    SECTION("a new stab on the tail of a lifted one is a tip-in of its own: it adds, and arms async");
+    {
+        cfg.enabled = 1; cfg.load_source = 0; cfg.enable_disenrich = 0; cfg.enable_decay = 1;
+        cfg.enable_async = 1; cfg.max_async_pulses = 2; cfg.async_holdoff_ms = 0;
+        TransientThrottle tt; tt.init(cfg);
+        uint32_t cyc = 0;
+        auto step = [&](float tps, EngineFrame& f) {
+            g_ms += 10; SignalBus b{}; b.set(SIG_TPS, tps); b.set(SIG_CLT, 85.0f); b.set(SIG_RPM, 1500.0f);
+            b.set(SIG_BASE_PW, 3000.0f); b.set(SIG_PW_ADD_DEADTIME, 900.0f);
+            tt.update(pos(cyc++ / 8), b, f); return b.get(SIG_FUEL_CORR_ACCEL, 1.0f);
+        };
+        g_ms = 15000;
+        EngineFrame f{};
+        for (int i = 0; i < 5; ++i) step(13.0f, f);
+        for (float t : {16.0f, 19.0f, 22.0f, 22.0f}) step(t, f);
+        step(18.0f, f); step(12.0f, f); const float tail = step(8.0f, f);
+        CHECK(tail > 1.0f + 1e-3f);
+        float again = tail; bool async = false;
+        for (float t : {14.0f, 22.0f, 30.0f}) {
+            EngineFrame g{}; again = std::max(again, step(t, g)); async = async || g.async_inj_pulses > 0;
+        }
+        fprintf(stdout, "    tail %.3f, second stab %.3f, async %d\n", (double)tail, (double)again, (int)async);
+        CHECK(again >= tail - 1e-4f);                              // the tail is not thrown away by the new push
+        CHECK(async);                                              // and it is a real tip-in: async armed
+        cfg.enable_async = 0;
     }
 
     SECTION("a wiggle on boost, inside an event that began at a closed throttle, is judged from where it began");

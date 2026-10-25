@@ -9,6 +9,17 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- **Overlapping injector pulses no longer cut each other short.** When an async transient squirt landed
+  while an injector was in its normal pulse, the injector closed at the squirt's earlier close and the
+  rest of the normal pulse was lost: on the bench, a 1 ms squirt cut an 8 ms pulse to 3 ms. That cylinder
+  ran lean for the cycle, on exactly the tip-ins the squirt was meant to help. The same happened to a
+  normal pulse starting during a squirt, and with the cold-start prime. An injector now stays open until
+  the later of its closes.
+- **A lift no longer throws away the tip-in enrichment.** With disenrichment off, the enrichment was set
+  to zero the moment the throttle started to close, while MAP (which lags the throttle) was still at its
+  peak. A quick stab and lift went briefly lean: λ 0.99 to 1.34, about 20 AFR on the 14.7 scale. The lift
+  still ends the event, so it cannot grow or re-peak, but what it added now bleeds off at the Enrich Decay
+  rate.
 
 ## 0.4.21
 - **Key-on is a power-on.** With USB holding the ECU up, key-off used to leave every module and sensor as

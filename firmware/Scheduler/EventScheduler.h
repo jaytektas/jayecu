@@ -344,6 +344,9 @@ private:
     // polarity, so one mask may mix active-high and active-low drivers.
     void drive_ign(OutputMask m, bool energize) noexcept;
     void drive_inj(OutputMask m, bool energize) noexcept;
+    // Open injectors and book their close — the ONE way an injector is opened (sequential, prime, async),
+    // so an injector opened twice stays open until the LATER of its closes (see open_inj).
+    void open_inj(OutputMask m, uint32_t close_tick) noexcept;
     void fire_prime() noexcept;   // Timer ISR (pri 2): open all active injectors, schedule the close
     void fire_async_pulse() noexcept;  // Timer ISR (pri 2): one async squirt of all active injectors (slot-guarded)
 
@@ -447,6 +450,9 @@ private:
     TimeEvt              time_pool_[MAX_INJ_CHANNELS];
     TimeEvt*             time_free_;
     TimeEvt*             time_head_;
+    // Which injectors are open, and until when (the latest close booked for each). Timer-ISR only.
+    OutputMask           inj_open_ = 0;
+    uint32_t             inj_open_until_[MAX_INJ_CHANNELS] = {};
 
     volatile bool        phase_known_;
     volatile bool        firing_enabled_;

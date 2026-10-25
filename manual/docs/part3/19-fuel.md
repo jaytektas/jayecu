@@ -269,10 +269,16 @@ There are two ways to do it. Use **one**, not both.
    Rate table.
 6. **Disenrichment** (off by default) is the same in reverse when the load falls, using the
    Disenrich tables and dead bands. A strong movement in the opposite direction switches an event
-   from one to the other.
+   from one to the other. With disenrichment off, a lift **ends** the enrichment event (it can no longer
+   grow or re-peak), but what it had added is not dropped: it keeps bleeding off at the **Enrich Decay**
+   rate. MAP lags the throttle, so on a quick stab and lift the cylinders are still full of air for a
+   cycle or two after the throttle starts to close. A new stab during that tail is a new enrichment
+   event of its own.
 7. **Async** (off by default): at the start of an enrichment event, the ECU can also fire up to **Max
    Async Injector Pulses** extra squirts from every injector, sized by the **Async Amount** table,
-   each with its own dead time. **Async Holdoff Time** is the minimum time between bursts.
+   each with its own dead time. **Async Holdoff Time** is the minimum time between bursts. A squirt
+   that lands while an injector is already open (its normal pulse, or the prime) keeps it open until
+   the later of the two closes, so it never shortens the pulse it overlaps.
 8. **Ignition Correction** adds timing (degrees, by load × speed) while enriching, and after the
    event it fades away over **Ign Corr Decay Time** (default 500 ms).
 
