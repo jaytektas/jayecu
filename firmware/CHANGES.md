@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.21
 - **Key-on is a power-on.** With USB holding the ECU up, key-off used to leave every module and sensor as
   it was, and the next key-on carried on from there. Now key-off puts every module back to its power-on
   state and key-on re-reads every sensor from scratch. Only what survives a real power loss carries over:
