@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 310" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Three ways to wire a switch</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1.5; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: none; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 8 5; }
+    .ecufill { fill: #f4f5f7; }
+    .part { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pin  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2.5; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2.5; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2.5; fill: none; }
+    .wout { stroke: #5f6670; stroke-width: 7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .shield { stroke: #8d939b; stroke-width: 2; fill: none; stroke-dasharray: 3 3; }
+    .node { fill: #5f6670; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .part { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { stroke: #9aa1ab; } .ecufill { fill: #1c1f25; }
+      .tgt, .pin { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .wout { stroke: #9aa1ab; } .node { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+  <text x="15" y="30" text-anchor="start" class="fg head">A · To ground, digital input</text>
+  <text x="15" y="50" text-anchor="start" class="muted small">DIG4: a plain on/off level</text>
+  <rect x="25" y="90" width="90" height="120" rx="8" class="box"/>
+  <text x="70" y="112" text-anchor="middle" class="fg head">Switch</text>
+  <circle cx="50" cy="160" r="4" class="node"/>
+  <circle cx="90" cy="160" r="4" class="node"/>
+  <path d="M50 160 L86 144" class="line"/>
+  <path d="M50 160 V190 H115" class="thin"/>
+  <path d="M90 160 V130 H115" class="thin"/>
+  <rect x="175" y="68" width="150" height="172" rx="8" class="ecufill"/>
+  <rect x="175" y="68" width="150" height="172" rx="8" class="ecu"/>
+  <text x="317" y="234" text-anchor="end" class="muted small">ECU</text>
+  <rect x="185" y="108" width="130" height="44" rx="4" class="pin"/>
+  <text x="250.0" y="127" text-anchor="middle" class="fg head mono">CN3-20</text>
+  <text x="250.0" y="144" text-anchor="middle" class="muted mono">DIG4</text>
+  <rect x="185" y="168" width="130" height="44" rx="4" class="pin"/>
+  <text x="250.0" y="187" text-anchor="middle" class="fg head mono">CN3-11</text>
+  <text x="250.0" y="204" text-anchor="middle" class="muted mono">Ground</text>
+  <path d="M115 130 H185" class="wout"/>
+  <path d="M115 130 H185" stroke="#ec8a24" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M115 130 H185" stroke="#e8c21e" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="150" y="120" text-anchor="middle" class="muted small mono">O/Y</text>
+  <path d="M115 190 H185" class="wout"/>
+  <path d="M115 190 H185" stroke="#1b1b1b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="150" y="180" text-anchor="middle" class="muted small mono">B</text>
+  <text x="250" y="90" text-anchor="middle" class="muted small">pulled up to 5 V</text>
+  <text x="15" y="266" text-anchor="start" class="fg small">Open: reads 1. Closed: reads 0.</text>
+  <text x="15" y="286" text-anchor="start" class="fg small head">Tick Invert so pressed reads 1.</text>
+  <text x="345" y="30" text-anchor="start" class="fg head">B · To ground, AT input</text>
+  <text x="345" y="50" text-anchor="start" class="muted small">AT3: read as a voltage</text>
+  <rect x="355" y="90" width="90" height="120" rx="8" class="box"/>
+  <text x="400" y="112" text-anchor="middle" class="fg head">Switch</text>
+  <circle cx="380" cy="160" r="4" class="node"/>
+  <circle cx="420" cy="160" r="4" class="node"/>
+  <path d="M380 160 L416 144" class="line"/>
+  <path d="M380 160 V190 H445" class="thin"/>
+  <path d="M420 160 V130 H445" class="thin"/>
+  <rect x="505" y="68" width="150" height="172" rx="8" class="ecufill"/>
+  <rect x="505" y="68" width="150" height="172" rx="8" class="ecu"/>
+  <text x="647" y="234" text-anchor="end" class="muted small">ECU</text>
+  <rect x="515" y="108" width="130" height="44" rx="4" class="pin"/>
+  <text x="580.0" y="127" text-anchor="middle" class="fg head mono">CN3-13</text>
+  <text x="580.0" y="144" text-anchor="middle" class="muted mono">AT3</text>
+  <rect x="515" y="168" width="130" height="44" rx="4" class="pin"/>
+  <text x="580.0" y="187" text-anchor="middle" class="fg head mono">CN3-11</text>
+  <text x="580.0" y="204" text-anchor="middle" class="muted mono">Ground</text>
+  <path d="M445 130 H515" class="wout"/>
+  <path d="M445 130 H515" stroke="#8d939b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M445 130 H515" stroke="#d6332a" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="480" y="120" text-anchor="middle" class="muted small mono">Gy/R</text>
+  <path d="M445 190 H515" class="wout"/>
+  <path d="M445 190 H515" stroke="#1b1b1b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="480" y="180" text-anchor="middle" class="muted small mono">B</text>
+  <text x="580" y="90" text-anchor="middle" class="muted small">pulled up to 5 V</text>
+  <text x="345" y="266" text-anchor="start" class="fg small">Open: ≈ 5 V. Closed: ≈ 0 V.</text>
+  <text x="345" y="286" text-anchor="start" class="fg small head">Set trip points, tick Invert.</text>
+  <text x="675" y="30" text-anchor="start" class="fg head">C · To 5 V, AV input</text>
+  <text x="675" y="50" text-anchor="start" class="muted small">AV5: read as a voltage</text>
+  <rect x="685" y="90" width="90" height="120" rx="8" class="box"/>
+  <text x="730" y="112" text-anchor="middle" class="fg head">Switch</text>
+  <circle cx="710" cy="160" r="4" class="node"/>
+  <circle cx="750" cy="160" r="4" class="node"/>
+  <path d="M710 160 L746 144" class="line"/>
+  <path d="M710 160 V190 H775" class="thin"/>
+  <path d="M750 160 V130 H775" class="thin"/>
+  <rect x="835" y="68" width="150" height="172" rx="8" class="ecufill"/>
+  <rect x="835" y="68" width="150" height="172" rx="8" class="ecu"/>
+  <text x="977" y="234" text-anchor="end" class="muted small">ECU</text>
+  <rect x="845" y="108" width="130" height="44" rx="4" class="pin"/>
+  <text x="910.0" y="127" text-anchor="middle" class="fg head mono">CN3-34</text>
+  <text x="910.0" y="144" text-anchor="middle" class="muted mono">AV5</text>
+  <rect x="845" y="168" width="130" height="44" rx="4" class="pin"/>
+  <text x="910.0" y="187" text-anchor="middle" class="fg head mono">CN4-15</text>
+  <text x="910.0" y="204" text-anchor="middle" class="muted mono">5V Sensor 2</text>
+  <path d="M775 130 H845" class="wout"/>
+  <path d="M775 130 H845" stroke="#2e9d4f" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="810" y="120" text-anchor="middle" class="muted small mono">G</text>
+  <path d="M775 190 H845" class="wout"/>
+  <path d="M775 190 H845" stroke="#ec8a24" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M775 190 H845" stroke="#f2f2f2" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="810" y="180" text-anchor="middle" class="muted small mono">O/W</text>
+  <text x="910" y="90" text-anchor="middle" class="muted small">pulled down (470 kΩ)</text>
+  <text x="675" y="266" text-anchor="start" class="fg small">Open: ≈ 0 V. Closed: ≈ 5 V.</text>
+  <text x="675" y="286" text-anchor="start" class="fg small head">Set trip points; no Invert.</text>
+</svg>

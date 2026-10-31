@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 540" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>How the jaytek_v1 connectors split the harness into a quiet sensor bundle and noisy switching bundles</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: #f4f5f7; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .quiet { stroke: #3b82c4; stroke-width: 12; fill: none; stroke-linecap: round; opacity: 0.85; }
+    .noisy { stroke: #d9822b; stroke-width: 12; fill: none; stroke-linecap: round; opacity: 0.85; }
+    .power { stroke: #c8412d; stroke-width: 12; fill: none; stroke-linecap: round; opacity: 0.85; }
+    .pair  { stroke: #5f6670; stroke-width: 3; fill: none; }
+    .shield { stroke: #5f6670; stroke-width: 2; fill: none; stroke-dasharray: 3 3; }
+    .cn2 { fill: #ebebeb; stroke: #5f6670; stroke-width: 2; }
+    .cn3 { fill: #3c6ec8; stroke: #5f6670; stroke-width: 2; }
+    .cn4 { fill: #282828; stroke: #5f6670; stroke-width: 2; }
+    .ink-l { fill: #1d1f23; font-weight: 600; } .ink-d { fill: #ffffff; font-weight: 600; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .pair, .shield { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { fill: #1a1c21; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .safe { fill: #361512; }
+      .cn4 { stroke: #9aa1ab; }
+    }
+  </style>
+
+  <!-- ECU -->
+  <rect x="20" y="40" width="200" height="460" rx="8" class="ecu"/>
+  <text x="120" y="66" text-anchor="middle" class="fg head">jaytek_v1 ECU</text>
+
+  <rect x="170" y="90" width="70" height="120" rx="4" class="cn4"/>
+  <text x="205" y="146" text-anchor="middle" class="ink-d">CN4</text>
+  <text x="205" y="164" text-anchor="middle" class="ink-d small">black</text>
+  <rect x="170" y="230" width="70" height="120" rx="4" class="cn3"/>
+  <text x="205" y="286" text-anchor="middle" class="ink-d">CN3</text>
+  <text x="205" y="304" text-anchor="middle" class="ink-d small">blue</text>
+  <rect x="170" y="370" width="70" height="110" rx="4" class="cn2"/>
+  <text x="205" y="422" text-anchor="middle" class="ink-l">CN2</text>
+  <text x="205" y="440" text-anchor="middle" class="ink-l small">white</text>
+
+  <text x="36" y="104" class="muted small">power in, 5 V</text>
+  <text x="36" y="120" class="muted small">sensor supplies,</text>
+  <text x="36" y="136" class="muted small">high-side outputs,</text>
+  <text x="36" y="152" class="muted small">H-bridges, CAN1,</text>
+  <text x="36" y="168" class="muted small">knock</text>
+  <text x="36" y="262" class="muted small">analog and temp</text>
+  <text x="36" y="278" class="muted small">inputs, VR, digital</text>
+  <text x="36" y="294" class="muted small">inputs, 4 grounds</text>
+  <text x="36" y="402" class="muted small">12 ignition and</text>
+  <text x="36" y="418" class="muted small">22 low-side outputs,</text>
+  <text x="36" y="434" class="muted small">1 ground</text>
+
+  <!-- CN4 bundles -->
+  <path d="M240 110 H420 C470 110 480 70 540 70 H700" class="power"/>
+  <rect x="700" y="48" width="340" height="44" rx="6" class="safe"/>
+  <text x="870" y="68" text-anchor="middle" class="fg head">Battery feed, main relay, grounds</text>
+  <text x="870" y="84" text-anchor="middle" class="muted small">heaviest wires · chapter 10</text>
+
+  <path d="M240 140 H700" class="noisy"/>
+  <rect x="700" y="118" width="340" height="44" rx="6" class="ff"/>
+  <text x="870" y="138" text-anchor="middle" class="fg head">High-side loads, throttle motor</text>
+  <text x="870" y="154" text-anchor="middle" class="muted small">switched current: route with the outputs</text>
+
+  <!-- CAN twisted pair -->
+  <path d="M240 175 C300 165 320 185 360 175 C400 165 420 185 460 175 C500 165 520 185 560 175 C600 165 620 185 700 180" class="pair"/>
+  <path d="M240 175 C300 185 320 165 360 175 C400 185 420 165 460 175 C500 185 520 165 560 175 C600 185 620 165 700 180" class="pair"/>
+  <rect x="700" y="170" width="340" height="30" rx="6" class="box"/>
+  <text x="870" y="190" text-anchor="middle" class="fg">CAN1: twisted pair · chapter 13</text>
+
+  <!-- knock shielded -->
+  <rect x="240" y="211" width="460" height="14" rx="7" class="shield"/>
+  <path d="M240 218 H700" class="pair"/>
+  <rect x="700" y="206" width="340" height="30" rx="6" class="box"/>
+  <text x="870" y="226" text-anchor="middle" class="fg">Knock sensors: shielded cable</text>
+
+  <!-- CN3 quiet bundle -->
+  <path d="M240 290 H700" class="quiet"/>
+  <rect x="700" y="262" width="340" height="56" rx="6" class="tgt"/>
+  <text x="870" y="284" text-anchor="middle" class="fg head">Sensors</text>
+  <text x="870" y="302" text-anchor="middle" class="muted small">quiet bundle: VR pairs twisted and shielded</text>
+
+  <!-- CN2 noisy bundle -->
+  <path d="M240 425 H700" class="noisy"/>
+  <rect x="700" y="398" width="340" height="56" rx="6" class="ff"/>
+  <text x="870" y="420" text-anchor="middle" class="fg head">Injectors and coils</text>
+  <text x="870" y="438" text-anchor="middle" class="muted small">fast edges, dwell current: the noisy bundle</text>
+
+  <!-- separation and crossing -->
+  <path d="M470 305 V410" class="line" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="482" y="352" class="fg">keep apart;</text>
+  <text x="482" y="370" class="fg">run separately</text>
+  <path d="M540 290 C580 290 600 305 600 330 V470" stroke="#3b82c4" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <text x="612" y="500" class="fg">where they must cross,</text>
+  <text x="612" y="518" class="fg">cross at a right angle</text>
+  <path d="M606 488 L600 470" class="line"/>
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+</svg>

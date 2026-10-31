@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 500" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Staged injection: how the fuel is shared between two stages as demand rises</title>
+  <style>
+    .fg { fill: #1d1f23; } .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .s1 { stroke: #3b82c4; stroke-width: 3; fill: none; }
+    .s2 { stroke: #d9822b; stroke-width: 3; fill: none; }
+    .s2x { stroke: #d9822b; stroke-width: 3; fill: none; stroke-dasharray: 6 4; }
+    .cap { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    .phA { fill: #e8f1fb; } .phB { fill: #fdf0e3; } .phC { fill: #eef7ee; } .phD { fill: #fbeaea; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; } .grid { stroke: #2c3038; }
+      .cap { stroke: #9aa1ab; }
+      .phA { fill: #16283b; } .phB { fill: #33240f; } .phC { fill: #13291a; } .phD { fill: #361512; }
+    }
+  </style>
+
+  <!-- passes -->
+  <rect x="90"  y="60" width="154" height="340" class="phA"/>
+  <rect x="244" y="60" width="280" height="340" class="phB"/>
+  <rect x="524" y="60" width="186" height="340" class="phC"/>
+  <rect x="710" y="60" width="50"  height="340" class="phD"/>
+  <text x="167" y="34" text-anchor="middle" class="fg head">1 · stage 1</text>
+  <text x="167" y="52" text-anchor="middle" class="muted">fills to its cap</text>
+  <text x="384" y="34" text-anchor="middle" class="fg head">1 · stage 2</text>
+  <text x="384" y="52" text-anchor="middle" class="muted">takes the overflow</text>
+  <text x="617" y="34" text-anchor="middle" class="fg head">2 · together</text>
+  <text x="617" y="52" text-anchor="middle" class="muted">both rise to 100 %</text>
+  <text x="735" y="52" text-anchor="middle" class="muted">3</text>
+
+  <!-- axes: y 400..100 = duty 0..100 % -->
+  <line x1="90" y1="100" x2="760" y2="100" class="grid"/>
+  <line x1="90" y1="250" x2="760" y2="250" class="grid"/>
+  <line x1="90" y1="190" x2="760" y2="190" class="cap"/>
+  <line x1="90" y1="400" x2="760" y2="400" class="axis"/>
+  <line x1="90" y1="60"  x2="90"  y2="400" class="axis"/>
+  <text x="80" y="404" text-anchor="end" class="muted">0</text>
+  <text x="80" y="254" text-anchor="end" class="muted">50</text>
+  <text x="80" y="194" text-anchor="end" class="muted">70</text>
+  <text x="80" y="104" text-anchor="end" class="muted">100</text>
+  <text x="20" y="80" class="muted">duty %</text>
+  <text x="425" y="430" text-anchor="middle" class="muted">total fuel the engine asks for →</text>
+
+  <!-- traces -->
+  <path d="M90 400 L244 190 L524 190 L710 100 L760 100" class="s1"/>
+  <path d="M90 398 L244 398 L524 190 L710 100" class="s2"/>
+  <path d="M710 100 L760 76" class="s2x"/>
+
+  <!-- legend -->
+  <line x1="790" y1="120" x2="830" y2="120" class="s1"/>
+  <text x="840" y="116" class="fg head">Stage 1</text>
+  <text x="840" y="136" class="muted">550 cc/min</text>
+  <line x1="790" y1="180" x2="830" y2="180" class="s2"/>
+  <text x="840" y="176" class="fg head">Stage 2</text>
+  <text x="840" y="196" class="muted">1000 cc/min</text>
+  <line x1="790" y1="240" x2="830" y2="240" class="cap"/>
+  <text x="840" y="236" class="fg head">Staging Duty</text>
+  <text x="840" y="256" class="muted">70 % on both</text>
+
+  <text x="790" y="310" class="fg">3 · past 100 % on every</text>
+  <text x="790" y="330" class="fg">stage, the rest goes on</text>
+  <text x="790" y="350" class="fg">the last stage: the</text>
+  <text x="790" y="370" class="fg">injectors are too small.</text>
+  <text x="90" y="470" class="muted">Fuel part of the pulse only; each stage adds its own dead time and short-pulse adder.</text>
+</svg>

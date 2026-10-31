@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 370" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Example 1: 60-2 crank and one cam pulse</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .tooth { fill: #5f6670; }
+    .ref  { fill: #d9822b; }
+    .reds { stroke: #c8412d; stroke-width: 2; fill: none; }
+    .redf { fill: #c8412d; }
+    .band { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 1.5; }
+    .blueline { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .grnline { stroke: #2e9d4f; stroke-width: 2; fill: none; }
+    .orgline { stroke: #d9822b; stroke-width: 2; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .band { fill: #13291a; } .tooth { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d9822b"/>
+    </marker>
+  </defs>
+  <text x="20.0" y="28.0" class="muted head">Example 1 over one 720° cycle: the crank pattern twice, the cam pulse once</text>
+  <text x="20.0" y="90.0" class="fg small head">Crank Primary</text>
+  <text x="20.0" y="108.0" class="muted small">VR1 · 60-2</text>
+  <path d="M150.0 102 H1030.0" class="thin"/>
+  <path d="M150.0 102 V76" class="sig"/>
+  <path d="M157.3 102 V76" class="sig"/>
+  <path d="M164.7 102 V76" class="sig"/>
+  <path d="M172.0 102 V76" class="sig"/>
+  <path d="M179.3 102 V76" class="sig"/>
+  <path d="M186.7 102 V76" class="sig"/>
+  <path d="M194.0 102 V76" class="sig"/>
+  <path d="M201.3 102 V76" class="sig"/>
+  <path d="M208.7 102 V76" class="sig"/>
+  <path d="M216.0 102 V76" class="sig"/>
+  <path d="M223.3 102 V76" class="sig"/>
+  <path d="M230.7 102 V76" class="sig"/>
+  <path d="M238.0 102 V76" class="sig"/>
+  <path d="M245.3 102 V76" class="sig"/>
+  <path d="M252.7 102 V76" class="sig"/>
+  <path d="M260.0 102 V76" class="sig"/>
+  <path d="M267.3 102 V76" class="sig"/>
+  <path d="M274.7 102 V76" class="sig"/>
+  <path d="M282.0 102 V76" class="sig"/>
+  <path d="M289.3 102 V76" class="sig"/>
+  <path d="M296.7 102 V76" class="sig"/>
+  <path d="M304.0 102 V76" class="sig"/>
+  <path d="M311.3 102 V76" class="sig"/>
+  <path d="M318.7 102 V76" class="sig"/>
+  <path d="M326.0 102 V76" class="sig"/>
+  <path d="M333.3 102 V76" class="sig"/>
+  <path d="M340.7 102 V76" class="sig"/>
+  <path d="M348.0 102 V76" class="sig"/>
+  <path d="M355.3 102 V76" class="sig"/>
+  <path d="M362.7 102 V76" class="sig"/>
+  <path d="M370.0 102 V76" class="sig"/>
+  <path d="M377.3 102 V76" class="sig"/>
+  <path d="M384.7 102 V76" class="sig"/>
+  <path d="M392.0 102 V76" class="sig"/>
+  <path d="M399.3 102 V76" class="sig"/>
+  <path d="M406.7 102 V76" class="sig"/>
+  <path d="M414.0 102 V76" class="sig"/>
+  <path d="M421.3 102 V76" class="sig"/>
+  <path d="M428.7 102 V76" class="sig"/>
+  <path d="M436.0 102 V76" class="sig"/>
+  <path d="M443.3 102 V76" class="sig"/>
+  <path d="M450.7 102 V76" class="sig"/>
+  <path d="M458.0 102 V76" class="sig"/>
+  <path d="M465.3 102 V76" class="sig"/>
+  <path d="M472.7 102 V76" class="sig"/>
+  <path d="M480.0 102 V76" class="sig"/>
+  <path d="M487.3 102 V76" class="sig"/>
+  <path d="M494.7 102 V76" class="sig"/>
+  <path d="M502.0 102 V76" class="sig"/>
+  <path d="M509.3 102 V76" class="sig"/>
+  <path d="M516.7 102 V76" class="sig"/>
+  <path d="M524.0 102 V76" class="sig"/>
+  <path d="M531.3 102 V76" class="sig"/>
+  <path d="M538.7 102 V76" class="sig"/>
+  <path d="M546.0 102 V76" class="sig"/>
+  <path d="M553.3 102 V76" class="sig"/>
+  <path d="M560.7 102 V76" class="sig"/>
+  <path d="M568.0 102 V76" class="sig"/>
+  <path d="M590.0 102 V76" class="sig"/>
+  <path d="M597.3 102 V76" class="sig"/>
+  <path d="M604.7 102 V76" class="sig"/>
+  <path d="M612.0 102 V76" class="sig"/>
+  <path d="M619.3 102 V76" class="sig"/>
+  <path d="M626.7 102 V76" class="sig"/>
+  <path d="M634.0 102 V76" class="sig"/>
+  <path d="M641.3 102 V76" class="sig"/>
+  <path d="M648.7 102 V76" class="sig"/>
+  <path d="M656.0 102 V76" class="sig"/>
+  <path d="M663.3 102 V76" class="sig"/>
+  <path d="M670.7 102 V76" class="sig"/>
+  <path d="M678.0 102 V76" class="sig"/>
+  <path d="M685.3 102 V76" class="sig"/>
+  <path d="M692.7 102 V76" class="sig"/>
+  <path d="M700.0 102 V76" class="sig"/>
+  <path d="M707.3 102 V76" class="sig"/>
+  <path d="M714.7 102 V76" class="sig"/>
+  <path d="M722.0 102 V76" class="sig"/>
+  <path d="M729.3 102 V76" class="sig"/>
+  <path d="M736.7 102 V76" class="sig"/>
+  <path d="M744.0 102 V76" class="sig"/>
+  <path d="M751.3 102 V76" class="sig"/>
+  <path d="M758.7 102 V76" class="sig"/>
+  <path d="M766.0 102 V76" class="sig"/>
+  <path d="M773.3 102 V76" class="sig"/>
+  <path d="M780.7 102 V76" class="sig"/>
+  <path d="M788.0 102 V76" class="sig"/>
+  <path d="M795.3 102 V76" class="sig"/>
+  <path d="M802.7 102 V76" class="sig"/>
+  <path d="M810.0 102 V76" class="sig"/>
+  <path d="M817.3 102 V76" class="sig"/>
+  <path d="M824.7 102 V76" class="sig"/>
+  <path d="M832.0 102 V76" class="sig"/>
+  <path d="M839.3 102 V76" class="sig"/>
+  <path d="M846.7 102 V76" class="sig"/>
+  <path d="M854.0 102 V76" class="sig"/>
+  <path d="M861.3 102 V76" class="sig"/>
+  <path d="M868.7 102 V76" class="sig"/>
+  <path d="M876.0 102 V76" class="sig"/>
+  <path d="M883.3 102 V76" class="sig"/>
+  <path d="M890.7 102 V76" class="sig"/>
+  <path d="M898.0 102 V76" class="sig"/>
+  <path d="M905.3 102 V76" class="sig"/>
+  <path d="M912.7 102 V76" class="sig"/>
+  <path d="M920.0 102 V76" class="sig"/>
+  <path d="M927.3 102 V76" class="sig"/>
+  <path d="M934.7 102 V76" class="sig"/>
+  <path d="M942.0 102 V76" class="sig"/>
+  <path d="M949.3 102 V76" class="sig"/>
+  <path d="M956.7 102 V76" class="sig"/>
+  <path d="M964.0 102 V76" class="sig"/>
+  <path d="M971.3 102 V76" class="sig"/>
+  <path d="M978.7 102 V76" class="sig"/>
+  <path d="M986.0 102 V76" class="sig"/>
+  <path d="M993.3 102 V76" class="sig"/>
+  <path d="M1000.7 102 V76" class="sig"/>
+  <path d="M1008.0 102 V76" class="sig"/>
+  <path d="M150.0 66 V112" class="orgline"/>
+  <text x="150.0" y="60.0" text-anchor="middle" class="fg small">tooth 0</text>
+  <path d="M590.0 66 V112" class="orgline"/>
+  <text x="590.0" y="60.0" text-anchor="middle" class="fg small">tooth 0</text>
+  <text x="20.0" y="190.0" class="fg small head">Cam Intake B1</text>
+  <text x="20.0" y="208.0" class="muted small">DIG1 · 1 pulse</text>
+  <path d="M150.0 202 H198.9 V176 H272.2 V202 H1030.0" class="sig2"/>
+  <text x="192.9" y="168.0" text-anchor="end" class="fg small">any pulse (band 0–720°)</text>
+  <text x="290.6" y="196.0" class="muted small">→ tells the decoder which revolution this is</text>
+  <path d="M150.0 280 H1030.0" class="line"/>
+  <path d="M150.0 275 V285" class="thin"/>
+  <text x="150.0" y="302.0" text-anchor="middle" class="mono muted">0°</text>
+  <path d="M260.0 275 V285" class="thin"/>
+  <text x="260.0" y="302.0" text-anchor="middle" class="mono muted">90°</text>
+  <path d="M370.0 275 V285" class="thin"/>
+  <text x="370.0" y="302.0" text-anchor="middle" class="mono muted">180°</text>
+  <path d="M590.0 275 V285" class="thin"/>
+  <text x="590.0" y="302.0" text-anchor="middle" class="mono muted">360°</text>
+  <path d="M700.0 275 V285" class="thin"/>
+  <text x="700.0" y="302.0" text-anchor="middle" class="mono muted">450°</text>
+  <path d="M810.0 275 V285" class="thin"/>
+  <text x="810.0" y="302.0" text-anchor="middle" class="mono muted">540°</text>
+  <path d="M1030.0 275 V285" class="thin"/>
+  <text x="1030.0" y="302.0" text-anchor="middle" class="mono muted">720°</text>
+  <text x="20.0" y="284.0" class="muted small">decoder angle</text>
+  <path d="M260.0 90 V280" class="dash"/>
+  <path d="M480.0 90 V280" class="dash"/>
+  <path d="M700.0 90 V280" class="dash"/>
+  <path d="M920.0 90 V280" class="dash"/>
+  <text x="260.0" y="322.0" text-anchor="middle" class="fg small">TDC #1 (engine 0°) with an offset of 90</text>
+  <text x="20.0" y="352.0" class="muted small">Dashed lines: TDCs of a four-cylinder, 180° apart. Which revolution holds TDC #1 comes from the cam; where in the revolution comes from tooth 0 and the offset.</text>
+</svg>

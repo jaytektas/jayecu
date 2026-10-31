@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 660" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>jaytek_v1 board block diagram</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .cpu  { fill: #f1f2f4; stroke: #1d1f23; stroke-width: 2.5; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .cpu { fill: #2a2d33; stroke: #e4e6ea; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- column heads -->
+  <text x="20"  y="28" class="muted head">Harness connectors</text>
+  <text x="300" y="28" class="muted head">Front ends and drivers on the board</text>
+  <text x="700" y="28" class="muted head">Processor</text>
+  <text x="900" y="28" class="muted head">On the board</text>
+
+  <!-- ===== inputs ===== -->
+  <rect x="20" y="44" width="220" height="250" rx="8" class="tgt"/>
+  <text x="130" y="68" text-anchor="middle" class="fg head">CN3 · blue · 35-way</text>
+  <text x="130" y="90" text-anchor="middle" class="muted">sensors and triggers</text>
+  <text x="36" y="118" class="fg mono">AV1–AV11, AV13–AV16</text>
+  <text x="36" y="140" class="fg mono">AT1–AT4</text>
+  <text x="36" y="162" class="fg mono">VR1 ±, VR2 ±</text>
+  <text x="36" y="184" class="fg mono">DIG1–DIG8</text>
+  <text x="36" y="206" class="fg mono">GND ×4</text>
+  <text x="36" y="246" class="muted">Knock inputs are on CN4</text>
+  <text x="36" y="266" class="muted">(pins 22, 23)</text>
+
+  <rect x="300" y="44" width="330" height="54" rx="6" class="tgt"/>
+  <text x="316" y="66" class="fg head">Analog buffers (MCP6004)</text>
+  <text x="316" y="86" class="muted">AV and AT: 0–5 V scaled to the ADC</text>
+  <rect x="300" y="106" width="330" height="54" rx="6" class="tgt"/>
+  <text x="316" y="128" class="fg head">VR interfaces (MAX9924) ×2</text>
+  <text x="316" y="148" class="muted">VR1, VR2: sine wave to clean edge</text>
+  <rect x="300" y="168" width="330" height="54" rx="6" class="tgt"/>
+  <text x="316" y="190" class="fg head">Schmitt buffers (74HC2G17) ×8</text>
+  <text x="316" y="210" class="muted">DIG1–8, 2.7 kΩ pull-up to 5 V</text>
+  <rect x="300" y="230" width="330" height="54" rx="6" class="tgt"/>
+  <text x="316" y="252" class="fg head">Knock amplifiers and filters ×2</text>
+  <text x="316" y="272" class="muted">KNOCK1, KNOCK2 to a fast ADC burst</text>
+
+  <!-- ===== outputs ===== -->
+  <rect x="20" y="310" width="220" height="112" rx="8" class="ff"/>
+  <text x="130" y="334" text-anchor="middle" class="fg head">CN2 · white · 35-way</text>
+  <text x="130" y="356" text-anchor="middle" class="muted">coils and low-sides</text>
+  <text x="36" y="382" class="fg mono">IGN1–IGN12</text>
+  <text x="36" y="404" class="fg mono">LS1–LS22 · GND</text>
+
+  <rect x="20" y="438" width="220" height="200" rx="8" class="box"/>
+  <text x="130" y="462" text-anchor="middle" class="fg head">CN4 · black · 23-way</text>
+  <text x="130" y="484" text-anchor="middle" class="muted">power, high-sides, CAN1</text>
+  <text x="36" y="510" class="fg mono">12V RAW · 12V MR</text>
+  <text x="36" y="532" class="fg mono">12V PROT · 5V SENSOR 1/2</text>
+  <text x="36" y="554" class="fg mono">HS1–HS8</text>
+  <text x="36" y="576" class="fg mono">HBRIDGE1 ±, HBRIDGE2 ±</text>
+  <text x="36" y="598" class="fg mono">CAN1 H/L · KNOCK1/2</text>
+  <text x="36" y="620" class="fg mono">GND ×2</text>
+
+  <rect x="300" y="310" width="330" height="54" rx="6" class="ff"/>
+  <text x="316" y="332" class="fg head">Coil drivers (IX4427) ×6</text>
+  <text x="316" y="352" class="muted">IGN1–12: 5 V logic signal, HIGH = dwell</text>
+  <rect x="300" y="372" width="330" height="54" rx="6" class="ff"/>
+  <text x="316" y="394" class="fg head">Low-side switches (VNLD5090) ×11</text>
+  <text x="316" y="414" class="muted">LS1–22: switch the load to ground</text>
+  <rect x="300" y="434" width="330" height="54" rx="6" class="ff"/>
+  <text x="316" y="456" class="fg head">High-side switches (VNQ7140) ×2</text>
+  <text x="316" y="476" class="muted">HS1–8: switch 12V MR to the load</text>
+  <rect x="300" y="496" width="330" height="54" rx="6" class="ff"/>
+  <text x="316" y="518" class="fg head">H-bridges (IFX9201) ×2</text>
+  <text x="316" y="538" class="muted">drive a motor both ways, from 12V MR</text>
+  <rect x="300" y="558" width="330" height="54" rx="6" class="pid"/>
+  <text x="316" y="580" class="fg head">CAN transceivers (TJA1051) ×2</text>
+  <text x="316" y="600" class="muted">CAN1 to CN4, CAN2 to header H4</text>
+
+  <!-- ===== MCU ===== -->
+  <rect x="690" y="44" width="170" height="568" rx="10" class="cpu"/>
+  <text x="775" y="300" text-anchor="middle" class="fg head">STM32F767ZI</text>
+  <text x="775" y="322" text-anchor="middle" class="muted">216 MHz</text>
+  <text x="775" y="344" text-anchor="middle" class="muted">12-bit ADC1, ADC3</text>
+
+  <!-- arrows front-ends -> MCU -->
+  <path d="M630,71 H688"  class="line" marker-end="url(#a)"/>
+  <path d="M630,133 H688" class="line" marker-end="url(#a)"/>
+  <path d="M630,195 H688" class="line" marker-end="url(#a)"/>
+  <path d="M630,257 H688" class="line" marker-end="url(#a)"/>
+  <path d="M690,337 H632" class="line" marker-end="url(#a)"/>
+  <path d="M690,399 H632" class="line" marker-end="url(#a)"/>
+  <path d="M690,461 H632" class="line" marker-end="url(#a)"/>
+  <path d="M690,523 H632" class="line" marker-end="url(#a)"/>
+  <path d="M632,585 H688" class="line" marker-start="url(#a)" marker-end="url(#a)"/>
+  <!-- connectors -> front ends -->
+  <path d="M240,170 H298" class="line" marker-end="url(#a)"/>
+  <path d="M300,366 H242" class="line" marker-end="url(#a)"/>
+  <path d="M300,500 H242" class="line" marker-end="url(#a)"/>
+
+  <!-- ===== on-board ===== -->
+  <rect x="900" y="44" width="180" height="54" rx="6" class="pid"/>
+  <text x="916" y="66" class="fg head">USB-B socket</text>
+  <text x="916" y="86" class="muted">studio link + SD drive</text>
+  <rect x="900" y="106" width="180" height="54" rx="6" class="box"/>
+  <text x="916" y="128" class="fg head">microSD card</text>
+  <text x="916" y="148" class="muted">logs and ECU files</text>
+  <rect x="900" y="168" width="180" height="54" rx="6" class="tgt"/>
+  <text x="916" y="190" class="fg head">Barometer</text>
+  <text x="916" y="210" class="muted">LPS22HB, on-board</text>
+  <rect x="900" y="230" width="180" height="54" rx="6" class="box"/>
+  <text x="916" y="252" class="fg head">Knock audio jack</text>
+  <text x="916" y="272" class="muted">CN1, 3.5 mm</text>
+  <rect x="900" y="292" width="180" height="54" rx="6" class="box"/>
+  <text x="916" y="314" class="fg head">Status LEDs ×5</text>
+  <text x="916" y="334" class="muted">PWR RUN WAR ERR COM</text>
+  <rect x="900" y="354" width="180" height="54" rx="6" class="box"/>
+  <text x="916" y="376" class="fg head">RESET, BOOT buttons</text>
+  <text x="916" y="396" class="muted">SW4, SW5</text>
+  <rect x="900" y="416" width="180" height="54" rx="6" class="box"/>
+  <text x="916" y="438" class="fg head">Headers</text>
+  <text x="916" y="458" class="muted">SWD, UART, SPI, CAN2</text>
+  <rect x="900" y="478" width="180" height="54" rx="6" class="safe"/>
+  <text x="916" y="500" class="fg head">Power supplies</text>
+  <text x="916" y="520" class="muted">see Figure 7.5</text>
+  <rect x="900" y="540" width="180" height="54" rx="6" class="box"/>
+  <text x="916" y="562" class="fg head">Coin cell (CR2032)</text>
+  <text x="916" y="582" class="muted">keeps the RTC running</text>
+
+  <path d="M862,71  H898" class="line"/>
+  <path d="M862,133 H898" class="line"/>
+  <path d="M862,195 H898" class="line"/>
+  <path d="M862,319 H898" class="line"/>
+  <path d="M862,381 H898" class="line"/>
+  <path d="M862,443 H898" class="line"/>
+</svg>

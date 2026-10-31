@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 250" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The order to tune in</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <g>
+    <rect x="20"  y="30" width="190" height="84" rx="6" class="safe"/>
+    <text x="115" y="58" text-anchor="middle" class="fg head">1 · Safe base</text>
+    <text x="115" y="80" text-anchor="middle" class="fg">sensors, injectors,</text>
+    <text x="115" y="100" text-anchor="middle" class="fg">protections, wideband</text>
+
+    <rect x="235" y="30" width="190" height="84" rx="6" class="box"/>
+    <text x="330" y="58" text-anchor="middle" class="fg head">2 · Timing proven</text>
+    <text x="330" y="80" text-anchor="middle" class="fg">trigger offset set</text>
+    <text x="330" y="100" text-anchor="middle" class="fg">with a timing light</text>
+
+    <rect x="450" y="30" width="190" height="84" rx="6" class="box"/>
+    <text x="545" y="58" text-anchor="middle" class="fg head">3 · Start and idle</text>
+    <text x="545" y="80" text-anchor="middle" class="fg">cranking, warm-up,</text>
+    <text x="545" y="100" text-anchor="middle" class="fg">idle air and timing</text>
+
+    <rect x="665" y="30" width="190" height="84" rx="6" class="tgt"/>
+    <text x="760" y="58" text-anchor="middle" class="fg head">4 · VE, steady</text>
+    <text x="760" y="80" text-anchor="middle" class="fg">light load first,</text>
+    <text x="760" y="100" text-anchor="middle" class="fg">then up the load</text>
+
+    <rect x="880" y="30" width="200" height="84" rx="6" class="tgt"/>
+    <text x="980" y="58" text-anchor="middle" class="fg head">5 · Timing</text>
+    <text x="980" y="80" text-anchor="middle" class="fg">towards MBT,</text>
+    <text x="980" y="100" text-anchor="middle" class="fg">watching knock</text>
+  </g>
+  <path d="M210 72 H233" class="line" marker-end="url(#a)"/>
+  <path d="M425 72 H448" class="line" marker-end="url(#a)"/>
+  <path d="M640 72 H663" class="line" marker-end="url(#a)"/>
+  <path d="M855 72 H878" class="line" marker-end="url(#a)"/>
+
+  <path d="M980 114 V150 H760 V168" class="line" marker-end="url(#a)"/>
+  <rect x="665" y="170" width="190" height="64" rx="6" class="pid"/>
+  <text x="760" y="198" text-anchor="middle" class="fg head">6 · Transients</text>
+  <text x="760" y="220" text-anchor="middle" class="fg">tip-in, tip-out</text>
+  <path d="M665 202 H642" class="line" marker-end="url(#a)"/>
+  <rect x="450" y="170" width="190" height="64" rx="6" class="pid"/>
+  <text x="545" y="198" text-anchor="middle" class="fg head">7 · Closed loop</text>
+  <text x="545" y="220" text-anchor="middle" class="fg">trims, learning</text>
+  <text x="120" y="208" class="muted">Each step assumes the ones before it are right.</text>
+</svg>

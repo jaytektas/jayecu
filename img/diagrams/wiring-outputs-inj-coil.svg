@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 520" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Wiring an injector, a coil with a built-in igniter, and a coil with an external igniter</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .panel { fill: none; stroke: #c9ced6; stroke-width: 1.5; }
+    .edge { stroke: #5f6670; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .w-br { stroke: #8b5a2b; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .w-w  { stroke: #f7f7f7; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .w-r  { stroke: #d0312d; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .w-b  { stroke: #1d1f23; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .panel { stroke: #3a3f48; } .edge { stroke: #9aa1ab; }
+      .w-b { stroke: #000000; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .safe { fill: #361512; }
+    }
+  </style>
+
+  <!-- ================= A · INJECTOR ================= -->
+  <rect x="10" y="10" width="360" height="500" rx="8" class="panel"/>
+  <text x="190" y="38" text-anchor="middle" class="fg head">A · Injector (saturated)</text>
+  <text x="190" y="58" text-anchor="middle" class="muted small">high-impedance, driven straight from an LS pin</text>
+
+  <rect x="40" y="86" width="150" height="46" rx="6" class="box"/>
+  <text x="115" y="106" text-anchor="middle" class="fg">Injector relay</text>
+  <text x="115" y="123" text-anchor="middle" class="muted small">fused +12 V</text>
+  <path d="M190 109 H260 V170" class="edge"/><path d="M190 109 H260 V170" class="w-r"/>
+  <text x="272" y="140" class="muted small">+12 V (red)</text>
+  <rect x="200" y="172" width="120" height="70" rx="6" class="ff"/>
+  <text x="260" y="203" text-anchor="middle" class="fg head">Injector</text>
+  <text x="260" y="224" text-anchor="middle" class="muted small">2 pins, no polarity</text>
+  <path d="M260 242 V330" class="edge"/><path d="M260 242 V330" class="w-br"/>
+  <text x="272" y="292" class="muted small">brown / black</text>
+  <circle cx="260" cy="340" r="9" class="node"/>
+  <text x="260" y="374" text-anchor="middle" class="fg head">CN2-1</text>
+  <text x="260" y="392" text-anchor="middle" class="mono muted">LS1</text>
+  <text x="30" y="438" class="fg small">One injector per LS pin. The ECU switches</text>
+  <text x="30" y="456" class="fg small">the injector to ground for the pulse width;</text>
+  <text x="30" y="474" class="fg small">the +12 V side is shared by all injectors.</text>
+
+  <!-- ================= B · SMART COIL ================= -->
+  <rect x="380" y="10" width="360" height="500" rx="8" class="panel"/>
+  <text x="560" y="38" text-anchor="middle" class="fg head">B · Coil with built-in igniter</text>
+  <text x="560" y="58" text-anchor="middle" class="muted small">"logic" or "smart" coil: takes a 5 V signal</text>
+
+  <rect x="490" y="150" width="140" height="130" rx="6" class="ff"/>
+  <text x="560" y="182" text-anchor="middle" class="fg head">Coil</text>
+  <text x="560" y="200" text-anchor="middle" class="muted small">igniter inside</text>
+  <text x="500" y="232" class="fg small">+12 V</text>
+  <text x="500" y="252" class="fg small">power ground</text>
+  <text x="500" y="272" class="fg small">signal</text>
+  <rect x="400" y="86" width="150" height="46" rx="6" class="box"/>
+  <text x="475" y="106" text-anchor="middle" class="fg">Ignition relay</text>
+  <text x="475" y="123" text-anchor="middle" class="muted small">fused +12 V</text>
+  <path d="M550 109 H680 V228 H632" class="edge"/><path d="M550 109 H680 V228 H632" class="w-r"/>
+  <text x="688" y="170" class="muted small">red</text>
+  <path d="M632 248 H700 V330" class="edge"/><path d="M632 248 H700 V330" class="w-b"/>
+  <path d="M686 332 H714 M691 338 H709 M696 344 H704" class="line"/>
+  <text x="700" y="364" text-anchor="middle" class="muted small">engine</text>
+  <text x="700" y="378" text-anchor="middle" class="muted small">ground</text>
+  <path d="M490 268 H440 V330" class="edge"/><path d="M490 268 H440 V330" class="w-w"/>
+  <text x="400" y="300" class="muted small">white/</text>
+  <text x="400" y="314" class="muted small">black</text>
+  <circle cx="440" cy="340" r="9" class="node"/>
+  <text x="440" y="374" text-anchor="middle" class="fg head">CN2-24</text>
+  <text x="440" y="392" text-anchor="middle" class="mono muted">IGN1</text>
+  <text x="400" y="438" class="fg small">The ECU only signals; the coil switches its</text>
+  <text x="400" y="456" class="fg small">own current. A 4-pin coil's extra pin is a</text>
+  <text x="400" y="474" class="fg small">signal ground: take it back to the ECU ground.</text>
+
+  <!-- ================= C · IGNITER ================= -->
+  <rect x="750" y="10" width="360" height="500" rx="8" class="panel"/>
+  <text x="930" y="38" text-anchor="middle" class="fg head">C · Plain coil + external igniter</text>
+  <text x="930" y="58" text-anchor="middle" class="muted small">2-wire coil primary, switched by an igniter</text>
+
+  <rect x="770" y="86" width="150" height="46" rx="6" class="box"/>
+  <text x="845" y="106" text-anchor="middle" class="fg">Ignition relay</text>
+  <text x="845" y="123" text-anchor="middle" class="muted small">fused +12 V</text>
+  <path d="M920 109 H1030 V152" class="edge"/><path d="M920 109 H1030 V152" class="w-r"/>
+  <rect x="970" y="154" width="120" height="70" rx="6" class="box"/>
+  <text x="1030" y="184" text-anchor="middle" class="fg head">Coil</text>
+  <text x="1030" y="204" text-anchor="middle" class="muted small">+ / − primary</text>
+  <path d="M1030 224 V262" class="line"/>
+  <rect x="930" y="264" width="170" height="60" rx="6" class="ff"/>
+  <text x="1015" y="290" text-anchor="middle" class="fg head">Igniter</text>
+  <text x="1015" y="310" text-anchor="middle" class="muted small">powered as its maker says</text>
+  <path d="M930 294 H810 V330" class="edge"/><path d="M930 294 H810 V330" class="w-w"/>
+  <text x="820" y="286" class="muted small">white/black</text>
+  <circle cx="810" cy="340" r="9" class="node"/>
+  <text x="810" y="374" text-anchor="middle" class="fg head">CN2-24</text>
+  <text x="810" y="392" text-anchor="middle" class="mono muted">IGN1</text>
+  <rect x="770" y="420" width="320" height="72" rx="6" class="safe"/>
+  <text x="930" y="444" text-anchor="middle" class="fg small">Never connect the coil primary itself</text>
+  <text x="930" y="462" text-anchor="middle" class="fg small">to an IGN pin: the pin is a 5 V signal</text>
+  <text x="930" y="480" text-anchor="middle" class="fg small">and cannot switch coil current.</text>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 440" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>How the studio decides which tune a connection runs on</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- the two tunes -->
+  <rect x="150" y="30" width="280" height="64" rx="6" class="tgt"/>
+  <text x="290" y="56" text-anchor="middle" class="fg head">Your saved tune</text>
+  <text x="290" y="78" text-anchor="middle" class="muted">this ECU's tune file on the PC</text>
+  <rect x="630" y="30" width="280" height="64" rx="6" class="ff"/>
+  <text x="770" y="56" text-anchor="middle" class="fg head">The tune on the ECU</text>
+  <text x="770" y="78" text-anchor="middle" class="muted">just read, at step 6</text>
+
+  <circle cx="530" cy="146" r="22" class="node"/>
+  <text x="530" y="152" text-anchor="middle" class="fg head">=?</text>
+  <text x="530" y="190" text-anchor="middle" class="muted">compared setting by setting</text>
+  <path d="M290 94 V146 H506" class="line" marker-end="url(#a)"/>
+  <path d="M770 94 V146 H554" class="line" marker-end="url(#a)"/>
+
+  <!-- three outcomes -->
+  <path d="M530 168 V172" class="line"/>
+  <path d="M170 204 H890" class="line"/>
+  <path d="M170 204 V222" class="line" marker-end="url(#a)"/>
+  <path d="M530 196 V222" class="line" marker-end="url(#a)"/>
+  <path d="M890 204 V222" class="line" marker-end="url(#a)"/>
+
+  <rect x="20" y="224" width="300" height="64" rx="6" class="box"/>
+  <text x="170" y="250" text-anchor="middle" class="fg head">Nothing saved yet</text>
+  <text x="170" y="272" text-anchor="middle" class="muted">the ECU's tune is taken as it is</text>
+  <rect x="380" y="224" width="300" height="64" rx="6" class="pid"/>
+  <text x="530" y="250" text-anchor="middle" class="fg head">The same</text>
+  <text x="530" y="272" text-anchor="middle" class="muted">carry on: “● In sync · &lt;tune&gt;”</text>
+  <rect x="740" y="224" width="300" height="64" rx="6" class="tgt"/>
+  <text x="890" y="250" text-anchor="middle" class="fg head">Different</text>
+  <text x="890" y="272" text-anchor="middle" class="muted">the difference report opens</text>
+
+  <!-- the three answers -->
+  <path d="M890 288 V310" class="line"/>
+  <path d="M485 310 H940" class="line"/>
+  <path d="M485 310 V328" class="line" marker-end="url(#a)"/>
+  <path d="M715 310 V328" class="line" marker-end="url(#a)"/>
+  <path d="M940 310 V328" class="line" marker-end="url(#a)"/>
+
+  <rect x="380" y="330" width="210" height="84" rx="6" class="ff"/>
+  <text x="485" y="355" text-anchor="middle" class="fg head">Keep the ECU's tune</text>
+  <text x="485" y="377" text-anchor="middle" class="muted">your tune file is updated</text>
+  <text x="485" y="397" text-anchor="middle" class="muted">to match the ECU</text>
+  <rect x="610" y="330" width="210" height="84" rx="6" class="safe"/>
+  <text x="715" y="355" text-anchor="middle" class="fg head">Push &lt;tune&gt; to the ECU</text>
+  <text x="715" y="377" text-anchor="middle" class="muted">the ECU gets your tune;</text>
+  <text x="715" y="397" text-anchor="middle" class="muted">burn to keep it</text>
+  <rect x="840" y="330" width="200" height="84" rx="6" class="box"/>
+  <text x="940" y="355" text-anchor="middle" class="fg head">Exit - no changes</text>
+  <text x="940" y="377" text-anchor="middle" class="muted">the link closes;</text>
+  <text x="940" y="397" text-anchor="middle" class="muted">nothing is written</text>
+
+  <text x="20" y="340" class="muted">The report shows only the pages</text>
+  <text x="20" y="360" class="muted">that differ, your tune beside</text>
+  <text x="20" y="380" class="muted">the ECU's. It chooses one whole</text>
+  <text x="20" y="400" class="muted">tune; there is no merging.</text>
+</svg>
