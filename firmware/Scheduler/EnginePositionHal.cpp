@@ -499,7 +499,7 @@ void EnginePositionHal::handle_sync_level_change(SyncLevel from, SyncLevel to) n
         // ARM ACROSS THE TRANSITION. vtrig_reconfigure() above has just reset the DCO, and the old
         // watchdog lived inside it — so this is precisely the window in which the ECU had no
         // liveness detection at all. If the teeth stop here, the deadline is what notices.
-        arm_tooth_deadline(last_fine_tick_valid_ ? last_fine_tick_ : timebase_now());
+        arm_tooth_deadline_masked();
         promotion_pending_ = false;
         break;
 
@@ -524,7 +524,7 @@ void EnginePositionHal::handle_sync_level_change(SyncLevel from, SyncLevel to) n
         scheduler_.set_phase_known(true);
         // Same reasoning as the CRANK case: the promotion has just reset the DCO. This is the exact
         // transition that left a bench ECU reporting 1348 rpm with no trigger wire attached.
-        arm_tooth_deadline(last_fine_tick_valid_ ? last_fine_tick_ : timebase_now());
+        arm_tooth_deadline_masked();
         promotion_pending_ = false;
         break;
     }
@@ -1162,6 +1162,19 @@ void EnginePositionHal::arm_tooth_deadline(uint32_t from_tick) noexcept
     if (to < stall_min_ticks_)   to = stall_min_ticks_;
     if (to > stall_floor_ticks_) to = stall_floor_ticks_;
     assignment_.tooth_alarm->arm(from_tick + to);
+}
+
+// THE SAME ARM FROM TASK CONTEXT, MASKED. The capture ISR (priority 1) arms this deadline on every
+// tooth. A task that read last_fine_tick_ and was then interrupted by the next tooth went on to arm
+// from the tooth BEFORE it — overwriting the ISR's deadline with one a pitch early, which expired
+// half a pitch after a tooth that had arrived on time: MISSED_TOOTH, sync cut, P0336 + P0335.
+// Kelly's Hilux, cold start 31 Oct: crank tooth 14, right after the cam (at 13.5) promoted PHASE —
+// the one transition that re-arms from the task while the teeth are coming fastest.
+void EnginePositionHal::arm_tooth_deadline_masked() noexcept
+{
+    const uint32_t pm = platform_irq_save();
+    arm_tooth_deadline(last_fine_tick_valid_ ? last_fine_tick_ : timebase_now());
+    platform_irq_restore(pm);
 }
 
 void EnginePositionHal::disarm_tooth_deadline() noexcept

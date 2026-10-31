@@ -461,6 +461,7 @@ private:
     // Arm the deadline for the next tooth this stream predicts; disarm when there is no position to
     // lose. Both cheap enough for the capture ISR (one CCR write).
     void arm_tooth_deadline(uint32_t from_tick) noexcept;
+    void arm_tooth_deadline_masked() noexcept;   // task context: same arm, capture ISR held off
     void disarm_tooth_deadline() noexcept;
     static void tooth_deadline_trampoline(void* ud) noexcept;
 

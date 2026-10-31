@@ -21,6 +21,11 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
   the edge, the next pulse could be refused too, and that cost phase. About 1 crossing in 150 on a car.
   A cam pulse a whole number of cycles after the last one is now accepted; one half a cycle out is still
   rejected.
+- **No false missed tooth when the engine gains full sync.** The switch to full (cam) sync re-armed the
+  "next crank tooth due by" timer without holding off the crank interrupt. A tooth landing in that moment
+  left the timer set from the tooth before, so it ran out half a tooth after a tooth that came on time:
+  a missed tooth (P0336), sync cut and re-acquired (P0335). Seen on a cold start, the moment the flare
+  took the engine past the phase-sync rpm.
 
 ## 0.4.22
 - **Fuel asked for while an injector is open is now added, and the dead time is paid once per opening.**
