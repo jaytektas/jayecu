@@ -9,6 +9,11 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- **A sensor check's Delay now means what it says while it has a Precondition.** The delay is how long a
+  reading must be out of range, continuously, while the precondition holds. The timer kept running while
+  the precondition was false, so the first moment it came true the code set at once, with no delay. Found
+  on a car: an oil-pressure check (Reading Low with an rpm/pressure precondition) set P0524, protection
+  level 3, on a single sample as the idle sagged at a stop. The oil pressure was fine.
 
 ## 0.4.22
 - **Fuel asked for while an injector is open is now added, and the dead time is paid once per opening.**

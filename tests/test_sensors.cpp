@@ -705,6 +705,46 @@ int main() {
         assert(dtcs.code_severity(SENSOR_CATALOG[CLT].dtc_precond) > 0);  // and it says WHICH sensor
         printf("ok  precond: a broken expression fails ARMED and raises P%04X\n",
                SENSOR_CATALOG[CLT].dtc_precond);
+
+        // (e) the DELAY is "tripping continuously WHILE ARMED". The reading stays over the ceiling
+        //     throughout; only the gate flickers. A timer left running through the unarmed spell
+        //     tripped the first armed sample with no delay at all (Kelly's oil check, 31 Oct: one
+        //     705 rpm / 96 kPa sample on a stop = P0524, protection level 3).
+        {
+            uint8_t* q = c.precond_expr;
+            memset(c.precond_expr, 0, sizeof(c.precond_expr));
+            *q++ = expr::OP_PUSH_SIG;
+            const uint16_t sel = (uint16_t)(SIG_MAP + 1);
+            memcpy(q, &sel, 2); q += 2;
+            *q++ = expr::OP_PUSH_F;
+            const int32_t v = 5000;                            // map >= 50
+            memcpy(q, &v, 4); q += 4;
+            *q++ = expr::OP_GE;
+            *q++ = expr::OP_END;
+        }
+        c.diag_delay_ms = 1000;
+        DtcManager dtcs5; dtcs5.init(1);
+        Sensors s5; s5.init(cfg); s5.set_dtc(&dtcs5);
+        SignalBus bus5;
+        const uint16_t op_code = SENSOR_CATALOG[CLT].dtc_op_max;
+        bus5.set(SIG_MAP, 80.0f, true, 4000, 1000);
+        g_tick = 4000; pump(s5, bus5);     // armed, over the ceiling: timer starts
+        assert(s5.healthy(CLT));
+        bus5.set(SIG_MAP, 20.0f, true, 4500, 1000);
+        g_tick = 4500; pump(s5, bus5);     // unarmed
+        bus5.set(SIG_MAP, 80.0f, true, 5500, 1000);
+        g_tick = 5500; pump(s5, bus5);     // armed again, 1.5 s after the first start: NOT a fault yet
+        assert(s5.healthy(CLT));
+        assert(dtcs5.code_severity(op_code) == 0);
+        bus5.set(SIG_MAP, 80.0f, true, 6000, 1000);
+        g_tick = 6000; pump(s5, bus5);     // 0.5 s armed
+        assert(s5.healthy(CLT));
+        bus5.set(SIG_MAP, 80.0f, true, 6600, 1000);
+        g_tick = 6600; pump(s5, bus5);     // 1.1 s armed and tripping -> fault
+        assert(!s5.healthy(CLT));
+        assert(dtcs5.code_severity(op_code) == 3);
+        c.diag_delay_ms = 0;
+        printf("ok  precond: the op delay restarts when the gate shuts (no instant trip on re-arm)\n");
     }
 
     // ---- 14. frequency max-derivative (rate-of-change) plausibility ----

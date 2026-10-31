@@ -824,7 +824,12 @@ void Sensors::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
             // The other four slots never had the problem — they fall through to raise-or-heal every run,
             // and an absent check reads as "not tripping", which heals. This makes that true of all six.
             const bool slot_on = ((c.diag_enable >> slot) & 1u) != 0;
-            if (is_op && slot_on && !ctx.op_armed) continue;   // not under load → leave op codes
+            // NOT UNDER LOAD → leave the op codes, but RESTART their persistence timer. The delay means
+            // "tripping continuously WHILE ARMED"; a timer left running through an unarmed spell is
+            // stale, and the first armed sample then trips at once with no delay at all. Kelly's oil
+            // check (Reading Low 250 kPa, the precondition picks rpm > 700 and oil < 100) did exactly
+            // that: oil is under 250 at every idle, so one 705 rpm / 96 kPa sample on a stop = P0524.
+            if (is_op && slot_on && !ctx.op_armed) { dtc_since_ms_[i][slot] = 0; continue; }
             const uint16_t code = codes[slot];
             const bool raw_trip = slot_on && ((ctx.diag_tripped & (1u << slot)) != 0);
             // PERSISTENCE. A check must trip CONTINUOUSLY for diag_delay_ms before it counts as a fault;
