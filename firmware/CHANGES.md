@@ -14,6 +14,13 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
   the precondition was false, so the first moment it came true the code set at once, with no delay. Found
   on a car: an oil-pressure check (Reading Low with an rpm/pressure precondition) set P0524, protection
   level 3, on a single sample as the idle sagged at a stop. The oil pressure was fine.
+- **The cam is no longer rejected as rpm comes back up through the phase-sync band.** Below the band the
+  cam is ignored, and the place it is next due is carried forward one cycle at a time. The carry landed
+  half a tooth before the cam's own edge, so if rpm crossed into the band in that half tooth the real cam
+  pulse looked like the wrong revolution and was thrown away as noise (P0339). If it crossed just after
+  the edge, the next pulse could be refused too, and that cost phase. About 1 crossing in 150 on a car.
+  A cam pulse a whole number of cycles after the last one is now accepted; one half a cycle out is still
+  rejected.
 
 ## 0.4.22
 - **Fuel asked for while an injector is open is now added, and the dead time is paid once per opening.**

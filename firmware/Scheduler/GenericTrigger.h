@@ -545,8 +545,14 @@ private:
                 }
                 const uint16_t at    = ref_teeth(s);
                 const uint16_t since = static_cast<uint16_t>(at - cam_seen_teeth_);
-                const bool one_cycle = cam_sightings_ > 0 &&
-                                       since + 1u >= phase_expect_teeth_ && since <= phase_expect_teeth_ + 1u;
+                // A WHOLE NUMBER OF CYCLES, give or take a tooth. Not just one: a pulse the band gated
+                // out was ignored, not missing, so the next one lands two cycles after the last sighting
+                // and is exactly as much the same revolution. The other revolution sits half a cycle
+                // off, which this still rejects. (Kelly's Hilux: the band reopening just after the cam
+                // edge rejected the next true pulse, and the reject then cost phase.)
+                const uint16_t rem = phase_expect_teeth_ ? static_cast<uint16_t>(since % phase_expect_teeth_) : since;
+                const bool one_cycle = cam_sightings_ > 0 && since + 1u >= phase_expect_teeth_ &&
+                                       (rem <= 1u || rem + 1u >= phase_expect_teeth_);
                 if (!one_cycle) {
                     if (confirmed) { reject_cam_edge(idx); return; }    // right place, wrong revolution
                     cam_sightings_ = 1; cam_seen_teeth_ = at; cam_seen_fine_ = fine;
@@ -683,10 +689,15 @@ private:
             // the band edge. (Kelly's Hilux: every phase drop on a drive sat at 1500-1535 rpm.)
             // The window's own last sighting is carried the same way, a WHOLE cycle at a time, so it
             // stays where the cam will next be due rather than going stale and rejecting it.
+            // CARRIED ONLY ONCE THE CAM'S WINDOW HAS CLOSED — one cycle plus the tooth either side the
+            // window allows. Carried the moment one cycle had passed, it moved on the tooth just BEFORE
+            // the cam's own edge, and a band reopening in that half pitch handed the real cam "0 teeth
+            // since the last sighting": right place, wrong revolution, rejected. (Kelly's Hilux: P0339
+            // at crank tooth 13, cam at 13.5, 2 in 344 upward crossings of 1500.)
             if (!phase_stream_valid_) {
                 phase_mark_ = crank_teeth_;
                 if (phase_expect_teeth_ && cam_sightings_ &&
-                    static_cast<uint16_t>(crank_teeth_ - cam_seen_teeth_) >= phase_expect_teeth_)
+                    static_cast<uint16_t>(crank_teeth_ - cam_seen_teeth_) > phase_expect_teeth_ + 1u)
                     cam_seen_teeth_ = static_cast<uint16_t>(cam_seen_teeth_ + phase_expect_teeth_);
             }
             // A WIDTH cam that has OPENED is not overdue while it is still open: its timing edge arrived, and

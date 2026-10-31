@@ -203,6 +203,54 @@ int main() {
         CHECK(lost2 >= 1);                                                      // a pulse that never comes is still lost
     }
 
+    // KELLY'S HILUX, 26 + 27 Oct: P0339 (a rejected cam edge, counted as noise) at crank tooth 13, both on
+    // an upward crossing of the 1500 rpm band edge. 2 in 344 crossings. Below the band the cam's last
+    // sighting is carried a whole cycle at a time on the crank teeth, and the carry fired the moment one
+    // cycle had passed — on the tooth just BEFORE the cam edge (tooth 13, cam at 13.5). A band that
+    // reopened in that half pitch handed the real cam edge "0 teeth since the last sighting": right place,
+    // wrong revolution, rejected. Wherever in the cycle the band reopens, the true cam must be believed.
+    SECTION("cam band reopening at ANY tooth: the true cam edge is never rejected as the wrong revolution");
+    {
+        auto run = [](int reopen_after_slot, int reopen_rev) {
+            GenericTrigger g;
+            uint8_t gi[1] = {0}, gr[1] = {3};
+            int cr  = g.add_gap(0, 2, 36, gi, gr, 1, 25);                          // 36-2
+            int cam = g.add_width(2, REPEATS_PHASE, 0, 7200, 3600, true, /*both_edges*/false);
+            g.set_phase_meta(2, 4950, false, 0, 450);                               // nominal 495, allowance 45
+            struct E { uint32_t tick; int idx; int c; int rev; int slot; };
+            std::vector<E> ev;
+            for (int c = 0; c < 30; c++) {
+                for (int rev = 0; rev < 2; rev++) for (int slot = 0; slot < 34; slot++)
+                    ev.push_back({(uint32_t)((c*7200 + rev*3600 + slot*100)*K), cr, c, rev, slot});
+                ev.push_back({(uint32_t)((c*7200 + 4950)*K), cam, c, -1, -1});
+            }
+            std::stable_sort(ev.begin(), ev.end(), [](const E& a, const E& b) { return a.tick < b.tick; });
+            uint32_t noise_before = 0; bool phase_before = false;
+            for (auto& e : ev) {
+                if (e.c == 10 && e.idx == cr && e.rev == 0 && e.slot == 0) {      // in band, locked: go below it
+                    phase_before = g.level() == SyncLvl::PHASE;
+                    noise_before = g.noise_total();
+                    g.set_phase_stream_valid(false);
+                }
+                g.on_edge((uint8_t)e.idx, e.tick, true);
+                if (e.c == 15 && e.idx == cr && e.rev == reopen_rev && e.slot == reopen_after_slot)
+                    g.set_phase_stream_valid(true);                               // back up through 1500
+            }
+            return std::make_tuple(phase_before, g.noise_total() - noise_before, g.phase_lost_total(), g.level());
+        };
+        int bad = 0;
+        for (int rev = 0; rev < 2; rev++) for (int slot = 0; slot < 34; slot++) {
+            const auto [was_phase, noise, lost, lvl] = run(slot, rev);
+            CHECK(was_phase);
+            if (noise != 0 || lost != 0 || lvl != SyncLvl::PHASE) {
+                fprintf(stdout, "    band reopened after rev %d tooth %d: noise %u, phase lost %u, level %d\n",
+                        rev, slot, noise, lost, (int)lvl);
+                ++bad;
+            }
+        }
+        CHECK(bad == 0);
+    }
+
     SECTION("VR single-pulse cam: a wandering FALLING edge never costs phase; the RISING edge times the cam");
     {
         auto run = [](std::vector<int> close_after_deg, bool drop_one) {
