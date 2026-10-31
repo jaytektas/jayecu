@@ -41,4 +41,5 @@ private:
     bool                 pulse_high_   = false;     // Step/Dir: last service raised STEP (lower it next)
     void start_homing() noexcept;
     DtcManager*          dtc_          = nullptr;
+    uint32_t             input_missing_since_ = 0;   // P1730 persistence (DtcManager::report_missing)
 };

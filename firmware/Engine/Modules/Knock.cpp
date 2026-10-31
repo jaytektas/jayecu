@@ -359,10 +359,9 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
     suppressed_ = cut || tps_low;
     // Only a fault when the tuner ASKED for the TPS gate. Requiring a signal the configuration does
     // not use would be inventing a dependency.
-    if (dtc_) {
-        if (tps_gate && !tps_ok) dtc_->raise(ModuleDtc::KNOCK_TPS, DtcSource::MODULE, ModuleDtc::KNOCK_TPS_SEV, now, dtc_ttl());
-        else                     dtc_->heal(ModuleDtc::KNOCK_TPS);
-    }
+    if (dtc_)
+        dtc_->report_missing(tps_missing_since_, ModuleDtc::KNOCK_TPS, DtcSource::MODULE,
+                             ModuleDtc::KNOCK_TPS_SEV, tps_gate && !tps_ok, now, dtc_ttl());
 
     // Cell dwell — settle before teaching, so a transient sweeping across cells does not smear one
     // cell's floor into its neighbours.

@@ -466,6 +466,7 @@ void Sensors::update_supplies(SignalBus& bus, uint32_t now) {
         }
     }
     supply_lost_ = lost;
+    if (dtc_mgr_) dtc_mgr_->set_supply_lost(lost);   // the modules' "signal missing" codes stand down
 }
 
 void Sensors::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& /*frame*/) {

@@ -44,6 +44,7 @@ private:
     bool  charge_known_   = false;  // a split has happened since power-up (else: stage 1's own)
     const FuelCalculatorConfig* cfg_ = nullptr;
     DtcManager*                 dtc_ = nullptr;
+    uint32_t                    missing_since_[5] = {};   // P1700-P1704 persistence: MAP TPS CLT IAT MAF
 
     // Wall-film (X-τ) state: the film mass held in fuel-PW units, and the last update tick for dt.
     float    film_pw_[kStages] = {};   // each port-injected stage's film, in its own per-cycle PW units

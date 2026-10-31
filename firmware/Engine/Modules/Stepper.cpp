@@ -56,12 +56,9 @@ void Stepper::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
 
     // --- Position demand + input-signal DTC (both modes) ---
     const SignalId input_id = static_cast<SignalId>(cfg_->input_sig);
-    if (dtc_) {
-        if (!bus.valid(input_id))
-            dtc_->raise(ModuleDtc::STEP_IN, DtcSource::MODULE, ModuleDtc::STEP_IN_SEV, now_ms, dtc_ttl());
-        else
-            dtc_->heal(ModuleDtc::STEP_IN);
-    }
+    if (dtc_)
+        dtc_->report_missing(input_missing_since_, ModuleDtc::STEP_IN, DtcSource::MODULE,
+                             ModuleDtc::STEP_IN_SEV, !bus.valid(input_id), now_ms, dtc_ttl());
     float demand = bus.get(input_id, 0.0f);
     demand = std::clamp(demand, 0.0f, 100.0f);
     // While homing the target is the closed stop, whatever is asked for; the valve is driven there from

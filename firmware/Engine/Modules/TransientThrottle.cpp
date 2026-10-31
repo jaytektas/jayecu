@@ -40,13 +40,9 @@ void TransientThrottle::update(const EnginePosition& pos, SignalBus& bus, Engine
     // --- Load + derivatives ------------------------------------------------------------------
     const SignalId load_src = static_cast<SignalId>(cfg_->load_source == 0 ? cfg_->tps_src
                                                                            : cfg_->map_src);
-    if (dtc_) {
-        const uint32_t now_ms = platform_get_tick_ms();
-        if (!bus.valid(load_src))
-            dtc_->raise(ModuleDtc::TT_LOAD, DtcSource::MODULE, ModuleDtc::TT_LOAD_SEV, now_ms, dtc_ttl());
-        else
-            dtc_->heal(ModuleDtc::TT_LOAD);
-    }
+    if (dtc_)
+        dtc_->report_missing(load_missing_since_, ModuleDtc::TT_LOAD, DtcSource::MODULE,
+                             ModuleDtc::TT_LOAD_SEV, !bus.valid(load_src), platform_get_tick_ms(), dtc_ttl());
     const float    load   = bus.get(load_src, 0.0f);
     const uint32_t now_ms = platform_get_tick_ms();
     const float    dt_s   = (last_ms_ != 0) ? (now_ms - last_ms_) / 1000.0f : 0.0f;

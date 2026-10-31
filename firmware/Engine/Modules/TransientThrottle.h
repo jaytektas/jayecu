@@ -46,6 +46,7 @@ private:
 
     const TransientThrottleConfig* cfg_ = nullptr;
     DtcManager*                    dtc_ = nullptr;
+    uint32_t                       load_missing_since_ = 0;   // P1720 persistence (DtcManager::report_missing)
     bool was_enabled_ = false;   // enabled->disabled edge: heal our DTCs once (DtcManager::heal)
 
     float    last_load_   = 0.0f;    // previous load sample (for the rate)

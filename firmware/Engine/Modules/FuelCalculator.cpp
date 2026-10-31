@@ -272,18 +272,19 @@ void FuelCalculator::update(const EnginePosition& pos, SignalBus& bus, EngineFra
         //     a tuner on the bench sees exactly which fuel inputs still need a signal assigned.
         //   configured but INVALID   -> DtcSource::MODULE @ sev  -> key-on gated, so an input that's simply
         //     absent at rest (engine not running, sensor unpowered) doesn't flood the bench table.
-        auto report = [&](uint16_t code, bool needed, SignalId src, uint8_t sev) {
+        //   ...and a configured input that is invalid goes through report_missing(): not while a 5 V
+        //     reference is down (the supply's own code names that), and only once it has held 100 ms.
+        auto report = [&](uint32_t& since, uint16_t code, bool needed, SignalId src, uint8_t sev) {
             const bool unset   = needed && (src == SIG_NONE);
             const bool invalid = needed && !unset && !bus.valid(src);
-            if (unset)        dtc_->raise(code, DtcSource::CONFIG, DTC_SEV_LEVEL1, now_ms, dtc_ttl());
-            else if (invalid) dtc_->raise(code, DtcSource::MODULE, sev, now_ms, dtc_ttl());
-            else              dtc_->heal(code);
+            if (unset) { since = 0; dtc_->raise(code, DtcSource::CONFIG, DTC_SEV_LEVEL1, now_ms, dtc_ttl()); }
+            else       dtc_->report_missing(since, code, DtcSource::MODULE, sev, invalid, now_ms, dtc_ttl());
         };
-        report(ModuleDtc::FUEL_MAP, need_map, map_id,                               ModuleDtc::FUEL_MAP_SEV);
-        report(ModuleDtc::FUEL_TPS, need_tps, static_cast<SignalId>(cfg_->tps_src), ModuleDtc::FUEL_TPS_SEV);
-        report(ModuleDtc::FUEL_CLT, true,     clt_id,                               ModuleDtc::FUEL_CLT_SEV);
-        report(ModuleDtc::FUEL_IAT, true,     static_cast<SignalId>(cfg_->iat_src), ModuleDtc::FUEL_IAT_SEV);
-        report(ModuleDtc::FUEL_MAF, need_maf, static_cast<SignalId>(cfg_->maf_src), ModuleDtc::FUEL_MAF_SEV);
+        report(missing_since_[0], ModuleDtc::FUEL_MAP, need_map, map_id,                               ModuleDtc::FUEL_MAP_SEV);
+        report(missing_since_[1], ModuleDtc::FUEL_TPS, need_tps, static_cast<SignalId>(cfg_->tps_src), ModuleDtc::FUEL_TPS_SEV);
+        report(missing_since_[2], ModuleDtc::FUEL_CLT, true,     clt_id,                               ModuleDtc::FUEL_CLT_SEV);
+        report(missing_since_[3], ModuleDtc::FUEL_IAT, true,     static_cast<SignalId>(cfg_->iat_src), ModuleDtc::FUEL_IAT_SEV);
+        report(missing_since_[4], ModuleDtc::FUEL_MAF, need_maf, static_cast<SignalId>(cfg_->maf_src), ModuleDtc::FUEL_MAF_SEV);
     }
     float load_real, density_kpa;
     // BLEND IS TWO MAPS. Below Blend Start RPM the Alpha-N VE table (RPM x throttle) carries the charge;

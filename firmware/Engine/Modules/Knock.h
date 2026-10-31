@@ -136,6 +136,7 @@ private:
     const KnockConfig* cfg_      = nullptr;
     Ignition*          ignition_ = nullptr;
     DtcManager*        dtc_      = nullptr;
+    uint32_t           tps_missing_since_ = 0;   // KNOCK_TPS persistence (DtcManager::report_missing)
     bool was_enabled_ = false;   // enabled->disabled edge: heal our DTCs once (DtcManager::heal)
 
     // Learned region slices — [CELLS] each, per cylinder. Null until init() maps them.

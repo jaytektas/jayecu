@@ -166,6 +166,17 @@ void DtcManager::age(uint32_t now_ms) {
     }
 }
 
+void DtcManager::report_missing(uint32_t& since, uint16_t code, uint8_t source, uint8_t severity,
+                                bool missing, uint32_t now_ms, uint32_t ttl_ms) {
+    if (!missing) { since = 0; heal(code); return; }
+    // The supply is the fault, and it says so itself. Neither raised nor healed — a code this check
+    // raised before the rail went is left to age — and the timer starts again when the rail is back,
+    // so a signal still missing then has to hold for the whole delay on its own account.
+    if (supply_lost_) { since = 0; return; }
+    if (since == 0) { since = now_ms ? now_ms : 1u; return; }   // 0 = "not missing"
+    if (now_ms - since >= MISSING_SIGNAL_DELAY_MS) raise(code, source, severity, now_ms, ttl_ms);
+}
+
 void DtcManager::heal(uint16_t code) {
     if (!maybe_present(code)) return;    // the common case, and no lock for it
     DtcGuard g;

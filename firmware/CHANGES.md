@@ -26,6 +26,13 @@ raises the version (tools/release_notes.py). A line per change; no commit hashes
   left the timer set from the tooth before, so it ran out half a tooth after a tooth that came on time:
   a missed tooth (P0336), sync cut and re-acquired (P0335). Seen on a cold start, the moment the flare
   took the engine past the phase-sync rpm.
+- **"Signal missing" codes wait 100 ms, and stand down while a 5 V sensor reference is down.** The
+  module codes for a required input that has gone (P1700-P1704 fuel, P1710 boost, P1720 transient
+  throttle, P1730 stepper, knock's throttle gate) used to set on a single bad frame. At key-off the sensor
+  references go a few milliseconds before the battery reading falls below the key-off threshold, so the
+  throttle read missing for a frame with the key still on: P1720 and a CEL flash at shutdown. They now
+  need the input missing for 100 ms (as the supply codes do), and say nothing while a reference is down,
+  because P0641 / P0651 report that. An input that is not assigned at all is still reported at once.
 
 ## 0.4.22
 - **Fuel asked for while an injector is open is now added, and the dead time is paid once per opening.**

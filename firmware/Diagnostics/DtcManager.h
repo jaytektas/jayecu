@@ -77,6 +77,24 @@ public:
     // (drops ACTIVE, keeps STORED history), so the bench shows a clean active list. Set every frame.
     void set_active(bool a) noexcept;
 
+    // A REQUIRED SIGNAL IS MISSING — the module "signal missing" codes (P17xx). Two rules every such
+    // check needs, so they live here rather than in each module:
+    //   * A 5 V SENSOR REFERENCE IS DOWN: every pin-read sensor publishes invalid on purpose, and the
+    //     supply raises its own code (P0641 / P0651). A module reporting its input "missing" then names
+    //     a symptom, not the fault — and at key-off, when the references go a few ms before the battery
+    //     reading falls below the key threshold, it named one that is not a fault at all: P1720 with the
+    //     key going off, battery 12.46 V, CEL flash, stored code (Kelly's Hilux, three times).
+    //   * PERSISTENCE: missing for MISSING_SIGNAL_DELAY_MS before it counts — the same 100 ms the supply
+    //     codes wait. A signal really gone still reports within a tenth of a second; one late frame does
+    //     not light the CEL for a second and leave a stored code.
+    // Healing stays immediate. `since` is the caller's own timer, one per code (0 = not missing).
+    static constexpr uint32_t MISSING_SIGNAL_DELAY_MS = 100;
+    void report_missing(uint32_t& since, uint16_t code, uint8_t source, uint8_t severity,
+                        bool missing, uint32_t now_ms, uint32_t ttl_ms);
+    // Set by Sensors every pass (false with the key off). See report_missing().
+    void set_supply_lost(bool lost) noexcept { supply_lost_ = lost; }
+    bool supply_lost() const noexcept { return supply_lost_; }
+
     // CROSS-TASK GUARD. The table is raised into by the engine task, the CAN task and Lua, read and
     // cleared by comms/CLI/OBD, and serialised by the housekeeping save — all different tasks, and a
     // record copied half-way through an update is a torn record on the card. The platform supplies a
@@ -194,6 +212,7 @@ private:
     uint32_t  clear_gen_ = 0;   // bumped by clear_all(); read via clear_generation()
     bool      dirty_   = false;
     bool      active_  = true;  // system-active gate: false on USB/bench (see set_active)
+    bool      supply_lost_ = false;   // a 5 V sensor reference is down (see report_missing)
     // When each slot's code last went active (this run). Not persisted: CONFIRMED is what persists.
     uint32_t  active_since_[SLOTS] = {};
     bool      cycle_open_ = false;          // a key cycle is in progress (see set_active)

@@ -419,6 +419,42 @@ int main() {
         check(rejected(t, on), "older store: a zero code is rejected");
     }
 
+    // ---- report_missing: a module's "signal missing" code (P17xx) ----
+    // Kelly's Hilux: P1720 at key-off, three times — the 5 V references went a few ms before the battery
+    // reading fell below the key threshold, TPS published invalid for a frame, and the module raised at
+    // once. The supply names that itself; and nothing should light the CEL on one late frame.
+    {
+        constexpr uint16_t P1720 = 0x1720;
+        constexpr uint8_t  MOD   = 9;
+        const uint32_t     D     = DtcManager::MISSING_SIGNAL_DELAY_MS;
+        DtcManager t; t.init(4);
+        uint32_t since = 0;
+        t.report_missing(since, P1720, MOD, DTC_SEV_LEVEL1, true, 1000, 1000);
+        t.report_missing(since, P1720, MOD, DTC_SEV_LEVEL1, true, 1000 + D - 1, 1000);
+        check(t.code_severity(P1720) == 0, "missing: not a fault before the delay");
+        t.report_missing(since, P1720, MOD, DTC_SEV_LEVEL1, false, 1000 + D - 1 + 1, 1000);
+        t.report_missing(since, P1720, MOD, DTC_SEV_LEVEL1, true, 1000 + D + 5, 1000);
+        t.report_missing(since, P1720, MOD, DTC_SEV_LEVEL1, true, 1000 + D + 50, 1000);
+        check(t.code_severity(P1720) == 0, "missing: a good sample restarts the delay");
+        t.report_missing(since, P1720, MOD, DTC_SEV_LEVEL1, true, 1000 + 2 * D + 5, 1000);
+        check(t.code_severity(P1720) == DTC_SEV_LEVEL1, "missing: held for the delay -> raised");
+        t.report_missing(since, P1720, MOD, DTC_SEV_LEVEL1, false, 1000 + 2 * D + 6, 1000);
+        check(t.code_severity(P1720) == 0, "missing: heals on the first good sample");
+
+        DtcManager u; u.init(4);
+        uint32_t s2 = 0;
+        u.set_supply_lost(true);                                    // a 5 V reference is down
+        for (uint32_t ms = 2000; ms <= 2000 + 5 * D; ms += 10)
+            u.report_missing(s2, P1720, MOD, DTC_SEV_LEVEL1, true, ms, 1000);
+        check(u.code_severity(P1720) == 0 && u.stored_count() == 0,
+              "missing: never raised while a 5 V reference is down (the supply's code names it)");
+        u.set_supply_lost(false);                                   // rail back, signal still missing
+        u.report_missing(s2, P1720, MOD, DTC_SEV_LEVEL1, true, 3000, 1000);
+        check(u.code_severity(P1720) == 0, "missing: after the rail returns the delay starts again");
+        u.report_missing(s2, P1720, MOD, DTC_SEV_LEVEL1, true, 3000 + D, 1000);
+        check(u.code_severity(P1720) == DTC_SEV_LEVEL1, "missing: ...and a signal really gone still reports");
+    }
+
     printf("\n%d passed, %d failed\n", _p, _f);
     return _f ? 1 : 0;
 }

@@ -154,12 +154,9 @@ void Boost::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
     const float    rpm = pos.rpm;
     const float    map = bus.get(wk::map, 0.0f);   // manifold pressure [kPa]
 
-    if (dtc_) {
-        if (!bus.valid(wk::map))
-            dtc_->raise(ModuleDtc::BOOST_MAP, DtcSource::MODULE, ModuleDtc::BOOST_MAP_SEV, now, dtc_ttl());
-        else
-            dtc_->heal(ModuleDtc::BOOST_MAP);
-    }
+    if (dtc_)
+        dtc_->report_missing(map_missing_since_, ModuleDtc::BOOST_MAP, DtcSource::MODULE,
+                             ModuleDtc::BOOST_MAP_SEV, !bus.valid(wk::map), now, dtc_ttl());
 
     // --- Boost target (kPa) from the target table, published for telemetry regardless of activation ---
     float target = tbl::table_eval(boost_target_table_desc(cfg_), bus);

@@ -522,7 +522,10 @@ int main() {
         bus.set(wk::fuel_load, 100.0f);
         bus.set(wk::rpm, 4000.0f);              // deliberately no wk::tps — the gate cannot be answered
         k.update(pos, bus, frame);
-        CHECK(dtc.code_severity(ModuleDtc::KNOCK_TPS) != 0);   // raised while it was running
+        CHECK(dtc.code_severity(ModuleDtc::KNOCK_TPS) == 0);   // one frame missing is not yet a fault
+        g_stub_tick_ms += DtcManager::MISSING_SIGNAL_DELAY_MS;
+        k.update(pos, bus, frame);
+        CHECK(dtc.code_severity(ModuleDtc::KNOCK_TPS) != 0);   // held the delay: raised while it was running
 
         // The switch the user actually flicks: the module holds a POINTER into the config, so writing
         // the flag is what a burn does. No re-init, no reconstruction.

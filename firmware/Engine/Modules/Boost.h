@@ -62,6 +62,7 @@ private:
     bool ob_cutting_ = false;          // overboost backstop is cutting (hysteresis state)
     const BoostConfig* cfg_ = nullptr;
     DtcManager*        dtc_ = nullptr;
+    uint32_t           map_missing_since_ = 0;   // P1710 persistence (DtcManager::report_missing)
     bool was_enabled_ = false;   // enabled->disabled edge: heal our DTCs once (DtcManager::heal)
     PiController pi_;                 // closed-loop trim; integ is the persistent wastegate state
     uint32_t     last_ms_  = 0;       // for the PI/D dt
