@@ -435,10 +435,15 @@ void Knock::update(const EnginePosition& pos, SignalBus& bus, EngineFrame& frame
             const bool quiet_now = cfg_->quiet_check_en && !missing
                                 && bus.get(SIG[k], 0.0f) < static_cast<float>(cfg_->quiet_db) * 0.1f;
             quiet_ms_[k] = (judge && quiet_now) ? quiet_ms_[k] + dt * 1000.0f : 0.0f;
-            if (used[k] && judge && (missing || quiet_ms_[k] >= 1000.0f))
+            // Missing goes through report_missing (100 ms, quiet while a 5 V reference is down): one
+            // expired frame is not a dead sensor. A sensor that reads but stays quiet is its own verdict.
+            if (used[k] && judge && !missing && quiet_ms_[k] >= 1000.0f) {
+                missing_since_[k] = 0;
                 dtc_->raise(CODE[k], DtcSource::MODULE, SEV[k], now, dtc_ttl());
-            else
-                dtc_->heal(CODE[k]);
+            } else {
+                dtc_->report_missing(missing_since_[k], CODE[k], DtcSource::MODULE, SEV[k],
+                                     used[k] && judge && missing, now, dtc_ttl());
+            }
         }
     }
 

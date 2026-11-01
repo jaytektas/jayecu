@@ -122,26 +122,27 @@ void TractionControl::update(const EnginePosition& /*pos*/, SignalBus& bus, Engi
         if (ok[dA])            { driven = w[dA]; driven_ok = true; }
         if (ok[dB] && (!driven_ok || w[dB] > driven)) { driven = w[dB]; driven_ok = true; }
     }
+    // The CODE waits 100 ms (report_missing): one expired frame from a speed input on its own cadence is
+    // not a missing sensor. The module stands down on the first frame regardless.
+    if (dtc_) dtc_->report_missing(no_driven_since_, ModuleDtc::TRACTION_NO_DRIVEN, DtcSource::MODULE,
+                                   ModuleDtc::TRACTION_NO_DRIVEN_SEV, !driven_ok, now, dtc_ttl());
     if (!driven_ok) {
-        if (dtc_) dtc_->raise(ModuleDtc::TRACTION_NO_DRIVEN, DtcSource::MODULE,
-                              ModuleDtc::TRACTION_NO_DRIVEN_SEV, now, dtc_ttl());
         publish_neutral(bus, now);
         return;
     }
-    if (dtc_) dtc_->heal(ModuleDtc::TRACTION_NO_DRIVEN);
 
     // --- and what the road is doing ---------------------------------------------------------------
     // ONE ANSWER, FROM ONE PLACE. vehicle_spd is whatever Vehicle Speed's Main Source names — the
     // undriven axle on a two-wheel-drive car, GPS on a four-wheel-drive one. This module used to choose
     // for itself, which meant the ECU held two answers to "how fast is the car going" and could not say
     // which was right.
-    if (!bus.valid(wk::vehicle_spd)) {
-        if (dtc_) dtc_->raise(ModuleDtc::TRACTION_NO_REF, DtcSource::MODULE,
-                              ModuleDtc::TRACTION_NO_REF_SEV, now, dtc_ttl());
+    const bool ref_ok = bus.valid(wk::vehicle_spd);
+    if (dtc_) dtc_->report_missing(no_ref_since_, ModuleDtc::TRACTION_NO_REF, DtcSource::MODULE,
+                                   ModuleDtc::TRACTION_NO_REF_SEV, !ref_ok, now, dtc_ttl());
+    if (!ref_ok) {
         publish_neutral(bus, now);
         return;
     }
-    if (dtc_) dtc_->heal(ModuleDtc::TRACTION_NO_REF);
     const float reference = bus.get(wk::vehicle_spd, 0.0f);
 
     if (reference < static_cast<float>(cfg_->min_speed_kph) || reference <= 0.0f) {

@@ -112,6 +112,7 @@ private:
     SignalId src2_sig_  = SIG_NONE;
     bool     src2_wide_ = false, src2_narrow_ = false;
     DtcManager* dtc_ = nullptr;
+    uint32_t    no_sensor_since_ = 0;   // LAMBDA_NO_SENSOR persistence (DtcManager::report_missing)
 
     // --- NARROWBAND SWITCHING LOOP ------------------------------------------------------------------
     // A narrowband cannot be a second kind of wideband, so it is not kept in wb_[]: it measures which

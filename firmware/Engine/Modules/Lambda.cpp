@@ -522,11 +522,11 @@ void Lambda::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame& 
         else
             dtc_->heal(ModuleDtc::LAMBDA_CONFIG);
 
-        if (cfg_->enabled != 0 && !measured && !nb_valid)
-            dtc_->raise(ModuleDtc::LAMBDA_NO_SENSOR, DtcSource::MODULE,
-                        ModuleDtc::LAMBDA_NO_SENSOR_SEV, now, dtc_ttl());
-        else
-            dtc_->heal(ModuleDtc::LAMBDA_NO_SENSOR);   // reading again, or switched off
+        // Held 100 ms and quiet while a 5 V reference is down (report_missing): one expired frame is not
+        // a missing sensor. Heals at once — reading again, or switched off.
+        dtc_->report_missing(no_sensor_since_, ModuleDtc::LAMBDA_NO_SENSOR, DtcSource::MODULE,
+                             ModuleDtc::LAMBDA_NO_SENSOR_SEV, cfg_->enabled != 0 && !measured && !nb_valid,
+                             now, dtc_ttl());
     }
 
 

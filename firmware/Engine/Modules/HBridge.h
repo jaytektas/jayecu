@@ -46,6 +46,7 @@ private:
     const HBridgeConfig* cfg_          = nullptr;
     Comms::CommsManager* comms_        = nullptr;
     DtcManager*          dtc_          = nullptr;
+    uint32_t             missing_since_[2][2] = {};   // [half][demand, enable] (DtcManager::report_missing)
     IHBridge*            bridges_[2]   = {};
     uint32_t applied_freq_hz_ = 0;   // carrier actually programmed into the timer
     bool                 was_enabled_[2] = {};

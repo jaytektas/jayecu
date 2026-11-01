@@ -58,6 +58,7 @@ private:
 
     const TractionControlConfig* cfg_ = nullptr;
     DtcManager* dtc_ = nullptr;
+    uint32_t    no_driven_since_ = 0, no_ref_since_ = 0;   // report_missing persistence
     PiController pi_;
 
     float cap_     = 100.0f;

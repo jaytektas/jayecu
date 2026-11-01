@@ -97,6 +97,8 @@ public:
     // Key-on hysteresis, in volts. Public so the one place that used to own them can't drift from them.
     static constexpr float KEY_ON_V  = 8.0f;
     static constexpr float KEY_OFF_V = 7.0f;
+    // How long the battery has to stay at or under KEY_OFF_V (or unreadable) before the key is off.
+    static constexpr uint32_t KEY_OFF_HOLD_MS = 100;
 
     // Per-sensor health: false once an enabled diagnostic check is tripped.
     bool healthy(uint8_t idx) const { return idx < SENSOR_COUNT && !fault_[idx]; }
@@ -152,6 +154,8 @@ private:
     // (pipe::State per stage); this manager keeps only decimation + arbitration + DTC state.
     bool     key_on_   = false;   // hysteretic key state, decided mid-pass (see key_on())
     uint32_t key_on_since_ = 0;   // tick the key last came on, 0 while it is off (key_on_s)
+    uint32_t key_low_since_ = 0;  // key on, battery low since this tick (0 = not low) — KEY_OFF_HOLD_MS
+    float    key_low_min_v_ = 0;  // lowest battery reading in the current low spell (logged on recovery)
     // The 5 V references (see supply_lost()): read right after the key is decided, before any sensor that
     // they gate runs, so the pass in which one fails is also the pass in which the sensors go invalid.
     void     update_supplies(SignalBus& bus, uint32_t now);

@@ -1076,17 +1076,29 @@ int main() {
         assert(bus.valid(SIG_CLT));               // alive in the SAME pass the key turned
         assert(bus.valid(SIG_HW_AV1));            // ...and its raw pin is back with it, same pass
 
-        // …AND KEY-OFF ON THE FRAME THE IGNITION DROPS. Found on a car with USB holding the ECU up: the
-        // 5 V references fell with the ignition, the battery still read 12.68 V from its last 20 Hz
-        // sample, so for that window the key was on with every sensor invalid, and Boost and Transient
-        // Throttle logged MAP missing at every other key-off. One frame after a running one, the key
-        // must already be off.
+        // A DEAD BATTERY FRAME IS NOT A KEY-OFF. A battery terminal losing contact for a millisecond on a
+        // bump read as the ignition going off: sync dropped, firing stopped, every module back to
+        // power-on, on a car on the move. A dip has to hold KEY_OFF_HOLD_MS before it is a key-off.
         g_tick += 1; pump(s, bus);                // a running frame, mid-period for a 20 Hz sensor
         assert(g_system_active);
+        g_tick += 1; g_ain[11] = 0;    pump(s, bus);   // the terminal lets go for one frame
+        assert(g_system_active);
+        g_tick += 1; g_ain[11] = 2232; pump(s, bus);   // and is back
+        assert(g_system_active);
+        for (int i = 0; i < 99; i++) { g_tick += 1; g_ain[11] = 0; pump(s, bus); }   // 99 ms of it
+        assert(g_system_active);
+        g_tick += 1; g_ain[11] = 2232; pump(s, bus);
+        assert(g_system_active);                  // under the hold: still never a key-off
+
+        // …BUT THE IGNITION GOING OFF IS ONE, within the hold. The "signal missing" codes that once made
+        // this a same-frame decision (P1710 / P1720 at key-off, the references falling first) now wait
+        // 100 ms and stand down while a reference is down, so they no longer need the key to race them.
         g_tick += 1;
         g_ain[11] = 50;                           // ignition gone: 0.3 V
         pump(s, bus);
-        assert(!g_system_active);                 // off in the same frame, not up to 50 ms later
+        assert(g_system_active);                  // not yet: could be a dip
+        for (int i = 0; i < Sensors::KEY_OFF_HOLD_MS; i++) { g_tick += 1; pump(s, bus); }
+        assert(!g_system_active);                 // held: off
         assert(bus.get(SIG_KEY_ON_S) == 0.0f);    // time since key-on reads 0 while it is off
 
         // TIME SINCE KEY-ON counts from the key, not from boot: a prime timed off uptime never ran with
@@ -1117,8 +1129,8 @@ int main() {
         g_ain[11] = 2232; g_din[0] = true;                     // key on, switch pressed
         for (int f = 0; f < 6; f++) { g_tick += sw_slot; pump(s, bus); }
         assert(g_system_active && bus.get(ch) > 0.5f);
-        g_ain[11] = 50;                                        // the battery drops out: key off
-        g_tick += 1; pump(s, bus);
+        g_ain[11] = 50;                                        // the battery drops out: key off,
+        for (unsigned f = 0; f <= Sensors::KEY_OFF_HOLD_MS; f++) { g_tick += 1; pump(s, bus); }   // once held
         assert(!g_system_active);
         g_din[0] = false;                                      // key released while the ECU cannot see it
         for (int f = 0; f < 50; f++) { g_tick += sw_slot; pump(s, bus); }

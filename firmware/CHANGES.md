@@ -9,6 +9,19 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+- **A battery dip is no longer a key-off.** One reading at or under 7 V, or one frame the battery could
+  not be read, turned the key off on the spot: on a running engine that dropped sync, stopped firing and
+  reset every module. A loose battery terminal on a bump is not the ignition going off. The supply now
+  has to stay low for 100 ms, and a dip it rode through is written to the log with how low it went.
+- **An ECU restart on the move no longer leaves a dead throttle.** With power back while the car was
+  still rolling, the trigger had not synced yet, so the throttle took the engine for stopped: it swept
+  the plate at road speed, cut fuel and spark for half a second, then gave up and stayed dead until the
+  engine stopped. The plate is never swept while trigger teeth are arriving. Once the engine runs, the
+  passive check (both tracks agree, inside the stored cal) gives it the throttle, and the sweep runs at
+  the next stop.
+- Knock sensor missing, Traction Control's missing speed inputs, H-bridge inputs and Lambda's no-sensor
+  code now need the input gone for 100 ms, like the other "signal missing" codes. One expired frame set
+  them.
 - GM LS1 24x (and any Sequence crank with a cam) now reaches full sequential sync. It stayed on wasted
   spark and batch fire for good, with no fault.
 - A trigger set up with only Width streams is now refused with P1652. It could never sync, but the ECU

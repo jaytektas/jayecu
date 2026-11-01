@@ -157,9 +157,11 @@ If the ECU's starter output cranks the engine, make it wait for the check: switc
 press until every enabled throttle has passed. With Engine Start off, Crank Request is the button itself. A starter output set up before this firmware reads the button directly; run
 the output wizard on it to take the new condition.
 
-An engine that is already **running** when the check starts (the ECU restarted on the move, after a
-supply dip) is never cut by this. The sweep is skipped and the sensor check alone is used, because a
-running engine is worse off with a dead throttle than with an unswept one.
+An engine that is already **turning** when the check starts (the ECU restarted on the move, after a
+supply dip) is never swept. "Turning" means a trigger tooth has arrived in the last half second, so it
+counts even before the trigger has synced. The ECU waits for sync. If the engine is then running, the
+sensor check alone gives it the throttle, because a running engine is worse off with a dead throttle
+than with an unswept one. The sweep is still owed and runs the next time the engine stops.
 <!-- src: firmware/Engine/Modules/ElectronicThrottle.cpp -->
 
 ### 6 · The half bridges

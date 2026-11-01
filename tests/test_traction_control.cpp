@@ -108,8 +108,12 @@ int main() {
         bus.set(SIG_WHEEL_FL, 100.0f, true, g_ms, 0);
         bus.set(wk::vehicle_spd, 100.0f, true, g_ms, 0);
         t.update(p, bus, f);
-        CHECK_NEAR(t.cap(), 100.0f, 0.1f);
-        CHECK(raised(ModuleDtc::TRACTION_NO_DRIVEN));
+        CHECK_NEAR(t.cap(), 100.0f, 0.1f);                // stands down on the first frame...
+        CHECK(!raised(ModuleDtc::TRACTION_NO_DRIVEN));    // ...but one frame is not a missing sensor
+        g_ms += 100;
+        bus.set(SIG_WHEEL_FL, 100.0f, true, g_ms, 0); bus.set(wk::vehicle_spd, 100.0f, true, g_ms, 0);
+        t.update(p, bus, f);
+        CHECK(raised(ModuleDtc::TRACTION_NO_DRIVEN));     // held 100 ms: now it is
     }
 
     SECTION("the reference is the ROAD SPEED, whatever Vehicle Speed says it is");
@@ -136,6 +140,10 @@ int main() {
         bus.set(SIG_WHEEL_RL, 200.0f, true, g_ms, 0); bus.set(SIG_WHEEL_RR, 200.0f, true, g_ms, 0);
         t.update(p, bus, f);
         CHECK_NEAR(t.cap(), 100.0f, 0.1f);
+        CHECK(!raised(ModuleDtc::TRACTION_NO_REF));       // one frame is not a missing reference
+        g_ms += 100;
+        bus.set(SIG_WHEEL_RL, 200.0f, true, g_ms, 0); bus.set(SIG_WHEEL_RR, 200.0f, true, g_ms, 0);
+        t.update(p, bus, f);
         // "Not active" is also what a below-minimum speed gives, so only the code tells them apart.
         CHECK(raised(ModuleDtc::TRACTION_NO_REF));
         hold(t, bus, 100, 100, 100, 100, 3);

@@ -4,6 +4,7 @@
 #include "../Scheduler/EngineSyncSampler.h"   // engine-sync angle-window pin registration
 #include "../Signal/Expr.h"                   // op-window precondition expression VM
 #include "../Diagnostics/ReconfigCost.h"
+#include "../Diagnostics/TextLog.h"           // g_text_log — a supply dip the key rode through
 #include "../Storage/Crc32.h"                 // crc32_buf — each element's fingerprint (recompute_live)
 #include "../../generated/well_known_signals.h"  // wk::battery — bootstrap-sensor role (rename-safe)
 #include <cstddef>                            // offsetof — guard the inline precond array view
@@ -605,7 +606,30 @@ void Sensors::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
             // frame's. Decide the key from it before any gated sensor is reached.
             const float vbat = bus.get(wk::battery, 0.0f);
             const bool key_was = key_on_;
-            key_on_ = key_on_ ? (vbat > KEY_OFF_V) : (vbat > KEY_ON_V);
+            // KEY-OFF HAS TO HOLD. One reading at or under KEY_OFF_V -- or one frame with the battery
+            // channel invalid, which reads as 0 V -- used to turn the key off on the spot, and a key-off on
+            // a running engine drops sync, stops firing and puts every module back to power-on. A battery
+            // terminal that loses contact for a millisecond on a bump is not the ignition going off, so the
+            // supply has to stay low for KEY_OFF_HOLD_MS, the same 100 ms a missing signal needs before it
+            // is a fault. Key-on stays immediate. A dip that recovers in time is written to the log: it is
+            // the only trace a loose terminal leaves.
+            const bool low = !bus.valid(wk::battery) || vbat <= KEY_OFF_V;
+            if (!key_on_) {
+                key_on_ = vbat > KEY_ON_V;
+                key_low_since_ = 0;
+            } else if (!low) {
+                if (key_low_since_ != 0)
+                    g_text_log.printf("Supply dip held through: battery down to %d.%d V for %lu ms, key kept on\n",
+                                      static_cast<int>(key_low_min_v_),
+                                      static_cast<int>(key_low_min_v_ * 10.0f) % 10,
+                                      static_cast<unsigned long>(now - key_low_since_));
+                key_low_since_ = 0;
+            } else {
+                const float v = bus.valid(wk::battery) ? vbat : 0.0f;
+                if (key_low_since_ == 0) { key_low_since_ = now ? now : 1u; key_low_min_v_ = v; }
+                else if (v < key_low_min_v_) key_low_min_v_ = v;
+                if (now - key_low_since_ >= KEY_OFF_HOLD_MS) { key_on_ = false; key_low_since_ = 0; }
+            }
             extern volatile int g_key_override;          // 'key' bench command: force on/off
             if      (g_key_override > 0) key_on_ = true;
             else if (g_key_override < 0) key_on_ = false;

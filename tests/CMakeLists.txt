@@ -298,6 +298,7 @@ add_executable(test_sensors
     ${FW_DIR}/Sensors/Sensors.cpp
     ${FW_DIR}/Diagnostics/DtcManager.cpp
     ${FW_DIR}/Diagnostics/ReconfigCost.cpp
+    ${FW_DIR}/Diagnostics/TextLog.cpp         # g_text_log — a supply dip the key rode through
     ${FW_DIR}/Scheduler/EngineSyncSampler.cpp
     ${FW_DIR}/Integration/HardwareInput.cpp   # publishes SIG_HW_* the analog Acquire now reads off the bus
     ${FW_DIR}/Can/GenericCan.cpp              # a CAN sensor resolves (frame, start bit) -> field through it

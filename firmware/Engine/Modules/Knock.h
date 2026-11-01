@@ -124,6 +124,7 @@ public:
 
 private:
     float quiet_ms_[2] = { 0.0f, 0.0f };   // how long each sensor has read below quiet_db
+    uint32_t missing_since_[2] = { 0, 0 };  // KNOCK_1/2 missing persistence (DtcManager::report_missing)
     float judge_ms_    = 0.0f;             // how long the sensors have been judgeable (combustion, over the floor)
     [[nodiscard]] uint16_t cell_index(float rpm, float load) const;
     // Teach the live cell that this cylinder sounded like `db` on a clean cycle.

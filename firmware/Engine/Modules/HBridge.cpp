@@ -137,11 +137,12 @@ void HBridge::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
     //                          flags immediately while configuring (DtcManager passes CONFIG when inactive).
     //   configured-invalid  -> DtcSource::MODULE  @ sev   -> key-on gated, so a signal that's legitimately
     //                          absent at rest doesn't flood the table.
-    auto report = [&](uint16_t code, bool unset, bool invalid, uint8_t inval_sev) {
+    //   ...and configured-invalid goes through report_missing(): it has to hold 100 ms, and says nothing
+    //   while a 5 V reference is down — one expired frame from a producer on another cadence is not a fault.
+    auto report = [&](uint32_t& since, uint16_t code, bool unset, bool invalid, uint8_t inval_sev) {
         if (!dtc_) return;
-        if (unset)        dtc_->raise(code, DtcSource::CONFIG, DTC_SEV_LEVEL1, now_ms, dtc_ttl());
-        else if (invalid) dtc_->raise(code, DtcSource::MODULE, inval_sev, now_ms, dtc_ttl());
-        else              dtc_->heal(code);
+        if (unset) { since = 0; dtc_->raise(code, DtcSource::CONFIG, DTC_SEV_LEVEL1, now_ms, dtc_ttl()); }
+        else       dtc_->report_missing(since, code, DtcSource::MODULE, inval_sev, invalid, now_ms, dtc_ttl());
     };
 
     const auto engine_state = static_cast<EngineRunState>(
@@ -162,8 +163,8 @@ void HBridge::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
         if (!bc.enabled) {
             if (!off_reported_[i]) {
                 off_reported_[i] = true;
-                report(DEMAND_CODE[i], false, false, 0);
-                report(ENABLE_CODE[i], false, false, 0);
+                report(missing_since_[i][0], DEMAND_CODE[i], false, false, 0);
+                report(missing_since_[i][1], ENABLE_CODE[i], false, false, 0);
             }
             manual_until_ms_[i] = 0;
             apply_bridge(i, false, 0.0f);
@@ -180,8 +181,8 @@ void HBridge::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
         if (!nudging) manual_until_ms_[i] = 0;
         if (nudging) {
             if (!engine_stopped) { manual_until_ms_[i] = 0; apply_bridge(i, false, 0.0f); continue; }
-            report(DEMAND_CODE[i], false, false, 0);
-            report(ENABLE_CODE[i], false, false, 0);
+            report(missing_since_[i][0], DEMAND_CODE[i], false, false, 0);
+            report(missing_since_[i][1], ENABLE_CODE[i], false, false, 0);
             apply_bridge(i, true, map_demand(bc, manual_demand_[i]));
             continue;
         }
@@ -191,7 +192,7 @@ void HBridge::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
         const SignalId dsig = static_cast<SignalId>(bc.demand_sig);
         const bool demand_invalid = !demand_unset && !bus.valid(dsig);
         const bool demand_bad = demand_unset || demand_invalid;
-        report(DEMAND_CODE[i], demand_unset, demand_invalid, DEMAND_SEV[i]);
+        report(missing_since_[i][0], DEMAND_CODE[i], demand_unset, demand_invalid, DEMAND_SEV[i]);
 
         // --- Enable: fail-safe — the bridge drives ONLY while an enable signal is configured, valid and
         //     asserted. Unconfigured (255) -> config level 1 + off; configured-but-invalid -> per-code sev + off;
@@ -200,7 +201,7 @@ void HBridge::update(const EnginePosition& /*pos*/, SignalBus& bus, EngineFrame&
         const SignalId esig = static_cast<SignalId>(bc.enable_sig);
         const bool enable_invalid = !enable_unset && !bus.valid(esig);
         const bool enable_fault = enable_unset || enable_invalid;
-        report(ENABLE_CODE[i], enable_unset, enable_invalid, ENABLE_SEV[i]);
+        report(missing_since_[i][1], ENABLE_CODE[i], enable_unset, enable_invalid, ENABLE_SEV[i]);
 
         const bool enabled = !enable_fault && bus.get(esig, 0.0f) >= 0.5f;
         if (demand_bad || !enabled) { apply_bridge(i, false, 0.0f); continue; }

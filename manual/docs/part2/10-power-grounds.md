@@ -114,7 +114,11 @@ There is no separate ignition-sense pin. The ECU decides the key is on from the 
 measures on CN4-9, with hysteresis:
 
 - the key turns **on** when the measured battery voltage rises **above 8.0 V**;
-- once on, it turns **off** only when the voltage falls to **7.0 V or below**.
+- once on, it turns **off** only when the voltage stays at **7.0 V or below for 100 ms**.
+
+A shorter dip, such as a loose battery terminal losing contact over a bump, does not turn the key off.
+The ECU keeps running through it and writes a line to its log saying how low the voltage went and for
+how long.
 
 The result is published as the channel **Key On** `key_on`, 1 for on and 0 for off.
 <!-- src: firmware/Sensors/Sensors.h; firmware/Sensors/Sensors.cpp; definition/ecu.schema.yaml -->
@@ -155,7 +159,7 @@ stops and changes nothing (chapter 46).
 <!-- src: apps/studio-jf/src/app/FirmwareUpgrade.cpp -->
 
 !!! warning "The key turns off at 7.0 V, even while cranking"
-    If the voltage at CN4-9 drops to 7.0 V or below during cranking, the ECU treats the key as off.
+    If the voltage at CN4-9 stays at 7.0 V or below for 100 ms during cranking, the ECU treats the key as off.
     It stops scheduling fuel and spark and drops sync, and it does not turn back on until the
     voltage rises above 8.0 V. A weak battery, a long thin feed wire or a poor ground can do this.
     Measure CN4-9 while cranking if an engine cranks but will not fire.

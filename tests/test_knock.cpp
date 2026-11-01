@@ -565,6 +565,8 @@ int main() {
         for (int t = 0; t < 9; ++t) { g_stub_tick_ms += 100; k.update(pos, bus, frame); }
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) == 0);       // a second of it first
         g_stub_tick_ms += 100; k.update(pos, bus, frame);
+        CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) == 0);       // ...then missing has to HOLD (100 ms)
+        g_stub_tick_ms += 100; k.update(pos, bus, frame);
         CHECK(dtc.code_severity(ModuleDtc::KNOCK_1) != 0);
 
         // Opt-in QUIET check: present, but reading like an unplugged input.

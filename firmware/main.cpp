@@ -828,7 +828,23 @@ static void cmd_pg(const Cli::Argv& a, Cli::Out& o) {
     if (s && !strcmp(s, "ok"))    v =  1;
     if (s && !strcmp(s, "fault")) v = -1;
     if (s && !strcmp(s, "auto"))  v =  0;
-    if (k < 0 || v == 2) { o.put("usage: pg 1|2 ok|fault|auto\r\n"); return; }
+    // No arguments: READ, not force. The raw power-good pins, the battery straight off its divider and
+    // the key, whatever the key state -- update_supplies() only reads the pins with the key on, so the
+    // published sensor_supply channels cannot say what the supplies do on USB power or at key-off.
+    if (!n) {
+        const float vbat = static_cast<float>(platform_read_ain_raw(BOARD_BATTERY_AIN_INDEX))
+                         * (BOARD_ADC_VREF_V / BOARD_BATTERY_DIVIDER) / static_cast<float>(BOARD_ADC_FULL_SCALE);
+        extern bool g_system_active;
+        o.put("pg1="); o.print_u32(platform_read_power_good(0) ? 1 : 0);
+        o.put(" pg2="); o.print_u32(platform_read_power_good(1) ? 1 : 0);
+        o.put(" vbat_mv="); o.print_u32(static_cast<uint32_t>(vbat * 1000.0f));
+        o.put(" key="); o.print_u32(g_system_active ? 1 : 0);
+        o.put(" override1="); o.print_u32(static_cast<uint32_t>(g_pg_override[0] + 1));
+        o.put(" override2="); o.print_u32(static_cast<uint32_t>(g_pg_override[1] + 1));
+        o.put("  (override 0=fault 1=auto 2=ok)\r\n");
+        return;
+    }
+    if (k < 0 || v == 2) { o.put("usage: pg [1|2 ok|fault|auto]  (no args: read the pins)\r\n"); return; }
     g_pg_override[k] = v;
     o.put("5V sensor "); o.put(k ? "2" : "1");
     o.put(v > 0 ? " power-good forced OK\r\n" : v < 0 ? " power-good forced FAULT\r\n" : " power-good = auto (pin)\r\n");
@@ -982,7 +998,7 @@ static const Cli::Command kBenchCmds[] = {
     { "key", Cli::Args::S, cmd_key,
       "key on|off|auto -> override the SD-ownership key (bench USB-MSC handoff); auto = battery voltage" },
     { "pg", Cli::Args::SS, cmd_pg,
-      "pg 1|2 ok|fault|auto -> force a 5 V sensor reference's power-good (simulate a failed follower); auto = the pin" },
+      "pg [1|2 ok|fault|auto] -> no args: read both power-good pins, battery and key; with args: force a 5 V reference's power-good (auto = the pin)" },
     { "faults", Cli::Args::NONE, cmd_faults,
       "faults -> DTC table active/stored counts + RAM fault-log entry count" },
 };

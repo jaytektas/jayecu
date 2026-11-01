@@ -509,6 +509,51 @@ int main() {
         }
         CHECK(!cut_running);
         CHECK(static_cast<int>(bus2.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_READY);
+
+        // 5 -- THE SAME RESTART AS IT REALLY HAPPENS: the decoder has no sync for the first revolutions, so
+        //      engine_state reads STOPPED while the teeth are already arriving. Judged on engine_state alone
+        //      that was a stopped engine: the plate was swept at road speed, fuel and spark cut for 540 ms,
+        //      and the throttle left dead (UNCAL) for the rest of the drive once sync arrived.
+        //      Never sweep while it turns; once it runs, the passive check gives it the throttle; the sweep
+        //      is owed and runs at the next stop.
+        {
+            ElectronicThrottle tc3; tc3.set_dtc(&dtc);
+            tc3.init(cfg);
+            SignalBus bus3;
+            uint32_t teeth = 0;
+            bool swept_turning = false, cut_while_running = false;
+            int running_frames = 0;
+            auto rolling = [&](float st) {
+                bus3.set(SIG_TPS, g_plate, true, g_ms); bus3.set(SIG_AUX_1, g_plate, true, g_ms);
+                bus3.set_u32(SIG_TRIGGER_TEETH, teeth += 20, true, g_ms);   // the wheel is turning
+                bus3.set(SIG_ENGINE_STATE, st, true, g_ms);
+                bus3.expire_stale(g_ms);
+                run(tc3, bus3, 10); plant_step(bus3.get(SIG_ETB_DUTY_1));
+                if (static_cast<int>(bus3.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_AUTOCAL) swept_turning = true;
+                // The start interlock's cut from the unsynced frames (nothing fires without sync anyway) is
+                // allowed to expire on the first running frame; from then on, never.
+                if (st == 2.0f && ++running_frames > 1 && bus3.valid(SIG_IGN_CUT) && bus3.get_bool(SIG_IGN_CUT))
+                    cut_while_running = true;
+            };
+            for (int i = 0; i < 3;   i++) rolling(0.0f);    // 30 ms turning, no sync yet
+            for (int i = 0; i < 200; i++) rolling(2.0f);    // synced, running: 2 s of driving
+            CHECK(!swept_turning);                          // the plate was never driven to a stop
+            CHECK(!cut_while_running);                      // and the running engine never cut
+            CHECK(static_cast<int>(bus3.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_READY);
+
+            // The engine stops: once the teeth have been quiet, the owed sweep runs and passes.
+            bool swept_at_rest = false;
+            for (int i = 0; i < 600; i++) {
+                bus3.set(SIG_TPS, g_plate, true, g_ms); bus3.set(SIG_AUX_1, g_plate, true, g_ms);
+                bus3.set(SIG_ENGINE_STATE, 0.0f, true, g_ms);
+                bus3.expire_stale(g_ms);
+                run(tc3, bus3, 10); plant_step(bus3.get(SIG_ETB_DUTY_1));
+                if (static_cast<int>(bus3.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_AUTOCAL) swept_at_rest = true;
+                if (swept_at_rest && static_cast<int>(bus3.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_READY) break;
+            }
+            CHECK(swept_at_rest);
+            CHECK(static_cast<int>(bus3.get(SIG_ETB_STATE_1)) == ElectronicThrottle::ST_READY);
+        }
     }
 
     SECTION("the start sequence holds a press until the key-on check has passed, then asks for the crank");

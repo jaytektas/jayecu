@@ -33,6 +33,8 @@ static constexpr float    SWEEP_STOP_TOL_PCT  = 10.0f;
 // How long fuel/spark stay inhibited after a plate-driving routine ends — long enough for the
 // de-energised plate to spring back to its limp-home rest before the engine may fire.
 static constexpr uint32_t SWEEP_CUT_HOLD_MS   = 500;
+// A tooth within this long = the engine is turning, synced or not. The same test as the status LED.
+static constexpr uint32_t TURNING_MS          = 500;
 static const SignalId STATE_SIG[] = { SIG_ETB_STATE_1,    SIG_ETB_STATE_2 };
 static_assert(sizeof(POS_SIG) / sizeof(POS_SIG[0]) >= ELECTRONIC_THROTTLE_ETB_COUNT,
               "per-ETB signal table smaller than ELECTRONIC_THROTTLE_ETB_COUNT");
@@ -833,7 +835,15 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
 
     const auto engine_state = static_cast<EngineRunState>(
         static_cast<int>(bus.get(wk::engine_state, 0.0f)));
-    const bool engine_stopped = (engine_state == EngineRunState::STOPPED);
+    // AT REST, NOT MERELY "STOPPED". engine_state reads STOPPED whenever the decoder has no sync, and
+    // that includes the first revolutions after an ECU restart under a car still moving: power back
+    // mid-drive, teeth arriving, no sync yet. Judged on engine_state alone, that read as a stopped
+    // engine and the key-on check swept the plate at road speed, then aborted when sync came and left
+    // the throttle dead for the rest of the drive. Teeth arriving are a turning engine, synced or not:
+    // nothing drives the plate to a stop until they have been quiet for TURNING_MS.
+    const bool turning = bus.valid(wk::trigger_teeth) &&
+                         bus.age_ms(wk::trigger_teeth, now) < TURNING_MS;
+    const bool engine_stopped = (engine_state == EngineRunState::STOPPED) && !turning;
     engine_stopped_ = engine_stopped;          // for the command entry points (see the header)
 
     // THE ENGINE IS HELD DISABLED WHILE ANY ROUTINE DRIVES THE PLATE. These sweeps take the throttle to
@@ -1000,8 +1010,17 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
                     } else if (engine_state == EngineRunState::RUNNING) {
                         // THE ENGINE IS ALREADY RUNNING: the ECU has restarted under it (a supply dip on
                         // the move). Take the passive result -- a running engine is worse off with a dead
-                        // throttle than with an unswept one, and this is not a START to refuse.
+                        // throttle than with an unswept one, and this is not a START to refuse. The sweep
+                        // is still owed: it runs at the next stop, when nothing is turning.
                         calibrated_[i] = true;
+                        verify_interrupted_[i] = true;
+                        g_text_log.printf("ETB%u key-on verify OK with the engine running: passive check "
+                                          "only, the sweep runs at the next stop\n", i);
+                    } else if (engine_state == EngineRunState::STOPPED) {
+                        // TURNING WITHOUT SYNC: teeth are arriving but the decoder has not locked yet.
+                        // Neither a sweep (it is turning) nor a start to refuse yet (it may be a car
+                        // rolling with the ECU just back). Ask again next frame; sync decides.
+                        cal_pending_[i] = true;
                     } else if (!engine_stopped) {
                         // CRANKING. Never sweep a turning engine, and never let it start on a throttle that
                         // has not passed: the start interlock below holds fuel and spark, and the check
@@ -1048,6 +1067,20 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
         if (!armed) manual_until_ms_[i] = 0;
         bool dis;
         bool ran_loop = false;                              // closed_loop() ran this frame (D-term continuity)
+        // INTERRUPTED, AND NOW RUNNING: the check was cut short while the engine turned up without sync, and
+        // it has caught -- with fuel and spark held off by the start interlock, which leaves a car rolling
+        // with the ECU just back. Same answer as a restart found running: the passive check, the sweep at
+        // the next stop.
+        if (verify_interrupted_[i] && !calibrated_[i] && !fault_latched_[i] && !cal_pending_[i] &&
+            engine_state == EngineRunState::RUNNING && have_pos && matched && feedback_calibrated(e)) {
+            const bool in_span = (out_pos > -5.0f && out_pos < 105.0f);
+            if (in_span) {
+                calibrated_[i] = true;
+                g_text_log.printf("ETB%u key-on check resumed with the engine running: passive check "
+                                  "only, the sweep runs at the next stop\n", i);
+            }
+        }
+
         if (ac_phase_[i] != AC_OFF) {                       // autocal/fillff/autotune owns the ETB while running
             if (!engine_stopped) {
                 ac_phase_[i] = AC_OFF; duty_cmd_[i] = 0.0f; dis = true;
@@ -1060,8 +1093,8 @@ void ElectronicThrottle::update(const EnginePosition& /*pos*/, SignalBus& bus, E
                 if (ac_verify_[i]) {
                     ac_verify_[i] = false;
                     verify_interrupted_[i] = true;
-                    g_text_log.printf("ETB%u key-on check interrupted by cranking - engine held off; "
-                                      "it reruns when the engine stops\n", i);
+                    g_text_log.printf("ETB%u key-on check interrupted - the engine turned; held off "
+                                      "until it runs or stops\n", i);
                 }
             }
             else if (ac_phase_[i] == AT_CHECK || ac_phase_[i] == AT_SETTLE || ac_phase_[i] == AT_RELAY)
