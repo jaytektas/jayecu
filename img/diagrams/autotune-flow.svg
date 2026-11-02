@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 330" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>How Auto Tune turns readings into a proposal</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="30" width="190" height="110" rx="6" class="box"/>
+  <text x="115" y="56" text-anchor="middle" class="fg head">A reading</text>
+  <text x="115" y="80" text-anchor="middle" class="mono fg">lambda_1</text>
+  <text x="115" y="100" text-anchor="middle" class="mono fg">lambda_target</text>
+  <text x="115" y="120" text-anchor="middle" class="mono fg">trims, rpm, load</text>
+
+  <rect x="240" y="30" width="200" height="110" rx="6" class="tgt"/>
+  <text x="340" y="56" text-anchor="middle" class="fg head">Where was the gas made?</text>
+  <text x="340" y="80" text-anchor="middle" class="fg">credited back by the</text>
+  <text x="340" y="100" text-anchor="middle" class="fg">sensor's delay, to the</text>
+  <text x="340" y="120" text-anchor="middle" class="fg">cells the engine was in then</text>
+
+  <rect x="470" y="30" width="190" height="110" rx="6" class="safe"/>
+  <text x="565" y="56" text-anchor="middle" class="fg head">Reject when …</text>
+  <text x="565" y="80" text-anchor="middle" class="fg">fuel cut, cold, idle,</text>
+  <text x="565" y="100" text-anchor="middle" class="fg">a tip-in, low battery</text>
+  <text x="565" y="120" text-anchor="middle" class="muted">judged at that moment too</text>
+
+  <rect x="690" y="30" width="190" height="110" rx="6" class="ff"/>
+  <text x="785" y="56" text-anchor="middle" class="fg head">Error of the table</text>
+  <text x="785" y="80" text-anchor="middle" class="fg">measured ÷ target</text>
+  <text x="785" y="100" text-anchor="middle" class="fg">× the trims it was</text>
+  <text x="785" y="120" text-anchor="middle" class="fg">getting at the time</text>
+
+  <rect x="910" y="30" width="170" height="110" rx="6" class="box"/>
+  <text x="995" y="56" text-anchor="middle" class="fg head">Shared out</text>
+  <text x="995" y="80" text-anchor="middle" class="fg">over the (up to)</text>
+  <text x="995" y="100" text-anchor="middle" class="fg">four cells around it,</text>
+  <text x="995" y="120" text-anchor="middle" class="fg">by how close it was</text>
+
+  <path d="M210 85 H238" class="line" marker-end="url(#a)"/>
+  <path d="M440 85 H468" class="line" marker-end="url(#a)"/>
+  <path d="M660 85 H688" class="line" marker-end="url(#a)"/>
+  <path d="M880 85 H908" class="line" marker-end="url(#a)"/>
+  <path d="M995 140 V180 H785 V198" class="line" marker-end="url(#a)"/>
+
+  <rect x="580" y="200" width="410" height="110" rx="6" class="pid"/>
+  <text x="785" y="226" text-anchor="middle" class="fg head">Each cell's proposal</text>
+  <text x="785" y="250" text-anchor="middle" class="fg">the average error of its readings, × how sure it is</text>
+  <text x="785" y="270" text-anchor="middle" class="fg">(its weight against the Resistance: Easy 1, Normal 4, Hard 12)</text>
+  <text x="785" y="290" text-anchor="middle" class="fg">limited by Max change % and Max change</text>
+
+  <path d="M580 255 H452" class="line" marker-end="url(#a)"/>
+  <rect x="240" y="200" width="210" height="110" rx="6" class="tgt"/>
+  <text x="345" y="226" text-anchor="middle" class="fg head">Apply</text>
+  <text x="345" y="250" text-anchor="middle" class="fg">VE × (1 + change %)</text>
+  <text x="345" y="270" text-anchor="middle" class="fg">one Undo; evidence cleared</text>
+  <text x="345" y="290" text-anchor="middle" class="fg">then Burn to keep it</text>
+</svg>

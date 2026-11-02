@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 360" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>ECU start-up</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="26" class="muted">Stored copies of the tune</text>
+  <rect x="20" y="40"  width="170" height="44" rx="6" class="box"/><text x="105" y="67"  text-anchor="middle" class="fg">Flash bank A</text>
+  <rect x="20" y="96"  width="170" height="44" rx="6" class="box"/><text x="105" y="123" text-anchor="middle" class="fg">Flash bank B</text>
+  <rect x="20" y="152" width="170" height="44" rx="6" class="box"/><text x="105" y="179" text-anchor="middle" class="fg">SD card</text>
+  <path d="M190 62 H238"  class="line" marker-end="url(#a)"/>
+  <path d="M190 118 H238" class="line" marker-end="url(#a)"/>
+  <path d="M190 174 H238" class="line" marker-end="url(#a)"/>
+
+  <rect x="240" y="40" width="300" height="156" rx="6" class="tgt"/>
+  <text x="390" y="72" text-anchor="middle" class="fg head">Keep only copies that are</text>
+  <text x="390" y="98" text-anchor="middle" class="fg">undamaged (checksum), and</text>
+  <text x="390" y="122" text-anchor="middle" class="fg">made for this firmware (layout)</text>
+  <text x="390" y="156" text-anchor="middle" class="fg head">then take the newest</text>
+  <text x="390" y="180" text-anchor="middle" class="muted">a newer SD copy is written to flash</text>
+
+  <path d="M540 90 H598" class="line" marker-end="url(#a)"/>
+  <text x="569" y="80" text-anchor="middle" class="muted">found</text>
+  <rect x="600" y="40" width="220" height="100" rx="6" class="pid"/>
+  <text x="710" y="68" text-anchor="middle" class="fg head">Normal start</text>
+  <text x="710" y="94" text-anchor="middle" class="fg">tune loaded, learned</text>
+  <text x="710" y="116" text-anchor="middle" class="fg">values loaded from SD</text>
+  <path d="M820 90 H868" class="line" marker-end="url(#a)"/>
+  <rect x="870" y="40" width="210" height="100" rx="6" class="box"/>
+  <text x="975" y="68" text-anchor="middle" class="fg head">Runs the engine</text>
+  <text x="975" y="94" text-anchor="middle" class="fg">once it sees 12 V</text>
+  <text x="975" y="116" text-anchor="middle" class="muted">(key on, chapter 10)</text>
+
+  <path d="M390 196 V250 H598" class="line" marker-end="url(#a)"/>
+  <text x="480" y="240" text-anchor="middle" class="muted">none</text>
+  <rect x="600" y="210" width="480" height="120" rx="6" class="safe"/>
+  <text x="840" y="238" text-anchor="middle" class="fg head">No tune: the engine side stays off</text>
+  <text x="840" y="264" text-anchor="middle" class="fg">no trigger, fuel, spark or outputs; the ERR LED is lit</text>
+  <text x="840" y="288" text-anchor="middle" class="fg">USB and the studio still work: connect, send a tune,</text>
+  <text x="840" y="312" text-anchor="middle" class="fg">burn it, and restart</text>
+</svg>

@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Anatomy of a good open-barrel crimp, and three faults to reject</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .metal { fill: #d9dde3; stroke: #5f6670; stroke-width: 2; }
+    .ins  { fill: #e1912d; stroke: #5f6670; stroke-width: 2; }
+    .cu   { fill: #c9814a; stroke: #8a5a2b; stroke-width: 1; }
+    .ok   { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .bad  { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .call { fill: #3b82c4; }
+    .callt { fill: #ffffff; font-weight: 600; font-size: 13px; }
+    .lead { stroke: #3b82c4; stroke-width: 1.5; fill: none; }
+    .redx { stroke: #c8412d; stroke-width: 2.5; fill: none; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .metal { fill: #4a4f58; stroke: #9aa1ab; }
+      .ok { fill: #13291a; } .bad { fill: #361512; }
+    }
+  </style>
+
+  <text x="20" y="28" class="muted head">A good crimp, side view</text>
+
+  <!-- contact end -->
+  <rect x="40" y="90" width="230" height="44" rx="4" class="metal"/>
+  <text x="155" y="112" text-anchor="middle" class="fg">contact</text>
+  <text x="155" y="127" text-anchor="middle" class="muted small">mates with the header pin</text>
+  <path d="M270 96 L310 104 L310 120 L270 128 Z" class="metal"/>
+  <!-- strands: they show in front of the conductor crimp and in the gap behind it -->
+  <rect x="298" y="106" width="202" height="12" class="cu"/>
+  <rect x="310" y="96" width="150" height="32" class="metal"/>
+  <path d="M460 96 L474 90 L474 134 L460 128 Z" class="metal"/>
+  <text x="385" y="117" text-anchor="middle" class="fg">conductor crimp</text>
+  <rect x="500" y="100" width="520" height="24" class="ins"/>
+  <rect x="520" y="92" width="120" height="40" class="metal"/>
+  <text x="580" y="110" text-anchor="middle" class="fg small">insulation</text>
+  <text x="580" y="125" text-anchor="middle" class="fg small">crimp</text>
+  <text x="830" y="117" text-anchor="middle" class="fg">wire (insulated)</text>
+
+  <!-- markers -->
+  <path d="M302 106 L302 62" class="lead"/><circle cx="302" cy="50" r="12" class="call"/><text x="302" y="55" text-anchor="middle" class="callt">1</text>
+  <path d="M385 128 L385 158" class="lead"/><circle cx="385" cy="170" r="12" class="call"/><text x="385" y="175" text-anchor="middle" class="callt">2</text>
+  <path d="M470 90 L470 62" class="lead"/><circle cx="470" cy="50" r="12" class="call"/><text x="470" y="55" text-anchor="middle" class="callt">3</text>
+  <path d="M488 118 L488 158" class="lead"/><circle cx="488" cy="170" r="12" class="call"/><text x="488" y="175" text-anchor="middle" class="callt">4</text>
+  <path d="M580 132 L580 158" class="lead"/><circle cx="580" cy="170" r="12" class="call"/><text x="580" y="175" text-anchor="middle" class="callt">5</text>
+
+  <!-- legend -->
+  <circle cx="52" cy="212" r="10" class="call"/><text x="52" y="217" text-anchor="middle" class="callt">1</text>
+  <text x="70" y="217" class="fg small">Strands just show in front of the conductor crimp: the conductor went all the way in.</text>
+  <circle cx="52" cy="238" r="10" class="call"/><text x="52" y="243" text-anchor="middle" class="callt">2</text>
+  <text x="70" y="243" class="fg small">Every strand is inside the conductor crimp. None bent back, no insulation under it.</text>
+  <circle cx="52" cy="264" r="10" class="call"/><text x="52" y="269" text-anchor="middle" class="callt">3</text>
+  <text x="70" y="269" class="fg small">A small bellmouth: the back edge of the barrel flares, so it does not cut the strands.</text>
+  <circle cx="570" cy="212" r="10" class="call"/><text x="570" y="217" text-anchor="middle" class="callt">4</text>
+  <text x="588" y="217" class="fg small">A short gap where strands and insulation both show.</text>
+  <circle cx="570" cy="238" r="10" class="call"/><text x="570" y="243" text-anchor="middle" class="callt">5</text>
+  <text x="588" y="243" class="fg small">The insulation crimp grips the insulation, not the strands.</text>
+
+  <!-- ===== faults ===== -->
+  <text x="20" y="318" class="muted head">Reject and redo</text>
+
+  <rect x="20" y="332" width="330" height="120" rx="6" class="bad"/>
+  <rect x="40" y="378" width="110" height="26" class="metal"/>
+  <rect x="150" y="384" width="180" height="14" class="ins"/>
+  <path d="M60 378 L52 356 M80 378 L86 354 M100 404 L94 428" stroke="#c9814a" stroke-width="2" fill="none"/>
+  <text x="185" y="362" text-anchor="middle" class="fg small">stray strands outside the barrel</text>
+  <text x="185" y="440" text-anchor="middle" class="muted small">can short to the next terminal</text>
+
+  <rect x="365" y="332" width="330" height="120" rx="6" class="bad"/>
+  <rect x="385" y="378" width="110" height="26" class="metal"/>
+  <rect x="405" y="384" width="270" height="14" class="ins"/>
+  <path d="M405 372 V410" class="redx"/>
+  <text x="530" y="362" text-anchor="middle" class="fg small">insulation under the conductor crimp</text>
+  <text x="530" y="440" text-anchor="middle" class="muted small">no metal contact: works, then fails hot</text>
+
+  <rect x="710" y="332" width="330" height="120" rx="6" class="bad"/>
+  <rect x="730" y="378" width="110" height="26" class="metal"/>
+  <rect x="805" y="386" width="30" height="10" class="cu"/>
+  <rect x="835" y="384" width="185" height="14" class="ins"/>
+  <path d="M780 372 V410" class="redx"/>
+  <text x="875" y="362" text-anchor="middle" class="fg small">conductor stops short of the barrel end</text>
+  <text x="875" y="440" text-anchor="middle" class="muted small">half a crimp: pulls out under vibration</text>
+</svg>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 500" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The ECU's power states: no power, key off on USB, key on</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- no power -->
+  <rect x="20" y="150" width="200" height="70" rx="8" class="box"/>
+  <text x="120" y="180" text-anchor="middle" class="fg head">No power</text>
+  <text x="120" y="202" text-anchor="middle" class="muted">no USB, no 12 V</text>
+
+  <!-- key off, USB only -->
+  <rect x="330" y="30" width="340" height="300" rx="8" class="tgt"/>
+  <text x="500" y="58" text-anchor="middle" class="fg head">Key off — USB only</text>
+  <text x="500" y="78" text-anchor="middle" class="mono muted">key_on = 0</text>
+  <text x="350" y="108" class="fg head">Runs</text>
+  <text x="350" y="130" class="fg">· the link to the studio</text>
+  <text x="350" y="152" class="fg">· the battery reading, nothing else</text>
+  <text x="350" y="174" class="fg">· the SD card, offered to the PC</text>
+  <text x="350" y="196" class="fg">· firmware updates</text>
+  <text x="350" y="228" class="fg head">Held off</text>
+  <text x="350" y="250" class="fg">· every other sensor (reads blank)</text>
+  <text x="350" y="272" class="fg">· trigger decoding, fuel and spark</text>
+  <text x="350" y="294" class="fg">· outputs released, not driven</text>
+  <text x="350" y="316" class="fg">· bench calibrations</text>
+
+  <!-- key on -->
+  <rect x="780" y="30" width="300" height="300" rx="8" class="ff"/>
+  <text x="930" y="58" text-anchor="middle" class="fg head">Key on</text>
+  <text x="930" y="78" text-anchor="middle" class="mono muted">key_on = 1</text>
+  <text x="800" y="108" class="fg head">Runs</text>
+  <text x="800" y="130" class="fg">· every enabled sensor</text>
+  <text x="800" y="152" class="fg">· 5 V supply checks</text>
+  <text x="800" y="174" class="fg">· trigger decoding</text>
+  <text x="800" y="196" class="fg">· fuel and spark</text>
+  <text x="800" y="218" class="fg">· outputs driven</text>
+  <text x="800" y="240" class="fg">· the SD card, owned by the ECU</text>
+
+  <!-- transitions -->
+  <path d="M220 170 H328" class="line" marker-end="url(#a)"/>
+  <text x="274" y="160" text-anchor="middle" class="muted">USB in</text>
+
+  <path d="M670 110 H778" class="line" marker-end="url(#a)"/>
+  <text x="724" y="90" text-anchor="middle" class="muted">CN4-9</text>
+  <text x="724" y="104" text-anchor="middle" class="muted">above 8.0 V</text>
+  <path d="M778 250 H672" class="line" marker-end="url(#a)"/>
+  <text x="724" y="270" text-anchor="middle" class="muted">CN4-9</text>
+  <text x="724" y="286" text-anchor="middle" class="muted">7.0 V or less</text>
+
+  <path d="M120 220 V420 H930 V332" class="line" marker-end="url(#a)"/>
+  <text x="525" y="412" text-anchor="middle" class="muted">12 V on CN4-9 alone powers the whole ECU: above 8.0 V it goes straight to key on</text>
+
+  <path d="M990 332 V460 H60 V222" class="line" marker-end="url(#a)"/>
+  <text x="525" y="480" text-anchor="middle" class="muted">12 V lost with no USB connected: the ECU simply loses power — there is no power hold</text>
+</svg>

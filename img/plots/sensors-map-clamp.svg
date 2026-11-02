@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>A two-point MAP calibration and its raw checks</title>
+  <style>
+    .fg { fill: #1d1f23; } .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .l0 { stroke: #3b82c4; stroke-width: 3; fill: none; }
+    .l1 { stroke: #d9822b; stroke-width: 3; fill: none; }
+    .l2 { stroke: #2e9d4f; stroke-width: 3; fill: none; }
+    .l3 { stroke: #8a5cc2; stroke-width: 3; fill: none; stroke-dasharray: 9 5; }
+    .flat { stroke: #3b82c4; stroke-width: 3; fill: none; stroke-dasharray: 3 5; }
+    .bad { fill: #fbeaea; } .trip { stroke: #c8412d; stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+    .dot { fill: #3b82c4; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; } .grid { stroke: #2c3038; }
+      .bad { fill: #361512; }
+    }
+  </style>
+
+  <rect x="90" y="60" width="30.0" height="340" class="bad"/>
+  <rect x="660.0" y="60" width="30.0" height="340" class="bad"/>
+  <line x1="90" y1="346.9" x2="690" y2="346.9" class="grid"/>
+  <text x="80" y="351.9" text-anchor="end" class="muted">50</text>
+  <line x1="90" y1="293.8" x2="690" y2="293.8" class="grid"/>
+  <text x="80" y="298.8" text-anchor="end" class="muted">100</text>
+  <line x1="90" y1="240.6" x2="690" y2="240.6" class="grid"/>
+  <text x="80" y="245.6" text-anchor="end" class="muted">150</text>
+  <line x1="90" y1="187.5" x2="690" y2="187.5" class="grid"/>
+  <text x="80" y="192.5" text-anchor="end" class="muted">200</text>
+  <line x1="90" y1="134.4" x2="690" y2="134.4" class="grid"/>
+  <text x="80" y="139.4" text-anchor="end" class="muted">250</text>
+  <line x1="90" y1="81.2" x2="690" y2="81.2" class="grid"/>
+  <text x="80" y="86.2" text-anchor="end" class="muted">300</text>
+  <text x="90.0" y="422" text-anchor="middle" class="muted">0 V</text>
+  <text x="210.0" y="422" text-anchor="middle" class="muted">1 V</text>
+  <text x="330.0" y="422" text-anchor="middle" class="muted">2 V</text>
+  <text x="450.0" y="422" text-anchor="middle" class="muted">3 V</text>
+  <text x="570.0" y="422" text-anchor="middle" class="muted">4 V</text>
+  <text x="690.0" y="422" text-anchor="middle" class="muted">5 V</text>
+  <path d="M90 60 V400 H690" class="axis"/>
+  <text x="30" y="40" class="muted">kPa</text>
+  <text x="390" y="450" text-anchor="middle" class="muted">sensor output at the ECU pin</text>
+  <path d="M90 389.4 H150.0" class="flat"/>
+  <path d="M630.0 81.2 H690" class="flat"/>
+  <path d="M150.0 389.4 L630.0 81.2" class="l0"/>
+  <circle cx="150.0" cy="389.4" r="6" class="dot"/>
+  <circle cx="630.0" cy="81.2" r="6" class="dot"/>
+  <line x1="120.0" y1="400" x2="120.0" y2="60" class="trip"/>
+  <line x1="660.0" y1="400" x2="660.0" y2="60" class="trip"/>
+  <text x="162.0" y="393.4" class="fg">0.5 V → 10 kPa</text>
+  <text x="618.0" y="69.2" text-anchor="end" class="fg">4.5 V → 300 kPa</text>
+  <path d="M720 90 h40" class="l0"/>
+  <text x="770" y="95" class="fg">The calibration: two points,</text>
+  <text x="770" y="114" class="muted">straight line between them</text>
+  <path d="M720 152 h40" class="flat"/>
+  <text x="770" y="157" class="fg">Outside the points the reading</text>
+  <text x="770" y="176" class="muted">holds the end value</text>
+  <path d="M720 214 h40" class="trip"/>
+  <text x="770" y="219" class="fg">Raw Low 0.25 V / Raw High 4.75 V</text>
+  <text x="770" y="238" class="muted">(the defaults), shaded beyond</text>
+  <text x="720" y="286" class="muted">A short to ground reads 0 V: the curve</text>
+  <text x="720" y="306" class="muted">alone would call that 10 kPa. Raw Low</text>
+  <text x="720" y="326" class="muted">calls it a fault: the channel goes invalid.</text>
+</svg>

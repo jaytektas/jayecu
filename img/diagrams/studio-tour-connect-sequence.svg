@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 760" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>What happens when you press Connect, step by step</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" class="muted head">The chip turns amber when the port opens, and green once the tune has been read (step 6).</text>
+
+  <!-- 1 -->
+  <rect x="20" y="46" width="470" height="72" rx="6" class="tgt"/>
+  <text x="40" y="72" class="fg head">1 · Find the ECU</text>
+  <text x="40" y="94" class="muted">The port named in Preferences, or the USB serial ports.</text>
+  <text x="40" y="112" class="muted">Several ECUs answer: you pick one.</text>
+  <path d="M490 82 H568" class="safeline" marker-end="url(#r)"/>
+  <rect x="570" y="46" width="470" height="72" rx="6" class="safe"/>
+  <text x="590" y="72" class="fg">“No ECU found on the bus”, “No serial ports found”:</text>
+  <text x="590" y="94" class="muted">the chip stays grey. A port that will not open:</text>
+  <text x="590" y="112" class="fg">“Link error: open …”, and the chip turns red</text>
+  <path d="M255 118 V140" class="line" marker-end="url(#a)"/>
+
+  <!-- 2 -->
+  <rect x="20" y="142" width="470" height="72" rx="6" class="tgt"/>
+  <text x="40" y="168" class="fg head">2 · Ask who it is</text>
+  <text x="40" y="190" class="muted">The ECU answers with its board, firmware version,</text>
+  <text x="40" y="208" class="muted">layout hash and serial number (uid).</text>
+  <path d="M490 178 H568" class="safeline" marker-end="url(#r)"/>
+  <rect x="570" y="142" width="470" height="72" rx="6" class="safe"/>
+  <text x="590" y="168" class="fg">“ECU did not identify (no reply)”</text>
+  <text x="590" y="190" class="muted">no answer to two tries, 2 s each;</text>
+  <text x="590" y="208" class="muted">the chip turns red</text>
+  <path d="M255 214 V236" class="line" marker-end="url(#a)"/>
+
+  <!-- 3 -->
+  <rect x="20" y="238" width="470" height="72" rx="6" class="box"/>
+  <text x="40" y="264" class="fg head">3 · Check its firmware</text>
+  <text x="40" y="286" class="muted">If the studio carries newer firmware for this board,</text>
+  <text x="40" y="304" class="muted">it shows what an update would change first.</text>
+  <path d="M490 274 H568" class="line" marker-end="url(#a)"/>
+  <rect x="570" y="238" width="470" height="72" rx="6" class="box"/>
+  <text x="590" y="264" class="fg">Not now: the connection carries on</text>
+  <text x="590" y="286" class="muted">Update: chapter 46</text>
+  <path d="M255 310 V332" class="line" marker-end="url(#a)"/>
+
+  <!-- 4 -->
+  <rect x="20" y="334" width="470" height="72" rx="6" class="box"/>
+  <text x="40" y="360" class="fg head">4 · Open this ECU's project</text>
+  <text x="40" y="382" class="muted">Its folder on this PC, keyed by uid: its pages,</text>
+  <text x="40" y="400" class="muted">navigation tree and the name of its tune.</text>
+  <path d="M490 370 H568" class="line" marker-end="url(#a)"/>
+  <rect x="570" y="334" width="470" height="72" rx="6" class="box"/>
+  <text x="590" y="360" class="fg">Unsaved layout open: Save / Discard / Cancel</text>
+  <text x="590" y="382" class="muted">No pages yet: the board's shipped layout,</text>
+  <text x="590" y="400" class="muted">or the one on the ECU's SD card</text>
+  <path d="M255 406 V428" class="line" marker-end="url(#a)"/>
+
+  <!-- 5 -->
+  <rect x="20" y="430" width="470" height="72" rx="6" class="box"/>
+  <text x="40" y="456" class="fg head">5 · Load its definition</text>
+  <text x="40" y="478" class="muted">The definition in the studio's library whose name</text>
+  <text x="40" y="496" class="muted">carries the ECU's layout hash.</text>
+  <path d="M490 466 H568" class="line" marker-end="url(#a)"/>
+  <rect x="570" y="430" width="470" height="72" rx="6" class="box"/>
+  <text x="590" y="456" class="fg">Not in the library: fetched from the SD card</text>
+  <text x="590" y="478" class="muted">(“Fetching schema”); failing that,</text>
+  <text x="590" y="496" class="muted">you are asked to choose one</text>
+  <path d="M255 502 V524" class="line" marker-end="url(#a)"/>
+
+  <!-- 6 -->
+  <rect x="20" y="526" width="470" height="72" rx="6" class="ff"/>
+  <text x="40" y="552" class="fg head">6 · Read the tune</text>
+  <text x="40" y="574" class="muted">The whole tune is read from the ECU. It becomes</text>
+  <text x="40" y="592" class="muted">the connect point, and the chip turns green.</text>
+  <path d="M255 598 V620" class="line" marker-end="url(#a)"/>
+
+  <!-- 7 -->
+  <rect x="20" y="622" width="470" height="72" rx="6" class="pid"/>
+  <text x="40" y="648" class="fg head">7 · Compare it with your saved tune</text>
+  <text x="40" y="670" class="muted">None saved, or the same: carry on.</text>
+  <text x="40" y="688" class="muted">Different: you choose which tune wins (Figure 5.4).</text>
+  <path d="M490 658 H568" class="line" marker-end="url(#a)"/>
+  <rect x="570" y="622" width="470" height="72" rx="6" class="pid"/>
+  <text x="590" y="648" class="fg head">Live</text>
+  <text x="590" y="670" class="muted">readings stream in; every edit goes</text>
+  <text x="590" y="688" class="muted">to the ECU at once</text>
+
+  <text x="20" y="740" class="muted">Blue: finding and naming the ECU. Grey: the studio's own preparation. Orange: read from the ECU. Green: the check, then live.</text>
+</svg>

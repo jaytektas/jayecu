@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 320" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Wiring a knock sensor</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1.5; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: none; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 8 5; }
+    .ecufill { fill: #f4f5f7; }
+    .part { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pin  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2.5; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2.5; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2.5; fill: none; }
+    .wout { stroke: #5f6670; stroke-width: 7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .shield { stroke: #8d939b; stroke-width: 2; fill: none; stroke-dasharray: 3 3; }
+    .node { fill: #5f6670; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .part { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { stroke: #9aa1ab; } .ecufill { fill: #1c1f25; }
+      .tgt, .pin { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .wout { stroke: #9aa1ab; } .node { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+  <text x="20" y="30" text-anchor="start" class="fg head">Knock sensor: two wires in a shielded, twisted pair</text>
+  <text x="20" y="50" text-anchor="start" class="muted small">a piezo element bolted to the block; it makes its own small AC signal</text>
+  <rect x="30" y="90" width="170" height="150" rx="8" class="box"/>
+  <text x="115" y="116" text-anchor="middle" class="fg head">Knock sensor</text>
+  <text x="115" y="134" text-anchor="middle" class="muted small">(bank 1)</text>
+  <text x="190" y="165" text-anchor="end" class="muted small">Signal</text>
+  <text x="190" y="215" text-anchor="end" class="muted small">Return</text>
+  <rect x="540" y="70" width="200" height="230" rx="8" class="ecufill"/>
+  <rect x="540" y="70" width="200" height="230" rx="8" class="ecu"/>
+  <text x="730" y="90" text-anchor="end" class="muted small">ECU</text>
+  <rect x="560" y="138" width="160" height="44" rx="4" class="pin"/>
+  <text x="640.0" y="157" text-anchor="middle" class="fg head mono">CN4-23</text>
+  <text x="640.0" y="174" text-anchor="middle" class="muted mono">KNOCK1</text>
+  <rect x="560" y="188" width="160" height="44" rx="4" class="pin"/>
+  <text x="640.0" y="207" text-anchor="middle" class="fg head mono">CN3-35</text>
+  <text x="640.0" y="224" text-anchor="middle" class="muted mono">Ground</text>
+  <rect x="560" y="240" width="160" height="44" rx="4" class="pin"/>
+  <text x="640.0" y="259" text-anchor="middle" class="fg head mono">CN3-12</text>
+  <text x="640.0" y="276" text-anchor="middle" class="muted mono">Ground</text>
+  <rect x="250" y="146" width="230" height="88" rx="34" class="shield"/>
+  <path d="M200 160 H560" class="wout"/>
+  <path d="M200 160 H560" stroke="#ec7fb5" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M200 160 H560" stroke="#1b1b1b" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="365" y="140" text-anchor="middle" class="muted small mono">Pk/B pink/black</text>
+  <path d="M200 210 H560" class="wout"/>
+  <path d="M200 210 H560" stroke="#1b1b1b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="365" y="200" text-anchor="middle" class="muted small mono">B black</text>
+  <path d="M470 234 V262 H560" class="dash"/>
+  <text x="360" y="262" text-anchor="middle" class="muted small">shield drain → ground, ECU end only</text>
+  <text x="250" y="300" text-anchor="start" class="muted small">Leave the shield unconnected at the sensor end.</text>
+  <rect x="770" y="90" width="210" height="150" rx="6" class="tgt"/>
+  <text x="875" y="116" text-anchor="middle" class="fg head">Second sensor</text>
+  <text x="875" y="140" text-anchor="middle" class="fg small">signal to KNOCK2,</text>
+  <text x="875" y="158" text-anchor="middle" class="fg small mono">CN4-22 (Pk/W pink/white)</text>
+  <text x="875" y="184" text-anchor="middle" class="muted small">Which input hears which</text>
+  <text x="875" y="202" text-anchor="middle" class="muted small">cylinder is set on the</text>
+  <text x="875" y="220" text-anchor="middle" class="muted small">Knock Control page.</text>
+</svg>

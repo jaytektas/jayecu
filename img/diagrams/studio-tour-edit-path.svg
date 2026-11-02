@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Where an edit goes: the studio's copy, ECU RAM, flash, the tune file and the connect point</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .pidline  { stroke: #2e9d4f; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+    <marker id="gm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2e9d4f"/>
+    </marker>
+  </defs>
+
+  <!-- ===== the main path: edit → studio copy → ECU RAM → flash ===== -->
+  <rect x="20" y="60" width="190" height="70" rx="6" class="tgt"/>
+  <text x="115" y="90" text-anchor="middle" class="fg head">Your edit</text>
+  <text x="115" y="112" text-anchor="middle" class="muted">a control on a page</text>
+
+  <rect x="260" y="60" width="210" height="70" rx="6" class="box"/>
+  <text x="365" y="90" text-anchor="middle" class="fg head">The studio's copy</text>
+  <text x="365" y="112" text-anchor="middle" class="muted">of the tune</text>
+
+  <rect x="560" y="60" width="210" height="70" rx="6" class="ff"/>
+  <text x="665" y="90" text-anchor="middle" class="fg head">ECU RAM</text>
+  <text x="665" y="112" text-anchor="middle" class="muted">the engine uses it at once</text>
+
+  <rect x="830" y="60" width="210" height="70" rx="6" class="ff"/>
+  <text x="935" y="90" text-anchor="middle" class="fg head">ECU flash</text>
+  <text x="935" y="112" text-anchor="middle" class="muted">survives power off</text>
+
+  <path d="M210 95 H258" class="line" marker-end="url(#a)"/>
+  <path d="M470 95 H558" class="line" marker-end="url(#a)"/>
+  <text x="515" y="84" text-anchor="middle" class="muted">at once</text>
+  <path d="M770 95 H828" class="line" marker-end="url(#a)"/>
+  <text x="800" y="84" text-anchor="middle" class="fg head">Burn</text>
+
+  <text x="20" y="36" class="muted head">An edit reaches the ECU straight away. It only survives a power cycle once you burn it.</text>
+
+  <!-- ===== Verify ===== -->
+  <rect x="440" y="196" width="250" height="84" rx="6" class="pid"/>
+  <text x="565" y="220" text-anchor="middle" class="fg head">Verify ↔ ECU</text>
+  <text x="565" y="241" text-anchor="middle" class="muted">reads ECU RAM back, compares,</text>
+  <text x="565" y="261" text-anchor="middle" class="muted">re-sends whatever differs</text>
+  <path d="M365 130 V238 H438" class="pidline" marker-start="url(#gm)"/>
+  <path d="M620 130 V194" class="pidline" marker-start="url(#gm)" marker-end="url(#gm)"/>
+
+  <!-- ===== power off before a burn ===== -->
+  <rect x="800" y="196" width="240" height="84" rx="6" class="safe"/>
+  <text x="920" y="220" text-anchor="middle" class="fg head">Power off or reset first</text>
+  <text x="920" y="241" text-anchor="middle" class="muted">RAM is lost: the ECU starts</text>
+  <text x="920" y="261" text-anchor="middle" class="muted">on the tune in flash</text>
+  <path d="M750 130 V238 H798" class="safeline" marker-end="url(#r)"/>
+
+  <!-- ===== tune file on the PC ===== -->
+  <rect x="150" y="330" width="300" height="100" rx="6" class="box"/>
+  <text x="300" y="354" text-anchor="middle" class="fg head">The tune file on this PC</text>
+  <text x="300" y="376" text-anchor="middle" class="mono muted">ecus/&lt;uid&gt;/tunes/&lt;name&gt;.tune</text>
+  <text x="300" y="397" text-anchor="middle" class="muted">written on Save Tune, disconnect,</text>
+  <text x="300" y="416" text-anchor="middle" class="muted">switching ECU and quitting</text>
+  <path d="M300 130 V328" class="line" marker-end="url(#a)"/>
+
+  <!-- ===== connect point ===== -->
+  <rect x="560" y="330" width="300" height="100" rx="6" class="box"/>
+  <text x="710" y="354" text-anchor="middle" class="fg head">Connect point</text>
+  <text x="710" y="376" text-anchor="middle" class="muted">the ECU's tune as it was at connect</text>
+  <text x="710" y="396" text-anchor="middle" class="mono muted">ecus/&lt;uid&gt;/restore/</text>
+  <text x="710" y="416" text-anchor="middle" class="muted">Edit ▸ Restore… sends it back</text>
+  <path d="M705 130 V328" class="line" marker-end="url(#a)"/>
+  <text x="714" y="306" class="muted">copied at connect</text>
+</svg>

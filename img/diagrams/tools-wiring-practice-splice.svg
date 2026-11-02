@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 430" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>A sealed splice, and splices staggered along a bundle</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .metal { fill: #d9dde3; stroke: #5f6670; stroke-width: 2; }
+    .cu   { fill: #c9814a; stroke: #8a5a2b; stroke-width: 1; }
+    .shrink { fill: #3b82c4; fill-opacity: 0.22; stroke: #3b82c4; stroke-width: 2; }
+    .glue { fill: #d9822b; fill-opacity: 0.55; }
+    .ok   { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .bad  { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .case { stroke: #5f6670; stroke-width: 9; fill: none; stroke-linecap: round; }
+    .wO { stroke: #e1912d; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .wR { stroke: #c83c37; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .wB { stroke: #282828; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .wG { stroke: #2da04b; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .sp { fill: #d9dde3; stroke: #5f6670; stroke-width: 2; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .metal, .sp { fill: #4a4f58; stroke: #9aa1ab; }
+      .ok { fill: #13291a; } .bad { fill: #361512; } .case { stroke: #9aa1ab; }
+    }
+  </style>
+
+  <text x="20" y="28" class="muted head">A sealed splice, cut away</text>
+  <!-- wires in -->
+  <path d="M40 90 H250" class="case"/><path d="M40 90 H250" class="wO"/>
+  <path d="M40 120 H250" class="case"/><path d="M40 120 H250" class="wO"/>
+  <path d="M600 105 H820" class="case"/><path d="M600 105 H820" class="wO"/>
+  <!-- stripped strands -->
+  <rect x="250" y="84" width="110" height="12" class="cu"/>
+  <rect x="250" y="114" width="110" height="12" class="cu"/>
+  <rect x="490" y="99" width="110" height="12" class="cu"/>
+  <!-- splice barrel -->
+  <rect x="300" y="72" width="250" height="66" rx="6" class="metal"/>
+  <text x="425" y="110" text-anchor="middle" class="fg">crimp splice barrel</text>
+  <!-- heat shrink with adhesive -->
+  <rect x="200" y="56" width="450" height="98" rx="20" class="shrink"/>
+  <rect x="205" y="138" width="440" height="10" rx="5" class="glue"/>
+  <text x="425" y="176" text-anchor="middle" class="fg">adhesive-lined heat-shrink, overlapping the insulation on both sides</text>
+  <text x="425" y="194" text-anchor="middle" class="muted small">the adhesive melts and seals the ends: no water wicks along the strands</text>
+
+  <!-- stagger -->
+  <text x="20" y="238" class="muted head">Stagger splices along a bundle</text>
+  <rect x="20" y="252" width="500" height="160" rx="6" class="ok"/>
+  <path d="M40 300 H500" class="case"/><path d="M40 300 H500" class="wO"/>
+  <path d="M40 330 H500" class="case"/><path d="M40 330 H500" class="wR"/>
+  <path d="M40 360 H500" class="case"/><path d="M40 360 H500" class="wG"/>
+  <rect x="110" y="290" width="60" height="20" rx="6" class="sp"/>
+  <rect x="240" y="320" width="60" height="20" rx="6" class="sp"/>
+  <rect x="370" y="350" width="60" height="20" rx="6" class="sp"/>
+  <text x="270" y="278" text-anchor="middle" class="fg">staggered: the bundle stays slim and flexible</text>
+  <text x="270" y="396" text-anchor="middle" class="muted small">and one splice cannot rub through its neighbour</text>
+
+  <rect x="540" y="252" width="500" height="160" rx="6" class="bad"/>
+  <path d="M560 300 H1020" class="case"/><path d="M560 300 H1020" class="wO"/>
+  <path d="M560 330 H1020" class="case"/><path d="M560 330 H1020" class="wR"/>
+  <path d="M560 360 H1020" class="case"/><path d="M560 360 H1020" class="wG"/>
+  <rect x="760" y="290" width="60" height="20" rx="6" class="sp"/>
+  <rect x="760" y="320" width="60" height="20" rx="6" class="sp"/>
+  <rect x="760" y="350" width="60" height="20" rx="6" class="sp"/>
+  <text x="790" y="278" text-anchor="middle" class="fg">side by side: a hard lump</text>
+  <text x="790" y="396" text-anchor="middle" class="muted small">stiff, bulky, and the barrels chafe against each other</text>
+</svg>

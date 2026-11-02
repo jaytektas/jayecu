@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 480" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>How switches are read from an analog pin</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .trace { stroke: #1d1f23; stroke-width: 2.5; fill: none; }
+    .out  { stroke: #d9822b; stroke-width: 3; fill: none; }
+    .on   { stroke: #3b82c4; stroke-width: 2; fill: none; stroke-dasharray: 8 5; }
+    .off  { stroke: #3b82c4; stroke-width: 2; fill: none; stroke-dasharray: 3 4; }
+    .hyst { fill: #e8f1fb; }
+    .band { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .gap  { fill: #fbeaea; }
+    .rail { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; } .grid { stroke: #2c3038; }
+      .trace { stroke: #e4e6ea; } .hyst { fill: #16283b; } .band { fill: #16283b; } .gap { fill: #361512; }
+      .rail { fill: #20232a; stroke: #9aa1ab; }
+    }
+  </style>
+
+  <!-- ===== A · two trip points ===== -->
+  <text x="20" y="26" class="fg head">A · A switch on an analog pin: two trip points</text>
+  <!-- voltage panel: y 60..250 = 5..0 V -->
+  <rect x="70" y="117" width="430" height="46" class="hyst"/>
+  <line x1="70" y1="117" x2="500" y2="117" class="on"/>
+  <line x1="70" y1="163" x2="500" y2="163" class="off"/>
+  <path d="M70 60 V250 H500" class="axis"/>
+  <text x="62" y="64" text-anchor="end" class="muted">5 V</text>
+  <text x="62" y="254" text-anchor="end" class="muted">0 V</text>
+  <text x="496" y="110" text-anchor="end" class="fg">On point</text>
+  <text x="496" y="182" text-anchor="end" class="fg">Off point</text>
+  <!-- the pin: rises through the band with noise, then falls back through it -->
+  <path d="M70 230 L110 228 L130 200 L140 150 L146 132 L150 142 L156 128 L162 136 L170 108 L190 92
+           L250 90 L300 92 L320 110 L326 126 L332 118 L338 140 L344 132 L352 172 L372 214 L420 226 L500 228" class="trace"/>
+  <text x="200" y="84" class="fg">pin voltage</text>
+  <!-- output: y 290..330 -->
+  <text x="80" y="284" class="muted">reading</text>
+  <text x="62" y="304" text-anchor="end" class="muted">1</text>
+  <text x="62" y="344" text-anchor="end" class="muted">0</text>
+  <path d="M70 280 V350" class="axis"/>
+  <path d="M70 340 H170 V300 H352 V340 H500" class="out"/>
+  <line x1="170" y1="260" x2="170" y2="350" class="grid"/>
+  <line x1="352" y1="260" x2="352" y2="350" class="grid"/>
+  <text x="176" y="372" class="muted">on: rises past the On point</text>
+  <text x="358" y="392" class="muted">off: falls below Off</text>
+  <text x="20" y="420" class="muted">Off point = calibration raw point 1, On point = raw point 2. Between</text>
+  <text x="20" y="440" class="muted">them the reading keeps what it was, so a noisy pin cannot chatter.</text>
+  <text x="20" y="460" class="muted">Invert Signal flips the result.</text>
+
+  <!-- ===== B · voltage bands ===== -->
+  <text x="560" y="26" class="fg head">B · A multi-position switch: one band per position</text>
+  <!-- rail y 60..400 = 5..0 V : 68 px per volt -->
+  <rect x="600" y="60" width="70" height="340" class="rail"/>
+  <rect x="600" y="60" width="70" height="340" class="gap"/>
+  <rect x="600" y="87"  width="70" height="14" class="band"/>
+  <rect x="600" y="176" width="70" height="14" class="band"/>
+  <rect x="600" y="258" width="70" height="14" class="band"/>
+  <rect x="600" y="386" width="70" height="14" class="band"/>
+  <text x="590" y="64"  text-anchor="end" class="muted">5 V</text>
+  <text x="590" y="404" text-anchor="end" class="muted">0 V</text>
+  <text x="686" y="99"  class="fg">Position 0 · rest   4.40–4.60 V</text>
+  <text x="686" y="188" class="fg">Position 1   3.10–3.30 V</text>
+  <text x="686" y="270" class="fg">Position 2   1.90–2.10 V</text>
+  <text x="686" y="398" class="fg">Position 3   0.00–0.20 V (grounds the line)</text>
+  <text x="686" y="138" class="muted">gap: crossed on the way between positions</text>
+  <text x="686" y="230" class="muted">in a band for 40 ms → that position</text>
+  <text x="686" y="320" class="muted">in no band for 100 ms → invalid, and the</text>
+  <text x="686" y="340" class="muted">sensor's No Calibrated Band code</text>
+  <text x="560" y="440" class="muted">Capture centres a band ±0.1 V on the live reading,</text>
+  <text x="560" y="460" class="muted">kept 0.05 V clear of the bands either side.</text>
+</svg>

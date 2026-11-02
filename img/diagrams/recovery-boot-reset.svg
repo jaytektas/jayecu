@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 250" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Starting the USB bootloader</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .btn  { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .ok   { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .btn { fill: #33240f; } .ok { fill: #13291a; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="40" width="180" height="110" rx="6" class="box"/>
+  <text x="110" y="70" text-anchor="middle" class="fg head">1 · Case open</text>
+  <text x="110" y="94" text-anchor="middle" class="fg">USB connected</text>
+  <text x="110" y="116" text-anchor="middle" class="muted">(USB power is</text>
+  <text x="110" y="134" text-anchor="middle" class="muted">enough)</text>
+
+  <rect x="230" y="40" width="180" height="110" rx="6" class="btn"/>
+  <text x="320" y="70" text-anchor="middle" class="fg head">2 · Hold</text>
+  <text x="320" y="94" text-anchor="middle" class="fg">SW5 BOOT</text>
+
+  <rect x="440" y="40" width="180" height="110" rx="6" class="btn"/>
+  <text x="530" y="70" text-anchor="middle" class="fg head">3 · Press and release</text>
+  <text x="530" y="94" text-anchor="middle" class="fg">SW4 RESET</text>
+  <text x="530" y="116" text-anchor="middle" class="muted">still holding BOOT</text>
+
+  <rect x="650" y="40" width="180" height="110" rx="6" class="btn"/>
+  <text x="740" y="70" text-anchor="middle" class="fg head">4 · Let go</text>
+  <text x="740" y="94" text-anchor="middle" class="fg">of BOOT</text>
+
+  <rect x="860" y="40" width="220" height="110" rx="6" class="ok"/>
+  <text x="970" y="70" text-anchor="middle" class="fg head">5 · Connect</text>
+  <text x="970" y="94" text-anchor="middle" class="fg">the studio finds the</text>
+  <text x="970" y="116" text-anchor="middle" class="fg">bootloader and offers</text>
+  <text x="970" y="138" text-anchor="middle" class="fg">to install firmware</text>
+
+  <path d="M200 95 H228" class="line" marker-end="url(#a)"/>
+  <path d="M410 95 H438" class="line" marker-end="url(#a)"/>
+  <path d="M620 95 H648" class="line" marker-end="url(#a)"/>
+  <path d="M830 95 H858" class="line" marker-end="url(#a)"/>
+
+  <text x="550" y="200" text-anchor="middle" class="muted">The bootloader is built into the processor: no firmware or tune can damage it. Nothing on the board changes until</text>
+  <text x="550" y="222" text-anchor="middle" class="muted">you say Yes. To leave it without installing anything, press RESET alone.</text>
+</svg>

@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 560" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>jaytek_v1 output stages and how a load is wired to each</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .red  { stroke: #c8412d; stroke-width: 2.5; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pin  { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2.5; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .cpu  { fill: #f1f2f4; stroke: #1d1f23; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .ff, .pin { fill: #33240f; } .safe { fill: #361512; } .cpu { fill: #2a2d33; stroke: #e4e6ea; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <text x="20"  y="26" class="muted head">Processor</text>
+  <text x="200" y="26" class="muted head">Driver on the board</text>
+  <text x="470" y="26" class="muted head">Pin</text>
+  <text x="680" y="26" class="muted head">Outside the ECU</text>
+
+  <!-- A: IGN -->
+  <text x="20" y="56" class="muted head">A · Ignition  IGN1–IGN12</text>
+  <rect x="20" y="66" width="140" height="62" rx="6" class="cpu"/>
+  <text x="90" y="92" text-anchor="middle" class="fg">GPIO</text>
+  <text x="90" y="113" text-anchor="middle" class="muted">HIGH = dwell</text>
+  <rect x="200" y="66" width="230" height="62" rx="6" class="ff"/>
+  <text x="315" y="92" text-anchor="middle" class="fg">Gate driver IX4427</text>
+  <text x="315" y="113" text-anchor="middle" class="muted">5 V push-pull, 100 Ω out</text>
+  <rect x="470" y="66" width="170" height="62" rx="6" class="pin"/>
+  <text x="555" y="92" text-anchor="middle" class="fg head">CN2 24–35</text>
+  <text x="555" y="113" text-anchor="middle" class="fg mono">0 V / 5 V signal</text>
+  <rect x="680" y="66" width="420" height="62" rx="6" class="box"/>
+  <text x="890" y="92" text-anchor="middle" class="fg">Trigger input of a coil with a built-in igniter,</text>
+  <text x="890" y="113" text-anchor="middle" class="muted">or of a separate igniter module</text>
+  <path d="M160,97 H198" class="line" marker-end="url(#a)"/>
+  <path d="M430,97 H468" class="line" marker-end="url(#a)"/>
+  <path d="M640,97 H678" class="line" marker-end="url(#a)"/>
+
+  <!-- B: LS -->
+  <text x="20" y="166" class="muted head">B · Low-side  LS1–LS22</text>
+  <rect x="20" y="176" width="140" height="62" rx="6" class="cpu"/>
+  <text x="90" y="202" text-anchor="middle" class="fg">GPIO</text>
+  <text x="90" y="223" text-anchor="middle" class="muted">HIGH = on</text>
+  <rect x="200" y="176" width="230" height="62" rx="6" class="ff"/>
+  <text x="315" y="202" text-anchor="middle" class="fg">Low-side switch VNLD5090</text>
+  <text x="315" y="223" text-anchor="middle" class="muted">connects the pin to ground</text>
+  <rect x="470" y="176" width="170" height="62" rx="6" class="pin"/>
+  <text x="555" y="202" text-anchor="middle" class="fg head">CN2 1–22</text>
+  <text x="555" y="223" text-anchor="middle" class="fg mono">sinks current</text>
+  <rect x="680" y="176" width="200" height="62" rx="6" class="box"/>
+  <text x="780" y="202" text-anchor="middle" class="fg">Load</text>
+  <text x="780" y="223" text-anchor="middle" class="muted">injector, solenoid, relay</text>
+  <rect x="920" y="176" width="180" height="62" rx="6" class="safe"/>
+  <text x="1010" y="202" text-anchor="middle" class="fg">+12 V</text>
+  <text x="1010" y="223" text-anchor="middle" class="muted">switched feed</text>
+  <path d="M160,207 H198" class="line" marker-end="url(#a)"/>
+  <path d="M430,207 H468" class="line"/>
+  <path d="M640,207 H678" class="line"/>
+  <path d="M880,207 H918" class="red"/>
+
+  <!-- C: a PWM solenoid on a low-side — no diode on the board -->
+  <text x="20" y="276" class="muted head">C · Low-side driving a PWM solenoid  (any LS)</text>
+  <rect x="200" y="286" width="230" height="62" rx="6" class="ff"/>
+  <text x="315" y="312" text-anchor="middle" class="fg">VNLD5090 only</text>
+  <text x="315" y="333" text-anchor="middle" class="muted">no freewheel diode on the board</text>
+  <rect x="470" y="286" width="170" height="62" rx="6" class="pin"/>
+  <text x="555" y="312" text-anchor="middle" class="fg head">CN2 1–22</text>
+  <text x="555" y="333" text-anchor="middle" class="fg mono">any LS pin</text>
+  <rect x="680" y="286" width="200" height="62" rx="6" class="box"/>
+  <text x="780" y="312" text-anchor="middle" class="fg">PWM solenoid</text>
+  <text x="780" y="333" text-anchor="middle" class="muted">diode at the valve, if asked for</text>
+  <rect x="920" y="286" width="180" height="62" rx="6" class="safe"/>
+  <text x="1010" y="312" text-anchor="middle" class="fg">Main-relay 12 V</text>
+  <text x="1010" y="333" text-anchor="middle" class="muted">switched feed</text>
+  <path d="M430,317 H468" class="line"/>
+  <path d="M640,317 H678" class="line"/>
+  <path d="M880,317 H918" class="red"/>
+
+  <!-- D: HS -->
+  <text x="20" y="386" class="muted head">D · High-side  HS1–HS8</text>
+  <rect x="20" y="396" width="140" height="62" rx="6" class="cpu"/>
+  <text x="90" y="422" text-anchor="middle" class="fg">GPIO</text>
+  <text x="90" y="443" text-anchor="middle" class="muted">HIGH = on</text>
+  <rect x="200" y="396" width="230" height="62" rx="6" class="ff"/>
+  <text x="315" y="422" text-anchor="middle" class="fg">High-side switch VNQ7140</text>
+  <text x="315" y="443" text-anchor="middle" class="muted">connects 12V MR to the pin</text>
+  <rect x="470" y="396" width="170" height="62" rx="6" class="pin"/>
+  <text x="555" y="422" text-anchor="middle" class="fg head">CN4 1–8</text>
+  <text x="555" y="443" text-anchor="middle" class="fg mono">sources current</text>
+  <rect x="680" y="396" width="200" height="62" rx="6" class="box"/>
+  <text x="780" y="422" text-anchor="middle" class="fg">Load</text>
+  <text x="780" y="443" text-anchor="middle" class="muted">relay coil, lamp, pump relay</text>
+  <rect x="920" y="396" width="180" height="62" rx="6" class="box"/>
+  <text x="1010" y="422" text-anchor="middle" class="fg">Ground</text>
+  <text x="1010" y="443" text-anchor="middle" class="muted">chassis or ECU ground</text>
+  <path d="M160,427 H198" class="line" marker-end="url(#a)"/>
+  <path d="M430,427 H468" class="line" marker-end="url(#a)"/>
+  <path d="M640,427 H678" class="line" marker-end="url(#a)"/>
+  <path d="M880,427 H918" class="line"/>
+
+  <!-- E: H-bridge -->
+  <text x="20" y="496" class="muted head">E · H-bridge  HBRIDGE1, HBRIDGE2</text>
+  <rect x="20" y="506" width="140" height="46" rx="6" class="cpu"/>
+  <text x="90" y="534" text-anchor="middle" class="fg">PWM, DIR, DIS</text>
+  <rect x="200" y="506" width="230" height="46" rx="6" class="ff"/>
+  <text x="315" y="534" text-anchor="middle" class="fg">IFX9201, from 12V MR</text>
+  <rect x="470" y="506" width="170" height="46" rx="6" class="pin"/>
+  <text x="555" y="534" text-anchor="middle" class="fg head">CN4 18–21</text>
+  <rect x="680" y="506" width="420" height="46" rx="6" class="box"/>
+  <text x="890" y="534" text-anchor="middle" class="fg">DC motor across + and −: throttle, idle valve, stepper coil</text>
+  <path d="M160,529 H198" class="line" marker-end="url(#a)"/>
+  <path d="M430,529 H468" class="line" marker-end="url(#a)"/>
+  <path d="M640,529 H678" class="line" marker-start="url(#a)" marker-end="url(#a)"/>
+</svg>

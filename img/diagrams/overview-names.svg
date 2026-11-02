@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 410" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>How a setting is named: the studio label and the schema path</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+      .big { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 20px; fill: #1d1f23; }
+    .brace { stroke: #3b82c4; stroke-width: 2; fill: none; }
+    .small { font-size: 13px; }
+    @media (prefers-color-scheme: dark) { .big { fill: #e4e6ea; } }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+  <text x="150" y="18" text-anchor="middle" class="muted head">In the studio</text>
+  <text x="380" y="18" class="muted head">In this manual and the settings reference</text>
+  
+  <rect x="20" y="30" width="260" height="86" rx="6" class="box"/>
+  <text x="150" y="64" text-anchor="middle" class="fg head">Cylinders</text>
+  <text x="150" y="90" text-anchor="middle" class="muted">what the page shows</text>
+  <path d="M282 73 H368" class="line" marker-end="url(#a)"/>
+  <text x="380" y="68" class="big">engine</text>
+  <path d="M382 80 V88 H446 V80" class="brace"/>
+  <text x="414" y="106" text-anchor="middle" class="muted small">settings</text>
+  <text x="414" y="123" text-anchor="middle" class="muted small">group</text>
+  <text x="454" y="68" class="big">.</text>
+  <text x="472" y="68" class="big">cylinder_count</text>
+  <path d="M474 80 V88 H629 V80" class="brace"/>
+  <text x="552" y="106" text-anchor="middle" class="muted small">the setting</text>
+  <rect x="20" y="160" width="260" height="86" rx="6" class="box"/>
+  <text x="150" y="194" text-anchor="middle" class="fg head">Enabled</text>
+  <text x="150" y="220" text-anchor="middle" class="muted">on a sensor page</text>
+  <path d="M282 203 H368" class="line" marker-end="url(#a)"/>
+  <text x="380" y="198" class="big">sensors</text>
+  <path d="M382 210 V218 H458 V210" class="brace"/>
+  <text x="420" y="236" text-anchor="middle" class="muted small">settings</text>
+  <text x="420" y="253" text-anchor="middle" class="muted small">group</text>
+  <text x="466" y="198" class="big">.</text>
+  <text x="483" y="198" class="big">sensor</text>
+  <path d="M485 210 V218 H550 V210" class="brace"/>
+  <text x="517" y="236" text-anchor="middle" class="muted small">a list</text>
+  <text x="558" y="198" class="big">[clt]</text>
+  <path d="M560 210 V218 H613 V210" class="brace"/>
+  <text x="586" y="236" text-anchor="middle" class="muted small">which one,</text>
+  <text x="586" y="253" text-anchor="middle" class="muted small">by name</text>
+  <text x="621" y="198" class="big">.</text>
+  <text x="638" y="198" class="big">enabled</text>
+  <path d="M640 210 V218 H716 V210" class="brace"/>
+  <text x="678" y="236" text-anchor="middle" class="muted small">the setting</text>
+  <rect x="20" y="290" width="260" height="86" rx="6" class="tgt"/>
+  <text x="150" y="324" text-anchor="middle" class="fg head">Engine RPM</text>
+  <text x="150" y="350" text-anchor="middle" class="muted">a gauge or a log column</text>
+  <path d="M282 333 H368" class="line" marker-end="url(#a)"/>
+  <text x="380" y="328" class="big">rpm</text>
+  <path d="M382 340 V348 H412 V340" class="brace"/>
+  <text x="397" y="366" text-anchor="middle" class="muted small">an output channel:</text>
+  <text x="397" y="383" text-anchor="middle" class="muted small">a live value, not a setting</text>
+</svg>

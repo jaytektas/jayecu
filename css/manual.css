@@ -1,0 +1,43 @@
+/* THE STUDIO'S LOOK. Header in the studio's own chrome grey, links and highlights in its accent orange
+   (apps/studio-jf/studio.common.style: accent 255 140 40). */
+:root {
+  --md-primary-fg-color:        #23252b;
+  --md-primary-fg-color--light: #2e3138;
+  --md-primary-fg-color--dark:  #1a1c20;
+  --md-primary-bg-color:        #f2f3f5;
+  --md-primary-bg-color--light: #c9ccd2;
+  --md-accent-fg-color:         #ff8c28;
+  --md-accent-fg-color--transparent: rgba(255, 140, 40, 0.12);
+}
+[data-md-color-scheme="default"] { --md-typeset-a-color: #c8641e; }
+[data-md-color-scheme="slate"]   { --md-typeset-a-color: #ff8c28; --md-default-bg-color: #1b1d22; }
+
+/* USE THE WIDTH. Material caps the page at 61rem; with the second index gone there is no reason to
+   leave the rest of a wide screen empty — tables and figures in particular want it. */
+.md-grid { max-width: none; }
+.md-main__inner { margin-left: 1.2rem; margin-right: 1.2rem; }
+
+/* Level badges (STANDARD.md §2): one under every section heading. */
+.level-basic        { color: #2e9d4f; }
+.level-intermediate { color: #d19a00; }
+.level-advanced     { color: #c8412d; }
+
+/* Figures: centred, captioned, never wider than the text column. */
+figure { margin: 1.6em auto; text-align: center; }
+figure img { max-width: 100%; border-radius: 4px; }
+figcaption { font-size: 0.85em; color: var(--md-default-fg-color--light); max-width: 46em; margin: 0.5em auto 0; }
+
+/* Studio screenshots get a hairline so a dark page reads as a picture, not as part of the page. */
+img[src*="img/studio/"] { border: 1px solid var(--md-default-fg-color--lightest); }
+
+/* Diagrams are SVG with a viewBox and no fixed size: give them the full text column, or they shrink to
+   the browser's default replaced-element size and nothing in them can be read. */
+figure img[src$=".svg"] { width: 100%; height: auto; }
+/* …and the figure around it: Material makes a figure fit its content, which for an SVG is nothing. */
+.md-typeset figure:has(> img[src$=".svg"]),
+.md-typeset figure:has(> p > img[src$=".svg"]) { width: 100%; }
+
+/* Settings reference: a path is one unbroken token, and the facts column stays narrow enough for the
+   explanation to have the room. */
+.md-typeset table code { word-break: keep-all; white-space: nowrap; }
+.md-typeset table:not([class]) td:first-child { min-width: 14em; }

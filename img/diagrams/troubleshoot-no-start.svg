@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Cranks but will not start</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .q    { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .fix  { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .ok   { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .line { stroke: #9aa1ab; }
+      .q { fill: #16283b; } .fix { fill: #33240f; } .ok { fill: #13291a; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- questions down the left, fixes to the right -->
+  <rect x="20" y="20"  width="360" height="60" rx="6" class="q"/>
+  <text x="200" y="45" text-anchor="middle" class="fg head">1 · Does RPM show while cranking?</text>
+  <text x="200" y="67" text-anchor="middle" class="mono fg">rpm</text>
+
+  <rect x="20" y="120" width="360" height="60" rx="6" class="q"/>
+  <text x="200" y="145" text-anchor="middle" class="fg head">2 · Does it reach sync?</text>
+  <text x="200" y="167" text-anchor="middle" class="fg">Status Lamps; RUN LED solid</text>
+
+  <rect x="20" y="220" width="360" height="60" rx="6" class="q"/>
+  <text x="200" y="245" text-anchor="middle" class="fg head">3 · Are fuel and spark switched on?</text>
+  <text x="200" y="267" text-anchor="middle" class="fg">Injector Outputs, Ignition Outputs</text>
+
+  <rect x="20" y="320" width="360" height="60" rx="6" class="q"/>
+  <text x="200" y="345" text-anchor="middle" class="fg head">4 · Is there spark, at the right time?</text>
+  <text x="200" y="367" text-anchor="middle" class="fg">spark tester; timing light on the starter</text>
+
+  <rect x="20" y="420" width="360" height="60" rx="6" class="q"/>
+  <text x="200" y="445" text-anchor="middle" class="fg head">5 · Is the fuel about right?</text>
+  <text x="200" y="467" text-anchor="middle" class="fg">wet plugs = too much; dry = too little</text>
+
+  <path d="M200 80 V118" class="line" marker-end="url(#a)"/>
+  <path d="M200 180 V218" class="line" marker-end="url(#a)"/>
+  <path d="M200 280 V318" class="line" marker-end="url(#a)"/>
+  <path d="M200 380 V418" class="line" marker-end="url(#a)"/>
+  <text x="210" y="104" class="muted">yes</text><text x="210" y="204" class="muted">yes</text>
+  <text x="210" y="304" class="muted">yes</text><text x="210" y="404" class="muted">yes</text>
+
+  <path d="M380 50 H478" class="line" marker-end="url(#a)"/><text x="425" y="42" text-anchor="middle" class="muted">no</text>
+  <rect x="480" y="20" width="600" height="60" rx="6" class="fix"/>
+  <text x="496" y="45" class="fg">12 V at the ECU (key_on)? Stream on the right input? Sensor powered?</text>
+  <text x="496" y="67" class="fg">Trigger Log: do edges arrive? — chapters 10, 11, 16</text>
+
+  <path d="M380 150 H478" class="line" marker-end="url(#a)"/><text x="425" y="142" text-anchor="middle" class="muted">no</text>
+  <rect x="480" y="120" width="600" height="60" rx="6" class="fix"/>
+  <text x="496" y="145" class="fg">Wrong wheel or cam description, wrong edge, noise.</text>
+  <text x="496" y="167" class="fg">Compare the Trigger Log with the wheel — chapter 16</text>
+
+  <path d="M380 250 H478" class="line" marker-end="url(#a)"/><text x="425" y="242" text-anchor="middle" class="muted">no</text>
+  <rect x="480" y="220" width="600" height="60" rx="6" class="fix"/>
+  <text x="496" y="245" class="fg">Switch them on (Engine Configuration ▸ Fuel System / Ignition System).</text>
+  <text x="496" y="267" class="fg">They survive a reset. Also: a protection cut, flood clear (throttle open)</text>
+
+  <path d="M380 350 H478" class="line" marker-end="url(#a)"/><text x="425" y="342" text-anchor="middle" class="muted">no</text>
+  <rect x="480" y="320" width="600" height="60" rx="6" class="fix"/>
+  <text x="496" y="345" class="fg">No spark: coil wiring, dwell, ignition mode. Wrong time: trigger offset,</text>
+  <text x="496" y="367" class="fg">firing order, cam phase (360° out) — chapters 16, 20</text>
+
+  <path d="M380 450 H478" class="line" marker-end="url(#a)"/><text x="425" y="442" text-anchor="middle" class="muted">no</text>
+  <rect x="480" y="420" width="600" height="60" rx="6" class="fix"/>
+  <text x="496" y="445" class="fg">Cranking fuel, injector data, fuel pressure, pump running,</text>
+  <text x="496" y="467" class="fg">injector outputs assigned — chapters 18, 19, 38</text>
+</svg>

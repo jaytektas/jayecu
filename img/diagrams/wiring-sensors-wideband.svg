@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 390" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Wiring a wideband controller by analogue output or by CAN</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .thin { stroke: #5f6670; stroke-width: 1.5; fill: none; }
+    .dash { stroke: #5f6670; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: none; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 8 5; }
+    .ecufill { fill: #f4f5f7; }
+    .part { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pin  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .sig  { stroke: #3b82c4; stroke-width: 2.5; fill: none; }
+    .sig2 { stroke: #d9822b; stroke-width: 2.5; fill: none; }
+    .sig3 { stroke: #2e9d4f; stroke-width: 2.5; fill: none; }
+    .wout { stroke: #5f6670; stroke-width: 7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .shield { stroke: #8d939b; stroke-width: 2; fill: none; stroke-dasharray: 3 3; }
+    .node { fill: #5f6670; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line, .thin, .dash { stroke: #9aa1ab; } .box, .part { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { stroke: #9aa1ab; } .ecufill { fill: #1c1f25; }
+      .tgt, .pin { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .wout { stroke: #9aa1ab; } .node { fill: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+  <text x="20" y="30" text-anchor="start" class="fg head">A · Analogue output</text>
+  <text x="20" y="50" text-anchor="start" class="muted small">the controller's 0–5 V output read as a voltage</text>
+  <rect x="30" y="76" width="150" height="190" rx="8" class="box"/>
+  <text x="105" y="100" text-anchor="middle" class="fg head">Wideband</text>
+  <text x="105" y="118" text-anchor="middle" class="fg head">controller</text>
+  <rect x="320" y="64" width="170" height="214" rx="8" class="ecufill"/>
+  <rect x="320" y="64" width="170" height="214" rx="8" class="ecu"/>
+  <text x="480" y="272" text-anchor="end" class="muted small">ECU</text>
+  <text x="170" y="145" text-anchor="end" class="muted small">Analogue out</text>
+  <rect x="335" y="118" width="140" height="44" rx="4" class="pin"/>
+  <text x="405.0" y="137" text-anchor="middle" class="fg head mono">CN3-25</text>
+  <text x="405.0" y="154" text-anchor="middle" class="muted mono">AV3</text>
+  <path d="M180 140 H335" class="wout"/>
+  <path d="M180 140 H335" stroke="#2e9d4f" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M180 140 H335" stroke="#d6332a" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="257" y="128" text-anchor="middle" class="muted small mono">G/R green/red</text>
+  <text x="170" y="205" text-anchor="end" class="muted small">Signal ground</text>
+  <rect x="335" y="178" width="140" height="44" rx="4" class="pin"/>
+  <text x="405.0" y="197" text-anchor="middle" class="fg head mono">CN3-12</text>
+  <text x="405.0" y="214" text-anchor="middle" class="muted mono">Ground</text>
+  <path d="M180 200 H335" class="wout"/>
+  <path d="M180 200 H335" stroke="#1b1b1b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="257" y="188" text-anchor="middle" class="muted small mono">B black</text>
+  <text x="170" y="240" text-anchor="end" class="muted small">12 V in</text>
+  <text x="170" y="258" text-anchor="end" class="muted small">Power ground</text>
+  <path d="M180 236 H240 V300" class="thin"/>
+  <path d="M180 254 H226 V300" class="thin"/>
+  <rect x="140" y="300" width="190" height="44" rx="6" class="ff"/>
+  <text x="235" y="318" text-anchor="middle" class="fg small">Fused, switched 12 V</text>
+  <text x="235" y="335" text-anchor="middle" class="muted small">and power ground</text>
+  <text x="20" y="372" text-anchor="start" class="muted small">Calibrate the curve to the controller's output (chapter 17).</text>
+  <text x="520" y="30" text-anchor="start" class="fg head">B · CAN output</text>
+  <text x="520" y="50" text-anchor="start" class="muted small">the reading arrives as a CAN frame</text>
+  <rect x="530" y="76" width="150" height="190" rx="8" class="box"/>
+  <text x="605" y="100" text-anchor="middle" class="fg head">Wideband</text>
+  <text x="605" y="118" text-anchor="middle" class="fg head">controller</text>
+  <rect x="820" y="64" width="170" height="214" rx="8" class="ecufill"/>
+  <rect x="820" y="64" width="170" height="214" rx="8" class="ecu"/>
+  <text x="980" y="272" text-anchor="end" class="muted small">ECU</text>
+  <text x="670" y="145" text-anchor="end" class="muted small">CAN H</text>
+  <rect x="835" y="118" width="140" height="44" rx="4" class="pin"/>
+  <text x="905.0" y="137" text-anchor="middle" class="fg head mono">CN4-10</text>
+  <text x="905.0" y="154" text-anchor="middle" class="muted mono">CAN1 H</text>
+  <path d="M680 140 H835" class="wout"/>
+  <path d="M680 140 H835" stroke="#9ad89a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="757" y="128" text-anchor="middle" class="muted small mono">Lg lt green</text>
+  <text x="670" y="205" text-anchor="end" class="muted small">CAN L</text>
+  <rect x="835" y="178" width="140" height="44" rx="4" class="pin"/>
+  <text x="905.0" y="197" text-anchor="middle" class="fg head mono">CN4-17</text>
+  <text x="905.0" y="214" text-anchor="middle" class="muted mono">CAN1 L</text>
+  <path d="M680 200 H835" class="wout"/>
+  <path d="M680 200 H835" stroke="#9ad89a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M680 200 H835" stroke="#1b1b1b" stroke-width="4" fill="none" stroke-dasharray="7 9"/>
+  <text x="757" y="188" text-anchor="middle" class="muted small mono">Lg/B lt green/black</text>
+  <text x="670" y="240" text-anchor="end" class="muted small">12 V in</text>
+  <text x="670" y="258" text-anchor="end" class="muted small">Power ground</text>
+  <path d="M680 236 H740 V300" class="thin"/>
+  <path d="M680 254 H726 V300" class="thin"/>
+  <rect x="640" y="300" width="190" height="44" rx="6" class="ff"/>
+  <text x="735" y="318" text-anchor="middle" class="fg small">Fused, switched 12 V</text>
+  <text x="735" y="335" text-anchor="middle" class="muted small">and power ground</text>
+  <text x="520" y="372" text-anchor="start" class="muted small">Twist CAN H and L together; bus and termination: chapter 13.</text>
+</svg>

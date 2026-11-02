@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 560" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>What a Generic output does every millisecond</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <!-- ===== 1 · WHEN ===== -->
+  <text x="20" y="28" class="muted head">1 · When: is it on at all?</text>
+  <rect x="20" y="42" width="260" height="76" rx="6" class="tgt"/>
+  <text x="150" y="66" text-anchor="middle" class="fg head">Turn On When</text>
+  <text x="150" y="87" text-anchor="middle" class="fg">Turn Off When</text>
+  <text x="150" y="107" text-anchor="middle" class="muted">expressions; both empty = always on</text>
+  <path d="M280 80 H318" class="line" marker-end="url(#a)"/>
+  <rect x="320" y="42" width="260" height="76" rx="6" class="tgt"/>
+  <text x="450" y="66" text-anchor="middle" class="fg head">Gate</text>
+  <text x="450" y="87" text-anchor="middle" class="muted">latch · min on / off · max on · re-arm</text>
+  <text x="450" y="107" text-anchor="middle" class="muted">If Unanswerable: Off / On / Hold</text>
+  <path d="M580 80 H700 V168" class="line" marker-end="url(#a)"/>
+  <text x="708" y="118" class="muted">open or closed</text>
+
+  <!-- ===== 2 · HOW MUCH ===== -->
+  <text x="20" y="160" class="muted head">2 · How much: Value From</text>
+  <rect x="20" y="174" width="300" height="94" rx="6" class="tgt"/>
+  <text x="170" y="198" text-anchor="middle" class="fg head">Candidates</text>
+  <text x="170" y="219" text-anchor="middle" class="muted">Primary (combined by policy)</text>
+  <text x="170" y="238" text-anchor="middle" class="muted">→ Limit clamps down</text>
+  <text x="170" y="257" text-anchor="middle" class="muted">→ first valid Override replaces</text>
+  <rect x="20" y="280" width="140" height="50" rx="6" class="tgt"/>
+  <text x="90" y="310" text-anchor="middle" class="fg">Table</text>
+  <rect x="180" y="280" width="140" height="50" rx="6" class="tgt"/>
+  <text x="250" y="310" text-anchor="middle" class="fg">Fixed</text>
+  <rect x="20" y="342" width="300" height="50" rx="6" class="tgt"/>
+  <text x="170" y="372" text-anchor="middle" class="fg">Duty Expression</text>
+
+  <!-- one of them is chosen -->
+  <path d="M320 221 H380 V268" class="line"/>
+  <path d="M320 305 H380" class="line"/>
+  <path d="M320 367 H380 V342" class="line"/>
+  <circle cx="400" cy="305" r="20" class="node"/>
+  <text x="400" y="311" text-anchor="middle" class="fg" font-size="13">one</text>
+  <path d="M380 268 V285" class="line"/>
+  <path d="M380 342 V325" class="line"/>
+
+  <!-- failsafe -->
+  <rect x="440" y="378" width="230" height="58" rx="6" class="safe"/>
+  <text x="555" y="402" text-anchor="middle" class="fg head">Failsafe</text>
+  <text x="555" y="423" text-anchor="middle" class="muted">nothing valid to use</text>
+  <path d="M555 378 V340" class="safeline" marker-end="url(#r)"/>
+
+  <!-- the gate switch -->
+  <path d="M420 305 H468" class="line" marker-end="url(#a)"/>
+  <rect x="470" y="170" width="330" height="170" rx="6" class="box"/>
+  <text x="635" y="196" text-anchor="middle" class="fg head">Gate open?</text>
+  <text x="635" y="226" text-anchor="middle" class="fg">open: the value</text>
+  <text x="635" y="252" text-anchor="middle" class="fg">closed: Clamp Low</text>
+  <text x="635" y="286" text-anchor="middle" class="muted">a closed gate reads no candidate,</text>
+  <text x="635" y="306" text-anchor="middle" class="muted">so no module can push it on</text>
+
+  <!-- ===== 3 · SHAPING ===== -->
+  <path d="M800 255 H838" class="line" marker-end="url(#a)"/>
+  <rect x="840" y="200" width="200" height="110" rx="6" class="ff"/>
+  <text x="940" y="224" text-anchor="middle" class="fg head">Shaping</text>
+  <text x="940" y="248" text-anchor="middle" class="fg">× Scale + Offset</text>
+  <text x="940" y="272" text-anchor="middle" class="fg">clamp Low … High</text>
+  <text x="940" y="296" text-anchor="middle" class="muted">the command</text>
+  <path d="M940 310 V450 H802" class="line" marker-end="url(#a)"/>
+
+  <!-- ===== 4 · THE PIN ===== -->
+  <text x="20" y="444" class="muted head">3 · The pin: Kind and Active High</text>
+  <rect x="440" y="458" width="360" height="90" rx="6" class="ff"/>
+  <text x="620" y="482" text-anchor="middle" class="fg head">Kind</text>
+  <text x="620" y="505" text-anchor="middle" class="fg">PWM: the command is the duty, at the carrier</text>
+  <text x="620" y="528" text-anchor="middle" class="fg">Digital: on when command ≥ (Low + High) ÷ 2</text>
+  <path d="M440 503 H362" class="line" marker-end="url(#a)"/>
+  <rect x="160" y="470" width="200" height="66" rx="6" class="box"/>
+  <text x="260" y="496" text-anchor="middle" class="fg head">Pin</text>
+  <text x="260" y="518" text-anchor="middle" class="muted">Active High sets the level</text>
+  <text x="850" y="505" class="mono muted">out_N</text>
+  <text x="850" y="524" class="muted">what was commanded</text>
+  <path d="M800 490 H842" class="line"/>
+</svg>

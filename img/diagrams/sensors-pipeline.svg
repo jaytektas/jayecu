@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 640" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>What happens to one sensor reading</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .gate { fill: none; stroke: #c8412d; stroke-width: 2; stroke-dasharray: 6 4; }
+    .red  { fill: #c8412d; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .red { fill: #e5705e; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <!-- ===== 1 · THE PIPELINE ===== -->
+  <text x="20" y="28" class="muted head">1 · Every enabled input, at its type's rate</text>
+
+  <rect x="20" y="44" width="300" height="72" rx="6" class="box"/>
+  <text x="170" y="68" text-anchor="middle" class="fg head">Acquire</text>
+  <text x="170" y="89" text-anchor="middle" class="muted">pin · CAN field · on-board part</text>
+  <text x="170" y="107" text-anchor="middle" class="mono muted">hw_av1 · hw_dig3_freq</text>
+
+  <rect x="380" y="44" width="300" height="72" rx="6" class="safe"/>
+  <text x="530" y="68" text-anchor="middle" class="fg head">Raw checks</text>
+  <text x="530" y="89" text-anchor="middle" class="muted">Detect Raw Low / Raw High</text>
+  <text x="530" y="107" text-anchor="middle" class="muted">in the input's own units</text>
+
+  <rect x="740" y="44" width="300" height="72" rx="6" class="tgt"/>
+  <text x="890" y="68" text-anchor="middle" class="fg head">Calibration</text>
+  <text x="890" y="89" text-anchor="middle" class="muted">curve: raw → reading</text>
+  <text x="890" y="107" text-anchor="middle" class="muted">2–16 points · ends held flat</text>
+
+  <rect x="740" y="176" width="300" height="72" rx="6" class="safe"/>
+  <text x="890" y="200" text-anchor="middle" class="fg head">Reading checks</text>
+  <text x="890" y="221" text-anchor="middle" class="muted">Detect Reading Low / High</text>
+  <text x="890" y="239" text-anchor="middle" class="muted">only while the Precondition holds</text>
+
+  <rect x="380" y="176" width="300" height="72" rx="6" class="safe"/>
+  <text x="530" y="200" text-anchor="middle" class="fg head">Behaviour checks</text>
+  <text x="530" y="221" text-anchor="middle" class="muted">Detect Stuck (switches)</text>
+  <text x="530" y="239" text-anchor="middle" class="muted">Detect Rate Spike</text>
+
+  <rect x="20" y="176" width="300" height="72" rx="6" class="box"/>
+  <text x="170" y="200" text-anchor="middle" class="fg head">Publish</text>
+  <text x="170" y="221" text-anchor="middle" class="muted">reading + valid flag + freshness</text>
+  <text x="170" y="239" text-anchor="middle" class="mono muted">map · clt · tps · clutch_sw</text>
+
+  <path d="M320 80 H378" class="line" marker-end="url(#a)"/>
+  <path d="M680 80 H738" class="line" marker-end="url(#a)"/>
+  <path d="M890 116 V174" class="line" marker-end="url(#a)"/>
+  <path d="M740 212 H682" class="line" marker-end="url(#a)"/>
+  <path d="M380 212 H322" class="line" marker-end="url(#a)"/>
+
+  <!-- what a trip does to the value -->
+  <text x="530" y="136" text-anchor="middle" class="red">a trip marks the reading invalid</text>
+  <text x="530" y="268" text-anchor="middle" class="red">a trip marks the reading invalid</text>
+  <text x="890" y="268" text-anchor="middle" class="muted">a trip raises a code; the reading stays valid</text>
+
+  <!-- ===== 2 · FROM TRIP TO REACTION ===== -->
+  <text x="20" y="318" class="muted head">2 · What a tripped check becomes</text>
+  <path d="M660 248 V290 H290 V332" class="safeline" marker-end="url(#r)"/>
+  <path d="M890 280 V290 H660" class="safeline"/>
+
+  <rect x="20" y="334" width="300" height="72" rx="6" class="safe"/>
+  <text x="170" y="358" text-anchor="middle" class="fg head">DTC Delay</text>
+  <text x="170" y="379" text-anchor="middle" class="muted">must trip continuously this long</text>
+  <text x="170" y="397" text-anchor="middle" class="muted">(default 250 ms)</text>
+
+  <rect x="380" y="334" width="300" height="72" rx="6" class="safe"/>
+  <text x="530" y="358" text-anchor="middle" class="fg head">Trouble code</text>
+  <text x="530" y="379" text-anchor="middle" class="muted">the check's P-code, with its Severity</text>
+  <text x="530" y="397" text-anchor="middle" class="muted">None · Level 1 · Level 2 · Level 3</text>
+
+  <rect x="740" y="334" width="300" height="72" rx="6" class="safe"/>
+  <text x="890" y="358" text-anchor="middle" class="fg head">Engine protection</text>
+  <text x="890" y="379" text-anchor="middle" class="muted">the worst active severity picks</text>
+  <text x="890" y="397" text-anchor="middle" class="muted">protection level 1, 2 or 3 (chapter 29)</text>
+
+  <path d="M320 370 H378" class="safeline" marker-end="url(#r)"/>
+  <path d="M680 370 H738" class="safeline" marker-end="url(#r)"/>
+  <text x="530" y="428" text-anchor="middle" class="muted">healed the moment the check passes again</text>
+
+  <!-- ===== 3 · GATES OVER THE WHOLE POOL ===== -->
+  <text x="20" y="478" class="muted head">3 · Two gates over every input</text>
+
+  <rect x="20" y="494" width="490" height="120" rx="6" class="gate"/>
+  <text x="40" y="520" class="fg head">Key off</text>
+  <text x="40" y="544" class="muted">Only Battery Voltage runs. The key is on above 8.0 V</text>
+  <text x="40" y="564" class="muted">and off again below 7.0 V. Everything else waits for</text>
+  <text x="40" y="584" class="muted">key-on and no check trips, because a USB-powered 5 V</text>
+  <text x="40" y="604" class="muted">rail gives readings that are real but wrong.</text>
+
+  <rect x="550" y="494" width="490" height="120" rx="6" class="gate"/>
+  <text x="570" y="520" class="fg head">5 V sensor supply down</text>
+  <text x="570" y="544" class="muted">Either power-good line low: every input read from an</text>
+  <text x="570" y="564" class="muted">ECU pin is invalid and its own checks stand down. After</text>
+  <text x="570" y="584" class="muted">100 ms the supply raises <tspan class="mono">P0641</tspan> or <tspan class="mono">P0651</tspan> (Level 2).</text>
+  <text x="570" y="604" class="muted">Battery, on-board and CAN inputs are not affected.</text>
+</svg>

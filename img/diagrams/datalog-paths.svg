@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 300" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The two ways to log</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="95" width="170" height="90" rx="6" class="box"/>
+  <text x="105" y="130" text-anchor="middle" class="fg head">ECU</text>
+  <text x="105" y="154" text-anchor="middle" class="fg">every channel</text>
+
+  <!-- studio path -->
+  <path d="M190 120 H258" class="line" marker-end="url(#a)"/>
+  <text x="224" y="110" text-anchor="middle" class="muted">USB</text>
+  <rect x="260" y="30" width="250" height="100" rx="6" class="tgt"/>
+  <text x="385" y="58" text-anchor="middle" class="fg head">Studio recording</text>
+  <text x="385" y="82" text-anchor="middle" class="fg">Record button, while connected</text>
+  <text x="385" y="104" text-anchor="middle" class="muted">at the link's rate</text>
+  <path d="M510 80 H598" class="line" marker-end="url(#a)"/>
+  <rect x="600" y="40" width="220" height="80" rx="6" class="pid"/>
+  <text x="710" y="68" text-anchor="middle" class="fg head">The log folder on the PC</text>
+  <text x="710" y="92" text-anchor="middle" class="fg">.msl recordings, imported .MLG</text>
+
+  <!-- onboard path -->
+  <path d="M190 160 H258" class="line" marker-end="url(#a)"/>
+  <rect x="260" y="150" width="250" height="120" rx="6" class="ff"/>
+  <text x="385" y="178" text-anchor="middle" class="fg head">Onboard logging</text>
+  <text x="385" y="202" text-anchor="middle" class="fg">the ECU writes its own card,</text>
+  <text x="385" y="224" text-anchor="middle" class="fg">while Log While holds —</text>
+  <text x="385" y="246" text-anchor="middle" class="fg">no studio needed</text>
+  <path d="M510 210 H598" class="line" marker-end="url(#a)"/>
+  <rect x="600" y="170" width="220" height="80" rx="6" class="ff"/>
+  <text x="710" y="198" text-anchor="middle" class="fg head">LOG0001.MLG …</text>
+  <text x="710" y="222" text-anchor="middle" class="fg">on the SD card</text>
+  <path d="M820 210 H868" class="line" marker-end="url(#a)"/>
+  <text x="844" y="200" text-anchor="middle" class="muted">key off</text>
+  <rect x="870" y="150" width="210" height="120" rx="6" class="box"/>
+  <text x="975" y="178" text-anchor="middle" class="fg head">Logs on Card…</text>
+  <text x="975" y="202" text-anchor="middle" class="fg">the card is a USB drive;</text>
+  <text x="975" y="224" text-anchor="middle" class="fg">Import copies the logs</text>
+  <text x="975" y="246" text-anchor="middle" class="fg">into the log folder</text>
+  <path d="M975 150 V80 H822" class="line" marker-end="url(#a)"/>
+  <text x="980" y="60" text-anchor="middle" class="muted">both open in MegaLogViewer</text>
+</svg>

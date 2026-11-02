@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The same voltage, four different lambdas</title>
+  <style>
+    .fg { fill: #1d1f23; } .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .l0 { stroke: #3b82c4; stroke-width: 3; fill: none; }
+    .l1 { stroke: #d9822b; stroke-width: 3; fill: none; }
+    .l2 { stroke: #2e9d4f; stroke-width: 3; fill: none; }
+    .l3 { stroke: #8a5cc2; stroke-width: 3; fill: none; stroke-dasharray: 9 5; }
+    .flat { stroke: #3b82c4; stroke-width: 3; fill: none; stroke-dasharray: 3 5; }
+    .bad { fill: #fbeaea; } .trip { stroke: #c8412d; stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+    .dot { fill: #3b82c4; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; } .grid { stroke: #2c3038; }
+      .bad { fill: #361512; }
+    }
+  </style>
+
+  <line x1="90" y1="343.3" x2="690" y2="343.3" class="grid"/>
+  <text x="80" y="348.3" text-anchor="end" class="muted">0.6</text>
+  <line x1="90" y1="286.7" x2="690" y2="286.7" class="grid"/>
+  <text x="80" y="291.7" text-anchor="end" class="muted">0.8</text>
+  <line x1="90" y1="230.0" x2="690" y2="230.0" class="grid"/>
+  <text x="80" y="235.0" text-anchor="end" class="muted">1.0</text>
+  <line x1="90" y1="173.3" x2="690" y2="173.3" class="grid"/>
+  <text x="80" y="178.3" text-anchor="end" class="muted">1.2</text>
+  <line x1="90" y1="116.7" x2="690" y2="116.7" class="grid"/>
+  <text x="80" y="121.7" text-anchor="end" class="muted">1.4</text>
+  <line x1="90.0" y1="400" x2="90.0" y2="60" class="grid"/>
+  <text x="90.0" y="422" text-anchor="middle" class="muted">0 V</text>
+  <line x1="210.0" y1="400" x2="210.0" y2="60" class="grid"/>
+  <text x="210.0" y="422" text-anchor="middle" class="muted">1 V</text>
+  <line x1="330.0" y1="400" x2="330.0" y2="60" class="grid"/>
+  <text x="330.0" y="422" text-anchor="middle" class="muted">2 V</text>
+  <line x1="450.0" y1="400" x2="450.0" y2="60" class="grid"/>
+  <text x="450.0" y="422" text-anchor="middle" class="muted">3 V</text>
+  <line x1="570.0" y1="400" x2="570.0" y2="60" class="grid"/>
+  <text x="570.0" y="422" text-anchor="middle" class="muted">4 V</text>
+  <line x1="690.0" y1="400" x2="690.0" y2="60" class="grid"/>
+  <text x="690.0" y="422" text-anchor="middle" class="muted">5 V</text>
+  <path d="M90 60 V400 H690" class="axis"/>
+  <text x="30" y="40" class="muted">lambda</text>
+  <text x="390" y="450" text-anchor="middle" class="muted">controller analogue output, at the ECU pin</text>
+  <line x1="390.0" y1="400" x2="390.0" y2="60" class="trip"/>
+  <path d="M90.0 371.7 L690.0 88.3" class="l0"/>
+  <circle cx="390.0" cy="230.0" r="4" class="dot"/>
+  <path d="M720 90 h40" class="l0"/>
+  <text x="770" y="95" class="fg">0 V = 0.50 · 5 V = 1.50</text>
+  <text x="770" y="114" class="muted">at 2.5 V reads λ 1.00</text>
+  <path d="M90.0 371.7 L690.0 81.8" class="l1"/>
+  <circle cx="390.0" cy="226.7" r="4" class="dot"/>
+  <path d="M720 152 h40" class="l1"/>
+  <text x="770" y="157" class="fg">0 V = 0.50 · 5 V = 1.52</text>
+  <text x="770" y="176" class="muted">at 2.5 V reads λ 1.01</text>
+  <path d="M90.0 349.0 L690.0 164.8" class="l2"/>
+  <circle cx="390.0" cy="256.9" r="4" class="dot"/>
+  <path d="M720 214 h40" class="l2"/>
+  <text x="770" y="219" class="fg">0 V = 0.58 · 5 V = 1.23</text>
+  <text x="770" y="238" class="muted">at 2.5 V reads λ 0.91</text>
+  <path d="M90.0 320.7 L690.0 128.0" class="l3"/>
+  <circle cx="390.0" cy="224.3" r="4" class="dot"/>
+  <path d="M720 276 h40" class="l3"/>
+  <text x="770" y="281" class="fg">0 V = 0.68 · 5 V = 1.36</text>
+  <text x="770" y="300" class="muted">at 2.5 V reads λ 1.02</text>
+  <text x="720" y="352" class="muted">Red dashed line: 2.5 V at the pin.</text>
+</svg>

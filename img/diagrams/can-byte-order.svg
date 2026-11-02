@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 330" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>CAN byte order</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .cell { fill: #ffffff; stroke: #5f6670; stroke-width: 1.5; }
+    .hi   { fill: #fbeaea; stroke: #c8412d; stroke-width: 1.5; }
+    .lo   { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 1.5; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .cell { fill: #20232a; stroke: #9aa1ab; } .hi { fill: #361512; } .lo { fill: #16283b; }
+    }
+  </style>
+
+  <!-- Motorola -->
+  <text x="20" y="28" class="fg head">Big endian (Motorola): Start = the top bit, 7</text>
+  <text x="20" y="48" class="muted">bits run down through byte 0 and on into byte 1 — the high byte comes first</text>
+  <g class="mono">
+    <text x="20" y="92" class="fg">Byte 0</text>
+    <text x="20" y="130" class="fg">Byte 1</text>
+    <rect x="80"  y="72" width="56" height="30" class="hi"/><text x="108" y="92" text-anchor="middle" class="fg">7</text>
+    <rect x="136" y="72" width="56" height="30" class="hi"/><text x="164" y="92" text-anchor="middle" class="fg">6</text>
+    <rect x="192" y="72" width="56" height="30" class="hi"/><text x="220" y="92" text-anchor="middle" class="fg">5</text>
+    <rect x="248" y="72" width="56" height="30" class="hi"/><text x="276" y="92" text-anchor="middle" class="fg">4</text>
+    <rect x="304" y="72" width="56" height="30" class="hi"/><text x="332" y="92" text-anchor="middle" class="fg">3</text>
+    <rect x="360" y="72" width="56" height="30" class="hi"/><text x="388" y="92" text-anchor="middle" class="fg">2</text>
+    <rect x="416" y="72" width="56" height="30" class="hi"/><text x="444" y="92" text-anchor="middle" class="fg">1</text>
+    <rect x="472" y="72" width="56" height="30" class="hi"/><text x="500" y="92" text-anchor="middle" class="fg">0</text>
+    <rect x="80"  y="110" width="56" height="30" class="lo"/><text x="108" y="130" text-anchor="middle" class="fg">15</text>
+    <rect x="136" y="110" width="56" height="30" class="lo"/><text x="164" y="130" text-anchor="middle" class="fg">14</text>
+    <rect x="192" y="110" width="56" height="30" class="lo"/><text x="220" y="130" text-anchor="middle" class="fg">13</text>
+    <rect x="248" y="110" width="56" height="30" class="lo"/><text x="276" y="130" text-anchor="middle" class="fg">12</text>
+    <rect x="304" y="110" width="56" height="30" class="lo"/><text x="332" y="130" text-anchor="middle" class="fg">11</text>
+    <rect x="360" y="110" width="56" height="30" class="lo"/><text x="388" y="130" text-anchor="middle" class="fg">10</text>
+    <rect x="416" y="110" width="56" height="30" class="lo"/><text x="444" y="130" text-anchor="middle" class="fg">9</text>
+    <rect x="472" y="110" width="56" height="30" class="lo"/><text x="500" y="130" text-anchor="middle" class="fg">8</text>
+  </g>
+  <text x="20" y="172" class="fg">3000 RPM = 0x0BB8: byte 0 = <tspan class="mono">0B</tspan>, byte 1 = <tspan class="mono">B8</tspan></text>
+
+  <!-- Intel -->
+  <text x="570" y="28" class="fg head">Little endian (Intel): Start = the bottom bit, 0</text>
+  <text x="570" y="48" class="muted">bits run up through byte 0 and on into byte 1 — the low byte comes first</text>
+  <g class="mono">
+    <text x="570" y="92" class="fg">Byte 0</text>
+    <text x="570" y="130" class="fg">Byte 1</text>
+    <rect x="630" y="72" width="56" height="30" class="lo"/><text x="658" y="92" text-anchor="middle" class="fg">7</text>
+    <rect x="686" y="72" width="56" height="30" class="lo"/><text x="714" y="92" text-anchor="middle" class="fg">6</text>
+    <rect x="742" y="72" width="56" height="30" class="lo"/><text x="770" y="92" text-anchor="middle" class="fg">5</text>
+    <rect x="798" y="72" width="56" height="30" class="lo"/><text x="826" y="92" text-anchor="middle" class="fg">4</text>
+    <rect x="854" y="72" width="56" height="30" class="lo"/><text x="882" y="92" text-anchor="middle" class="fg">3</text>
+    <rect x="910" y="72" width="56" height="30" class="lo"/><text x="938" y="92" text-anchor="middle" class="fg">2</text>
+    <rect x="966" y="72" width="56" height="30" class="lo"/><text x="994" y="92" text-anchor="middle" class="fg">1</text>
+    <rect x="1022" y="72" width="56" height="30" class="lo"/><text x="1050" y="92" text-anchor="middle" class="fg">0</text>
+    <rect x="630" y="110" width="56" height="30" class="hi"/><text x="658" y="130" text-anchor="middle" class="fg">15</text>
+    <rect x="686" y="110" width="56" height="30" class="hi"/><text x="714" y="130" text-anchor="middle" class="fg">14</text>
+    <rect x="742" y="110" width="56" height="30" class="hi"/><text x="770" y="130" text-anchor="middle" class="fg">13</text>
+    <rect x="798" y="110" width="56" height="30" class="hi"/><text x="826" y="130" text-anchor="middle" class="fg">12</text>
+    <rect x="854" y="110" width="56" height="30" class="hi"/><text x="882" y="130" text-anchor="middle" class="fg">11</text>
+    <rect x="910" y="110" width="56" height="30" class="hi"/><text x="938" y="130" text-anchor="middle" class="fg">10</text>
+    <rect x="966" y="110" width="56" height="30" class="hi"/><text x="994" y="130" text-anchor="middle" class="fg">9</text>
+    <rect x="1022" y="110" width="56" height="30" class="hi"/><text x="1050" y="130" text-anchor="middle" class="fg">8</text>
+  </g>
+  <text x="570" y="172" class="fg">3000 RPM = 0x0BB8: byte 0 = <tspan class="mono">B8</tspan>, byte 1 = <tspan class="mono">0B</tspan></text>
+
+  <!-- key -->
+  <rect x="20" y="214" width="22" height="16" class="hi"/><text x="52" y="227" class="fg">high byte of the 16-bit value</text>
+  <rect x="300" y="214" width="22" height="16" class="lo"/><text x="332" y="227" class="fg">low byte</text>
+  <text x="20" y="270" class="fg">Bit numbers are byte × 8 + bit, with bit 7 the top bit of its byte — the same numbers DBC files and CAN tools use.</text>
+  <text x="20" y="296" class="muted">Both fields are 16 bits long and sit in the same two bytes; only the Start and the byte order differ.</text>
+</svg>

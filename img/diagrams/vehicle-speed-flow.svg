@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 430" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Road speed and gear</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="24" class="muted">Pickups (Hz)</text>
+  <g>
+    <rect x="20" y="40"  width="170" height="40" rx="6" class="box"/><text x="105" y="65"  text-anchor="middle" class="fg">Drive shaft</text>
+    <rect x="20" y="92"  width="170" height="40" rx="6" class="box"/><text x="105" y="117" text-anchor="middle" class="fg">Front left</text>
+    <rect x="20" y="144" width="170" height="40" rx="6" class="box"/><text x="105" y="169" text-anchor="middle" class="fg">Front right</text>
+    <rect x="20" y="196" width="170" height="40" rx="6" class="box"/><text x="105" y="221" text-anchor="middle" class="fg">Rear left</text>
+    <rect x="20" y="248" width="170" height="40" rx="6" class="box"/><text x="105" y="273" text-anchor="middle" class="fg">Rear right</text>
+    <rect x="20" y="300" width="170" height="40" rx="6" class="box"/><text x="105" y="325" text-anchor="middle" class="fg">GPS module</text>
+  </g>
+
+  <rect x="240" y="40" width="210" height="300" rx="6" class="tgt"/>
+  <text x="345" y="150" text-anchor="middle" class="fg head">Each pickup</text>
+  <text x="345" y="175" text-anchor="middle" class="fg">Hz × 3600 ÷ pulses/km</text>
+  <text x="345" y="200" text-anchor="middle" class="muted">0 pulses/km: not used</text>
+  <text x="345" y="222" text-anchor="middle" class="muted">above Implausible: dropped</text>
+  <path d="M190 60 H238"  class="line" marker-end="url(#a)"/>
+  <path d="M190 112 H238" class="line" marker-end="url(#a)"/>
+  <path d="M190 164 H238" class="line" marker-end="url(#a)"/>
+  <path d="M190 216 H238" class="line" marker-end="url(#a)"/>
+  <path d="M190 268 H238" class="line" marker-end="url(#a)"/>
+  <path d="M190 320 H238" class="line" marker-end="url(#a)"/>
+
+  <text x="470" y="68" class="mono fg">shaft_spd</text>
+  <text x="470" y="120" class="mono fg">wheel_fl</text>
+  <text x="470" y="172" class="mono fg">wheel_fr</text>
+  <text x="470" y="224" class="mono fg">wheel_rl</text>
+  <text x="470" y="276" class="mono fg">wheel_rr</text>
+  <text x="470" y="328" class="mono fg">gps_spd</text>
+  <path d="M450 190 H578" class="line" marker-end="url(#a)"/>
+
+  <rect x="580" y="130" width="220" height="120" rx="6" class="ff"/>
+  <text x="690" y="156" text-anchor="middle" class="fg head">Main Source</text>
+  <text x="690" y="182" text-anchor="middle" class="fg">one pickup, or</text>
+  <text x="690" y="204" text-anchor="middle" class="fg">the middle speed of an axle</text>
+  <text x="690" y="226" text-anchor="middle" class="fg">or all four wheels</text>
+
+  <rect x="850" y="160" width="220" height="60" rx="6" class="pid"/>
+  <text x="960" y="186" text-anchor="middle" class="fg head">Vehicle Speed</text>
+  <text x="960" y="207" text-anchor="middle" class="mono fg">vehicle_spd</text>
+  <path d="M800 190 H848" class="line" marker-end="url(#a)"/>
+
+  <rect x="850" y="300" width="220" height="80" rx="6" class="box"/>
+  <text x="960" y="325" text-anchor="middle" class="fg head">Gear Detection</text>
+  <text x="960" y="347" text-anchor="middle" class="fg">RPM ÷ speed vs each ratio</text>
+  <text x="960" y="369" text-anchor="middle" class="mono fg">gear (0 = unknown)</text>
+  <path d="M960 220 V298" class="line" marker-end="url(#a)"/>
+  <text x="1070" y="410" text-anchor="end" class="muted" font-size="12">also read by launch, traction, pit limiter, cruise and idle</text>
+</svg>

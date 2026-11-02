@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 190" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="13">
+<title>Chrysler NGC 36-2+2 + 8cyl cam</title>
+<style>.fg{fill:#1d1f23}.muted{fill:#5f6670}.axis{stroke:#9aa1ab;stroke-width:1;fill:none}.tooth{fill:#3b82c4}.cam{fill:#d9822b}.grid{stroke:#c9ced6;stroke-width:1;stroke-dasharray:3 4}@media (prefers-color-scheme: dark){.fg{fill:#e4e6ea}.muted{fill:#9aa1ab}.grid{stroke:#4a5059}}</style>
+<line x1="110.0" y1="20" x2="110.0" y2="164" class="grid"/>
+<text x="110.0" y="182" text-anchor="middle" class="muted">0°</text>
+<line x1="218.8" y1="20" x2="218.8" y2="164" class="grid"/>
+<text x="218.8" y="182" text-anchor="middle" class="muted">90°</text>
+<line x1="327.5" y1="20" x2="327.5" y2="164" class="grid"/>
+<text x="327.5" y="182" text-anchor="middle" class="muted">180°</text>
+<line x1="436.2" y1="20" x2="436.2" y2="164" class="grid"/>
+<text x="436.2" y="182" text-anchor="middle" class="muted">270°</text>
+<line x1="545.0" y1="20" x2="545.0" y2="164" class="grid"/>
+<text x="545.0" y="182" text-anchor="middle" class="muted">360°</text>
+<line x1="653.8" y1="20" x2="653.8" y2="164" class="grid"/>
+<text x="653.8" y="182" text-anchor="middle" class="muted">450°</text>
+<line x1="762.5" y1="20" x2="762.5" y2="164" class="grid"/>
+<text x="762.5" y="182" text-anchor="middle" class="muted">540°</text>
+<line x1="871.2" y1="20" x2="871.2" y2="164" class="grid"/>
+<text x="871.2" y="182" text-anchor="middle" class="muted">630°</text>
+<line x1="980.0" y1="20" x2="980.0" y2="164" class="grid"/>
+<text x="980.0" y="182" text-anchor="middle" class="muted">720°</text>
+<text x="10" y="66" class="fg">crank</text>
+<line x1="110" y1="80" x2="980" y2="80" class="axis"/>
+<rect x="110.0" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="146.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="158.3" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="170.4" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="182.5" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="194.6" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="206.7" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="218.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="230.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="242.9" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="255.0" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="267.1" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="279.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="291.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="303.3" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="315.4" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="327.5" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="339.6" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="375.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="387.9" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="400.0" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="412.1" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="424.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="436.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="448.3" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="460.4" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="472.5" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="484.6" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="496.7" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="508.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="520.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="532.9" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="545.0" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="581.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="593.3" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="605.4" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="617.5" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="629.6" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="641.7" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="653.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="665.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="677.9" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="690.0" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="702.1" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="714.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="726.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="738.3" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="750.4" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="762.5" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="774.6" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="810.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="822.9" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="835.0" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="847.1" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="859.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="871.2" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="883.3" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="895.4" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="907.5" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="919.6" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="931.7" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="943.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="955.8" y="50" width="6.0" height="30" class="tooth"/>
+<rect x="967.9" y="50" width="6.0" height="30" class="tooth"/>
+<text x="10" y="126" class="fg">cam</text>
+<line x1="110" y1="140" x2="980" y2="140" class="axis"/>
+<rect x="110.0" y="110" width="12.7" height="30" class="cam"/>
+<rect x="218.8" y="110" width="12.7" height="30" class="cam"/>
+<rect x="244.1" y="110" width="12.7" height="30" class="cam"/>
+<rect x="327.5" y="110" width="12.7" height="30" class="cam"/>
+<rect x="352.9" y="110" width="12.7" height="30" class="cam"/>
+<rect x="378.2" y="110" width="12.7" height="30" class="cam"/>
+<rect x="436.2" y="110" width="12.7" height="30" class="cam"/>
+<rect x="461.6" y="110" width="12.7" height="30" class="cam"/>
+<rect x="545.0" y="110" width="12.7" height="30" class="cam"/>
+<rect x="570.4" y="110" width="12.7" height="30" class="cam"/>
+<rect x="653.8" y="110" width="12.7" height="30" class="cam"/>
+<rect x="762.5" y="110" width="12.7" height="30" class="cam"/>
+<rect x="787.9" y="110" width="12.7" height="30" class="cam"/>
+<rect x="813.2" y="110" width="12.7" height="30" class="cam"/>
+<rect x="871.2" y="110" width="12.7" height="30" class="cam"/>
+</svg>

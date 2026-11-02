@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 560" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Electronic throttle signal flow</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+  </defs>
+
+  <!-- 1 pedal -->
+  <text x="20" y="28" class="muted head">1 · What the driver asks for  (Accelerator Pedal)</text>
+  <rect x="20" y="42" width="170" height="64" rx="6" class="box"/>
+  <text x="105" y="67" text-anchor="middle" class="fg head">Pedal tracks</text>
+  <text x="105" y="89" text-anchor="middle" class="mono muted">app_1 · app_2</text>
+  <rect x="220" y="42" width="170" height="64" rx="6" class="safe"/>
+  <text x="305" y="67" text-anchor="middle" class="fg head">A/B check</text>
+  <text x="305" y="89" text-anchor="middle" class="muted">fault → plate to rest</text>
+  <rect x="420" y="42" width="190" height="64" rx="6" class="tgt"/>
+  <text x="515" y="67" text-anchor="middle" class="fg head">Pedal to Throttle</text>
+  <text x="515" y="89" text-anchor="middle" class="muted">table · pedal × RPM</text>
+  <path d="M190 74 H218" class="line" marker-end="url(#a)"/>
+  <path d="M390 74 H418" class="line" marker-end="url(#a)"/>
+  <path d="M515 106 V150" class="line" marker-end="url(#a)"/>
+  <text x="525" y="134" class="mono muted">pedal_demand</text>
+
+  <!-- 2 arbitration -->
+  <text x="20" y="140" class="muted head">2 · What the plate should do  (Electronic throttle)</text>
+  <rect x="120" y="154" width="200" height="64" rx="6" class="tgt"/>
+  <text x="220" y="179" text-anchor="middle" class="fg">Idle floor</text>
+  <text x="220" y="201" text-anchor="middle" class="muted">idle_duty × Idle Authority</text>
+  <rect x="420" y="154" width="190" height="64" rx="6" class="tgt"/>
+  <text x="515" y="179" text-anchor="middle" class="fg">Cruise floor</text>
+  <text x="515" y="201" text-anchor="middle" class="muted">higher of the two wins</text>
+  <rect x="650" y="152" width="200" height="68" rx="6" class="tgt"/>
+  <text x="750" y="177" text-anchor="middle" class="fg head">Arbitration</text>
+  <text x="750" y="199" text-anchor="middle" class="muted">floor + pedal above it</text>
+  <path d="M610 186 H648" class="line" marker-end="url(#a)"/>
+  <path d="M220 218 V238 H760 V222" class="line" marker-end="url(#a)"/>
+  <rect x="880" y="154" width="200" height="64" rx="6" class="safe"/>
+  <text x="980" y="179" text-anchor="middle" class="fg">Traction / Torque Cap</text>
+  <text x="980" y="201" text-anchor="middle" class="muted">the lower wins</text>
+  <path d="M850 186 H878" class="line" marker-end="url(#a)"/>
+  <path d="M980 218 V252 H700 V278" class="line" marker-end="url(#a)"/>
+  <text x="850" y="270" class="mono muted">throttle_demand</text>
+
+  <!-- 3 position loop -->
+  <text x="20" y="262" class="muted head">3 · Moving the plate there</text>
+  <rect x="560" y="280" width="280" height="64" rx="6" class="tgt"/>
+  <text x="700" y="305" text-anchor="middle" class="fg">Min / Max TPS, Open / Close Rate</text>
+  <text x="700" y="327" text-anchor="middle" class="muted">target clamped and slew-limited</text>
+  <rect x="300" y="280" width="220" height="64" rx="6" class="ff"/>
+  <text x="410" y="305" text-anchor="middle" class="fg head">Feed-forward</text>
+  <text x="410" y="327" text-anchor="middle" class="muted">duty to hold that position</text>
+  <rect x="40" y="280" width="220" height="64" rx="6" class="pid"/>
+  <text x="150" y="305" text-anchor="middle" class="fg head">+ PID</text>
+  <text x="150" y="327" text-anchor="middle" class="muted">target − position</text>
+  <path d="M560 312 H522" class="line" marker-end="url(#a)"/>
+  <path d="M300 312 H262" class="line" marker-end="url(#a)"/>
+  <path d="M150 344 V398" class="line" marker-end="url(#a)"/>
+  <text x="160" y="378" class="mono muted">etb_duty_1 · etb_en_1</text>
+
+  <!-- 4 bridge + plate -->
+  <rect x="40" y="400" width="220" height="64" rx="6" class="box"/>
+  <text x="150" y="425" text-anchor="middle" class="fg head">Half Bridge A</text>
+  <text x="150" y="447" text-anchor="middle" class="muted">drives only while enabled</text>
+  <rect x="300" y="400" width="220" height="64" rx="6" class="box"/>
+  <text x="410" y="425" text-anchor="middle" class="fg head">Throttle motor</text>
+  <text x="410" y="447" text-anchor="middle" class="muted">spring returns it when off</text>
+  <path d="M260 432 H298" class="line" marker-end="url(#a)"/>
+  <rect x="560" y="400" width="220" height="64" rx="6" class="box"/>
+  <text x="670" y="425" text-anchor="middle" class="fg head">Throttle sensors</text>
+  <text x="670" y="447" text-anchor="middle" class="mono muted">tps · tps_2</text>
+  <path d="M520 432 H558" class="line" marker-end="url(#a)"/>
+  <rect x="820" y="400" width="250" height="64" rx="6" class="safe"/>
+  <text x="945" y="425" text-anchor="middle" class="fg head">A/B check, stall check</text>
+  <text x="945" y="447" text-anchor="middle" class="muted">fault → bridge off, latched</text>
+  <path d="M780 432 H818" class="line" marker-end="url(#a)"/>
+  <path d="M945 464 V510 H20 V312 H38" class="line" marker-end="url(#a)"/>
+  <text x="520" y="530" class="mono muted">etb_position_1 (track A) — fed back to the PID</text>
+</svg>

@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 470" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>How jayecu Studio updates itself</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+  <text x="20" y="28" class="muted head">1 · While you work</text>
+  <rect x="20" y="44" width="184" height="78" rx="6" class="tgt"/>
+  <text x="112" y="68" text-anchor="middle" class="fg head">Check</text>
+  <text x="112" y="90" text-anchor="middle" class="muted">at startup, if ticked,</text>
+  <text x="112" y="109" text-anchor="middle" class="muted">or Check now</text>
+  <rect x="229" y="44" width="184" height="78" rx="6" class="box"/>
+  <text x="321" y="68" text-anchor="middle" class="fg head">Newest release</text>
+  <text x="321" y="90" text-anchor="middle" class="muted">on GitHub, compared</text>
+  <text x="321" y="109" text-anchor="middle" class="muted">with this version</text>
+  <rect x="438" y="44" width="184" height="78" rx="6" class="tgt"/>
+  <text x="530" y="68" text-anchor="middle" class="fg head">You are asked</text>
+  <text x="530" y="90" text-anchor="middle" class="muted">“Download and install</text>
+  <text x="530" y="109" text-anchor="middle" class="muted">it now (N MB)?”</text>
+  <rect x="647" y="44" width="184" height="78" rx="6" class="ff"/>
+  <text x="739" y="68" text-anchor="middle" class="fg head">Download</text>
+  <text x="739" y="90" text-anchor="middle" class="muted">SHA256SUMS first,</text>
+  <text x="739" y="109" text-anchor="middle" class="muted">then this system’s file</text>
+  <rect x="856" y="44" width="184" height="78" rx="6" class="pid"/>
+  <text x="948" y="68" text-anchor="middle" class="fg head">Verify</text>
+  <text x="948" y="90" text-anchor="middle" class="muted">the file’s SHA-256</text>
+  <text x="948" y="109" text-anchor="middle" class="muted">against SHA256SUMS</text>
+  <text x="20" y="176" class="muted head">2 · As the studio closes</text>
+  <rect x="20" y="192" width="184" height="78" rx="6" class="ff"/>
+  <text x="112" y="216" text-anchor="middle" class="fg head">Stage</text>
+  <text x="112" y="238" text-anchor="middle" class="muted">Linux: &lt;AppImage&gt;.new</text>
+  <text x="112" y="257" text-anchor="middle" class="muted">Windows: temp folder</text>
+  <rect x="229" y="192" width="184" height="78" rx="6" class="box"/>
+  <text x="321" y="216" text-anchor="middle" class="fg head">Studio closes</text>
+  <text x="321" y="238" text-anchor="middle" class="muted">the usual close: unsaved</text>
+  <text x="321" y="257" text-anchor="middle" class="muted">work is asked about</text>
+  <rect x="438" y="192" width="184" height="78" rx="6" class="ff"/>
+  <text x="530" y="216" text-anchor="middle" class="fg head">Install</text>
+  <text x="530" y="238" text-anchor="middle" class="muted">Linux: swap the file</text>
+  <text x="530" y="257" text-anchor="middle" class="muted">Windows: installer, silent</text>
+  <rect x="647" y="192" width="184" height="78" rx="6" class="pid"/>
+  <text x="739" y="216" text-anchor="middle" class="fg head">New version starts</text>
+  <text x="739" y="238" text-anchor="middle" class="muted">same data folder,</text>
+  <text x="739" y="257" text-anchor="middle" class="muted">same settings</text>
+  <path d="M204 83 H227" class="line" marker-end="url(#a)"/>
+  <path d="M413 83 H436" class="line" marker-end="url(#a)"/>
+  <text x="425" y="140" text-anchor="middle" class="muted">newer</text>
+  <path d="M622 83 H645" class="line" marker-end="url(#a)"/>
+  <text x="634" y="140" text-anchor="middle" class="muted">Yes</text>
+  <path d="M831 83 H854" class="line" marker-end="url(#a)"/>
+  <path d="M948 122 V150 H112 V190" class="line" marker-end="url(#a)"/>
+  <text x="980" y="140" class="muted">match</text>
+  <path d="M204 231 H227" class="line" marker-end="url(#a)"/>
+  <path d="M413 231 H436" class="line" marker-end="url(#a)"/>
+  <path d="M622 231 H645" class="line" marker-end="url(#a)"/>
+
+  <!-- ===== 3 · WHEN IT STOPS ===== -->
+  <text x="20" y="324" class="muted head">3 · When it stops, or waits</text>
+  <rect x="20" y="340" width="330" height="110" rx="6" class="safe"/>
+  <text x="36" y="364" class="fg head">Nothing to install here</text>
+  <text x="36" y="386" class="muted">you are told why: no file for this system,</text>
+  <text x="36" y="406" class="muted">no SHA256SUMS, or (Linux) not started</text>
+  <text x="36" y="426" class="muted">from an AppImage / folder not writable</text>
+  <rect x="370" y="340" width="330" height="110" rx="6" class="safe"/>
+  <text x="386" y="364" class="fg head">Download fails</text>
+  <text x="386" y="386" class="muted">no connection, or the file does not</text>
+  <text x="386" y="406" class="muted">match its checksum: not installed,</text>
+  <text x="386" y="426" class="muted">you are offered a retry</text>
+  <rect x="720" y="340" width="320" height="110" rx="6" class="box"/>
+  <text x="736" y="364" class="fg head">Close cancelled</text>
+  <text x="736" y="386" class="muted">the update stays staged and is</text>
+  <text x="736" y="406" class="muted">installed the next time the</text>
+  <text x="736" y="426" class="muted">studio closes</text>
+</svg>

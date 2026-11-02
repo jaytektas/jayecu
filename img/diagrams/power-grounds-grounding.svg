@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 560" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Grounding the ECU: output grounds to the engine, sensor returns to the ECU</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: #f6f7f9; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .pin  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .wblk { stroke: #1d1f23; stroke-width: 4; fill: none; }
+    .wsig { stroke: #1d1f23; stroke-width: 2; fill: none; }
+    .net  { stroke: #5f6670; stroke-width: 6; fill: none; }
+    .flow { stroke: #d9822b; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .bad  { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .pin { fill: #20232a; stroke: #9aa1ab; } .ecu { fill: #1c1f25; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .safe { fill: #361512; }
+      .wblk, .wsig { stroke: #cfd3d9; } .net { stroke: #9aa1ab; }
+    }
+  </style>
+  <defs>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d9822b"/>
+    </marker>
+  </defs>
+
+  <!-- ===== engine side ===== -->
+  <rect x="20" y="150" width="190" height="80" rx="6" class="box"/>
+  <text x="115" y="180" text-anchor="middle" class="fg head">Engine ground point</text>
+  <text x="115" y="202" text-anchor="middle" class="muted">block or head, bare metal</text>
+  <path d="M115 230 V300" class="wblk"/>
+  <rect x="20" y="300" width="190" height="56" rx="6" class="box"/>
+  <text x="115" y="324" text-anchor="middle" class="fg head">Battery −</text>
+  <text x="115" y="344" text-anchor="middle" class="muted">heavy strap to the engine</text>
+
+  <!-- output grounds -->
+  <path d="M210 175 H398" class="wblk"/>
+  <path d="M210 205 H398" class="wblk"/>
+  <path d="M210 222 H300 V235 H398" class="wblk"/>
+  <text x="300" y="165" text-anchor="middle" class="muted">B (black), one wire per pin</text>
+
+  <!-- ===== ECU ===== -->
+  <rect x="400" y="40" width="300" height="400" rx="8" class="ecu"/>
+  <text x="550" y="66" text-anchor="middle" class="fg head">ECU</text>
+  <text x="550" y="86" text-anchor="middle" class="muted">every GND pin is the same net inside</text>
+
+  <text x="410" y="130" class="muted head">Output grounds</text>
+  <rect x="400" y="160" width="130" height="30" rx="4" class="pin"/>
+  <text x="465" y="180" text-anchor="middle" class="fg">CN4-11</text>
+  <rect x="400" y="190" width="130" height="30" rx="4" class="pin"/>
+  <text x="465" y="210" text-anchor="middle" class="fg">CN4-12</text>
+  <rect x="400" y="220" width="130" height="30" rx="4" class="pin"/>
+  <text x="465" y="240" text-anchor="middle" class="fg">CN2-23</text>
+
+  <text x="690" y="130" text-anchor="end" class="muted head">Sensor grounds</text>
+  <rect x="570" y="160" width="130" height="30" rx="4" class="pin"/>
+  <text x="635" y="180" text-anchor="middle" class="fg">CN3-10</text>
+  <rect x="570" y="190" width="130" height="30" rx="4" class="pin"/>
+  <text x="635" y="210" text-anchor="middle" class="fg">CN3-11</text>
+  <rect x="570" y="220" width="130" height="30" rx="4" class="pin"/>
+  <text x="635" y="240" text-anchor="middle" class="fg">CN3-12</text>
+  <rect x="570" y="250" width="130" height="30" rx="4" class="pin"/>
+  <text x="635" y="270" text-anchor="middle" class="fg">CN3-35</text>
+
+  <path d="M465 250 V320 H635 V280" class="net"/>
+  <text x="550" y="345" text-anchor="middle" class="mono muted">GND</text>
+
+  <rect x="420" y="366" width="260" height="56" rx="6" class="ff"/>
+  <text x="550" y="390" text-anchor="middle" class="fg head">Low-side and ignition drivers</text>
+  <text x="550" y="410" text-anchor="middle" class="muted">switch their loads to GND</text>
+
+  <!-- load current path -->
+  <path d="M420 394 H340 V242" class="flow" marker-end="url(#o)"/>
+  <text x="250" y="272" text-anchor="middle" class="muted">injector, coil and</text>
+  <text x="250" y="290" text-anchor="middle" class="muted">relay current returns</text>
+
+  <!-- ===== sensor side ===== -->
+  <rect x="860" y="150" width="220" height="50" rx="6" class="tgt"/>
+  <text x="970" y="180" text-anchor="middle" class="fg">Coolant sensor, return</text>
+  <rect x="860" y="210" width="220" height="50" rx="6" class="tgt"/>
+  <text x="970" y="240" text-anchor="middle" class="fg">MAP and TPS ground</text>
+  <rect x="860" y="270" width="220" height="50" rx="6" class="tgt"/>
+  <text x="970" y="300" text-anchor="middle" class="fg">Shield of a crank lead</text>
+  <path d="M860 175 H702" class="wsig"/>
+  <path d="M860 235 H780 V205 H702" class="wsig"/>
+  <path d="M860 295 H760 V265 H702" class="wsig"/>
+  <text x="780" y="140" text-anchor="middle" class="muted">small current, no load</text>
+
+  <!-- ===== what not to do ===== -->
+  <rect x="740" y="400" width="340" height="140" rx="6" class="safe"/>
+  <text x="910" y="428" text-anchor="middle" class="fg head">Not this: a sensor return to a body bolt</text>
+  <text x="910" y="452" text-anchor="middle" class="muted">Load current flowing through the body and</text>
+  <text x="910" y="472" text-anchor="middle" class="muted">engine straps makes the bolt sit a little</text>
+  <text x="910" y="492" text-anchor="middle" class="muted">above or below the ECU's ground, and the</text>
+  <text x="910" y="512" text-anchor="middle" class="muted">sensor reading moves with engine load.</text>
+</svg>

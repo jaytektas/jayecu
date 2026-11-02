@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 380" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Torque against spark advance</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .curve{ stroke: #3b82c4; stroke-width: 3; fill: none; }
+    .knock{ fill: #fbeaea; stroke: none; }
+    .kline{ stroke: #c8412d; stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+    .mbt  { stroke: #2e9d4f; stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; }
+      .knock { fill: #361512; }
+    }
+  </style>
+
+  <!-- knock region right of 32 deg -->
+  <rect x="640" y="30" width="400" height="280" class="knock"/>
+  <path d="M640 30 V310" class="kline"/>
+  <text x="900" y="236" text-anchor="middle" class="fg head">Knock</text>
+  <text x="900" y="258" text-anchor="middle" class="fg">at this load, this engine knocks</text>
+  <text x="900" y="278" text-anchor="middle" class="fg">beyond about here — stay left of it</text>
+
+  <!-- axes -->
+  <path d="M80 30 V310 H1040" class="axis"/>
+  <text x="560" y="350" text-anchor="middle" class="fg">spark advance, degrees before top dead centre →</text>
+  <text x="40" y="170" text-anchor="middle" class="fg" transform="rotate(-90 40 170)">torque →</text>
+  <text x="120" y="330" class="muted">10</text><text x="360" y="330" class="muted">20</text>
+  <text x="600" y="330" class="muted">30</text><text x="840" y="330" class="muted">40</text>
+
+  <!-- torque curve: rises, flat top near 36 deg (x=744), then falls -->
+  <path d="M100 290 C 300 150, 520 70, 744 60 S 960 100, 1030 170" class="curve"/>
+  <path d="M744 60 V310" class="mbt"/>
+  <text x="752" y="150" class="fg head">MBT</text>
+  <text x="752" y="170" class="fg">best torque</text>
+
+  <circle cx="616" cy="79" r="6" fill="#d9822b"/>
+  <text x="600" y="126" text-anchor="end" class="fg head">Where you tune</text>
+  <text x="600" y="146" text-anchor="end" class="fg">MBT, or the knock limit</text>
+  <text x="600" y="166" text-anchor="end" class="fg">less a margin — whichever is less</text>
+
+  <text x="300" y="270" class="muted">too little advance: slow burn,</text>
+  <text x="300" y="290" class="muted">hot exhaust, wasted power</text>
+</svg>

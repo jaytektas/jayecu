@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 640" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>CAN bus topology: one line with a 120 ohm terminator at each end</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .wH   { stroke: #6fbf5a; stroke-width: 3; fill: none; }
+    .wL   { stroke: #6fbf5a; stroke-width: 3; fill: none; }
+    .wLs  { stroke: #1d1f23; stroke-width: 3; fill: none; stroke-dasharray: 5 7; }
+    .res  { fill: #ffffff; stroke: #1d1f23; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+      .wLs { stroke: #e4e6ea; } .res { fill: #20232a; stroke: #e4e6ea; }
+    }
+  </style>
+
+  <!-- ===== RIGHT ===== -->
+  <text x="20" y="28" class="fg head">Right: one line, a 120 Ω terminator at each end, short stubs</text>
+
+  <!-- ECU at the left end -->
+  <rect x="20" y="50" width="200" height="110" rx="6" class="pid"/>
+  <text x="120" y="74" text-anchor="middle" class="fg head">jayecu ECU</text>
+  <text x="120" y="94" text-anchor="middle" class="muted">CAN1, CN4 pins 10 / 17</text>
+  <path d="M80 117 H96 M144 117 H160" class="line"/><rect x="96" y="108" width="48" height="18" class="res"/><text x="120" y="122" text-anchor="middle" class="mono fg">R115</text>
+  <text x="120" y="146" text-anchor="middle" class="muted">120 Ω inside the ECU</text>
+
+  <!-- trunk -->
+  <path d="M220 90 H830" class="wH"/>
+  <path d="M220 120 H830" class="wL"/>
+  <path d="M220 120 H830" class="wLs"/>
+  <text x="238" y="84" class="mono muted">CAN H · Lg (light green)</text>
+  <text x="238" y="140" class="mono muted">CAN L · Lg/B (light green / black)</text>
+  <text x="690" y="84" text-anchor="middle" class="muted">trunk: one twisted pair</text>
+
+  <!-- far end node, terminated -->
+  <rect x="830" y="50" width="210" height="110" rx="6" class="tgt"/>
+  <text x="935" y="74" text-anchor="middle" class="fg head">Last device on the line</text>
+  <text x="935" y="94" text-anchor="middle" class="muted">e.g. a dash, terminated</text>
+  <path d="M895 117 H911 M959 117 H975" class="line"/><rect x="911" y="108" width="48" height="18" class="res"/>
+  <text x="935" y="146" text-anchor="middle" class="muted">120 Ω</text>
+
+  <!-- stubs -->
+  <path d="M540 90 V230" class="wH"/>
+  <path d="M558 120 V230" class="wL"/>
+  <path d="M558 120 V230" class="wLs"/>
+  <rect x="460" y="230" width="180" height="58" rx="6" class="box"/>
+  <text x="550" y="254" text-anchor="middle" class="fg">Wideband controller</text>
+  <text x="550" y="274" text-anchor="middle" class="muted">not terminated</text>
+
+  <path d="M740 90 V230" class="wH"/>
+  <path d="M758 120 V230" class="wL"/>
+  <path d="M758 120 V230" class="wLs"/>
+  <rect x="660" y="230" width="180" height="58" rx="6" class="box"/>
+  <text x="750" y="254" text-anchor="middle" class="fg">I/O expander</text>
+  <text x="750" y="274" text-anchor="middle" class="muted">not terminated</text>
+
+  <text x="650" y="312" text-anchor="middle" class="muted">stubs: as short as you can make them</text>
+
+  <rect x="20" y="206" width="240" height="82" rx="6" class="box"/>
+  <text x="140" y="230" text-anchor="middle" class="fg head">Check with a meter</text>
+  <text x="140" y="252" text-anchor="middle" class="muted">power off, H to L, anywhere:</text>
+  <text x="140" y="274" text-anchor="middle" class="fg">about 60 Ω</text>
+
+  <!-- ===== WRONG ===== -->
+  <text x="20" y="346" class="fg head">Wrong</text>
+
+  <!-- star -->
+  <rect x="20" y="362" width="490" height="258" rx="6" class="safe"/>
+  <text x="265" y="388" text-anchor="middle" class="fg head">A star: every branch is an unterminated end</text>
+  <circle cx="265" cy="500" r="10" class="node"/>
+  <path d="M265 490 V430" class="line"/><path d="M255 500 H150" class="line"/>
+  <path d="M275 500 H380" class="line"/><path d="M265 510 V560" class="line"/>
+  <rect x="200" y="404" width="130" height="30" rx="4" class="box"/>
+  <text x="265" y="424" text-anchor="middle" class="fg">ECU</text>
+  <rect x="40" y="485" width="110" height="30" rx="4" class="box"/>
+  <text x="95" y="505" text-anchor="middle" class="fg">Dash</text>
+  <rect x="380" y="485" width="110" height="30" rx="4" class="box"/>
+  <text x="435" y="505" text-anchor="middle" class="fg">Wideband</text>
+  <rect x="200" y="560" width="130" height="30" rx="4" class="box"/>
+  <text x="265" y="580" text-anchor="middle" class="fg">I/O box</text>
+  <text x="265" y="610" text-anchor="middle" class="muted">reflections: errors that come and go</text>
+
+  <!-- ECU mid-bus -->
+  <rect x="530" y="362" width="510" height="258" rx="6" class="safe"/>
+  <text x="785" y="388" text-anchor="middle" class="fg head">The ECU in the middle of a terminated bus</text>
+  <path d="M560 470 H1010" class="wH"/>
+  <path d="M560 496 H1010" class="wL"/><path d="M560 496 H1010" class="wLs"/>
+  <path d="M580 450 V470 M620 450 V496" class="line"/><rect x="550" y="420" width="110" height="30" rx="4" class="box"/>
+  <text x="605" y="440" text-anchor="middle" class="fg">End A · 120 Ω</text>
+  <path d="M950 450 V470 M990 450 V496" class="line"/><rect x="910" y="420" width="120" height="30" rx="4" class="box"/>
+  <text x="970" y="440" text-anchor="middle" class="fg">End B · 120 Ω</text>
+  <path d="M770 470 V530" class="line"/><path d="M790 496 V530" class="line"/>
+  <rect x="700" y="530" width="170" height="40" rx="4" class="pid"/>
+  <text x="785" y="555" text-anchor="middle" class="fg">ECU · 120 Ω (fixed)</text>
+  <text x="785" y="592" text-anchor="middle" class="fg">three terminators: about 40 Ω</text>
+  <text x="785" y="612" text-anchor="middle" class="muted">the ECU's own resistor cannot be switched off</text>
+</svg>

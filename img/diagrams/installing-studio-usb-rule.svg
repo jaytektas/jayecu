@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 440" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>The Linux USB rule: which devices it covers and what it grants</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .ff   { fill: #fdf0e3; stroke: #d9822b; stroke-width: 2; }
+    .pid  { fill: #eef7ee; stroke: #2e9d4f; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .safeline { stroke: #c8412d; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .node { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box, .node { fill: #20232a; stroke: #9aa1ab; }
+      .tgt { fill: #16283b; } .ff { fill: #33240f; } .pid { fill: #13291a; } .safe { fill: #361512; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9099"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c8412d"/>
+    </marker>
+  </defs>
+
+  <text x="20" y="28" class="muted head">1 · The ECU on USB</text>
+  <rect x="20" y="44" width="300" height="96" rx="6" class="tgt"/>
+  <text x="36" y="68" class="fg head">Running: USB serial port</text>
+  <text x="36" y="92" class="mono fg">0483:5740</text>
+  <text x="36" y="114" class="muted"><tspan class="mono">/dev/ttyACM</tspan><tspan class="mono">n</tspan>, and the link</text>
+  <text x="36" y="132" class="mono fg">/dev/jayecu</text>
+
+  <rect x="20" y="160" width="300" height="96" rx="6" class="tgt"/>
+  <text x="36" y="184" class="fg head">Updating: DFU bootloader</text>
+  <text x="36" y="208" class="mono fg">0483:df11</text>
+  <text x="36" y="230" class="muted">only while firmware is written</text>
+
+  <text x="380" y="28" class="muted head">2 · One rule file</text>
+  <rect x="380" y="44" width="300" height="212" rx="6" class="box"/>
+  <text x="396" y="68" class="mono fg">/etc/udev/rules.d/</text>
+  <text x="396" y="88" class="mono fg">70-jayecu.rules</text>
+  <text x="396" y="118" class="muted">tags both devices <tspan class="mono">uaccess</tspan>,</text>
+  <text x="396" y="138" class="muted">sets their group and mode 0660</text>
+  <text x="396" y="170" class="muted">numbered 70 so it runs before</text>
+  <text x="396" y="190" class="mono fg">73-seat-late.rules</text>
+  <text x="396" y="210" class="muted">— the step that grants the ACL</text>
+  <text x="396" y="240" class="muted">replaces an old <tspan class="mono">99-jayecu.rules</tspan></text>
+
+  <text x="740" y="28" class="muted head">3 · Who may open them</text>
+  <rect x="740" y="44" width="300" height="96" rx="6" class="pid"/>
+  <text x="756" y="68" class="fg head">You, at the desktop</text>
+  <text x="756" y="92" class="muted">an ACL from <tspan class="mono">uaccess</tspan>: works as soon</text>
+  <text x="756" y="112" class="muted">as the rule is loaded, no log-out</text>
+
+  <rect x="740" y="160" width="300" height="96" rx="6" class="box"/>
+  <text x="756" y="184" class="fg head">Members of a group</text>
+  <text x="756" y="208" class="muted">serial port: <tspan class="mono">dialout</tspan></text>
+  <text x="756" y="228" class="muted">USB devices: <tspan class="mono">plugdev</tspan></text>
+  <text x="756" y="248" class="muted">for SSH and scripts</text>
+
+  <path d="M320 92 H378" class="line" marker-end="url(#a)"/>
+  <path d="M320 208 H378" class="line" marker-end="url(#a)"/>
+  <path d="M680 92 H738" class="line" marker-end="url(#a)"/>
+  <path d="M680 208 H738" class="line" marker-end="url(#a)"/>
+
+  <text x="20" y="300" class="muted head">Without it</text>
+  <rect x="20" y="316" width="1020" height="104" rx="6" class="safe"/>
+  <text x="36" y="342" class="fg">The serial port belongs to <tspan class="mono">root:dialout</tspan>: the studio cannot open it unless you are in <tspan class="mono">dialout</tspan>,</text>
+  <text x="36" y="364" class="fg">and a group only takes effect after you log out and in again.</text>
+  <text x="36" y="394" class="fg">The bootloader cannot be opened by the studio, and an ECU already in its bootloader stays there until</text>
+  <text x="36" y="412" class="fg">it is written or its power is cycled. So the studio installs the rule before it starts a firmware update.</text>
+</svg>

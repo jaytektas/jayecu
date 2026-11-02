@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1130 560" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>Boost control handover during a spool</title>
+  <style>
+    .fg { fill: #1d1f23; } .muted { fill: #5f6670; }
+    .axis { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .grid { stroke: #d6d9de; stroke-width: 1; }
+    .map  { stroke: #1d1f23; stroke-width: 3; fill: none; }
+    .tgt  { stroke: #3b82c4; stroke-width: 2.5; fill: none; }
+    .cp   { stroke: #2e9d4f; stroke-width: 2; fill: none; stroke-dasharray: 8 5; }
+    .act  { stroke: #d9822b; stroke-width: 2; fill: none; stroke-dasharray: 3 4; }
+    .duty { stroke: #d9822b; stroke-width: 3; fill: none; }
+    .assist { stroke: #c8412d; stroke-width: 2.5; fill: none; stroke-dasharray: 7 4; }
+    .phA { fill: #f1f2f4; } .phB { fill: #fdf0e3; } .phC { fill: #eef7ee; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; } .axis { stroke: #9aa1ab; } .grid { stroke: #2c3038; }
+      .map { stroke: #e4e6ea; } .phA { fill: #1c1f25; } .phB { fill: #33240f; } .phC { fill: #13291a; }
+    }
+  </style>
+
+  <!-- phases -->
+  <rect x="90"  y="40" width="200" height="440" class="phA"/>
+  <rect x="290" y="40" width="250" height="440" class="phB"/>
+  <rect x="540" y="40" width="420" height="440" class="phC"/>
+  <text x="190" y="62" text-anchor="middle" class="fg head">A · Spring only</text>
+  <text x="190" y="80" text-anchor="middle" class="muted">nothing sent</text>
+  <text x="415" y="62" text-anchor="middle" class="fg head">B · Feed-forward</text>
+  <text x="415" y="80" text-anchor="middle" class="muted">base duty (or spool assist)</text>
+  <text x="750" y="62" text-anchor="middle" class="fg head">C · Closed loop</text>
+  <text x="750" y="80" text-anchor="middle" class="muted">base duty + PID trim</text>
+
+  <!-- pressure panel: y 100..300 maps 250..90 kPa -->
+  <line x1="90" y1="300" x2="960" y2="300" class="axis"/>
+  <line x1="90" y1="100" x2="90" y2="300" class="axis"/>
+  <text x="30" y="110" class="muted">kPa</text>
+  <line x1="90" y1="150" x2="960" y2="150" class="grid"/>
+  <line x1="90" y1="200" x2="960" y2="200" class="grid"/>
+  <line x1="90" y1="250" x2="960" y2="250" class="grid"/>
+  <text x="82" y="154" text-anchor="end" class="muted">200</text>
+  <text x="82" y="204" text-anchor="end" class="muted">160</text>
+  <text x="82" y="254" text-anchor="end" class="muted">120</text>
+
+  <!-- target 200 kPa -->
+  <line x1="90" y1="150" x2="960" y2="150" class="tgt"/>
+  <text x="966" y="146" class="fg">Boost target</text>
+  <!-- control point = target - offset (170) -->
+  <line x1="90" y1="187.5" x2="960" y2="187.5" class="cp"/>
+  <text x="966" y="183" class="fg">Control point</text>
+  <text x="966" y="199" class="muted">target − offset</text>
+  <!-- activation MAP 110 -->
+  <line x1="90" y1="262.5" x2="960" y2="262.5" class="act"/>
+  <text x="966" y="258" class="fg">Activation MAP</text>
+
+  <!-- measured MAP: rises through activation at x=290 and the control point at x=540, settles near target -->
+  <path d="M90 287 C200 285 250 272 290 262.5 C380 240 470 206 540 187.5 C600 170 640 146 700 142 C760 139 800 153 850 151 C890 149 930 150 960 150" class="map"/>
+  <text x="706" y="132" class="fg">MAP</text>
+
+  <!-- duty panel: y 340..470 maps 100..0 % -->
+  <line x1="90" y1="470" x2="960" y2="470" class="axis"/>
+  <line x1="90" y1="340" x2="90" y2="470" class="axis"/>
+  <text x="20" y="330" class="muted">duty %</text>
+  <text x="82" y="344" text-anchor="end" class="muted">100</text>
+  <text x="82" y="474" text-anchor="end" class="muted">0</text>
+
+  <!-- A: nothing -->
+  <text x="190" y="455" text-anchor="middle" class="muted">(output on its failsafe)</text>
+  <!-- B: base duty from the table, climbing with target reading -->
+  <path d="M290 405 H540" class="duty"/>
+  <text x="415" y="397" text-anchor="middle" class="fg">base duty</text>
+  <!-- B alternative: spool assist at max duty -->
+  <path d="M290 352 H540" class="assist"/>
+  <text x="415" y="372" text-anchor="middle" class="muted">with spool assist: max duty</text>
+  <!-- C: trimmed, settling -->
+  <path d="M540 392 C580 372 620 412 660 420 C720 428 780 400 840 407 C880 410 920 406 960 406" class="duty"/>
+  <text x="750" y="395" text-anchor="middle" class="fg">PID trims around the base duty</text>
+
+  <text x="900" y="500" class="fg">time →</text>
+  <text x="290" y="500" text-anchor="middle" class="mono muted">MAP ≥ activation</text>
+  <text x="540" y="520" text-anchor="start" class="mono muted">MAP ≥ control point (and start delay, min TPS)</text>
+  <line x1="290" y1="40" x2="290" y2="480" class="axis" stroke-dasharray="4 4"/>
+  <line x1="540" y1="40" x2="540" y2="480" class="axis" stroke-dasharray="4 4"/>
+</svg>

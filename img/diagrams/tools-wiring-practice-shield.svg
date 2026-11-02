@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 400" font-family="system-ui, -apple-system, 'Segoe UI', Ubuntu, sans-serif" font-size="14">
+  <title>A VR crank sensor on a shielded twisted pair: both wires to the ECU, shield grounded at the ECU end only</title>
+  <style>
+    .fg   { fill: #1d1f23; }  .muted { fill: #5f6670; }
+    .line { stroke: #5f6670; stroke-width: 2; fill: none; }
+    .box  { fill: #ffffff; stroke: #5f6670; stroke-width: 2; }
+    .ecu  { fill: #f4f5f7; stroke: #5f6670; stroke-width: 2; }
+    .tgt  { fill: #e8f1fb; stroke: #3b82c4; stroke-width: 2; }
+    .safe { fill: #fbeaea; stroke: #c8412d; stroke-width: 2; }
+    .term { fill: #ffffff; stroke: #1d1f23; stroke-width: 1.5; }
+    .jacket { fill: #9aa1ab; fill-opacity: 0.18; stroke: #5f6670; stroke-width: 2; stroke-dasharray: 4 3; }
+    .case { stroke: #5f6670; stroke-width: 7; fill: none; stroke-linecap: round; }
+    .wBu { stroke: #3c6ec8; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .sB  { stroke: #282828; stroke-width: 4; fill: none; stroke-dasharray: 6 8; }
+    .drain { stroke: #8a8f98; stroke-width: 3; fill: none; }
+    .redx { stroke: #c8412d; stroke-width: 2.5; fill: none; }
+    .mono { font-family: ui-monospace, 'Ubuntu Mono', Consolas, monospace; font-size: 12px; }
+    .head { font-weight: 600; }
+    .small { font-size: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #e4e6ea; } .muted { fill: #9aa1ab; }
+      .line { stroke: #9aa1ab; } .box { fill: #20232a; stroke: #9aa1ab; }
+      .ecu { fill: #1a1c21; stroke: #9aa1ab; } .tgt { fill: #16283b; } .safe { fill: #361512; }
+      .term { fill: #20232a; stroke: #e4e6ea; } .case { stroke: #9aa1ab; } .jacket { stroke: #9aa1ab; }
+    }
+  </style>
+
+  <!-- sensor -->
+  <rect x="20" y="110" width="170" height="120" rx="8" class="tgt"/>
+  <text x="105" y="140" text-anchor="middle" class="fg head">VR crank sensor</text>
+  <text x="105" y="160" text-anchor="middle" class="muted small">two wires, no supply</text>
+  <text x="178" y="186" text-anchor="end" class="mono fg">+</text>
+  <text x="178" y="214" text-anchor="end" class="mono fg">−</text>
+
+  <!-- the cable jacket / shield from 250 to 800 -->
+  <rect x="250" y="160" width="560" height="70" rx="30" class="jacket"/>
+  <text x="530" y="150" text-anchor="middle" class="muted">shield (foil or braid) around the twisted pair</text>
+
+  <!-- twisted pair: two sine-like paths crossing -->
+  <path d="M190 182 H250 C280 182 290 208 320 208 C350 208 360 182 390 182 C420 182 430 208 460 208 C490 208 500 182 530 182 C560 182 570 208 600 208 C630 208 640 182 670 182 C700 182 710 208 740 208 C770 208 780 182 810 182 H880" class="case"/>
+  <path d="M190 182 H250 C280 182 290 208 320 208 C350 208 360 182 390 182 C420 182 430 208 460 208 C490 208 500 182 530 182 C560 182 570 208 600 208 C630 208 640 182 670 182 C700 182 710 208 740 208 C770 208 780 182 810 182 H880" class="wBu"/>
+  <path d="M190 208 H250 C280 208 290 182 320 182 C350 182 360 208 390 208 C420 208 430 182 460 182 C490 182 500 208 530 208 C560 208 570 182 600 182 C630 182 640 208 670 208 C700 208 710 182 740 182 C770 182 780 208 810 208 H880" class="case"/>
+  <path d="M190 208 H250 C280 208 290 182 320 182 C350 182 360 208 390 208 C420 208 430 182 460 182 C490 182 500 208 530 208 C560 208 570 182 600 182 C630 182 640 208 670 208 C700 208 710 182 740 182 C770 182 780 208 810 208 H880" class="wBu"/>
+  <path d="M190 208 H250 C280 208 290 182 320 182 C350 182 360 208 390 208 C420 208 430 182 460 182 C490 182 500 208 530 208 C560 208 570 182 600 182 C630 182 640 208 670 208 C700 208 710 182 740 182 C770 182 780 208 810 208 H880" class="sB"/>
+
+  <!-- shield at the sensor end: cut back and insulated -->
+  <path d="M250 232 V290" class="drain"/>
+  <path d="M240 290 L260 310 M260 290 L240 310" class="redx"/>
+  <text x="270" y="300" class="fg small">sensor end: shield cut back and</text>
+  <text x="270" y="316" class="fg small">covered with heat-shrink. Not connected.</text>
+
+  <!-- ECU -->
+  <rect x="880" y="60" width="160" height="300" rx="8" class="ecu"/>
+  <text x="960" y="86" text-anchor="middle" class="fg head">ECU · CN3</text>
+  <text x="960" y="104" text-anchor="middle" class="muted small">blue connector</text>
+  <rect x="874" y="176" width="12" height="12" class="term"/><text x="894" y="187" class="mono fg">6 · VR1+</text>
+  <rect x="874" y="202" width="12" height="12" class="term"/><text x="894" y="213" class="mono fg">7 · VR1−</text>
+  <rect x="874" y="294" width="12" height="12" class="term"/><text x="894" y="305" class="mono fg">12 · GND</text>
+
+  <!-- drain at ECU end -->
+  <path d="M810 232 V300 H874" class="drain"/>
+  <text x="600" y="258" class="fg small">ECU end: shield drain to an ECU ground</text>
+  <text x="600" y="274" class="fg small">pin on the same connector</text>
+
+  <text x="600" y="120" class="muted small">Bu (blue) and Bu/B (blue-black)</text>
+  <text x="20" y="370" class="muted small">Keep the twist all the way to the connector, and keep the untwisted, unshielded tail at each end as short as you can.</text>
+</svg>
