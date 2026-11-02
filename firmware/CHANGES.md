@@ -9,6 +9,8 @@ Unreleased in the same commit. `make release` turns Unreleased into the next ver
 raises the version (tools/release_notes.py). A line per change; no commit hashes, no file names.
 
 ## Unreleased
+
+## 0.4.24
 - **A battery dip is no longer a key-off.** One reading at or under 7 V, or one frame the battery could
   not be read, turned the key off on the spot: on a running engine that dropped sync, stopped firing and
   reset every module. A loose battery terminal on a bump is not the ignition going off. The supply now
