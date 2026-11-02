@@ -254,7 +254,20 @@ CON_12V_RAW → D15 SMCJ30CA (TVS) → F1 → F2 → CON_12V_PROT
               → REF3033AIDBZR (U40) → VREF+ (3.000 V)
 VDD → L3 ferrite → VDDA (3.3 V analog, decoupled)
 CR2032 B1 → VBAT
+USB VBUS → D20 → +5V   (USB-only power: no 12 V needed for the MCU or the sensor supplies)
 ```
+
+**USB-only power (tested on the bench and confirmed, 2026-11-01):** with only USB connected, `+5V` is
+fed through D20 and sits at about **4.6 V** because of the diode drop. The TLS115 sensor supplies hang off
+`+5V`, so **CON_5V_SENSOR1/2 are powered on USB**, at that lower rail. Their power-good lines then read
+**5V_SENSOR1_PG = fault, 5V_SENSOR2_PG = OK** (read with the key forced on and 12 V off). On that bench
+the ETB and TPS sensors are fed from the sensor supplies, so the split is likely load-dependent (a loaded
+tracker on a 4.6 V input falls out of regulation first), not a fixed property of the board. So:
+
+- sensor readings on USB are shifted against the lower reference, which is why the firmware does not read
+  the sensors with the key off;
+- power-good cannot tell "ignition off" from a supply glitch: with the ignition off on USB, one line still
+  reads OK.
 
 ---
 
