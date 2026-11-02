@@ -77,12 +77,12 @@ voltage. It is not on a connector and cannot be assigned to a sensor. Chapter 7 
 <!-- src: definition/boards/jaytek_v1.board.yaml pins[] AV12 (assignable: false, "battery voltage sense (fixed input)") -->
 
 **Key on, key off.** The ECU decides that the ignition key is on when its battery voltage rises above
-8.0 V, and that it is off when the voltage falls to 7.0 V or below. With the key off, even with the USB
+8.0 V, and that it is off when the voltage stays at 7.0 V or below for 100 ms. With the key off, even with the USB
 cable plugged in and the studio connected, the ECU **fires no coil and no injector**, raises no
 running trouble codes, and its sensor channels read zero. This is what lets you work on a tune at your
 desk with the ECU powered from USB alone. The live channel **Key On** `key_on` shows which state the ECU
 is in.
-<!-- src: firmware/Sensors/Sensors.h (KEY_ON_V 8.0, KEY_OFF_V 7.0); firmware/Sensors/Sensors.cpp; firmware/Engine/EngineTask.cpp (firing gate = key on) (DTCs active only key on) -->
+<!-- src: firmware/Sensors/Sensors.h (KEY_ON_V 8.0, KEY_OFF_V 7.0, KEY_OFF_HOLD_MS 100); firmware/Sensors/Sensors.cpp; firmware/Engine/EngineTask.cpp (firing gate = key on) (DTCs active only key on) -->
 
 !!! note "Other boards"
     The firmware also builds for the Proteus F7 board. The appendix

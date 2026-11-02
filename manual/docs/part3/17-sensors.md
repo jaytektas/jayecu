@@ -201,8 +201,8 @@ Two sensors on one pin is a configuration fault: the second one is not read, and
 
 ### 5 · Key off and the 5 V supplies
 
-- **Key off:** only **Battery Voltage** runs. The key counts as on above 8.0 V and off again below
-  7.0 V. Every other sensor waits for key-on, because on USB power alone the 5 V rail is fed from USB
+- **Key off:** only **Battery Voltage** runs. The key counts as on above 8.0 V and off again once the
+  voltage stays at 7.0 V or below for 100 ms. Every other sensor waits for key-on, because on USB power alone the 5 V rail is fed from USB
   and the readings would be real but wrong.
 - **5 V sensor supply down:** each 5 V sensor supply has a power-good line. If either goes low, every
   input read from an ECU pin is marked invalid at once, and its own checks stand down, so one fault is
